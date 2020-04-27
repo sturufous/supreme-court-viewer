@@ -1,0 +1,26 @@
+scv-api/[Bb]in/
+scv-api/[Oo]bj/
+scv-web/.DS_Store
+scv-web/node_modules
+scv-web/dist
+
+
+# local env files
+.env.local
+.env.*.local
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor directories and files
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Visual Studio Code
+scv-api/.vscode
