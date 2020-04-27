@@ -42,13 +42,13 @@ exit 1
 buildImages(){  
 
   docker build \
-    -t 'scv-api' \
-    -f '../scv-api/Dockerfile' '../scv-api/'
+    -t 'api' \
+    -f 'Dockerfile-api' '../scv-api/'
   echo -e
 
   docker build \
-    -t 'scv-web' \
-    -f '../scv-web/Dockerfile' '../scv-web/'
+    -t 'web' \
+    -f 'Dockerfile-web' '../scv-web/'
   echo -e
 }
 

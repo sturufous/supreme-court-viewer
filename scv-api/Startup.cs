@@ -46,7 +46,7 @@ namespace scv_api
             {
                 app.UseDeveloperExceptionPage();
             }
- 	    app.UseCors();
+ 	        app.UseCors();
 
             app.UseHttpsRedirection();
 

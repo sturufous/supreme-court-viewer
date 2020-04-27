@@ -1,3 +1,9 @@
+**/bin
+**/obj
+**/node_modules
+**/packages
+**/.vs
+
 scv-api/[Bb]in/
 scv-api/[Oo]bj/
 scv-web/.DS_Store
@@ -16,10 +22,9 @@ yarn-error.log*
 
 # Editor directories and files
 .idea
+*.user
 *.suo
 *.ntvs*
-*.njsproj
-*.sln
 *.sw?
 
 # Visual Studio Code

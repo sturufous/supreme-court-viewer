@@ -1,12 +1,12 @@
-version: "3"
+version: "3.4"
 services:
-  scv-web:
-    image: scv-web
+  web:
+    image: web
     ports:
       - 8080:80
     links:
-      - scv-api
-  scv-api:
-    image: scv-api
+      - api
+  api:
+    image: api
     ports:
       - 5000:5000
