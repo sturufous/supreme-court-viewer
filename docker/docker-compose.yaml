@@ -1,12 +1,12 @@
 version: "3"
 services:
-  scv-web-app:
+  scv-web:
     image: scv-web
     ports:
       - 8080:80
     links:
-      - scv-api-dotnetcore
-  scv-api-dotnetcore:
+      - scv-api
+  scv-api:
     image: scv-api
     ports:
       - 5000:5000

@@ -1,6 +1,9 @@
-.DS_Store
-node_modules
-/dist
+scv-api/[Bb]in/
+scv-api/[Oo]bj/
+scv-web/.DS_Store
+scv-web/node_modules
+scv-web/dist
+
 
 # local env files
 .env.local
@@ -13,9 +16,11 @@ yarn-error.log*
 
 # Editor directories and files
 .idea
-.vscode
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# Visual Studio Code
+scv-api/.vscode

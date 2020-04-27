@@ -39,14 +39,17 @@ exit 1
 # Functions:
 # -----------------------------------------------------------------------------------------------------------------
 
-buildImages(){
-  cd .. 
-  cd scv-api
-  docker build -t scv-api .
-  cd ..
-  cd scv-web
-  docker build -t scv-web .
-  cd ..
+buildImages(){  
+
+  docker build \
+    -t 'scv-api' \
+    -f '../scv-api/Dockerfile' '../scv-api/'
+  echo -e
+
+  docker build \
+    -t 'scv-web' \
+    -f '../scv-web/Dockerfile' '../scv-web/'
+  echo -e
 }
 
 toLower() {
