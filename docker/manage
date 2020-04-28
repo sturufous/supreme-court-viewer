@@ -3,6 +3,15 @@ export MSYS_NO_PATHCONV=1
 set -e
 
 
+S2I_EXE=s2i
+if [ -z $(type -P "$S2I_EXE") ]; then
+  echo -e "The ${S2I_EXE} executable is needed and not on your path."
+  echo -e "It can be downloaded from here: https://github.com/openshift/source-to-image"
+  echo -e "Make sure you place it in a directory on your path."
+  exit 1
+fi
+
+
 SCRIPT_HOME="$( cd "$( dirname "$0" )" && pwd )"
 #export COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME-fpo}"
 
@@ -39,18 +48,42 @@ exit 1
 # Functions:
 # -----------------------------------------------------------------------------------------------------------------
 
-buildImages(){
+build-api() {
+  #
+  # fpo-api
+  #
+  echo -e "\nBuilding api image ..."
+  ${S2I_EXE} build \
+    -e "ASPNETCORE_ENVIRONMENT=Production" \
+    -e "ASPNETCORE_URLS=http://+:5000" \
+    -e "CORS_DOMAIN=http://localhost:8080" \
+    '../scv-api' \
+    'registry.centos.org/dotnet/dotnet-31-centos7' \
+    'scv-api'
+}
 
-  docker build \
-    -f './api/Dockerfile' '../api/' \
-    -t 'scv-api'
+build-web(){
+  ${S2I_EXE} build \
+    '../scv-web' \
+    'registry.centos.org/centos/nodejs-10-centos7' \
+    'scv-web'
   echo -e
+}
 
+build-webx(){  
   docker build \
     -f './web/Dockerfile' '../web/' \
     -t 'scv-web'
   echo -e
 }
+
+buildImages() {
+ build-web  
+#  build-api
+}
+
+
+
 
 toLower() {
   echo $(echo ${@} | tr '[:upper:]' '[:lower:]')
