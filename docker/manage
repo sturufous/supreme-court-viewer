@@ -25,7 +25,7 @@ usage() {
 
           Example:
           $0 start
-         
+
   stop - Stops the services.  This is a non-destructive process.  The containers
          are not deleted so they will be reused the next time you run start.
 
@@ -39,16 +39,16 @@ exit 1
 # Functions:
 # -----------------------------------------------------------------------------------------------------------------
 
-buildImages(){  
+buildImages(){
 
   docker build \
-    -t 'scv-api' \
-    -f '../scv-api/Dockerfile' '../scv-api/'
+    -f './api/Dockerfile' '../api/' \
+    -t 'scv-api'
   echo -e
 
   docker build \
-    -t 'scv-web' \
-    -f '../scv-web/Dockerfile' '../scv-web/'
+    -f './web/Dockerfile' '../web/' \
+    -t 'scv-web'
   echo -e
 }
 
@@ -62,14 +62,14 @@ COMMAND=$(toLower ${1})
 shift
 
 case "$COMMAND" in
-  start)   
+  start)
       docker-compose up
-    ;;  
+    ;;
   stop)
       docker-compose stop
     ;;
   build)
-      buildImages   
+      buildImages
     ;;
   *)
     usage
