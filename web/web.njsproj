@@ -37,9 +37,6 @@
   <ItemGroup>
     <Content Include=".env" />
     <Content Include="nginx.conf" />
-    <Content Include="postcss.config.js">
-      <SubType>Code</SubType>
-    </Content>
     <Content Include="public\favicon.ico" />
     <Content Include="public\images\bcid-192x192.png" />
     <Content Include="public\images\bcid-512x512.png" />
