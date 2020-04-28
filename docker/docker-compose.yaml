@@ -1,12 +1,14 @@
 version: "3.4"
 services:
+
   web:
-    image: web
+    image: scv-web
     ports:
       - 8080:80
     links:
       - api
+  
   api:
-    image: api
+    image: scv-api
     ports:
       - 5000:5000
