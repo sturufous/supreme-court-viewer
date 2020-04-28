@@ -2,7 +2,7 @@ FROM mcr.microsoft.com/dotnet/core/sdk:3.1 as build
 
 WORKDIR /src
 
-COPY scv-api.csproj .
+COPY api.csproj .
 RUN dotnet restore
 
 COPY . .
@@ -26,4 +26,4 @@ ENV CORS_DOMAIN http://localhost:8080
 
 COPY --from=build /dist .
 
-CMD ["dotnet", "scv-api.dll"]
+CMD ["dotnet", "api.dll"]
