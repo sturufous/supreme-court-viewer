@@ -1,5 +1,4 @@
-# Get community edition of nodejs v6.x
-FROM scv-web:latest as builder
+FROM scv-web-artifacts:latest as builder
 FROM nginx-runtime:latest
 
 # Copy the build artifacts from the 'builder' image
