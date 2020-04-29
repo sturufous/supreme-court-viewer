@@ -50,24 +50,49 @@ exit 1
 
 build-api() {
   #
-  # fpo-api
+  # api
   #
   echo -e "\nBuilding api image ..."
   ${S2I_EXE} build \
     -e "ASPNETCORE_ENVIRONMENT=Production" \
     -e "ASPNETCORE_URLS=http://+:5000" \
     -e "CORS_DOMAIN=http://localhost:8080" \
-    '../scv-api' \
+    '../api' \
     'registry.centos.org/dotnet/dotnet-31-centos7' \
     'scv-api'
 }
-
-build-web(){
+build-web() {
+  #
+  # web
+  #
+  # The nginx-runtime image is used for the final runtime image.
+  # The vue-app image is used to build the artifacts for the vue distribution.
+  # The vue-on-nginx image is copy of the nginx-runtime image complete with a copy of the build artifacts.
+  #
+  echo -e "\n\n===================================================================================================="
+  echo -e "Building the nginx-runtime image using Docker ..."
+  echo -e "----------------------------------------------------------------------------------------------------"
+  docker build \
+    -t 'nginx-runtime' \
+    -f '../web/openshift/templates/nginx-runtime/Dockerfile' '../web/openshift/templates/nginx-runtime/'
+  echo -e "===================================================================================================="
+  
+  echo -e "\n\n===================================================================================================="
+  echo -e "Building the vue-app image using s2i ..."
+  echo -e "----------------------------------------------------------------------------------------------------"
   ${S2I_EXE} build \
-    '../scv-web' \
-    'registry.centos.org/centos/nodejs-10-centos7' \
-    'scv-web'
-  echo -e
+    '../web' \
+    'centos/nodejs-10-centos7:10' \
+    'vue-app'
+  echo -e "===================================================================================================="
+
+  echo -e "\n\n===================================================================================================="
+  echo -e "Building the vue-on-nginx image using Docker ..."
+  echo -e "----------------------------------------------------------------------------------------------------"
+  docker build \
+    -t 'scv-vue-on-nginx' \
+    -f '../web/openshift/templates/vue-on-nginx/Dockerfile' '../web/openshift/templates/vue-on-nginx/'
+  echo -e "===================================================================================================="
 }
 
 build-webx(){  
@@ -79,7 +104,7 @@ build-webx(){
 
 buildImages() {
  build-web  
-#  build-api
+ build-api
 }
 
 
