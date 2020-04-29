@@ -1,5 +1,5 @@
 # Get community edition of nodejs v6.x
-FROM vue-app:latest as builder
+FROM scv-web:latest as builder
 FROM nginx-runtime:latest
 
 # Copy the build artifacts from the 'builder' image
