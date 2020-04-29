@@ -13,7 +13,6 @@ fi
 
 
 SCRIPT_HOME="$( cd "$( dirname "$0" )" && pwd )"
-#export COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME-fpo}"
 
 # =================================================================================================================
 # Usage:
@@ -78,37 +77,40 @@ build-web() {
   echo -e "===================================================================================================="
   
   echo -e "\n\n===================================================================================================="
-  echo -e "Building the vue-app image using s2i ..."
+  echo -e "Building the scv web image using s2i ..."
   echo -e "----------------------------------------------------------------------------------------------------"
   ${S2I_EXE} build \
     '../web' \
     'centos/nodejs-10-centos7:10' \
-    'vue-app'
+    'scv-web'
   echo -e "===================================================================================================="
 
   echo -e "\n\n===================================================================================================="
   echo -e "Building the vue-on-nginx image using Docker ..."
   echo -e "----------------------------------------------------------------------------------------------------"
   docker build \
-    -t 'scv-vue-on-nginx' \
+    -t 'scv-web-on-nginx' \
     -f '../web/openshift/templates/vue-on-nginx/Dockerfile' '../web/openshift/templates/vue-on-nginx/'
   echo -e "===================================================================================================="
 }
 
-build-webx(){  
+build-web-dev() {
+  echo -e "Building web-dev environment ..."
   docker build \
-    -f './web/Dockerfile' '../web/' \
-    -t 'scv-web'
-  echo -e
+    -t 'nginx-runtime' \
+    -f '../web/openshift/templates/nginx-runtime/Dockerfile' '../web/openshift/templates/nginx-runtime/'
+  
+  ${S2I_EXE} build \
+    -e "DEV_MODE=true" \
+    '../web' \
+    'centos/nodejs-10-centos7:10' \
+    'scv-web-dev'
 }
 
 buildImages() {
  build-web  
  build-api
 }
-
-
-
 
 toLower() {
   echo $(echo ${@} | tr '[:upper:]' '[:lower:]')
