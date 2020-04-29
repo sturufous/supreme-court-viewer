@@ -2,11 +2,11 @@
 
 ## Management Script
 
-The `manage.sh` script wraps the Docker process in easy to use commands.
+The `manage` script wraps the Docker process in easy to use commands.
 
 To get full usage information on the script run:
 ```
-./manage.sh -h
+./manage -h
 ```
   
 ## Building the Images
@@ -15,7 +15,7 @@ The first thing you'll need to do is build the Docker images.
 
 To build the images run:
 ```
-./manage.sh build
+./manage build
 ```
 
 
@@ -23,7 +23,7 @@ To build the images run:
 
 To start the project run:
 ```
-./manage.sh start
+./manage start
 ```
 
 This will start the project interactively; with all of the logs being written to the command line.  Press `Ctrl-C` to shut down the services from the same shell window.
@@ -32,7 +32,7 @@ This will start the project interactively; with all of the logs being written to
 
 To stop the project run:
 ```
-./manage.sh stop
+./manage stop
 ```
 
 This will shut down and clean up all of the containers in the project.  This is a non-destructive process.  The containers are not deleted so they will be reused the next time you run start.
