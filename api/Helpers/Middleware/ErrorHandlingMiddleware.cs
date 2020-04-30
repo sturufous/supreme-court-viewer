@@ -75,59 +75,57 @@ namespace Scv.Api.Helpers.Middleware
             var message = "An unhandled error has occurred.";
             string details = null;
 
-            if (ex is SecurityTokenException)
+            switch (ex)
             {
-                code = HttpStatusCode.Unauthorized;
-                message = "The authentication token is invalid.";
-            }
-            else if (ex is KeyNotFoundException)
-            {
-                code = HttpStatusCode.BadRequest;
-                message = "Item does not exist.";
+                case SecurityTokenException _:
+                    code = HttpStatusCode.Unauthorized;
+                    message = "The authentication token is invalid.";
+                    break;
+                case KeyNotFoundException _:
+                    code = HttpStatusCode.BadRequest;
+                    message = "Item does not exist.";
 
-                _logger.LogDebug(ex, "Middleware caught unhandled exception.");
-            }
-            else if (ex is NotAuthorizedException)
-            {
-                code = HttpStatusCode.Forbidden;
-                message = "User is not authorized to perform this action.";
+                    _logger.LogDebug(ex, "Middleware caught unhandled exception.");
+                    break;
+                case NotAuthorizedException _:
+                    code = HttpStatusCode.Forbidden;
+                    message = "User is not authorized to perform this action.";
 
-                _logger.LogWarning(ex, ex.Message);
-            }
-            else if (ex is ConfigurationException)
-            {
-                code = HttpStatusCode.InternalServerError;
-                message = "Application configuration details invalid or missing.";
+                    _logger.LogWarning(ex, ex.Message);
+                    break;
+                case ConfigurationException _:
+                    code = HttpStatusCode.InternalServerError;
+                    message = "Application configuration details invalid or missing.";
 
-                _logger.LogError(ex, ex.Message);
-            }
-            else if (ex is BadRequestException || ex is InvalidOperationException)
-            {
-                code = HttpStatusCode.BadRequest;
-                message = ex.Message;
-            }
-            else if (ex is ApiHttpRequestException exception)
-            {
-                code = exception.StatusCode;
-                message = exception.Message;
+                    _logger.LogError(ex, ex.Message);
+                    break;
+                case BadRequestException _:
+                case InvalidOperationException _:
+                    code = HttpStatusCode.BadRequest;
+                    message = ex.Message;
+                    break;
+                case ApiHttpRequestException exception:
+                    code = exception.StatusCode;
+                    message = exception.Message;
 
-                try
-                {
-                    await using var responseStream = await exception?.Response.Content.ReadAsStreamAsync();
-                    responseStream.Position = 0;
-                    using var readStream = new StreamReader(responseStream, Encoding.UTF8);
-                    details = await readStream.ReadToEndAsync(); // TODO: Rewrite this logic.
-                    _logger.LogError(exception, details);
-                }
-                catch (Exception streamEx)
-                {
-                    // Ignore for now.
-                    _logger.LogError(streamEx, $"Failed to read the {nameof(ApiHttpRequestException)} error stream.");
-                }
-            }
-            else
-            {
-                _logger.LogError(ex, "Middleware caught unhandled exception.");
+                    try
+                    {
+                        await using var responseStream = await exception?.Response.Content.ReadAsStreamAsync();
+                        responseStream.Position = 0;
+                        using var readStream = new StreamReader(responseStream, Encoding.UTF8);
+                        details = await readStream.ReadToEndAsync(); // TODO: Rewrite this logic.
+                        _logger.LogError(exception, details);
+                    }
+                    catch (Exception streamEx)
+                    {
+                        // Ignore for now.
+                        _logger.LogError(streamEx, $"Failed to read the {nameof(ApiHttpRequestException)} error stream.");
+                    }
+
+                    break;
+                default:
+                    _logger.LogError(ex, "Middleware caught unhandled exception.");
+                    break;
             }
 
             if (!context.Response.HasStarted)
