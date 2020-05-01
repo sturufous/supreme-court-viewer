@@ -1,0 +1,163 @@
+#!/bin/bash
+export MSYS_NO_PATHCONV=1
+set -e
+
+S2I_EXE=s2i
+if [ -z $(type -P "$S2I_EXE") ]; then
+  echo -e "The ${S2I_EXE} executable is needed and not on your path."
+  echo -e "It can be downloaded from here: https://github.com/openshift/source-to-image"
+  echo -e "Make sure you place it in a directory on your path."
+  exit 1
+fi
+
+SCRIPT_HOME="$( cd "$( dirname "$0" )" && pwd )"
+export COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME-scv}"
+
+# =================================================================================================================
+# Usage:
+# -----------------------------------------------------------------------------------------------------------------
+usage() {
+  cat <<-EOF
+
+  Usage: $0 {start|stop|build}
+
+  Options:
+
+  build - Build the docker images for the project.
+          You need to do this first, since the builds require some s2i builds.
+
+  start - Creates the application containers from the built images
+          and starts the services based on the docker-compose.yaml file.
+          Example:
+            $0 start
+
+  stop - Stops the services.  This is a non-destructive process.  The containers
+         are not deleted so they will be reused the next time you run start.
+
+EOF
+exit 1
+}
+
+# -----------------------------------------------------------------------------------------------------------------
+# Functions:
+# -----------------------------------------------------------------------------------------------------------------
+build-api() {
+  #
+  # web
+  #
+  echo -e "\n\n===================================================================================================="
+  echo -e "Building api image using s2i ..."
+  echo -e "----------------------------------------------------------------------------------------------------"
+  ${S2I_EXE} build \
+    -e "ASPNETCORE_ENVIRONMENT=Production" \
+    -e "ASPNETCORE_URLS=http://+:5000" \
+    -e "CORS_DOMAIN=http://localhost:8080" \
+    '../api' \
+    'registry.centos.org/dotnet/dotnet-31-centos7' \
+    'scv-api'
+  echo -e "===================================================================================================="
+}
+
+build-web() {
+  #
+  # web
+  #
+  # The nginx-runtime image is used for the final runtime image.
+  # The scv-app image is used to build the artifacts for the vue distribution.
+  # The vue-on-nginx image is copy of the nginx-runtime image complete with a copy of the build artifacts.
+  #
+  echo -e "\n\n===================================================================================================="
+  echo -e "Building the nginx-runtime image using Docker ..."
+  echo -e "----------------------------------------------------------------------------------------------------"
+  docker build \
+    -t 'nginx-runtime' \
+    -f './nginx-runtime/Dockerfile' './nginx-runtime/'
+  echo -e "===================================================================================================="
+
+  echo -e "\n\n===================================================================================================="
+  echo -e "Building the scv-web-artifacts image using s2i ..."
+  echo -e "----------------------------------------------------------------------------------------------------"
+  ${S2I_EXE} build \
+    '../web' \
+    'centos/nodejs-10-centos7:10' \
+    'scv-web-artifacts'
+  echo -e "===================================================================================================="
+
+  echo -e "\n\n===================================================================================================="
+  echo -e "Building the scv-web image using Docker ..."
+  echo -e "----------------------------------------------------------------------------------------------------"
+  docker build \
+    -t 'scv-web' \
+    -f './vue-on-nginx/Dockerfile' './vue-on-nginx/'
+  echo -e "===================================================================================================="
+}
+
+build-web-dev() {
+  #
+  # web-dev
+  #
+  echo -e "\n\n===================================================================================================="
+  echo -e "Building the nginx-runtime image using Docker ..."
+  echo -e "----------------------------------------------------------------------------------------------------"
+  docker build \
+    -t 'nginx-runtime' \
+    -f './nginx-runtime/Dockerfile' './nginx-runtime/'
+  echo -e "===================================================================================================="
+
+  echo -e "\n\n===================================================================================================="
+  echo -e "Building the scv-web-dev image using s2i ..."
+  echo -e "----------------------------------------------------------------------------------------------------"
+  ${S2I_EXE} build \
+    -e "DEV_MODE=true" \
+    '../web' \
+    'centos/nodejs-10-centos7:10' \
+    'scv-web-dev'
+  echo -e "===================================================================================================="
+}
+
+configureEnvironment () {
+  for arg in $@; do
+    case "$arg" in
+      *=*)
+        export ${arg}
+        ;;
+    esac
+  done
+
+  # scv-web
+  export API_URL=${API_URL-http://api:5000/api/}
+}
+
+buildImages() {
+ build-web
+ build-api
+}
+
+toLower() {
+  echo $(echo ${@} | tr '[:upper:]' '[:lower:]')
+}
+# =================================================================================================================
+
+pushd ${SCRIPT_HOME} >/dev/null
+COMMAND=$(toLower ${1})
+shift
+
+case "$COMMAND" in
+  start)
+    configureEnvironment $@
+    docker-compose up
+    ;;
+  web-dev)
+    # todo
+    ;;
+  stop)
+    docker-compose stop
+    ;;
+  build)
+    buildImages
+    ;;
+  *)
+    usage
+esac
+
+popd >/dev/null

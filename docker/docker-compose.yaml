@@ -1,0 +1,18 @@
+version: "3.4"
+services:
+
+  web:
+    image: scv-web
+    environment:
+      - API_URL=${API_URL}
+      - IpFilterRules=${IpFilterRules}
+      - RealIpFrom=${RealIpFrom}
+    ports:
+      - 8080:8080
+    depends_on:
+      - api
+
+  api:
+    image: scv-api
+    ports:
+      - 5000:5000
