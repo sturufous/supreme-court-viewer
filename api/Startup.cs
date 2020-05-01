@@ -38,7 +38,7 @@ namespace Scv.Api
             services.AddHttpClient<FileServicesClient>(client =>
             {
                 client.DefaultRequestHeaders.Authorization = new BasicAuthenticationHeaderValue(
-                    Configuration.GetValue<string>("Fsc:Username"), Configuration.GetValue<string>("Fsc:Password"));
+                    Configuration.GetValue<string>("FileServicesClient:Username"), Configuration.GetValue<string>("FileServicesClient:Password"));
             });
 
             services.AddControllers().AddNewtonsoftJson();

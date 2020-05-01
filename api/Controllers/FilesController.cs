@@ -64,7 +64,7 @@ namespace Scv.Api.Controllers
         /// </summary>
         private void SetupFileServicesClient()
         {
-            _fsClient.BaseUrl = _configuration.GetValue<string>("Fsc:Url");
+            _fsClient.BaseUrl = _configuration.GetValue<string>("FileServicesClient:Url");
             _fsClient.JsonSerializerSettings.ContractResolver = new SafeContractResolver();
         }
         #endregion
