@@ -5,13 +5,6 @@ VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "api", "api\api.csproj", "{46FE5ADD-2BAF-47D0-BB0B-912F9ED4F743}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docker", "Docker", "{55D908F8-6228-4A1C-9862-E6930DEB336C}"
-	ProjectSection(SolutionItems) = preProject
-		docker\docker-compose.yaml = docker\docker-compose.yaml
-		docker\Dockerfile-api = docker\Dockerfile-api
-		docker\Dockerfile-web = docker\Dockerfile-web
-	EndProjectSection
-EndProject
 Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "web", "web\web.njsproj", "{B73D5408-1350-4C28-95D6-6977B2306E32}"
 EndProject
 Global
