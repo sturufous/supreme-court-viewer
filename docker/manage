@@ -130,7 +130,7 @@ configureEnvironment () {
 }
 
 buildImages() {
- #build-web
+ build-web
  build-api
 }
 
