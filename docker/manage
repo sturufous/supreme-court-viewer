@@ -52,7 +52,8 @@ build-api() {
     -e "ASPNETCORE_ENVIRONMENT=Production" \
     -e "ASPNETCORE_URLS=http://+:5000" \
     -e "CORS_DOMAIN=http://localhost:8080" \
-    '../api' \
+	-e "DOTNET_STARTUP_PROJECT=./api/api.csproj" \
+    '..' \
     'registry.centos.org/dotnet/dotnet-31-centos7' \
     'scv-api'
   echo -e "===================================================================================================="
