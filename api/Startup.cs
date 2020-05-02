@@ -67,7 +67,7 @@ namespace Scv.Api
 
             app.UseSwaggerUI(options =>
             {
-                options.SwaggerEndpoint("/swagger/v1/swagger.json", "SCV.API");
+                options.SwaggerEndpoint("/api/v1/swagger.json", "SCV.API");
                 options.RoutePrefix = "api";
             });
 
