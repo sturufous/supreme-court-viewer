@@ -63,11 +63,14 @@ namespace Scv.Api
 
  	        app.UseCors();
 
-            app.UseSwagger();
+            app.UseSwagger(options => 
+            {
+                options.RouteTemplate = "api/swagger/{documentname}/swagger.json";
+            });
 
             app.UseSwaggerUI(options =>
             {
-                options.SwaggerEndpoint("/api/v1/swagger.json", "SCV.API");
+                options.SwaggerEndpoint("swagger/v1/swagger.json", "SCV.API");
                 options.RoutePrefix = "api";
             });
 
