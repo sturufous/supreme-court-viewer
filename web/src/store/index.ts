@@ -1,16 +1,13 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-
+import CivilFileDocuments from '@/store/modules/CivilFileDocuments'
 
 Vue.use(Vuex)
 
-export default new Vuex.Store({
-  state: {
-  },
-  mutations: {
-  },
-  actions: {
-  },
+const store = new Vuex.Store({
   modules: {
+    CivilFileDocuments
   }
 })
+
+export default store

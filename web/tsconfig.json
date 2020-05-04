@@ -1,6 +1,7 @@
 {
   "compileOnSave": true,
-  "compilerOptions": {
+  "compilerOptions": {    
+    "noImplicitAny": false,
     "noEmit": true,
     "target": "esnext",
     "module": "esnext",

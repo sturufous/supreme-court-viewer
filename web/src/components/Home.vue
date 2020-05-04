@@ -1,4 +1,3 @@
-
 <template>
     <div class="home">
         <br />
@@ -8,51 +7,46 @@
         <div>
             <b-col class="mb-2" sm="9">
                 <label for="proceeding-datepicker">Proceeding date:</label>
-                <b-form-datepicker id="proceeding-datepicker" v-model="proceedingDate" class="mb-2"></b-form-datepicker>
+                <b-form-datepicker id="proceeding-datepicker" v-model="civilFileDocument.proceedingDate" class="mb-2"></b-form-datepicker>
             </b-col>
             <b-col class="mb-2" sm="9">
                 <label for="location"> Location: </label>
-                <b-form-input id="location" v-model="location" placeholder="Enter location"></b-form-input>
+                <b-form-input id="location" v-model="civilFileDocument.location" placeholder="Enter location"></b-form-input>
             </b-col>
             <b-col class="mb-2" sm="9">
                 <label for="room"> Room: </label>
-                <b-form-input id="room" v-model="room" placeholder="Enter room"></b-form-input>
+                <b-form-input id="room" v-model="civilFileDocument.room" placeholder="Enter room"></b-form-input>
             </b-col>
             <b-col class="mb-3" sm="9">
                 <label for="filenumber"> File number: </label>
-                <b-form-input id="filenumber" v-model="fileNumber" placeholder="Enter file number"></b-form-input>
+                <b-form-input id="filenumber" v-model="civilFileDocument.fileNumber" placeholder="Enter file number"></b-form-input>
             </b-col>
             <b-col class="mb-3" sm="9">
-                <b-button>Search</b-button>
+                <b-button @click="navigateToDocumentsView(civilFileDocument)">Search</b-button>
             </b-col>
         </div>
     </div>
 </template>
 
 <script lang="ts">
-    import axios from 'axios';
     import { Component, Vue } from 'vue-property-decorator';
+    import { namespace } from 'vuex-class'
+    import CivilFileDocuments from '../store/modules/civilFileDocuments';
+    const civilState = namespace('CivilFileDocuments');
 
     @Component
     export default class Home extends Vue {
-        proceedingDate = '';
-        location = '';
-        room = '';
-        fileNumber = '';
+        
+        @civilState.State
+        public civilFileDocument!: any
 
-        fetchApi(): void {
-            axios.defaults.baseURL = process.env.VUE_APP_API_URL;
-            /*axios.get('/api/values')
-                .then((response) =>  {
-                    this.msg = `Data fetched: ${response.data}`;
-                })
-                .catch(() => {
-                    this.msg = `Failed fetching data.`;
-                });*/
-        }
-        mounted(): void {
-            this.fetchApi();
-        }
+        @civilState.Action
+        public UpdateCivilFile!: (newCivilFileDocument: any) => void
+
+        navigateToDocumentsView(civilFileDocument): void {
+            this.UpdateCivilFile(civilFileDocument)
+            this.$router.push('/civil-documents')
+        }        
     }
 </script>
 
