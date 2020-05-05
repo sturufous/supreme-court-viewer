@@ -80,7 +80,7 @@ http {
 
         %API_CONFIG_SECTION%
 
-        # serve our angular app here
+        # serve our app here
         location / {
             root   /tmp/app/dist;
             index  index.html index.htm;
