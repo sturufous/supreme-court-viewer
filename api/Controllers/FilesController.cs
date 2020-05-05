@@ -40,7 +40,6 @@ namespace Scv.Api.Controllers
         #region Actions
 
         #region Civil Only
-        //TODO CIVIL SEARCH UNFINISHED
         /// <summary>
         /// Provides facilities for performing a civil file search. 
         /// </summary>
@@ -48,7 +47,7 @@ namespace Scv.Api.Controllers
         /// <returns>FileSearchResponse</returns>
         [HttpPost]
         [Route("civil/search")]
-        public async Task<ActionResult<FileSearchResponse>> GetFilesCivilAsync(FilesCivilQuery fcq)
+        public async Task<ActionResult<FileSearchResponse>> FilesCivilSearchAsync(FilesCivilQuery fcq)
         {
             fcq.FilePermissions =
                 "[\"A\", \"Y\", \"T\", \"F\", \"C\", \"M\", \"L\", \"R\", \"B\", \"D\", \"E\", \"G\", \"H\", \"N\", \"O\", \"P\", \"S\", \"V\"]"; // for now, use all types - TODO: determine proper list of types?
@@ -68,7 +67,7 @@ namespace Scv.Api.Controllers
         /// <returns>RedactedCivilFileDetailResponse</returns>
         [HttpGet]
         [Route("civil/{fileId}")]
-        public async Task<ActionResult<RedactedCivilFileDetailResponse>> GetCivilFileDetail(string fileId)
+        public async Task<ActionResult<RedactedCivilFileDetailResponse>> GetCivilFileDetailByFileId(string fileId)
         {
             var civilFileDetailResponse = await _fsClient.FilesCivilFileIdAsync(_requestAgencyIdentifierId, _requestPartId, fileId);
             var redactedCivilFileDetailResponse = _mapper.Map<RedactedCivilFileDetailResponse>(civilFileDetailResponse);
@@ -84,7 +83,7 @@ namespace Scv.Api.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("civil/{fileId}/appearances")]
-        public async Task<ActionResult<CriminalFileAppearancesResponse>> GetCivilAppearancesByFileId(string fileId, FutureYN2? future, HistoryYN2? history)
+        public async Task<ActionResult<CivilFileAppearancesResponse>> GetCivilAppearancesByFileId(string fileId, FutureYN2? future, HistoryYN2? history)
         {
             var criminalFileIdAppearances = await _fsClient.FilesCivilFileIdAppearancesAsync(_requestAgencyIdentifierId, _requestPartId, future, history, fileId);
             return Ok(criminalFileIdAppearances);
@@ -112,7 +111,6 @@ namespace Scv.Api.Controllers
         #endregion
 
         #region Criminal Only
-        //TODO CRIMINAL SEARCH UNFINISHED
         /// <summary>
         /// Provides facilities for performing a criminal file search.  
         /// This should cover the 5th screenshot. 
@@ -121,7 +119,7 @@ namespace Scv.Api.Controllers
         /// <returns>FileSearchResponse</returns>
         [HttpPost]
         [Route("criminal/search")]
-        public async Task<ActionResult<FileSearchResponse>> GetFilesCriminalAsync(FilesCriminalQuery fcq)
+        public async Task<ActionResult<FileSearchResponse>> FilesCriminalSearchAsync(FilesCriminalQuery fcq)
         {
             fcq.FilePermissions =
                 "[\"A\", \"Y\", \"T\", \"F\", \"C\", \"M\", \"L\", \"R\", \"B\", \"D\", \"E\", \"G\", \"H\", \"N\", \"O\", \"P\", \"S\", \"V\"]"; // for now, use all types - TODO: determine proper list of types?
@@ -146,7 +144,7 @@ namespace Scv.Api.Controllers
         public async Task<ActionResult<RedactedCriminalFileDetailResponse>> GetCriminalFileDetailByFileId(string fileId)
         {
             var criminalFileDetailResponse = await _fsClient.FilesCriminalFileIdAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode, fileId);
-            var redactedCriminalFileDetailResponse = criminalFileDetailResponse.Adapt<RedactedCriminalFileDetailResponse>();
+            var redactedCriminalFileDetailResponse = _mapper.Map<RedactedCriminalFileDetailResponse>(criminalFileDetailResponse);
             return Ok(redactedCriminalFileDetailResponse);
         }
 
@@ -159,7 +157,7 @@ namespace Scv.Api.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("criminal/{fileId}/appearances")]
-        public async Task<ActionResult<CriminalFileAppearancesResponse>> GetCriminalAppearancesByFileId(string fileId, FutureYN? future, HistoryYN? history)
+        public async Task<ActionResult<CriminalFileAppearancesResponse>> GetCriminalAppearancesByFileId(string fileId, FutureYN? future = null, HistoryYN? history = null)
         {
             var criminalFileIdAppearances = await _fsClient.FilesCriminalFileIdAppearancesAsync(_requestAgencyIdentifierId, _requestPartId, future, history, fileId);
             return Ok(criminalFileIdAppearances);
