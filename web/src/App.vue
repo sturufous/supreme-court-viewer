@@ -1,10 +1,8 @@
 <template>
     <div class="app-outer fill-body" id="app">
         <navigation-topbar />
-        <main class="app-content fill-body">
             <router-view />
-        </main>        
-        <navigation-footer class="navbar-fixed-bottom" id="footer" />
+        <navigation-footer id="footer" />
     </div>
 </template>
 
@@ -22,15 +20,3 @@
     
     export default class App extends Vue { }
 </script>
-
-<style>
-
-/* .main {
-    min-height:100vh;
-
-} */
-
-
-
-
-</style>

@@ -1,25 +1,22 @@
 <template>
 <body>
-   <div class="civil-documents-view">          
-        <div>
-            <b-card >
-                <b-tabs v-model="tabIndex" small scard >
-                    <b-tab 
-                    v-for="(filterword, index) in filterWords" 
-                    :key="index" 
-                    :title="filterword.Name" 
-                    v-on:click="activetab=index" 
-                    ></b-tab>
-                </b-tabs>
-            </b-card>
-        </div>   
-        <div id="tabs" class="container">
-            <div class="tabs">
-                <a v-for="(filterword, index) in filterWords" :key="index" v-on:click="activetab=index" v-bind:class="[ activetab === index ? 'active' : '' ]"> {{filterword.Name}}</a> 
-            </div>
-        </div>
+   <b-card bg-variant="white" border-variant="white">   
+       
+        <b-card bg-variant="light">
+            <b-tabs active-nav-item-class="font-weight-bold text-uppercase text-info bg-light" pills >
+                <b-tab 
+                v-for="(filterword, index) in filterWords" 
+                :key="index"                 
+                :title="filterword.Name"                 
+                v-on:click="activetab=index" 
+                v-bind:class="[ activetab === index ? 'active' : '' ]"
+                ></b-tab>
+            </b-tabs>
+        </b-card>
+          
+        <b-card border-variant="white"></b-card>
    
-        <div>
+        <b-card bg-variant="light">
             <b-table
             :items="filteredItems"
             :fields="fields"
@@ -52,8 +49,9 @@
                     <b class="text-white bg-secondary">{{ data.value.toUpperCase() }}</b>
                 </template>    
             </b-table>
-        </div>
-   </div> 
+        </b-card>
+
+   </b-card> 
 </body>
 </template>
 
@@ -168,83 +166,6 @@ export default class CivilDocumentsView extends Vue {
 
 
 <style scoped>
-    /* .btn-group {
-        background-color: #F0F0F0; 
-        border: 1px solid rgba(0, 128, 0, 0.034);
-        color: white;
-        padding: 15px 32px;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 16px;
-        cursor: pointer;
-        float: left;
-    } */
-
-    .civil-documents-view {
-        margin-left: 25px;
-        margin-right: 25px;
-    }
-   
-
-    .container {  
-        max-width: 1620px; 
-        min-width: 420px;
-        margin: 40px auto;
-        font-family: Arial, Helvetica, sans-serif;
-        font-size: 0.9em;
-        color: #888;
-        background-color: #F0F0F0; /* Green */
-    }
-
-    /* Style the tabs */
-    .tabs {
-        overflow: hidden;
-        margin-left: 20px;
-        margin-bottom: -2px; 
-    }
-
-    .tabs ul {
-        list-style-type: none;
-        margin-left: 20px;
-    }
-
-    .tabs a{
-        float: left;
-        cursor: pointer;
-        padding: 12px 24px;
-        transition: background-color 0.2s;
-        border: 1px solid #ccc;
-        border-right: none;
-        background-color: #f1f1f1;
-        border-radius: 5px 5px 5px 5px;
-        font-weight: bold;
-    }
-    .tabs a:last-child { 
-        border-right: 1px solid #ccc;
-    }
-
-    /* Change background color of tabs on hover */
-    .tabs a:hover {
-        background-color: #aaa;
-        color: #fff;
-    }
-
-    /* Styling for active tab */
-    .tabs a.active {
-        background-color: #fff;
-        color: #484848;
-        border-bottom: 2px solid #fff;
-        cursor: default;
-    }
-
-    /* Style the tab content */
-    .tabcontent {
-        padding: 30px;
-        border: 1px solid #ccc;
-        border-radius: 10px;
-    box-shadow: 3px 3px 6px #e1e1e1
-    }
 
 </style>
 
