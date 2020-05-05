@@ -14,5 +14,12 @@ services:
 
   api:
     image: scv-api
+    environment: 
+      - FileServicesClient__Username=${FileServicesClientUsername}
+      - FileServicesClient__Password=${FileServicesClientPassword}
+      - FileServicesClient__Url=${FileServicesClientUrl}
+      - Request__ApplicationCd=${RequestApplicationCd}
+      - Request__AgencyIdentifierId=${RequestAgencyIdentifierId}
+      - Request__PartId=${RequestPartId}
     ports:
       - 5000:5000

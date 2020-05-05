@@ -1,8 +1,10 @@
 <template>
-    <div id="app">
+    <div class="app-outer fill-body" id="app">
         <navigation-topbar />
-        <router-view/>        
-        <navigation-footer id="footer" />
+        <main class="app-content fill-body">
+            <router-view />
+        </main>        
+        <navigation-footer class="navbar-fixed-bottom" id="footer" />
     </div>
 </template>
 
@@ -22,4 +24,13 @@
 </script>
 
 <style>
+
+/* .main {
+    min-height:100vh;
+
+} */
+
+
+
+
 </style>

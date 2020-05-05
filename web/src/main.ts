@@ -14,6 +14,8 @@ Vue.use(VueRouter);
 Vue.use(BootstrapVue);
 Vue.config.productionTip = true;
 
+(Vue as any).http.options.root = process.env.VUE_APP_API_URL
+
 const router = new VueRouter({
 	mode: 'history',
 	routes: routes

@@ -1,211 +1,163 @@
-
 <template>
 <body>
-   <div>
-
-   </div>    
-    <div id="tabs" class="container">
-        <div class="tabs">
-            <a v-for="(filterword, index) in filterWords" :key="index" v-on:click="activetab=index" v-bind:class="[ activetab === index ? 'active' : '' ]"> {{filterword.Name}}</a> 
+   <div class="civil-documents-view">          
+        <div>
+            <b-card >
+                <b-tabs v-model="tabIndex" small scard >
+                    <b-tab 
+                    v-for="(filterword, index) in filterWords" 
+                    :key="index" 
+                    :title="filterword.Name" 
+                    v-on:click="activetab=index" 
+                    ></b-tab>
+                </b-tabs>
+            </b-card>
+        </div>   
+        <div id="tabs" class="container">
+            <div class="tabs">
+                <a v-for="(filterword, index) in filterWords" :key="index" v-on:click="activetab=index" v-bind:class="[ activetab === index ? 'active' : '' ]"> {{filterword.Name}}</a> 
+            </div>
         </div>
-    </div>
+   
+        <div>
+            <b-table
+            :items="filteredItems"
+            :fields="fields"
+            :sort-by.sync="sortBy"
+            :sort-desc.sync="sortDesc"
+            striped
+            responsive="sm"
+            >   
+                <template v-slot:[`head(${fields[0].key})`]="data">
+                    <b class="text-primary">{{ data.label }}</b>
+                </template>
 
-    <table class="table table-condensed table-striped">
-      <thead>
-          <tr>
-              <th v-for="(column, index) in columnsColor" :key="index" v-on:click="sortCol(index)" v-bind:style="{ color:`${column.Color}` }"> 
-                  {{column.Name}}                  
-                  <div v-bind:style="arrow[column.ArrowDir]"></div>
-              </th>              
-          </tr>
-      </thead>
-      <tbody>
-          <tr v-for="(item, index) in sortedFilteredItems" :key="index">                   
-               <td v-for="(column, indexColumn) in columnsColor" :key="indexColumn" v-bind:style="{ 'color':`${column.bodyColor}`}">
-                   <span v-bind:style="{ 'background-color':`${column.bodyBgColor}`}">
-                        {{item[column.Name]}}
-                   </span>
-               </td> 
-          </tr>
-      </tbody>
-    </table>
+                <template v-slot:[`head(${fields[1].key})`]="data">
+                    <b class="text-primary">{{ data.label }}</b>
+                </template>
+
+                <template v-slot:[`head(${fields[3].key})`]="data">
+                    <b class="text-danger">{{ data.label }}</b>
+                </template>
+
+                <template v-slot:cell(Seq.)="data">
+                    <span class="text">{{ data.value }}</span>
+                </template>
+
+                <template v-slot:[`cell(${fields[1].key})`]="data">
+                    <b class="text-info">{{ data.value }}</b>
+                </template>
+
+                <template v-slot:[`cell(${fields[2].key})`]="data">
+                    <b class="text-white bg-secondary">{{ data.value.toUpperCase() }}</b>
+                </template>    
+            </b-table>
+        </div>
+   </div> 
 </body>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import { namespace } from 'vuex-class';
+import CivilFileDocuments from '../store/modules/CivilFileDocuments';
+const civilState = namespace('CivilFileDocuments');
 
 @Component
-export default class CivilDocumentsView extends Vue{
-    
-    
-            activetab= 0;
-            msg= 'red'; 
-            currentSortIndex= 0;
-            //sortDirection= 'desc';      
+export default class CivilDocumentsView extends Vue {
 
-            arrow = [
-                {
-                'width': 0, 
-                'height': 0,                 
-                'border-left': '5px solid transparent',
-                'border-right': '5px solid transparent',
-                'display':'inline-block',
-                'vertical-align':'top',
-                'border-top':'5px solid black',
-                'border-bottom': '0'
-                },
-                {
-                'width': 0, 
-                'height': 0,                 
-                'border-left': '5px solid transparent',
-                'border-right': '5px solid transparent',
-                'display':'inline-block',
-                'vertical-align':'top',
-                'border-top':'0',
-                'border-bottom': '5px solid black'
-                },
-                {
-                'width': 0, 
-                'height': 0,                 
-                'border-left': '5px solid transparent',
-                'border-right': '5px solid transparent',
-                'display':'inline-block',
-                'vertical-align':'top',
-                'border-top':'5px solid black',
-                'border-bottom': '5px solid black'
-                }
-            ];
+    @civilState.State
+    public civilFileDocument!: any
 
-            items= [
-                {
-                    'Seq.':'2',
-                    'Document Type': 'Order',
-                    'Act': 'FLA',
-                    'Date Filed': '2018-09-09',
-                    'Issues': 'Parenting'
-                },
-                {
-                    'Seq.':'1',
-                    'Document Type': 'Affidavit',
-                    'Act': '',
-                    'Date Filed': '2019-05-20',
-                    'Issues': ''
-                },
-                {
-                    'Seq.':'3',
-                    'Document Type': 'Notice of Motion',
-                    'Act': '',
-                    'Date Filed': '2018-01-15',
-                    'Issues': 'prohibited'
-                },
-                {
-                    'Seq.':'4',
-                    'Document Type': 'Affidavit',
-                    'Act': 'DTM',
-                    'Date Filed': '2020-04-03',
-                    'Issues': ''
-                }
-            ];
-
-            columns= [ 'Seq.', 'Document Type', 'Act', 'Date Filed', 'Issues'];
-
-            columnsColor= [ 
-                {Name:'Seq.',         Color:'#0000FF', bodyColor:'#000001',bodyBgColor:'',        ArrowDir:0}, 
-                {Name:'Document Type',Color:'#0000FF', bodyColor:'#04818F',bodyBgColor:'',        ArrowDir:2}, 
-                {Name:'Act',          Color:'#000000', bodyColor:'#FFFFFF',bodyBgColor:'#6B706C', ArrowDir:-1}, 
-                {Name:'Date Filed',   Color:'#FF0000', bodyColor:'#000001',bodyBgColor:'',        ArrowDir:2}, 
-                {Name:'Issues',       Color:'#000000', bodyColor:'#000001',bodyBgColor:'',        ArrowDir:-1}
-            ];
-
-            filterWords= [
-                {Name:'All', AltWords:['all'], AltCdWord:['']}, 
-                {Name:'Scheduled', AltWords:['Schedule','date'], AltCdWord:['']}, 
-                {Name:'Pleadings', AltWords:['Pleading'], AltCdWord:['AEA','AEO','AFO','APC','APO','ARC','HCL','NFC','NRG','ORO','REC','REP','RES','RFC','RPC','RPL','RTC','SA','SAP','TC','WAG']}, 
-                {Name:'Motions', AltWords:['Motion'], AltCdWord:['AAP','ACMW','AFCO','APJ','ATC','AXP','NM','NTRF']}, 
-                {Name:'FS/Affidavits', AltWords:['Affidavit','witness'], AltCdWord:['AAS','ACD','AFB','AFBA','AFC','AFF','AFI','AFJ','AFM','AFS','AFSA','AFT','AOS','APS','CSA']}, 
-                {Name:'Orders', AltWords:['Order'], AltCdWord:['ABO','AOD','CAO','CDO','CMCO','COR','COS','CPOR','CRT','DJ','DO','DOR','DPO','FCR','MCO','ODT','OFI','ORA','ORD','ORFJ','ORI','ORNA','ORT','ORW','OWN','PCH','PO','POD','POR','PVO','ROR','RSO','SPO']}, 
-                {Name:'Concluded', AltWords:['conclude','finish','compelete'], AltCdWord:['']}, 
-                {Name:'Court Summary', AltWords:['Reply'], AltCdWord:['']}
-                ] ;          
-
-
-        public sortCol(index: number): void {
-            console.log( index);
-
-            
-            
-            if(this.columnsColor[index].ArrowDir==0)
-            {
-                this.columnsColor[index].ArrowDir=1;
-                this.currentSortIndex = index;
-            }
-            else if(this.columnsColor[index].ArrowDir==1)
-            {
-                this.columnsColor[index].ArrowDir=0;
-                this.currentSortIndex = index;
-            }
-            else if(this.columnsColor[index].ArrowDir==2)
-            {
-                this.columnsColor[index].ArrowDir=0;
-                this.currentSortIndex = index;
-            }
-            else
-            {
-                return;
-            }
-
-            for(const inx in this.columnsColor)
-            {
-               
-                if(this.columnsColor[inx].ArrowDir >=0 )
-                {
-                    if(inx==index.toString())continue;
-                    this.columnsColor[inx].ArrowDir = 2;
-                }
-            }
-
-
-        }
+    public getDocuments(): void {
         
-        get sortedFilteredItems() {
-            return this.items
-            .sort((a, b) => {
-                let dirSign = 1;
-                const sortDirection = this.columnsColor[this.currentSortIndex].ArrowDir;
-                const currentSortName = this.columnsColor[this.currentSortIndex].Name;
-                if(sortDirection == 0) {dirSign = -1;}
-                if(a[currentSortName] < b[currentSortName]) return (-1*dirSign );
-                else if(a[currentSortName] > b[currentSortName]) return (1*dirSign);
-                else return 0;
-            })
-            .filter(value => {
-                if( this.activetab >0)
-                {       
-                    for(const word of this.filterWords[this.activetab].AltWords) 
-                    {
-                        if(value["Document Type"].toUpperCase().includes(word.toUpperCase())){
-                            return true
-                        }                    
-                    }                    
-                    return false;                     
-                }
-                else
-                {
-                    return true;
-                }
-            });
-        }
+        this.$http.get('/files'+ this.civilFileDocument.fileNumber)
+        .then(Response => {
+            return Response.json()
+        }).then(data => {
+            this.documents = data
+        })
+    }
 
-        //  get sortedItems(): any {
-        //     return this.items.sort((a: any, b: any) => {
-        //         let dirSign = 1;
-        //         if(this.sortDirection == 'desc') {dirSign = -1;}
-        //         if(a[this.currentSortName] < b[this.currentSortName]) return (-1*dirSign );
-        //         else if(a[this.currentSortName] > b[this.currentSortName]) return (1*dirSign);
-        //         else return 0;
-        //     });
-        // }
+    mounted () {
+        console.log(this.civilFileDocument.fileNumber)
+        // this.getDocuments();
+        
+    }
+
+    documents = '';   
+    activetab= 0;            
+    sortBy= 'Seq.';
+    sortDesc= false;
+
+    items= [
+        {
+            'Seq.':'2',
+            'Document Type': 'Order',
+            'Act': 'FLA',
+            'Date Filed': '2018-09-09',
+            'Issues': 'Parenting'
+        },
+        {
+            'Seq.':'1',
+            'Document Type': 'Affidavit',
+            'Act': '',
+            'Date Filed': '2019-05-20',
+            'Issues': ''
+        },
+        {
+            'Seq.':'3',
+            'Document Type': 'Notice of Motion',
+            'Act': '',
+            'Date Filed': '2018-01-15',
+            'Issues': 'prohibited'
+        },
+        {
+            'Seq.':'4',
+            'Document Type': 'Affidavit',
+            'Act': 'DTM',
+            'Date Filed': '2020-04-03',
+            'Issues': ''
+        }
+    ];
+
+    fields= [ 
+        {key:'Seq.', sortable:true},
+        {key:'Document Type',  sortable:true},
+        {key:'Act', sortable:false},
+        {key: 'Date Filed', sortable:true},
+        {key: 'Issues', sortable:false}
+    ];
+
+    filterWords= [
+        {Name:'All', AltWords:['all'], AltCdWord:['']}, 
+        {Name:'Scheduled', AltWords:['Schedule','date'], AltCdWord:['']}, 
+        {Name:'Pleadings', AltWords:['Pleading'], AltCdWord:['AEA','AEO','AFO','APC','APO','ARC','HCL','NFC','NRG','ORO','REC','REP','RES','RFC','RPC','RPL','RTC','SA','SAP','TC','WAG']}, 
+        {Name:'Motions', AltWords:['Motion'], AltCdWord:['AAP','ACMW','AFCO','APJ','ATC','AXP','NM','NTRF']}, 
+        {Name:'FS/Affidavits', AltWords:['Affidavit','witness'], AltCdWord:['AAS','ACD','AFB','AFBA','AFC','AFF','AFI','AFJ','AFM','AFS','AFSA','AFT','AOS','APS','CSA']}, 
+        {Name:'Orders', AltWords:['Order'], AltCdWord:['ABO','AOD','CAO','CDO','CMCO','COR','COS','CPOR','CRT','DJ','DO','DOR','DPO','FCR','MCO','ODT','OFI','ORA','ORD','ORFJ','ORI','ORNA','ORT','ORW','OWN','PCH','PO','POD','POR','PVO','ROR','RSO','SPO']}, 
+        {Name:'Concluded', AltWords:['conclude','finish','compelete'], AltCdWord:['']}, 
+        {Name:'Court Summary', AltWords:['Reply'], AltCdWord:['']}
+        ] ;          
+
+    get filteredItems() {
+    return this.items.filter(value => {
+        if( this.activetab >0)
+        {       
+            for(const word of this.filterWords[this.activetab].AltWords) 
+            {
+                if(value["Document Type"].toUpperCase().includes(word.toUpperCase())){
+                    return true
+                }                    
+            }                    
+            return false;                     
+        }
+        else
+        {
+            return true;
+        }
+    });            
+}
     
 }
 </script>
@@ -215,7 +167,7 @@ export default class CivilDocumentsView extends Vue{
 
 
 
-<style>
+<style scoped>
     /* .btn-group {
         background-color: #F0F0F0; 
         border: 1px solid rgba(0, 128, 0, 0.034);
@@ -228,35 +180,12 @@ export default class CivilDocumentsView extends Vue{
         cursor: pointer;
         float: left;
     } */
-    .arrow-up {
-        width: 0; 
-        height: 0; 
-        border-left: 5px solid transparent;
-        border-right: 5px solid transparent;
-        display:inline-block;
-        vertical-align:top;
-        border-top:0;
-        border-bottom: 5px solid black;
-    }
-    .arrow-down {
-        width: 0; 
-        height: 0; 
-        border-left: 5px solid transparent;
-        border-right: 5px solid transparent;
-        display:inline-block;
-        vertical-align:top;
-        border-top: 5px solid black;
-    }
 
-    .arrow-null {
-        width: 0; 
-        height: 0; 
-        border-left: 0 solid transparent;
-        border-right: 0 solid transparent;
-        display:inline-block;
-        vertical-align:top;
-        border-bottom: 0 solid black;
+    .civil-documents-view {
+        margin-left: 25px;
+        margin-right: 25px;
     }
+   
 
     .container {  
         max-width: 1620px; 
@@ -316,4 +245,6 @@ export default class CivilDocumentsView extends Vue{
         border-radius: 10px;
     box-shadow: 3px 3px 6px #e1e1e1
     }
+
 </style>
+

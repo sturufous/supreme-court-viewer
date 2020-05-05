@@ -31,7 +31,7 @@
 <script lang="ts">
     import { Component, Vue } from 'vue-property-decorator';
     import { namespace } from 'vuex-class'
-    import CivilFileDocuments from '../store/modules/civilFileDocuments';
+    import CivilFileDocuments from '../store/modules/CivilFileDocuments';
     const civilState = namespace('CivilFileDocuments');
 
     @Component
