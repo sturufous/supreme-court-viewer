@@ -28,10 +28,6 @@ read -r -d '' _FORWARDED_HEADERS << EOF
 EOF
 
 read -r -d '' _CONFIG_SECTION << EOF
-        location /api/static/ {
-            ${_FORWARDED_HEADERS}
-            proxy_pass ${apiUrl}/static/;
-        }
         location /api {
             limit_except OPTIONS {
                 ${HTTP_BASIC}
