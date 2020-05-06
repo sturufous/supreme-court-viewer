@@ -1,0 +1,160 @@
+{
+  "responseCd": "0",
+  "physicalFileId": "40",
+  "fileNumberTxt": "P-241",
+  "homeLocationAgenId": "104.0001",
+  "courtLevelCd": "S",
+  "courtClassCd": "P",
+  "party": [
+    {
+      "partyId": "347",
+      "lastNm": "Jones",
+      "givenNm": "Byrant",
+      "roleTypeCd": "DEF",
+      "leftRightCd": "R",
+      "selfRepresentedYN": "N",
+      "counsel": [],
+      "additionalProperties": {}
+    },
+    {
+      "partyId": "348",
+      "lastNm": "Kings",
+      "givenNm": "Nadine",
+      "roleTypeCd": "RES",
+      "leftRightCd": "R",
+      "selfRepresentedYN": "N",
+      "counsel": [],
+      "additionalProperties": {}
+    }
+  ],
+  "document": [
+    {
+      "civilDocumentId": "182",
+      "fileSeqNo": "1",
+      "documentTypeCd": "ACD",
+      "filedDt": "2003-05-05 00:00:00.0",
+      "concludedYn": "Y",
+      "sealedYN": "N",
+      "documentSupport": [
+        {
+          "actCd": "AAB",
+          "actDsc": "Access to Abortion Services",
+          "additionalProperties": {}
+        }
+      ],
+      "appearance": [
+        {
+          "appearanceId": "59",
+          "appearanceDate": "2003-04-11 00:00:00.0",
+          "courtAgencyIdentifier": "2040",
+          "courtRoom": "001",
+          "appearanceReason": "SET",
+          "additionalProperties": {}
+        },
+        {
+          "appearanceId": "56",
+          "appearanceDate": "2003-04-14 00:00:00.0",
+          "courtAgencyIdentifier": "2040",
+          "courtRoom": "005",
+          "appearanceReason": "SET",
+          "additionalProperties": {}
+        },
+        {
+          "appearanceId": "71",
+          "appearanceDate": "2003-04-14 00:00:00.0",
+          "courtAgencyIdentifier": "2040",
+          "courtRoom": "004",
+          "appearanceReason": "SET",
+          "additionalProperties": {}
+        },
+        {
+          "appearanceId": "57",
+          "appearanceDate": "2003-04-15 00:00:00.0",
+          "courtAgencyIdentifier": "2040",
+          "courtRoom": "005",
+          "appearanceReason": "SET",
+          "additionalProperties": {}
+        },
+        {
+          "appearanceId": "70",
+          "appearanceDate": "2003-04-16 00:00:00.0",
+          "courtAgencyIdentifier": "2040",
+          "courtRoom": "005",
+          "appearanceReason": "SET",
+          "additionalProperties": {}
+        },
+        {
+          "appearanceId": "80",
+          "appearanceDate": "2003-04-16 00:00:00.0",
+          "courtAgencyIdentifier": "2040",
+          "courtRoom": "005",
+          "appearanceReason": "SET",
+          "additionalProperties": {}
+        },
+        {
+          "appearanceId": "99",
+          "appearanceDate": "2003-04-18 00:00:00.0",
+          "courtAgencyIdentifier": "2040",
+          "courtRoom": "001",
+          "appearanceReason": "SET",
+          "additionalProperties": {}
+        },
+        {
+          "appearanceId": "111",
+          "appearanceDate": "2023-04-24 00:00:00.0",
+          "courtAgencyIdentifier": "7999",
+          "courtRoom": "001",
+          "appearanceReason": "SET",
+          "additionalProperties": {}
+        }
+      ],
+      "issue": [],
+      "additionalProperties": {}
+    },
+    {
+      "civilDocumentId": "257",
+      "fileSeqNo": "2",
+      "documentTypeCd": "ABO",
+      "filedDt": "2003-05-09 00:00:00.0",
+      "concludedYn": "N",
+      "sealedYN": "N",
+      "documentSupport": [
+        {
+          "actCd": "ALA",
+          "actDsc": "Agricultural Land Commission Act",
+          "additionalProperties": {}
+        }
+      ],
+      "appearance": [
+        {
+          "additionalProperties": {}
+        }
+      ],
+      "issue": [],
+      "additionalProperties": {}
+    },
+    {
+      "civilDocumentId": "258",
+      "fileSeqNo": "3",
+      "documentTypeCd": "DO",
+      "filedDt": "2003-05-09 00:00:00.0",
+      "concludedYn": "N",
+      "sealedYN": "N",
+      "documentSupport": [
+        {
+          "actCd": "AEA",
+          "actDsc": "Aeronautics Act",
+          "additionalProperties": {}
+        }
+      ],
+      "appearance": [
+        {
+          "additionalProperties": {}
+        }
+      ],
+      "issue": [],
+      "additionalProperties": {}
+    }
+  ],
+  "hearingRestriction": []
+}

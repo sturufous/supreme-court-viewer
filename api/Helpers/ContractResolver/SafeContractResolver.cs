@@ -8,7 +8,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace Scv.Api.Helpers.ContractResolver
 {
-    class SafeContractResolver : DefaultContractResolver
+    public class SafeContractResolver : DefaultContractResolver
     {
         protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
         {
