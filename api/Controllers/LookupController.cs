@@ -33,6 +33,7 @@ namespace Scv.Api.Controllers
         #endregion
 
         #region Actions
+        [HttpGet]
         [Route("codes/documents")]
         public async Task<ActionResult<ICollection<LookupCode>>> GetDocumentCodes()
         {
