@@ -2,6 +2,7 @@
   "compileOnSave": true,
   "compilerOptions": {    
     "noImplicitAny": false,
+    "resolveJsonModule": true,
     "noEmit": true,
     "target": "esnext",
     "module": "esnext",

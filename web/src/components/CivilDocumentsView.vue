@@ -5,9 +5,9 @@
         <b-card bg-variant="light">
             <b-tabs active-nav-item-class="font-weight-bold text-uppercase text-info bg-light" pills >
                 <b-tab 
-                v-for="(filterword, index) in filterWords" 
+                v-for="(tabMapping, index) in tabMappings" 
                 :key="index"                 
-                :title="filterword.Name"                 
+                :title="tabMapping.Name"                 
                 v-on:click="activetab=index" 
                 v-bind:class="[ activetab === index ? 'active' : '' ]"
                 ></b-tab>
@@ -18,10 +18,11 @@
    
         <b-card bg-variant="light">
             <b-table
-            :items="filteredItems"
+            :items="FilteredDocuments"
             :fields="fields"
             :sort-by.sync="sortBy"
             :sort-desc.sync="sortDesc"
+            :no-sort-reset="true"
             striped
             responsive="sm"
             >   
@@ -47,7 +48,8 @@
 
                 <template v-slot:[`cell(${fields[2].key})`]="data">
                     <b class="text-white bg-secondary">{{ data.value.toUpperCase() }}</b>
-                </template>    
+                </template> 
+
             </b-table>
         </b-card>
 
@@ -61,6 +63,9 @@ import { namespace } from 'vuex-class';
 import CivilFileDocuments from '../store/modules/CivilFileDocuments';
 const civilState = namespace('CivilFileDocuments');
 
+import json from '../assets/data.json';
+import documentTypeCodesJson from '../assets/lookup/documentTypeCodes.json';
+
 @Component
 export default class CivilDocumentsView extends Vue {
 
@@ -73,7 +78,7 @@ export default class CivilDocumentsView extends Vue {
         .then(Response => {
             return Response.json()
         }).then(data => {
-            this.documents = data
+            this.documentsJson = data.document
         })
     }
 
@@ -81,91 +86,91 @@ export default class CivilDocumentsView extends Vue {
         console.log(this.civilFileDocument.fileNumber)
         // this.getDocuments();
         
+        this.ExtractDocumentInfo();
+        
+        
     }
 
-    documents = '';   
+    documentTypeCodes = documentTypeCodesJson;
+    documentsJson = json.document;
     activetab= 0;            
     sortBy= 'Seq.';
     sortDesc= false;
 
-    items= [
-        {
-            'Seq.':'2',
-            'Document Type': 'Order',
-            'Act': 'FLA',
-            'Date Filed': '2018-09-09',
-            'Issues': 'Parenting'
-        },
-        {
-            'Seq.':'1',
-            'Document Type': 'Affidavit',
-            'Act': '',
-            'Date Filed': '2019-05-20',
-            'Issues': ''
-        },
-        {
-            'Seq.':'3',
-            'Document Type': 'Notice of Motion',
-            'Act': '',
-            'Date Filed': '2018-01-15',
-            'Issues': 'prohibited'
-        },
-        {
-            'Seq.':'4',
-            'Document Type': 'Affidavit',
-            'Act': 'DTM',
-            'Date Filed': '2020-04-03',
-            'Issues': ''
-        }
-    ];
+    documents: any[] = [];
 
     fields= [ 
         {key:'Seq.', sortable:true},
         {key:'Document Type',  sortable:true},
         {key:'Act', sortable:false},
-        {key: 'Date Filed', sortable:true},
-        {key: 'Issues', sortable:false}
+        {key:'Date Filed', sortable:true},
+        {key:'Issues', sortable:false}
     ];
 
-    filterWords= [
-        {Name:'All', AltWords:['all'], AltCdWord:['']}, 
-        {Name:'Scheduled', AltWords:['Schedule','date'], AltCdWord:['']}, 
-        {Name:'Pleadings', AltWords:['Pleading'], AltCdWord:['AEA','AEO','AFO','APC','APO','ARC','HCL','NFC','NRG','ORO','REC','REP','RES','RFC','RPC','RPL','RTC','SA','SAP','TC','WAG']}, 
-        {Name:'Motions', AltWords:['Motion'], AltCdWord:['AAP','ACMW','AFCO','APJ','ATC','AXP','NM','NTRF']}, 
-        {Name:'FS/Affidavits', AltWords:['Affidavit','witness'], AltCdWord:['AAS','ACD','AFB','AFBA','AFC','AFF','AFI','AFJ','AFM','AFS','AFSA','AFT','AOS','APS','CSA']}, 
-        {Name:'Orders', AltWords:['Order'], AltCdWord:['ABO','AOD','CAO','CDO','CMCO','COR','COS','CPOR','CRT','DJ','DO','DOR','DPO','FCR','MCO','ODT','OFI','ORA','ORD','ORFJ','ORI','ORNA','ORT','ORW','OWN','PCH','PO','POD','POR','PVO','ROR','RSO','SPO']}, 
-        {Name:'Concluded', AltWords:['conclude','finish','compelete'], AltCdWord:['']}, 
-        {Name:'Court Summary', AltWords:['Reply'], AltCdWord:['']}
+    tabMappings= [
+        {Name:'All', AltCdWords:['']}, 
+        {Name:'Scheduled', AltCdWords:['']}, 
+        {Name:'Pleadings', AltCdWords:['AEA','AEO','AFO','APC','APO','ARC','HCL','NFC','NRG','ORO','REC','REP','RES','RFC','RPC','RPL','RTC','SA','SAP','TC','WAG']}, 
+        {Name:'Motions', AltCdWords:['AAP','ACMW','AFCO','APJ','ATC','AXP','NM','NTRF']}, 
+        {Name:'FS/Affidavits', AltCdWords:['AAS','ACD','AFB','AFBA','AFC','AFF','AFI','AFJ','AFM','AFS','AFSA','AFT','AOS','APS','CSA']}, 
+        {Name:'Orders', AltCdWords:['ABO','AOD','CAO','CDO','CMCO','COR','COS','CPOR','CRT','DJ','DO','DOR','DPO','FCR','MCO','ODT','OFI','ORA','ORD','ORFJ','ORI','ORNA','ORT','ORW','OWN','PCH','PO','POD','POR','PVO','ROR','RSO','SPO']}, 
+        {Name:'Concluded', AltCdWords:['']}, 
+        {Name:'Court Summary', AltCdWords:['']}
         ] ;          
 
-    get filteredItems() {
-    return this.items.filter(value => {
-        if( this.activetab >0)
-        {       
-            for(const word of this.filterWords[this.activetab].AltWords) 
-            {
-                if(value["Document Type"].toUpperCase().includes(word.toUpperCase())){
-                    return true
-                }                    
-            }                    
-            return false;                     
-        }
-        else
+    public ExtractDocumentInfo(): void {
+               
+        for(const doc of this.documentsJson)
         {
-            return true;
+            const docInfo = {};           
+            docInfo[this.fields[0].key] = doc.fileSeqNo;
+            docInfo[this.fields[1].key] = this.ConvertCode2Description(doc.documentTypeCd);
+            docInfo["Cd"] = doc.documentTypeCd;
+            docInfo["Concluded"]= doc.concludedYn;
+
+            const appearance: any = doc.appearance.slice(-1)[0];
+            docInfo["Scheduled"]= appearance.appearanceDate;
+
+            // ensure all documentSupport elements only have one row
+            docInfo[this.fields[2].key] = doc.documentSupport[0].actCd;
+            docInfo[this.fields[3].key] = doc.filedDt.split(" ")[0];
+            // Once we have sample data with multiple issues we should rewrite it
+            docInfo[this.fields[4].key] = doc.issue.length? doc.issue : ' ';
+
+            this.documents.push(docInfo);
         }
-    });            
-}
+
+    }
+
+    public ConvertCode2Description(code: string): string{
+       return this.documentTypeCodes.filter(item =>{ return item.code==code })[0].shortDesc;
+    }
+
+    get FilteredDocuments() {
+        return this.documents.filter(doc => {
+            if(this.activetab == 6) {
+                if(doc["Concluded"] === "Y") return true; else return false;
+            } else if(this.activetab == 1) {
+                if(doc["Scheduled"]){        
+                    if(new Date(doc["Scheduled"]) > new Date()) return true; else return false;
+                } else {
+                    return false
+                }  
+
+            } else if ( this.activetab >1 )
+            {                  
+                for(const word of this.tabMappings[this.activetab].AltCdWords) 
+                {
+                    if(doc["Cd"]==word) return true;                                    
+                }                    
+                return false;                     
+            }
+            else
+            {
+                return true;
+            }
+        });        
+    }   
     
 }
 </script>
-
-
-
-
-
-
-<style scoped>
-
-</style>
-
