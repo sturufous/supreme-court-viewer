@@ -5,9 +5,11 @@ using JCCommon.Clients.FileServices;
 using JCCommon.Framework;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Scv.Api.Helpers.Mapping;
 using Scv.Api.Helpers.Middleware;
 
 namespace Scv.Api
@@ -24,7 +26,9 @@ namespace Scv.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-	        string corsDomain = Configuration.GetValue<string>("CORS_DOMAIN");
+            services.AddMapster();
+
+            string corsDomain = Configuration.GetValue<string>("CORS_DOMAIN");
             Console.WriteLine($"CORS_DOMAIN: {corsDomain}");
 
             services.AddCors(options =>
@@ -40,6 +44,8 @@ namespace Scv.Api
                 client.DefaultRequestHeaders.Authorization = new BasicAuthenticationHeaderValue(
                     Configuration.GetValue<string>("FileServicesClient:Username"), Configuration.GetValue<string>("FileServicesClient:Password"));
             });
+
+            services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
             services.AddControllers().AddNewtonsoftJson();
 
