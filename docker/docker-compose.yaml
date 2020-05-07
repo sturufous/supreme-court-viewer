@@ -18,6 +18,9 @@ services:
       - FileServicesClient__Username=${FileServicesClientUsername}
       - FileServicesClient__Password=${FileServicesClientPassword}
       - FileServicesClient__Url=${FileServicesClientUrl}
+      - LookupServicesClient__Username=${LookupServicesClientUsername}
+      - LookupServicesClient__Password=${LookupServicesClientPassword}
+      - LookupServicesClient__Url=${LookupServicesClientUrl}
       - Request__ApplicationCd=${RequestApplicationCd}
       - Request__AgencyIdentifierId=${RequestAgencyIdentifierId}
       - Request__PartId=${RequestPartId}
