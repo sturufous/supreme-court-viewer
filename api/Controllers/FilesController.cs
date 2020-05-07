@@ -98,13 +98,24 @@ namespace Scv.Api.Controllers
         /// <param name="fileId"></param>
         /// <param name="future">Y to show future, N to hide future</param>
         /// <param name="history">Y to show history, N to hide history</param>
-        /// <returns></returns>
+        /// <returns>CivilFileAppearancesResponse</returns>
         [HttpGet]
         [Route("civil/{fileId}/appearances")]
         public async Task<ActionResult<CivilFileAppearancesResponse>> GetCivilAppearancesByFileId(string fileId, FutureYN2? future, HistoryYN2? history)
         {
             var criminalFileIdAppearances = await _fsClient.FilesCivilFileIdAppearancesAsync(_requestAgencyIdentifierId, _requestPartId, future, history, fileId);
             return Ok(criminalFileIdAppearances);
+        }
+
+        /// <summary>
+        /// Gets court summary report for a given appearance id.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("civil/court-summary-report/{appearanceId}")]
+        public async Task<ActionResult<CivilFileAppearancesResponse>> GetCivilCourtSummaryReport(string appearanceId)
+        {
+            throw new NotImplementedException("Working on the JC interface for this. ");
         }
 
         /// <summary>
@@ -251,6 +262,8 @@ namespace Scv.Api.Controllers
             var recordsOfProceeding = await _fsClient.FilesRecordOfProceedingsAsync(partId, profSequenceNumber, courtLevelCode, courtClassCode);
             return Ok(recordsOfProceeding);
         }
+
+
 
 
         #endregion
