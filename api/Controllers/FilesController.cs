@@ -211,6 +211,22 @@ namespace Scv.Api.Controllers
                 proceedingDateString, appearanceId, justinNumber);
             return Ok(criminalFileContent);
         }
+
+        /// <summary>
+        /// Gets records of proceedings.
+        /// </summary>
+        /// <param name="partId">The participant id associated to the Record Of Proceedings.</param>
+        /// <param name="profSequenceNumber"></param>
+        /// <param name="courtLevelCode">The associated court level code.</param>
+        /// <param name="courtClassCode">The associated court class code.</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("criminal/record-of-proceedings")]
+        public async Task<ActionResult<CourtList>> GetRecordsOfProceeding(string partId, string profSequenceNumber, CourtLevelCd courtLevelCode, CourtClassCd courtClassCode)
+        {
+            var recordsOfProceeding = await _fsClient.FilesRecordOfProceedingsAsync(partId, profSequenceNumber, courtLevelCode, courtClassCode);
+            return Ok(recordsOfProceeding);
+        }
         #endregion
 
         /// <summary>
@@ -247,24 +263,7 @@ namespace Scv.Api.Controllers
             return Ok(documentResponse);
         }
 
-        /// <summary>
-        /// Gets records of proceedings.
-        /// </summary>
-        /// <param name="partId">The participant id associated to the Record Of Proceedings.</param>
-        /// <param name="profSequenceNumber"></param>
-        /// <param name="courtLevelCode">The associated court level code.</param>
-        /// <param name="courtClassCode">The associated court class code.</param>
-        /// <returns></returns>
-        [HttpGet]
-        [Route("record-of-proceedings")]
-        public async Task<ActionResult<CourtList>> GetRecordsOfProceeding(string partId, string profSequenceNumber, CourtLevelCd courtLevelCode, CourtClassCd courtClassCode)
-        {
-            var recordsOfProceeding = await _fsClient.FilesRecordOfProceedingsAsync(partId, profSequenceNumber, courtLevelCode, courtClassCode);
-            return Ok(recordsOfProceeding);
-        }
-
-
-
+  
 
         #endregion
 
