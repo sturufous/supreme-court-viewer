@@ -1,16 +1,11 @@
 ﻿using System;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using JCCommon.Clients.FileServices;
-using JCCommon.Framework;
 using JCCommon.Models;
 using MapsterMapper;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Scv.Api.Controllers;
-using Scv.Api.Helpers.Exceptions;
+using tests.api.Helpers;
 using Xunit;
 
 namespace tests.api
@@ -28,28 +23,8 @@ namespace tests.api
         #region Constructor
         public FilesControllerTests()
         {
-            //Load in secrets, this uses a separate secrets file for the tests project. 
-            var builder = new ConfigurationBuilder();
-            builder.AddUserSecrets<FilesControllerTests>();
-            IConfiguration configuration = builder.Build();
-
-            //Create HTTP client, usually done by Startup.cs - which handles the life cycle of HttpClient nicely. 
-            var client = new HttpClient();
-            client.DefaultRequestHeaders.Authorization = new BasicAuthenticationHeaderValue(
-                configuration.GetValue<string>("FileServicesClient:Username") ?? throw new ConfigurationException("FileServicesClient:Username was not found in secrets."),
-                configuration.GetValue<string>("FileServicesClient:Password") ?? throw new ConfigurationException("FileServicesClient:Password was not found in secrets."));
-
-            //Create logger.
-            var loggerFactory = LoggerFactory.Create(builder =>
-            {
-                builder
-                    .AddFilter("Microsoft", LogLevel.Warning)
-                    .AddFilter("System", LogLevel.Warning)
-                    .AddFilter("LoggingConsoleApp.Program", LogLevel.Debug)
-                    .AddConsole();
-            });
-
-            _controller = new FilesController(configuration, loggerFactory.CreateLogger<FilesController>(), new FileServicesClient(client), new Mapper()  );
+            var preTest = new ApiControllerEnvironmentBuilder("FileServicesClient:Username", "FileServicesClient:Password", typeof(FilesController));
+            _controller = new FilesController(preTest.Configuration, preTest.LogFactory.CreateLogger<FilesController>(), new FileServicesClient(preTest.HttpClient), new Mapper());
         }
         #endregion
 
@@ -65,7 +40,7 @@ namespace tests.api
             };
             var actionResult = await _controller.FilesCriminalSearchAsync(fcq);
 
-            var fileSearchResponse = CheckForValidHttpResponseAndReturnValue(actionResult);
+            var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Contains(fileSearchResponse.FileDetail, fd => fd.Participant.Any(p => p.FullNm.Contains("Smith")));
         }
 
@@ -81,14 +56,13 @@ namespace tests.api
             };
             var actionResult = await _controller.FilesCivilSearchAsync(fcq);
 
-            var fileSearchResponse = CheckForValidHttpResponseAndReturnValue(actionResult);
+            var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Equal("1", fileSearchResponse.RecCount);
             Assert.Equal(1, fileSearchResponse.FileDetail.Count);
             Assert.Contains("2437", fileSearchResponse.FileDetail.First().PhysicalFileId);
             Assert.Contains("BADGUY, Borris", fileSearchResponse.FileDetail.First().Participant.Select(u => u.FullNm));
         }
 
-        
         [Fact]
         public async void Criminal_File_Search_By_JustinNo()
         {
@@ -100,7 +74,7 @@ namespace tests.api
             };
             var actionResult = await _controller.FilesCriminalSearchAsync(fcq);
 
-            var fileSearchResponse = CheckForValidHttpResponseAndReturnValue(actionResult);
+            var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Contains(fileSearchResponse.FileDetail, fd => fd.MdocJustinNo == "35674");
         }
 
@@ -115,7 +89,7 @@ namespace tests.api
             };
             var actionResult = await _controller.FilesCivilSearchAsync(fcq);
 
-            var fileSearchResponse = CheckForValidHttpResponseAndReturnValue(actionResult);
+            var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Equal("1", fileSearchResponse.RecCount);
             Assert.Equal(1, fileSearchResponse.FileDetail.Count);
             Assert.Equal("C-11011", fileSearchResponse.FileDetail.First().FileNumberTxt);
@@ -127,7 +101,7 @@ namespace tests.api
         {
             var actionResult = await _controller.GetCriminalFileDetailByFileId("35674");
 
-            var redactedCriminalFileDetailResponse = CheckForValidHttpResponseAndReturnValue(actionResult);
+            var redactedCriminalFileDetailResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Equal("35674", redactedCriminalFileDetailResponse.JustinNo);
             Assert.True(redactedCriminalFileDetailResponse.Participant.Count > 0);
         }
@@ -137,7 +111,7 @@ namespace tests.api
         {
             var actionResult = await _controller.GetCivilFileDetailByFileId("40");
 
-            var redactedCivilFileDetailResponse = CheckForValidHttpResponseAndReturnValue(actionResult);
+            var redactedCivilFileDetailResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Equal("40", redactedCivilFileDetailResponse.PhysicalFileId);
             Assert.Equal("P-241", redactedCivilFileDetailResponse.FileNumberTxt);
             Assert.Contains(redactedCivilFileDetailResponse.Party, f => f.LastNm == "Kings");
@@ -149,7 +123,7 @@ namespace tests.api
         {
             var actionResult = await _controller.GetCriminalAppearancesByFileId("35674");
 
-            var criminalFileAppearancesResponse = CheckForValidHttpResponseAndReturnValue(actionResult);
+            var criminalFileAppearancesResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Contains(criminalFileAppearancesResponse.ApprDetail,
                 f => f.LastNm == "Young" && f.GivenNm == "Johnny");
         }
@@ -157,9 +131,9 @@ namespace tests.api
         [Fact]
         public async void Civil_Appearances_by_PhysicalFileId()
         {
-            var actionResult = await _controller.GetCivilAppearancesByFileId("2506",FutureYN2.Y, HistoryYN2.Y);
+            var actionResult = await _controller.GetCivilAppearancesByFileId("2506", FutureYN2.Y, HistoryYN2.Y);
 
-            var civilFileAppearancesByFileId = CheckForValidHttpResponseAndReturnValue(actionResult);
+            var civilFileAppearancesByFileId = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Equal("0", civilFileAppearancesByFileId.FutureRecCount);
             Assert.Equal("20", civilFileAppearancesByFileId.HistoryRecCount);
         }
@@ -169,7 +143,7 @@ namespace tests.api
         {
             var actionResult = await _controller.GetCriminalAppearancesByFileId("0");
 
-            var criminalFileAppearancesResponse = CheckForValidHttpResponseAndReturnValue(actionResult);
+            var criminalFileAppearancesResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Equal("0", criminalFileAppearancesResponse.FutureRecCount);
             Assert.Equal("0", criminalFileAppearancesResponse.HistoryRecCount);
         }
@@ -179,7 +153,7 @@ namespace tests.api
         {
             var actionResult = await _controller.GetCourtList("4801", "101", DateTime.Parse("2016-04-04"), "CR", "4889-1");
 
-            var criminalFileAppearancesResponse = CheckForValidHttpResponseAndReturnValue(actionResult);
+            var criminalFileAppearancesResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Equal("4801", criminalFileAppearancesResponse.CourtLocationName);
             Assert.Equal("101", criminalFileAppearancesResponse.CourtRoomCode);
             Assert.Equal("2016-04-04", criminalFileAppearancesResponse.CourtProceedingsDate);
@@ -190,7 +164,7 @@ namespace tests.api
         {
             var actionResult = await _controller.GetCriminalFileContent("4801", "101", DateTime.Parse("2016-04-04"), "44150.0734");
 
-            var criminalFileContent = CheckForValidHttpResponseAndReturnValue(actionResult);
+            var criminalFileContent = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Equal("4801",criminalFileContent.CourtLocaCd);
             Assert.Equal("101", criminalFileContent.CourtRoomCd);
             Assert.Equal("2016-04-04", criminalFileContent.CourtProceedingDate);
@@ -201,7 +175,7 @@ namespace tests.api
         {
             var actionResult = await _controller.GetCivilFileContent("4801", "101", DateTime.Parse("2016-04-04"), "984");
 
-            var civilFileContent = CheckForValidHttpResponseAndReturnValue(actionResult);
+            var civilFileContent = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Equal("4801", civilFileContent.CourtLocaCd);
             Assert.Equal("101", civilFileContent.CourtRoomCd);
             Assert.Equal("2016-04-04", civilFileContent.CourtProceedingDate);
@@ -221,7 +195,7 @@ namespace tests.api
             };
             var actionResult = await _controller.FilesCriminalSearchAsync(fcq);
 
-            var fileSearchResponse = CheckForValidHttpResponseAndReturnValue(actionResult);
+            var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Equal("2", fileSearchResponse.RecCount);
         }
 
@@ -237,7 +211,7 @@ namespace tests.api
             };
             var actionResult = await _controller.FilesCriminalSearchAsync(fcq);
 
-            var fileSearchResponse = CheckForValidHttpResponseAndReturnValue(actionResult);
+            var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Equal("1", fileSearchResponse.RecCount);
         }
 
@@ -252,7 +226,7 @@ namespace tests.api
             };
             var actionResult = await _controller.FilesCriminalSearchAsync(fcq);
 
-            var fileSearchResponse = CheckForValidHttpResponseAndReturnValue(actionResult);
+            var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Equal("3", fileSearchResponse.RecCount);
         }
 
@@ -268,24 +242,11 @@ namespace tests.api
             };
             var actionResult = await _controller.FilesCivilSearchAsync(fcq);
 
-            var fileSearchResponse = CheckForValidHttpResponseAndReturnValue(actionResult);
+            var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Equal("1", fileSearchResponse.RecCount);
             Assert.Equal(1, fileSearchResponse.FileDetail.Count);
             Assert.Equal("2506", fileSearchResponse.FileDetail.First().PhysicalFileId);
             Assert.Contains("BYSTANDER, Innocent", fileSearchResponse.FileDetail.First().Participant.Select(u => u.FullNm));
-        }
-        #endregion
-
-        #region Helpers
-        private T CheckForValidHttpResponseAndReturnValue<T>(ActionResult<T> actionResult)
-        {
-            Assert.NotNull(actionResult);
-            Assert.NotNull(actionResult.Result);
-            var okObjectResult = actionResult.Result as OkObjectResult;
-            Assert.NotNull(okObjectResult);
-            var result = (T) okObjectResult.Value;
-            Assert.NotNull(result);
-            return result;
         }
         #endregion
     }
