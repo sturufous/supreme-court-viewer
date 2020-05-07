@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using JCCommon.Clients.FileServices;
 using JCCommon.Models;
@@ -9,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Scv.Api.Helpers.ContractResolver;
 using Scv.Api.Helpers.Exceptions;
+using Scv.Api.Models;
 
 namespace Scv.Api.Controllers
 {
@@ -70,8 +73,23 @@ namespace Scv.Api.Controllers
         public async Task<ActionResult<RedactedCivilFileDetailResponse>> GetCivilFileDetailByFileId(string fileId)
         {
             var civilFileDetailResponse = await _fsClient.FilesCivilFileIdAsync(_requestAgencyIdentifierId, _requestPartId, fileId);
-            var redactedCivilFileDetailResponse = _mapper.Map<RedactedCivilFileDetailResponse>(civilFileDetailResponse);
-            return Ok(redactedCivilFileDetailResponse);
+            //Add in CSRs. 
+            foreach (var appearance in civilFileDetailResponse.Appearance)
+            {
+                civilFileDetailResponse.Document.Add(new CvfcDocument3
+                {
+                    CivilDocumentId = appearance.AppearanceId,
+                    ImageId = appearance.AppearanceId,
+                    DocumentTypeCd = "CSR",
+                    LastAppearanceDt = appearance.AppearanceDate,
+                    FiledDt = appearance.AppearanceDate
+                });
+            }
+
+            //Add in documentTypeDescription.
+
+            var civilFileDetail = _mapper.Map<RedactedCivilFileDetailResponse>(civilFileDetailResponse);
+            return Ok(civilFileDetail);
         }
 
         /// <summary>
@@ -211,7 +229,7 @@ namespace Scv.Api.Controllers
         /// <param name="isCriminal">True if Criminal, False if Civil</param>
         /// <returns>DocumentResponse</returns>
         [HttpGet]
-        [Route("document")]
+        [Route("document/{documentId}/{fileName?}")]
         public async Task<ActionResult<DocumentResponse>> GetDocument(string documentId, bool isCriminal = false)
         {
             var documentResponse = await _fsClient.FilesDocumentAsync(documentId, isCriminal ? "R" : "I");
