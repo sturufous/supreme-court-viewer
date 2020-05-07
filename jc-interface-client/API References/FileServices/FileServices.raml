@@ -2470,6 +2470,12 @@ schemas:
           "concludedYn" : {
             "type" : "string",
             "enum" : [ "Y", "N" ]
+          },
+          "issueResultCd" : {
+            "type" : "string"
+          },
+          "issueResultDsc" : {
+            "type" : "string"
           }
         }
       }
@@ -2512,9 +2518,19 @@ schemas:
           "lastAppearanceTm" : {
             "type" : "string"
           },
+          "sealedYN" : {
+            "type" : "string"
+          },
+          "DateGranted" : {
+            "type" : "string"
+          },
           "documentSupport" : {
             "type" : "array",
             "items" : { "$ref" : "cvfcDocumentSupport" }
+          },
+          "appearance" : {
+            "type" : "array",
+            "items" : { "$ref" : "cvfcAppearance" }
           },
           "issue" : {
             "type" : "array",
@@ -2605,6 +2621,9 @@ schemas:
           "sheriffCommentText" : {
             "type" : "string"
           },
+          "sealedYN" : {
+            "type" : "string"
+          },
           "party" : {
             "type" : "array",
             "items" : { "$ref" : "cvfcParty3" }
@@ -2612,6 +2631,10 @@ schemas:
           "document" : {
             "type" : "array",
             "items" : { "$ref" : "cvfcDocument3" }
+          },
+          "appearance" : {
+            "type" : "array",
+            "items" : { "$ref" : "cvfcAppearance" }
           },
           "hearingRestriction" : {
             "type" : "array",
@@ -2856,6 +2879,23 @@ schemas:
         }
       }
 
+  - justinReportResponse: | 
+      {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type" : "object",
+        "properties" : {
+          "responseCd" : {
+            "type" : "string"
+          },
+          "responseMessageTxt" : {
+            "type" : "string"
+          },
+          "reportContent" : {
+            "type" : "string"
+          }
+        }
+      }
+
 /files:
   displayName: Court File Resources
 
@@ -3084,16 +3124,16 @@ schemas:
             displayName: agencyId
             description: Agency Identifier Code (Location Code); for example 4801 (Kelona).
             type: string
-            required: true
+            required: false
           roomCd:
             displayName: roomCd
             type: string
-            required: true
+            required: false
           proceedingDt:
             displayName: proceedingDt
             description: The proceeding date in the format YYYY-MM-dd
             type: string
-            required: true
+            required: false
           appearanceId:
             displayName: appearanceId
             description: The full appeance Id in the for 00000.0000
@@ -3294,6 +3334,40 @@ schemas:
               example: |
                 {"message": "No items matching the given criteria were found."}
 
+    /courtsummaryreport: # civil
+      get:
+        description: |
+          Gets the court summary report for a given appearanceId.
+        queryParameters:
+          appearanceId:
+            displayName: appearanceId
+            description: The full appearance Id in the for 00000.0000
+            type: string
+            required: true
+          reportName:
+            displayName: reportName
+            type: string
+            required: true
+        headers:
+          requestAgencyIdentifierId:
+            description: Requesting Agency Identifier
+            type: string
+            required: true
+          requestPartId:
+            description: Requesting Participant Id
+            type: string
+            required: true
+        responses:
+          200:
+            body:
+              application/json:
+                schema: justinReportResponse
+          404:
+            body:
+              application/json:
+                example: |
+                  {"message": "No items matching the given criteria were found."}
+
     /filecontent: # civil
       get:
         description: |
@@ -3303,16 +3377,16 @@ schemas:
             displayName: agencyId
             description: Agency Identifier Code (Location Code); for example 4801 (Kelowna).
             type: string
-            required: true
+            required: false
           roomCd:
             displayName: roomCd
             type: string
-            required: true
+            required: false
           proceedingDt:
             displayName: proceedingDt
             description: The proceeding date in the format YYYY-MM-dd
             type: string
-            required: true
+            required: false
           appearanceId:
             displayName: appearanceId
             description: The full appearance Id in the for 00000.0000

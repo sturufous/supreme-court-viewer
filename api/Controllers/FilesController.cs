@@ -9,6 +9,7 @@ using Scv.Api.Helpers.Exceptions;
 using Scv.Api.Models;
 using System;
 using System.Threading.Tasks;
+using Scv.Api.Constants;
 
 namespace Scv.Api.Controllers
 {
@@ -82,9 +83,6 @@ namespace Scv.Api.Controllers
                     FiledDt = appearance.AppearanceDate
                 });
             }
-
-            //Add in documentTypeDescription.
-
             var civilFileDetail = _mapper.Map<RedactedCivilFileDetailResponse>(civilFileDetailResponse);
             return Ok(civilFileDetail);
         }
@@ -110,9 +108,11 @@ namespace Scv.Api.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("civil/court-summary-report/{appearanceId}")]
-        public async Task<ActionResult<CivilFileAppearancesResponse>> GetCivilCourtSummaryReport(string appearanceId)
+        public async Task<ActionResult<JustinReportResponse>> GetCivilCourtSummaryReport(string appearanceId)
         {
-            throw new NotImplementedException("Working on the JC interface for this. ");
+            var justinReportResponse = await _fsClient.FilesCivilCourtsummaryreportAsync(_requestAgencyIdentifierId,
+                _requestPartId, appearanceId, JustinReportName.CEISR035);
+            return Ok(justinReportResponse);
         }
 
         /// <summary>
