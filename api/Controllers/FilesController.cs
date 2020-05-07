@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using JCCommon.Clients.FileServices;
+﻿using JCCommon.Clients.FileServices;
 using JCCommon.Models;
-using Mapster;
 using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -12,6 +7,8 @@ using Microsoft.Extensions.Logging;
 using Scv.Api.Helpers.ContractResolver;
 using Scv.Api.Helpers.Exceptions;
 using Scv.Api.Models;
+using System;
+using System.Threading.Tasks;
 
 namespace Scv.Api.Controllers
 {
@@ -130,7 +127,7 @@ namespace Scv.Api.Controllers
         /// <returns>CivilFileContent</returns>
         [HttpGet]
         [Route("civil/file-content")]
-        public async Task<ActionResult<CivilFileContent>> GetCivilFileContent(string agencyId = "", string roomCode = "", DateTime? proceeding = null, string appearanceId = "", string physicalFileId = "")
+        public async Task<ActionResult<CivilFileContent>> GetCivilFileContent(string agencyId = null, string roomCode = null, DateTime? proceeding = null, string appearanceId = null, string physicalFileId = "")
         {
             var proceedingDateString = proceeding.HasValue ? proceeding.Value.ToString("yyyy-MM-dd") : "";
             var civilFileContent = await _fsClient.FilesCivilFilecontentAsync(agencyId, roomCode, proceedingDateString,
