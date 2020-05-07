@@ -952,20 +952,17 @@ namespace JCCommon.Clients.FileServices
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public async System.Threading.Tasks.Task<CivilFileContent> FilesCivilFilecontentAsync(string agencyId, string roomCd, string proceedingDt, string appearanceId, string physicalFileId, System.Threading.CancellationToken cancellationToken)
         {
-            if (agencyId == null)
-                throw new System.ArgumentNullException("agencyId");
-
-            if (roomCd == null)
-                throw new System.ArgumentNullException("roomCd");
-
-            if (proceedingDt == null)
-                throw new System.ArgumentNullException("proceedingDt");
-
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/files/civil/filecontent?");
-            urlBuilder_.Append(System.Uri.EscapeDataString("agencyId") + "=").Append(System.Uri.EscapeDataString(ConvertToString(agencyId, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
-            urlBuilder_.Append(System.Uri.EscapeDataString("roomCd") + "=").Append(System.Uri.EscapeDataString(ConvertToString(roomCd, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
-            urlBuilder_.Append(System.Uri.EscapeDataString("proceedingDt") + "=").Append(System.Uri.EscapeDataString(ConvertToString(proceedingDt, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            if (agencyId != null)
+                urlBuilder_.Append(System.Uri.EscapeDataString("agencyId") + "=").Append(System.Uri.EscapeDataString(ConvertToString(agencyId, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+
+            if (roomCd != null)
+                urlBuilder_.Append(System.Uri.EscapeDataString("roomCd") + "=").Append(System.Uri.EscapeDataString(ConvertToString(roomCd, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+
+            if (proceedingDt != null)
+                urlBuilder_.Append(System.Uri.EscapeDataString("proceedingDt") + "=").Append(System.Uri.EscapeDataString(ConvertToString(proceedingDt, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+
             if (appearanceId != null)
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("appearanceId") + "=").Append(System.Uri.EscapeDataString(ConvertToString(appearanceId, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
