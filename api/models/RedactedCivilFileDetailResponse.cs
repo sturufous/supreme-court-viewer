@@ -3,7 +3,7 @@ using JCCommon.Clients.FileServices;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace JCCommon.Models
+namespace Scv.Api.Models
 {
     public class RedactedCivilFileDetailResponse
     {
