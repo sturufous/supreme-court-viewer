@@ -105,7 +105,8 @@ namespace Scv.Api.Controllers
         /// <summary>
         /// Gets court summary report for a given appearance id.
         /// </summary>
-        /// <returns></returns>
+        /// <param name="appearanceId"></param>
+        /// <returns>JustinReportResponse</returns>
         [HttpGet]
         [Route("civil/court-summary-report/{appearanceId}/{fileName?}")]
         public async Task<ActionResult<JustinReportResponse>> GetCivilCourtSummaryReport(string appearanceId)
@@ -218,7 +219,7 @@ namespace Scv.Api.Controllers
         /// <param name="courtClassCode">The associated court class code.</param>
         /// <returns></returns>
         [HttpGet]
-        [Route("criminal/record-of-proceedings")]
+        [Route("criminal/record-of-proceedings/{partId}/{fileName?}")]
         public async Task<ActionResult<CourtList>> GetRecordsOfProceeding(string partId, string profSequenceNumber, CourtLevelCd courtLevelCode, CourtClassCd courtClassCode)
         {
             var recordsOfProceeding = await _fsClient.FilesRecordOfProceedingsAsync(partId, profSequenceNumber, courtLevelCode, courtClassCode);
