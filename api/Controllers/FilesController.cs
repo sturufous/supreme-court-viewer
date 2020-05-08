@@ -9,6 +9,7 @@ using Scv.Api.Helpers.Exceptions;
 using Scv.Api.Models;
 using System;
 using System.Threading.Tasks;
+using Scv.Api.Constants;
 
 namespace Scv.Api.Controllers
 {
@@ -82,9 +83,6 @@ namespace Scv.Api.Controllers
                     FiledDt = appearance.AppearanceDate
                 });
             }
-
-            //Add in documentTypeDescription.
-
             var civilFileDetail = _mapper.Map<RedactedCivilFileDetailResponse>(civilFileDetailResponse);
             return Ok(civilFileDetail);
         }
@@ -107,12 +105,15 @@ namespace Scv.Api.Controllers
         /// <summary>
         /// Gets court summary report for a given appearance id.
         /// </summary>
-        /// <returns></returns>
+        /// <param name="appearanceId"></param>
+        /// <returns>JustinReportResponse</returns>
         [HttpGet]
-        [Route("civil/court-summary-report/{appearanceId}")]
-        public async Task<ActionResult<CivilFileAppearancesResponse>> GetCivilCourtSummaryReport(string appearanceId)
+        [Route("civil/court-summary-report/{appearanceId}/{fileName?}")]
+        public async Task<ActionResult<JustinReportResponse>> GetCivilCourtSummaryReport(string appearanceId)
         {
-            throw new NotImplementedException("Working on the JC interface for this. ");
+            var justinReportResponse = await _fsClient.FilesCivilCourtsummaryreportAsync(_requestAgencyIdentifierId,
+                _requestPartId, appearanceId, JustinReportName.CEISR035);
+            return Ok(justinReportResponse);
         }
 
         /// <summary>
@@ -218,7 +219,7 @@ namespace Scv.Api.Controllers
         /// <param name="courtClassCode">The associated court class code.</param>
         /// <returns></returns>
         [HttpGet]
-        [Route("criminal/record-of-proceedings")]
+        [Route("criminal/record-of-proceedings/{partId}/{fileName?}")]
         public async Task<ActionResult<CourtList>> GetRecordsOfProceeding(string partId, string profSequenceNumber, CourtLevelCd courtLevelCode, CourtClassCd courtClassCode)
         {
             var recordsOfProceeding = await _fsClient.FilesRecordOfProceedingsAsync(partId, profSequenceNumber, courtLevelCode, courtClassCode);
