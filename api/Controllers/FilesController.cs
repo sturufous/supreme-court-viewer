@@ -107,7 +107,7 @@ namespace Scv.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Route("civil/court-summary-report/{appearanceId}")]
+        [Route("civil/court-summary-report/{appearanceId}/{fileName?}")]
         public async Task<ActionResult<JustinReportResponse>> GetCivilCourtSummaryReport(string appearanceId)
         {
             var justinReportResponse = await _fsClient.FilesCivilCourtsummaryreportAsync(_requestAgencyIdentifierId,
