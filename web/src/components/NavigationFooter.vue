@@ -1,5 +1,5 @@
 <template>
-  <footer>
+  <footer class="fixed-bottom">
     <nav class="navbar navbar-expand-lg navbar-dark">
       <!-- Navbar content -->
       <ul class="navbar-nav">
@@ -50,10 +50,15 @@
     </nav>
   </footer>
 </template>
-<script>
-export default {
-  data() {
-    return {};
+
+
+<script lang="ts">
+  import { Component, Vue } from 'vue-property-decorator';
+
+  @Component
+  export default class NavigationFooter extends Vue {   
+
   }
-};
 </script>
+
+
