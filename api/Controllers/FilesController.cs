@@ -202,7 +202,7 @@ namespace Scv.Api.Controllers
         /// <returns>CriminalFileContent</returns>
         [HttpGet]
         [Route("criminal/file-content")]
-        public async Task<ActionResult<CriminalFileContent>> GetCriminalFileContent(string agencyId, string roomCode, DateTime? proceeding, string appearanceId = null, string justinNumber = null)
+        public async Task<ActionResult<CriminalFileContent>> GetCriminalFileContent(string agencyId = null, string roomCode = null, DateTime? proceeding = null, string appearanceId = null, string justinNumber = "")
         {
             var proceedingDateString = proceeding.HasValue ? proceeding.Value.ToString("yyyy-MM-dd") : "";
             var criminalFileContent = await _fsClient.FilesCriminalFilecontentAsync(agencyId, roomCode,
@@ -220,7 +220,7 @@ namespace Scv.Api.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("criminal/record-of-proceedings/{partId}/{fileName?}")]
-        public async Task<ActionResult<CourtList>> GetRecordsOfProceeding(string partId, string profSequenceNumber, CourtLevelCd courtLevelCode, CourtClassCd courtClassCode)
+        public async Task<ActionResult<RopResponse>> GetRecordsOfProceeding(string partId, string profSequenceNumber, CourtLevelCd courtLevelCode, CourtClassCd courtClassCode)
         {
             var recordsOfProceeding = await _fsClient.FilesRecordOfProceedingsAsync(partId, profSequenceNumber, courtLevelCode, courtClassCode);
             return Ok(recordsOfProceeding);
