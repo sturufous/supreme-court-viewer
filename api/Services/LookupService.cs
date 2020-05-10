@@ -24,8 +24,11 @@ namespace Scv.Api.Services
         public const string LookupDocumentDescriptions = nameof(LookupDocumentDescriptions);
         #endregion
 
+        #region Properties
         private DateTimeOffset CacheExpiry => DateTimeOffset.Now.AddHours(1);
+        #endregion
 
+        #region Constructor
         public LookupService(IConfiguration configuration, LookupServiceClient lookupClient, IAppCache cache)
         {
             _configuration = configuration;
@@ -33,9 +36,11 @@ namespace Scv.Api.Services
             _cache = cache;
             SetupLookupServicesClient();
         }
+        #endregion
 
+        #region Methods
         /// <summary>
-        /// Gives you a docuemnt description, based on the provided document code.
+        /// Gives a document description, based on the provided document code.
         /// </summary>
         /// <param name="documentCode"></param>
         /// <returns></returns>
@@ -63,6 +68,7 @@ namespace Scv.Api.Services
                 throw new ConfigurationException("Couldn't not build dictionary based on DocumentCategories");
             return configurationSections.FirstOrDefault(cs => cs.Value.Split(",").Contains(documentCode)).Key ?? "";
         }
+        #endregion
 
         #region Helpers
 

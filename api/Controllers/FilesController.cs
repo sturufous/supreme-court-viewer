@@ -11,6 +11,7 @@ using System;
 using System.Threading.Tasks;
 using Scv.Api.Constants;
 using Scv.Api.Models.Civil;
+using Scv.Api.Models.Criminal;
 using Scv.Api.Services;
 
 namespace Scv.Api.Controllers

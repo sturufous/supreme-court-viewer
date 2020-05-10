@@ -7,17 +7,23 @@ using Microsoft.Extensions.Configuration;
 using Scv.Api.Helpers.ContractResolver;
 using Scv.Api.Helpers.Exceptions;
 using Scv.Api.Models.Civil;
+using Scv.Api.Models.Criminal;
 
 namespace Scv.Api.Services
 {
+    /// <summary>
+    /// This is meant to wrap our FileServicesClient. That way we can easily extend the information provided to us by the FileServicesClient. 
+    /// </summary>
     public class FilesService
     {
+        #region Variables
         private readonly FileServicesClient _fileServicesClient;
         private readonly IMapper _mapper;
         private readonly LookupService _lookupService;
         private readonly string _requestApplicationCode;
         private readonly string _requestAgencyIdentifierId;
         private readonly string _requestPartId;
+        #endregion 
 
         #region Constructor
         public FilesService(IConfiguration configuration, FileServicesClient fileServicesClient, IMapper mapper, LookupService lookupService)
@@ -33,6 +39,7 @@ namespace Scv.Api.Services
         }
         #endregion
 
+        #region Methods
         public async Task<FileSearchResponse> FilesCivilAsync(FilesCivilQuery fcq)
         {
             fcq.FilePermissions =
@@ -152,5 +159,6 @@ namespace Scv.Api.Services
             var documentResponse = await _fileServicesClient.FilesDocumentAsync(documentId, isCriminal ? "R" : "I");
             return documentResponse;
         }
+        #endregion
     }
 }

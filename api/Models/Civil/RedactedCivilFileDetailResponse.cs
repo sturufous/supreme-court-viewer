@@ -5,6 +5,9 @@ using Newtonsoft.Json.Converters;
 
 namespace Scv.Api.Models.Civil
 {
+    /// <summary>
+    /// This is used to narrow down the amount of information from CivilFileDetailResponse. 
+    /// </summary>
     public class RedactedCivilFileDetailResponse
     {
         [JsonProperty("responseCd", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
