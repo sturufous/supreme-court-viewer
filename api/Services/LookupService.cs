@@ -54,7 +54,7 @@ namespace Scv.Api.Services
         ///  Uses LazyCache to query LookupServiceClient for lookup codes. This is about 600 codes atm.
         /// </summary>
         /// <returns></returns>
-        public async Task<DocumentCodeLookup> GetDocumentCodesFromLazyCache() => await _cache.GetOrAdd(LookupDocumentDescriptions, async () => await _lookupClient.CodesDocumentsAsync(), CacheExpiry);
+        public async Task<DocumentCodeLookup> GetDocumentCodesFromLazyCache() => await _cache.GetOrAddAsync(LookupDocumentDescriptions, async () => await _lookupClient.CodesDocumentsAsync(), CacheExpiry);
 
         /// <summary>
         /// Reads from the configuration for the document category.
