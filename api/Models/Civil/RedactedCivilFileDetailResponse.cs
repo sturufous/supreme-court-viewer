@@ -3,7 +3,7 @@ using JCCommon.Clients.FileServices;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace Scv.Api.Models
+namespace Scv.Api.Models.Civil
 {
     public class RedactedCivilFileDetailResponse
     {
@@ -51,11 +51,13 @@ namespace Scv.Api.Models
         [JsonProperty("party", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public ICollection<CvfcParty3> Party { get; set; }
 
+        /// <summary>
+        /// Extended document object. 
+        /// </summary>
         [JsonProperty("document", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public ICollection<CvfcDocument3> Document { get; set; }
+        public ICollection<CivilFileDetailDocument> Document { get; set; }
 
         [JsonProperty("hearingRestriction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public ICollection<CvfcHearingRestriction2> HearingRestriction { get; set; }
-
     }
 }
