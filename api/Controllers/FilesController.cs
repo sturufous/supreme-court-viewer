@@ -1,14 +1,15 @@
-﻿using System;
-using System.Threading.Tasks;
-using JCCommon.Clients.FileServices;
+﻿using JCCommon.Clients.FileServices;
 using JCCommon.Models;
-using Mapster;
 using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Scv.Api.Helpers.ContractResolver;
 using Scv.Api.Helpers.Exceptions;
+using Scv.Api.Models;
+using System;
+using System.Threading.Tasks;
+using Scv.Api.Constants;
 
 namespace Scv.Api.Controllers
 {
@@ -70,8 +71,20 @@ namespace Scv.Api.Controllers
         public async Task<ActionResult<RedactedCivilFileDetailResponse>> GetCivilFileDetailByFileId(string fileId)
         {
             var civilFileDetailResponse = await _fsClient.FilesCivilFileIdAsync(_requestAgencyIdentifierId, _requestPartId, fileId);
-            var redactedCivilFileDetailResponse = _mapper.Map<RedactedCivilFileDetailResponse>(civilFileDetailResponse);
-            return Ok(redactedCivilFileDetailResponse);
+            //Add in CSRs. 
+            foreach (var appearance in civilFileDetailResponse.Appearance)
+            {
+                civilFileDetailResponse.Document.Add(new CvfcDocument3
+                {
+                    CivilDocumentId = appearance.AppearanceId,
+                    ImageId = appearance.AppearanceId,
+                    DocumentTypeCd = "CSR",
+                    LastAppearanceDt = appearance.AppearanceDate,
+                    FiledDt = appearance.AppearanceDate
+                });
+            }
+            var civilFileDetail = _mapper.Map<RedactedCivilFileDetailResponse>(civilFileDetailResponse);
+            return Ok(civilFileDetail);
         }
 
         /// <summary>
@@ -80,13 +93,27 @@ namespace Scv.Api.Controllers
         /// <param name="fileId"></param>
         /// <param name="future">Y to show future, N to hide future</param>
         /// <param name="history">Y to show history, N to hide history</param>
-        /// <returns></returns>
+        /// <returns>CivilFileAppearancesResponse</returns>
         [HttpGet]
         [Route("civil/{fileId}/appearances")]
         public async Task<ActionResult<CivilFileAppearancesResponse>> GetCivilAppearancesByFileId(string fileId, FutureYN2? future, HistoryYN2? history)
         {
             var criminalFileIdAppearances = await _fsClient.FilesCivilFileIdAppearancesAsync(_requestAgencyIdentifierId, _requestPartId, future, history, fileId);
             return Ok(criminalFileIdAppearances);
+        }
+
+        /// <summary>
+        /// Gets court summary report for a given appearance id.
+        /// </summary>
+        /// <param name="appearanceId"></param>
+        /// <returns>JustinReportResponse</returns>
+        [HttpGet]
+        [Route("civil/court-summary-report/{appearanceId}/{fileName?}")]
+        public async Task<ActionResult<JustinReportResponse>> GetCivilCourtSummaryReport(string appearanceId)
+        {
+            var justinReportResponse = await _fsClient.FilesCivilCourtsummaryreportAsync(_requestAgencyIdentifierId,
+                _requestPartId, appearanceId, JustinReportName.CEISR035);
+            return Ok(justinReportResponse);
         }
 
         /// <summary>
@@ -101,7 +128,7 @@ namespace Scv.Api.Controllers
         /// <returns>CivilFileContent</returns>
         [HttpGet]
         [Route("civil/file-content")]
-        public async Task<ActionResult<CivilFileContent>> GetCivilFileContent(string agencyId = "", string roomCode = "", DateTime? proceeding = null, string appearanceId = "", string physicalFileId = "")
+        public async Task<ActionResult<CivilFileContent>> GetCivilFileContent(string agencyId = null, string roomCode = null, DateTime? proceeding = null, string appearanceId = null, string physicalFileId = "")
         {
             var proceedingDateString = proceeding.HasValue ? proceeding.Value.ToString("yyyy-MM-dd") : "";
             var civilFileContent = await _fsClient.FilesCivilFilecontentAsync(agencyId, roomCode, proceedingDateString,
@@ -175,12 +202,28 @@ namespace Scv.Api.Controllers
         /// <returns>CriminalFileContent</returns>
         [HttpGet]
         [Route("criminal/file-content")]
-        public async Task<ActionResult<CriminalFileContent>> GetCriminalFileContent(string agencyId, string roomCode, DateTime? proceeding, string appearanceId = null, string justinNumber = null)
+        public async Task<ActionResult<CriminalFileContent>> GetCriminalFileContent(string agencyId = null, string roomCode = null, DateTime? proceeding = null, string appearanceId = null, string justinNumber = "")
         {
             var proceedingDateString = proceeding.HasValue ? proceeding.Value.ToString("yyyy-MM-dd") : "";
             var criminalFileContent = await _fsClient.FilesCriminalFilecontentAsync(agencyId, roomCode,
                 proceedingDateString, appearanceId, justinNumber);
             return Ok(criminalFileContent);
+        }
+
+        /// <summary>
+        /// Gets records of proceedings.
+        /// </summary>
+        /// <param name="partId">The participant id associated to the Record Of Proceedings.</param>
+        /// <param name="profSequenceNumber"></param>
+        /// <param name="courtLevelCode">The associated court level code.</param>
+        /// <param name="courtClassCode">The associated court class code.</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("criminal/record-of-proceedings/{partId}/{fileName?}")]
+        public async Task<ActionResult<RopResponse>> GetRecordsOfProceeding(string partId, string profSequenceNumber, CourtLevelCd courtLevelCode, CourtClassCd courtClassCode)
+        {
+            var recordsOfProceeding = await _fsClient.FilesRecordOfProceedingsAsync(partId, profSequenceNumber, courtLevelCode, courtClassCode);
+            return Ok(recordsOfProceeding);
         }
         #endregion
 
@@ -211,29 +254,14 @@ namespace Scv.Api.Controllers
         /// <param name="isCriminal">True if Criminal, False if Civil</param>
         /// <returns>DocumentResponse</returns>
         [HttpGet]
-        [Route("document")]
+        [Route("document/{documentId}/{fileName?}")]
         public async Task<ActionResult<DocumentResponse>> GetDocument(string documentId, bool isCriminal = false)
         {
             var documentResponse = await _fsClient.FilesDocumentAsync(documentId, isCriminal ? "R" : "I");
             return Ok(documentResponse);
         }
 
-        /// <summary>
-        /// Gets records of proceedings.
-        /// </summary>
-        /// <param name="partId">The participant id associated to the Record Of Proceedings.</param>
-        /// <param name="profSequenceNumber"></param>
-        /// <param name="courtLevelCode">The associated court level code.</param>
-        /// <param name="courtClassCode">The associated court class code.</param>
-        /// <returns></returns>
-        [HttpGet]
-        [Route("record-of-proceedings")]
-        public async Task<ActionResult<CourtList>> GetRecordsOfProceeding(string partId, string profSequenceNumber, CourtLevelCd courtLevelCode, CourtClassCd courtClassCode)
-        {
-            var recordsOfProceeding = await _fsClient.FilesRecordOfProceedingsAsync(partId, profSequenceNumber, courtLevelCode, courtClassCode);
-            return Ok(recordsOfProceeding);
-        }
-
+  
 
         #endregion
 

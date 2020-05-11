@@ -1,10 +1,10 @@
-
+# Running the Application on Docker
 
 ## Management Script
 
 The `manage` script wraps the Docker process in easy to use commands.
 
-To get full usage information on the script run:
+To get full usage information on the script, run:
 ```
 ./manage -h
 ```
@@ -13,15 +13,14 @@ To get full usage information on the script run:
 
 The first thing you'll need to do is build the Docker images. 
 
-To build the images run:
+To build the images, run:
 ```
 ./manage build
 ```
 
-
 ## Starting the Project
 
-To start the project run:
+To start the project, run:
 ```
 ./manage start
 ```
@@ -30,7 +29,7 @@ This will start the project interactively; with all of the logs being written to
 
 ## Stopping the Project
 
-To stop the project run:
+To stop the project, run:
 ```
 ./manage stop
 ```
@@ -41,5 +40,6 @@ Since the services are started interactively, you will have to issue this comman
 
 ## Using the Application
 
-* The main UI is exposed at; http://localhost:8080/
-
+- The main UI is exposed at; http://localhost:8080/
+- The API is available at; http://localhost:8080/api
+  - The API is also exposed directly at; http://localhost:5000/api

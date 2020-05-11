@@ -4,12 +4,7 @@ import { VuexModule, Module, Mutation, Action } from 'vuex-module-decorators'
   namespaced: true
 })
 class CivilFileDocuments extends VuexModule {
-  public civilFileDocument = {
-    proceedingDate: '',
-    location: '',
-    room: '',
-    fileNumber: ''
-  }      
+  public civilFileDocument = { }      
 
   @Mutation
   public setCivilFile(civilFileDocument): void {
