@@ -13,7 +13,9 @@
     "axios": "^0.19.2",
     "bootstrap": "^4.4.1",
     "bootstrap-vue": "^2.12.0",
-    "core-js": "^3.6.4",
+    "core-js": "^3.6.5",
+    "intersection-observer": "^0.10.0",
+    "regenerator-runtime": "^0.13.5",
     "vue": "2.6.11",
     "vue-class-component": "6.3.2",
     "vue-property-decorator": "^8.4.2",
@@ -66,6 +68,6 @@
   "browserslist": [
     "> 1%",
     "last 2 versions",
-    "not ie <= 8"
+    "ie 9-11"
   ]
 }

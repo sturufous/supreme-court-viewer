@@ -30,7 +30,13 @@
                    <b v-bind:key="index" :class="f.headerStyle" > {{ data.label }}</b>
                 </template>
                  <template v-for="(f,index) in fields[fieldsTab]" v-slot:[`cell(${f.key})`]="data" >
-                   <span v-bind:key="index" :class="(data.item.PdfAvail)&&(index==1)&&(activetab!='Court Summary')? 'text-info': f.cellStyle" style="white-space: pre-line"> {{ data.value }}</span>
+                   <span v-bind:key="index"
+                                v-on:click="(data.item.PdfAvail)&&(index==1)&&(activetab!='Court Summary')? 
+                                openDocumentsPdf(data.item['Document ID']): 
+                                ((index==0)&&(activetab=='Court Summary'))? openCourtSummaryPdf(data.item['Appearance ID']) : ''"
+                               :class="(data.item.PdfAvail)&&(index==1)&&(activetab!='Court Summary')? 'text-info': f.cellStyle" 
+                                style="white-space: pre-line"> {{ data.value }}
+                    </span>
                 </template>
             </b-table>
         </b-card>
@@ -71,13 +77,13 @@ export default class CivilDocumentsView extends Vue {
             });
     }
 
-    mounted () {
+    mounted () {        
         this.getDocuments();        
     }
 
     documentsJson;
     documentsDetailsJson;
-    documentsAppearanceJson;   
+    documentsAppearanceJson;
 
     activetab = 'All';            
     sortBy = 'Seq.';
@@ -112,7 +118,7 @@ export default class CivilDocumentsView extends Vue {
         {key:'Orders', AltCdWords:['ABO','AOD','CAO','CDO','CMCO','COR','COS','CPOR','CRT','DJ','DO','DOR','DPO','FCR','MCO','ODT','OFI','ORA','ORD','ORFJ','ORI','ORNA','ORT','ORW','OWN','PCH','PO','POD','POR','PVO','ROR','RSO','SPO']}, 
         {key:'Concluded', AltCdWords:['']}, 
         {key:'Court Summary', AltCdWords:['']}
-        ] ;          
+    ] ;          
 
     public ExtractDocumentInfo(): void {
                
@@ -137,8 +143,9 @@ export default class CivilDocumentsView extends Vue {
 
             // ensure all documentSupport elements only have one row
             const docSupport: any = jDoc.documentSupport.length? jDoc.documentSupport[0]:'{}';
-            docInfo["Act"] = (docSupport==={})? '': docSupport.actCd;            
-            docInfo["PdfAvail"] = jDoc.lastAppearanceDt? true : false 
+            docInfo["Act"] = (docSupport==={})? '': docSupport.actCd;
+            docInfo["Document ID"] = jDoc.civilDocumentId;            
+            docInfo["PdfAvail"] = jDoc.civilDocumentId? true : false 
             docInfo["Date Filed"] = jDoc.filedDt? jDoc.filedDt.split(" ")[0]: ' ';
             docInfo["Issues"] = jDoc.issue.length? this.ExtractIssues(jDoc.issue) : ' ';
         }
@@ -148,6 +155,7 @@ export default class CivilDocumentsView extends Vue {
             const docInfo = {}; 
             docInfo["Document Type"] = 'CourtSummary';
             docInfo["Appearance Date"] = doc.appearanceDt.split(" ")[0]
+            docInfo["Appearance ID"] = doc.appearanceId;
             this.summaryDocuments.push(docInfo);
         }
     }
@@ -197,7 +205,68 @@ export default class CivilDocumentsView extends Vue {
                 }
             }); 
         }       
-    }   
+    }
+
+    public b64toBlob(b64Data, contentType) {
+
+        const byteCharacters = atob(b64Data);
+        const byteArrays: any = [];
+        for ( let offset = 0; offset < byteCharacters.length; offset = offset + 512 ) {
+            const slice = byteCharacters.slice(offset, offset + 512);
+            const byteNumbers = new Array(slice.length);
+            for (let i = 0; i < slice.length; i++) {
+                byteNumbers[i] = slice.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            byteArrays.push(byteArray);
+        }
+        return new Blob(byteArrays, { type: contentType });
+    }
+
+    public openDocumentsPdf(documentId): void {
+        // TODO: remove the hardcoded documentId once sample data has pdf
+        documentId = 70
+        const filename = 'doc'+documentId+'.pdf';
+        // TODO: change to civil when a civil documentID is available 
+
+        this.$http.get('api/files/document/' + documentId + '/filename.pdf?isCriminal=true')
+            .then(Response => Response.json(), err => console.log('error')        
+            ).then(data => {
+                
+                if(window.navigator && window.navigator.msSaveOrOpenBlob) {
+                    window.navigator.msSaveOrOpenBlob(this.b64toBlob(data.b64Content,'application/pdf'), filename);
+                    return;
+                }
+                else
+                {
+                    const url = URL.createObjectURL(this.b64toBlob(data.b64Content,'application/pdf'))
+                    window.open(url);
+                }             
+ 
+            });        
+    }
+    
+    public openCourtSummaryPdf(appearanceId): void {
+
+        // TODO: remove the hardcoded appearanceId once sample data has pdf
+        appearanceId = 10098
+        const filename = 'court summary'+appearanceId+'.pdf';
+
+        this.$http.get("api/files/civil/court-summary-report/" + appearanceId + "/filename.pdf")
+            .then(Response => Response.json()        
+            ).then(data => {
+                
+                if(window.navigator && window.navigator.msSaveOrOpenBlob) {
+                    window.navigator.msSaveOrOpenBlob(this.b64toBlob(data.reportContent,'application/pdf'), filename);
+                    return;
+                }
+                else
+                {
+                    const url = URL.createObjectURL(this.b64toBlob(data.reportContent,'application/pdf'))
+                    window.open(url);
+                }  
+            });
+    }      
     
 }
 </script>
