@@ -35,7 +35,6 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include=".env" />
     <Content Include="public\favicon.ico" />
     <Content Include="public\images\bcid-192x192.png" />
     <Content Include="public\images\bcid-512x512.png" />
@@ -57,8 +56,11 @@
     <Content Include="public\index.html" />
     <Content Include="src\App.vue" />
     <Content Include="src\assets\bc-logo.svg" />
+    <Content Include="src\assets\data.json" />
     <Content Include="src\assets\landing.jpg" />
     <Content Include="src\assets\logo.png" />
+    <Content Include="src\assets\lookup\documentTypeCodes.json" />
+    <Content Include="src\components\CivilDocumentsView.vue" />
     <Content Include="src\components\Home.vue" />
     <Content Include="src\components\NavigationFooter.vue" />
     <Content Include="src\components\NavigationTopbar.vue" />
@@ -69,6 +71,7 @@
     <Content Include="tsconfig.json" />
     <Content Include="package.json" />
     <Content Include="README.md" />
+    <Content Include="vue.config.js" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="dist\" />
@@ -76,8 +79,12 @@
     <Folder Include="public\images\" />
     <Folder Include="src\" />
     <Folder Include="src\assets\" />
+    <Folder Include="src\assets\lookup\" />
     <Folder Include="src\components\" />
     <Folder Include="src\constants\" />
+    <Folder Include="src\router\" />
+    <Folder Include="src\store\" />
+    <Folder Include="src\store\modules\" />
     <Folder Include="src\views\" />
     <Folder Include="src\styles\" />
   </ItemGroup>
@@ -88,6 +95,11 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="babel.config.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="src\router\index.ts" />
+    <TypeScriptCompile Include="src\store\index.ts" />
+    <TypeScriptCompile Include="src\store\modules\CivilFileDocuments.ts" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />
   <Target Name="BeforeBuild" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
