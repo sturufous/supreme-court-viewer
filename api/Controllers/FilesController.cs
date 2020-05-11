@@ -10,6 +10,9 @@ using Scv.Api.Models;
 using System;
 using System.Threading.Tasks;
 using Scv.Api.Constants;
+using Scv.Api.Models.Civil;
+using Scv.Api.Models.Criminal;
+using Scv.Api.Services;
 
 namespace Scv.Api.Controllers
 {
@@ -20,21 +23,16 @@ namespace Scv.Api.Controllers
         #region Variables
         private readonly IConfiguration _configuration;
         private readonly ILogger<FilesController> _logger;
-        private readonly IMapper _mapper;
-        private readonly FileServicesClient _fsClient;
-        private string _requestApplicationCode;
-        private string _requestAgencyIdentifierId;
-        private string _requestPartId;
+        private readonly FilesService _filesService;
+
         #endregion
 
         #region Constructor
-        public FilesController(IConfiguration configuration, ILogger<FilesController> logger, FileServicesClient fsClient, IMapper mapper)
+        public FilesController(IConfiguration configuration, ILogger<FilesController> logger, FilesService filesService)
         {
             _configuration = configuration;
             _logger = logger;
-            _fsClient = fsClient;
-            _mapper = mapper;
-            SetupFileServicesClient();
+            _filesService = filesService;
         }
         #endregion
 
@@ -50,14 +48,7 @@ namespace Scv.Api.Controllers
         [Route("civil/search")]
         public async Task<ActionResult<FileSearchResponse>> FilesCivilSearchAsync(FilesCivilQuery fcq)
         {
-            fcq.FilePermissions =
-                "[\"A\", \"Y\", \"T\", \"F\", \"C\", \"M\", \"L\", \"R\", \"B\", \"D\", \"E\", \"G\", \"H\", \"N\", \"O\", \"P\", \"S\", \"V\"]"; // for now, use all types - TODO: determine proper list of types?
-            var fileSearchResponse = await _fsClient.FilesCivilAsync(_requestAgencyIdentifierId, _requestPartId,
-                _requestApplicationCode, fcq.SearchMode, fcq.FileHomeAgencyId, fcq.FileNumber, fcq.FilePrefix,
-                fcq.FilePermissions, fcq.FileSuffixNumber, fcq.MDocReferenceTypeCode, fcq.CourtClass, fcq.CourtLevel,
-                fcq.NameSearchType, fcq.LastName, fcq.OrgName, fcq.GivenName, fcq.Birth?.ToString("yyyy-MM-dd"),
-                fcq.SearchByCrownPartId, fcq.SearchByCrownActiveOnly, fcq.SearchByCrownFileDesignation,
-                fcq.MdocJustinNumberSet, fcq.PhysicalFileIdSet);
+            var fileSearchResponse = await _filesService.FilesCivilAsync(fcq);
             return Ok(fileSearchResponse);
         }
 
@@ -70,21 +61,8 @@ namespace Scv.Api.Controllers
         [Route("civil/{fileId}")]
         public async Task<ActionResult<RedactedCivilFileDetailResponse>> GetCivilFileDetailByFileId(string fileId)
         {
-            var civilFileDetailResponse = await _fsClient.FilesCivilFileIdAsync(_requestAgencyIdentifierId, _requestPartId, fileId);
-            //Add in CSRs. 
-            foreach (var appearance in civilFileDetailResponse.Appearance)
-            {
-                civilFileDetailResponse.Document.Add(new CvfcDocument3
-                {
-                    CivilDocumentId = appearance.AppearanceId,
-                    ImageId = appearance.AppearanceId,
-                    DocumentTypeCd = "CSR",
-                    LastAppearanceDt = appearance.AppearanceDate,
-                    FiledDt = appearance.AppearanceDate
-                });
-            }
-            var civilFileDetail = _mapper.Map<RedactedCivilFileDetailResponse>(civilFileDetailResponse);
-            return Ok(civilFileDetail);
+            var civilFileDetailResponse = await _filesService.FilesCivilFileIdAsync(fileId);
+            return Ok(civilFileDetailResponse);
         }
 
         /// <summary>
@@ -98,7 +76,7 @@ namespace Scv.Api.Controllers
         [Route("civil/{fileId}/appearances")]
         public async Task<ActionResult<CivilFileAppearancesResponse>> GetCivilAppearancesByFileId(string fileId, FutureYN2? future, HistoryYN2? history)
         {
-            var criminalFileIdAppearances = await _fsClient.FilesCivilFileIdAppearancesAsync(_requestAgencyIdentifierId, _requestPartId, future, history, fileId);
+            var criminalFileIdAppearances = await _filesService.FilesCivilFileIdAppearancesAsync( future, history, fileId);
             return Ok(criminalFileIdAppearances);
         }
 
@@ -111,8 +89,7 @@ namespace Scv.Api.Controllers
         [Route("civil/court-summary-report/{appearanceId}/{fileName?}")]
         public async Task<ActionResult<JustinReportResponse>> GetCivilCourtSummaryReport(string appearanceId)
         {
-            var justinReportResponse = await _fsClient.FilesCivilCourtsummaryreportAsync(_requestAgencyIdentifierId,
-                _requestPartId, appearanceId, JustinReportName.CEISR035);
+            var justinReportResponse = await _filesService.FilesCivilCourtsummaryreportAsync(appearanceId, JustinReportName.CEISR035);
             return Ok(justinReportResponse);
         }
 
@@ -130,9 +107,7 @@ namespace Scv.Api.Controllers
         [Route("civil/file-content")]
         public async Task<ActionResult<CivilFileContent>> GetCivilFileContent(string agencyId = null, string roomCode = null, DateTime? proceeding = null, string appearanceId = null, string physicalFileId = "")
         {
-            var proceedingDateString = proceeding.HasValue ? proceeding.Value.ToString("yyyy-MM-dd") : "";
-            var civilFileContent = await _fsClient.FilesCivilFilecontentAsync(agencyId, roomCode, proceedingDateString,
-                appearanceId, physicalFileId);
+            var civilFileContent = await _filesService.FilesCivilFilecontentAsync(agencyId, roomCode, proceeding, appearanceId, physicalFileId);
             return Ok(civilFileContent);
         }
         #endregion
@@ -140,7 +115,6 @@ namespace Scv.Api.Controllers
         #region Criminal Only
         /// <summary>
         /// Provides facilities for performing a criminal file search.  
-        /// This should cover the 5th screenshot. 
         /// </summary>
         /// <param name="fcq">FileCriminalQuery, composed of parameters for search. </param>
         /// <returns>FileSearchResponse</returns>
@@ -148,16 +122,7 @@ namespace Scv.Api.Controllers
         [Route("criminal/search")]
         public async Task<ActionResult<FileSearchResponse>> FilesCriminalSearchAsync(FilesCriminalQuery fcq)
         {
-            fcq.FilePermissions =
-                "[\"A\", \"Y\", \"T\", \"F\", \"C\", \"M\", \"L\", \"R\", \"B\", \"D\", \"E\", \"G\", \"H\", \"N\", \"O\", \"P\", \"S\", \"V\"]"; // for now, use all types - TODO: determine proper list of types?
-
-            //CourtLevel = "S"  Supreme court data, CourtLevel = "P" - Province.
-            var fileSearchResponse = await _fsClient.FilesCriminalAsync(_requestAgencyIdentifierId,
-                _requestPartId, _requestApplicationCode, fcq.SearchMode, fcq.FileHomeAgencyId, fcq.FileNumberTxt,
-                fcq.FilePrefixTxt, fcq.FilePermissions, fcq.FileSuffixNo, fcq.MdocRefTypeCode, fcq.CourtClass,
-                fcq.CourtLevel, fcq.NameSearchTypeCd, fcq.LastName, fcq.OrgName, fcq.GivenName,
-                fcq.Birth?.ToString("yyyy-MM-dd"), fcq.SearchByCrownPartId, fcq.SearchByCrownActiveOnly,
-                fcq.SearchByCrownFileDesignation, fcq.MdocJustinNoSet, fcq.PhysicalFileIdSet);
+            var fileSearchResponse = await _filesService.FilesCriminalAsync(fcq);
             return Ok(fileSearchResponse);
         }
 
@@ -170,8 +135,7 @@ namespace Scv.Api.Controllers
         [Route("criminal/{fileId}")]
         public async Task<ActionResult<RedactedCriminalFileDetailResponse>> GetCriminalFileDetailByFileId(string fileId)
         {
-            var criminalFileDetailResponse = await _fsClient.FilesCriminalFileIdAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode, fileId);
-            var redactedCriminalFileDetailResponse = _mapper.Map<RedactedCriminalFileDetailResponse>(criminalFileDetailResponse);
+            var redactedCriminalFileDetailResponse = await _filesService.FilesCriminalFileIdAsync(fileId);
             return Ok(redactedCriminalFileDetailResponse);
         }
 
@@ -186,7 +150,7 @@ namespace Scv.Api.Controllers
         [Route("criminal/{fileId}/appearances")]
         public async Task<ActionResult<CriminalFileAppearancesResponse>> GetCriminalAppearancesByFileId(string fileId, FutureYN? future = null, HistoryYN? history = null)
         {
-            var criminalFileIdAppearances = await _fsClient.FilesCriminalFileIdAppearancesAsync(_requestAgencyIdentifierId, _requestPartId, future, history, fileId);
+            var criminalFileIdAppearances = await _filesService.FilesCriminalFileIdAppearancesAsync(fileId, future, history);
             return Ok(criminalFileIdAppearances);
         }
 
@@ -202,12 +166,10 @@ namespace Scv.Api.Controllers
         /// <returns>CriminalFileContent</returns>
         [HttpGet]
         [Route("criminal/file-content")]
-        public async Task<ActionResult<CriminalFileContent>> GetCriminalFileContent(string agencyId = null, string roomCode = null, DateTime? proceeding = null, string appearanceId = null, string justinNumber = "")
+        public async Task<ActionResult<CriminalFileContent>> GetCriminalFileContent(string agencyId = null, string roomCode = null, DateTime? proceeding = null, string appearanceId = null, string justinNumber = null)
         {
-            var proceedingDateString = proceeding.HasValue ? proceeding.Value.ToString("yyyy-MM-dd") : "";
-            var criminalFileContent = await _fsClient.FilesCriminalFilecontentAsync(agencyId, roomCode,
-                proceedingDateString, appearanceId, justinNumber);
-            return Ok(criminalFileContent);
+            var criminalFileContent = await _filesService.FilesCriminalFilecontentAsync(agencyId, roomCode, proceeding, appearanceId, justinNumber);
+;            return Ok(criminalFileContent);
         }
 
         /// <summary>
@@ -222,7 +184,7 @@ namespace Scv.Api.Controllers
         [Route("criminal/record-of-proceedings/{partId}/{fileName?}")]
         public async Task<ActionResult<RopResponse>> GetRecordsOfProceeding(string partId, string profSequenceNumber, CourtLevelCd courtLevelCode, CourtClassCd courtClassCode)
         {
-            var recordsOfProceeding = await _fsClient.FilesRecordOfProceedingsAsync(partId, profSequenceNumber, courtLevelCode, courtClassCode);
+            var recordsOfProceeding = await _filesService.FilesRecordOfProceedingsAsync(partId, profSequenceNumber, courtLevelCode, courtClassCode);
             return Ok(recordsOfProceeding);
         }
         #endregion
@@ -240,8 +202,7 @@ namespace Scv.Api.Controllers
         [Route("court-list")]
         public async Task<ActionResult<CourtList>> GetCourtList(string agencyId, string roomCode, DateTime? proceeding, string divisionCode, string fileNumber)
         {
-            var proceedingDateString = proceeding.HasValue ? proceeding.Value.ToString("yyyy-MM-dd") : "";
-            var courtList = await _fsClient.FilesCourtlistAsync(agencyId, roomCode, proceedingDateString, divisionCode,
+            var courtList = await _filesService.FilesCourtlistAsync(agencyId, roomCode, proceeding, divisionCode,
                 fileNumber);
             return Ok(courtList);
         }
@@ -257,26 +218,10 @@ namespace Scv.Api.Controllers
         [Route("document/{documentId}/{fileName?}")]
         public async Task<ActionResult<DocumentResponse>> GetDocument(string documentId, bool isCriminal = false)
         {
-            var documentResponse = await _fsClient.FilesDocumentAsync(documentId, isCriminal ? "R" : "I");
+            var documentResponse = await _filesService.FilesDocumentAsync(documentId, isCriminal);
             return Ok(documentResponse);
         }
-
-  
-
         #endregion
 
-        #region Helpers
-        /// <summary>
-        /// This is used to set the baseUrl, and add in contract resolvers that allow fields to be null.
-        /// </summary>
-        private void SetupFileServicesClient()
-        {
-            _fsClient.JsonSerializerSettings.ContractResolver = new SafeContractResolver();
-            _fsClient.BaseUrl = _configuration.GetValue<string>("FileServicesClient:Url") ?? throw new ConfigurationException($"Configuration 'FileServicesClient:Url' is invalid or missing.");
-            _requestApplicationCode = _configuration.GetValue<string>("Request:ApplicationCd") ?? throw new ConfigurationException($"Configuration 'Request:ApplicationCd' is invalid or missing.");
-            _requestAgencyIdentifierId = _configuration.GetValue<string>("Request:AgencyIdentifierId") ?? throw new ConfigurationException($"Configuration 'Request:AgencyIdentifierId' is invalid or missing.");
-            _requestPartId = _configuration.GetValue<string>("Request:PartId") ?? throw new ConfigurationException($"Configuration 'Request:PartId' is invalid or missing.");
-        }
-        #endregion
     }
 }
