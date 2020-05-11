@@ -501,7 +501,6 @@
           {
             "name": "agencyId",
             "in": "query",
-            "required": true,
             "description": "Agency Identifier Code (Location Code); for example 4801 (Kelona).",
             "schema": {
               "type": "string"
@@ -510,7 +509,6 @@
           {
             "name": "roomCd",
             "in": "query",
-            "required": true,
             "schema": {
               "type": "string"
             }
@@ -518,7 +516,6 @@
           {
             "name": "proceedingDt",
             "in": "query",
-            "required": true,
             "description": "The proceeding date in the format YYYY-MM-dd",
             "schema": {
               "type": "string"
@@ -938,6 +935,73 @@
         ]
       }
     },
+    "/files/civil/courtsummaryreport": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/justinReportResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "No items matching the given criteria were found."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Gets the court summary report for a given appearanceId.\n",
+        "operationId": "GET_files-civil-courtsummaryreport",
+        "parameters": [
+          {
+            "name": "requestAgencyIdentifierId",
+            "in": "header",
+            "required": true,
+            "description": "Requesting Agency Identifier",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "requestPartId",
+            "in": "header",
+            "required": true,
+            "description": "Requesting Participant Id",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "appearanceId",
+            "in": "query",
+            "required": true,
+            "description": "The full appearance Id in the for 00000.0000",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "reportName",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
     "/files/civil/filecontent": {
       "get": {
         "responses": {
@@ -970,7 +1034,6 @@
           {
             "name": "agencyId",
             "in": "query",
-            "required": true,
             "description": "Agency Identifier Code (Location Code); for example 4801 (Kelowna).",
             "schema": {
               "type": "string"
@@ -979,7 +1042,6 @@
           {
             "name": "roomCd",
             "in": "query",
-            "required": true,
             "schema": {
               "type": "string"
             }
@@ -987,7 +1049,6 @@
           {
             "name": "proceedingDt",
             "in": "query",
-            "required": true,
             "description": "The proceeding date in the format YYYY-MM-dd",
             "schema": {
               "type": "string"
@@ -3672,6 +3733,12 @@
               "N"
             ],
             "type": "string"
+          },
+          "issueResultCd": {
+            "type": "string"
+          },
+          "issueResultDsc": {
+            "type": "string"
           }
         }
       },
@@ -4110,6 +4177,20 @@
             "type": "string"
           },
           "b64Content": {
+            "type": "string"
+          }
+        }
+      },
+      "justinReportResponse": {
+        "type": "object",
+        "properties": {
+          "responseCd": {
+            "type": "string"
+          },
+          "responseMessageTxt": {
+            "type": "string"
+          },
+          "reportContent": {
             "type": "string"
           }
         }

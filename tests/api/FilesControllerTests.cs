@@ -160,7 +160,7 @@ namespace tests.api
         }
 
         [Fact]
-        public async void CriminalFileContent()
+        public async void Criminal_File_Content()
         {
             var actionResult = await _controller.GetCriminalFileContent("4801", "101", DateTime.Parse("2016-04-04"), "44150.0734");
 
@@ -171,7 +171,7 @@ namespace tests.api
         }
 
         [Fact]
-        public async void CivilFileContent()
+        public async void Civil_File_Content_By_AgencyId_Room_Proceeding_Appearance()
         {
             var actionResult = await _controller.GetCivilFileContent("4801", "101", DateTime.Parse("2016-04-04"), "984");
 
@@ -247,6 +247,77 @@ namespace tests.api
             Assert.Equal(1, fileSearchResponse.FileDetail.Count);
             Assert.Equal("2506", fileSearchResponse.FileDetail.First().PhysicalFileId);
             Assert.Contains("BYSTANDER, Innocent", fileSearchResponse.FileDetail.First().Participant.Select(u => u.FullNm));
+        }
+
+        [Fact]
+        public async void Civil_Court_Summary_Report()
+        {
+            var actionResult = await _controller.GetCivilCourtSummaryReport("984");
+
+            var civilFileContent = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+            Assert.Equal("0", civilFileContent.ResponseCd);
+            Assert.Null(civilFileContent.ResponseMessageTxt);
+            Assert.Equal(6852, civilFileContent.ReportContent.Length);
+        }
+
+        [Fact]
+        public async void Criminal_Record_Of_Proceeding()
+        {
+            var actionResult = await _controller.GetRecordsOfProceeding("12971.0026", "24", CourtLevelCd.P , CourtClassCd.A);
+
+            var ropResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+            Assert.Equal(105548, ropResponse.B64Content.Length);
+            Assert.Equal("success", ropResponse.ResultMessage);
+            Assert.Equal("1", ropResponse.ResultCd);
+        }
+
+
+        [Fact]
+        public async void Civil_File_Content_By_FileId()
+        {
+            var actionResult = await _controller.GetCivilFileContent(physicalFileId: "2506");
+
+            var civilFileContent = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+            Assert.Null(civilFileContent.CourtLocaCd);
+            Assert.Null(civilFileContent.CourtRoomCd);
+            Assert.Equal("", civilFileContent.CourtProceedingDate);
+            Assert.Equal(1, civilFileContent.CivilFile.Count);
+            Assert.Equal("2506", civilFileContent.CivilFile.First().PhysicalFileID);
+        }
+
+        [Fact]
+        public async void Document_Civil()
+        {
+            var actionResult = await _controller.GetDocument("10010");
+
+            var documentResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+            Assert.Equal(19500, documentResponse.B64Content.Length);
+            Assert.Equal("success", documentResponse.ResultMessage);
+            Assert.Equal("1", documentResponse.ResultCd);
+        }
+
+        [Fact]
+        public async void Document_Criminal()
+        {
+            var actionResult = await _controller.GetDocument(documentId: "40", true);
+
+            var documentResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+            Assert.Equal(1043248, documentResponse.B64Content.Length);
+            Assert.Equal("success", documentResponse.ResultMessage);
+            Assert.Equal("1", documentResponse.ResultCd);
+        }
+
+        [Fact]
+        public async void Criminal_File_Content_By_JustinNumber()
+        {
+            var actionResult = await _controller.GetCriminalFileContent(justinNumber: "3179.0000");
+
+            var criminalFileContent = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+            Assert.Equal("", criminalFileContent.CourtLocaCd);
+            Assert.Equal("", criminalFileContent.CourtRoomCd);
+            Assert.Equal("", criminalFileContent.CourtProceedingDate);
+            Assert.Equal(1, criminalFileContent.AccusedFile.Count);
+            Assert.Equal("3179", criminalFileContent.AccusedFile.First().MdocJustinNo);
         }
         #endregion
     }
