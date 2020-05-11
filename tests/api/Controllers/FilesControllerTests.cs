@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Linq;
 using JCCommon.Clients.FileServices;
+using JCCommon.Clients.LookupServices;
 using JCCommon.Models;
+using LazyCache;
 using MapsterMapper;
 using Microsoft.Extensions.Logging;
 using Scv.Api.Controllers;
+using Scv.Api.Services;
 using tests.api.Helpers;
 using Xunit;
 
-namespace tests.api
+namespace tests.api.Controllers
 {
     /// <summary>
     /// These tests, ensure Api.FilesController and JC-Client-Interface.FileServicesClient work correctly. 
@@ -23,8 +26,12 @@ namespace tests.api
         #region Constructor
         public FilesControllerTests()
         {
-            var preTest = new ApiControllerEnvironmentBuilder("FileServicesClient:Username", "FileServicesClient:Password", typeof(FilesController));
-            _controller = new FilesController(preTest.Configuration, preTest.LogFactory.CreateLogger<FilesController>(), new FileServicesClient(preTest.HttpClient), new Mapper());
+            var preTest = new EnvironmentBuilder("FileServicesClient:Username", "FileServicesClient:Password", typeof(FilesController));
+            var lookupServiceClient = new LookupServiceClient(preTest.HttpClient);
+            var fileServicesClient = new FileServicesClient(preTest.HttpClient);
+            var lookupService = new LookupService(preTest.Configuration, lookupServiceClient, new CachingService());
+            var filesService = new FilesService(preTest.Configuration, fileServicesClient, new Mapper(), lookupService );
+            _controller = new FilesController(preTest.Configuration, preTest.LogFactory.CreateLogger<FilesController>(), filesService);
         }
         #endregion
 
