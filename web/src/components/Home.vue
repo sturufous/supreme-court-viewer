@@ -5,7 +5,7 @@
             <h2> Temporary landing page for SCV </h2>
         </div>
         <div>
-            <b-col class="mb-2" sm="9">
+            <!-- <b-col class="mb-2" sm="9">
                 <label for="proceeding-datepicker">Proceeding date:</label>
                 <b-form-datepicker id="proceeding-datepicker" v-model="civilFileDocument.proceedingDate" class="mb-2"></b-form-datepicker>
             </b-col>
@@ -16,7 +16,7 @@
             <b-col class="mb-2" sm="9">
                 <label for="room"> Room: </label>
                 <b-form-input id="room" v-model="civilFileDocument.room" placeholder="Enter room"></b-form-input>
-            </b-col>
+            </b-col> -->
             <b-col class="mb-3" sm="9">
                 <label for="filenumber"> File number: </label>
                 <b-form-input id="filenumber" v-model="civilFileDocument.fileNumber" placeholder="Enter file number"></b-form-input>
