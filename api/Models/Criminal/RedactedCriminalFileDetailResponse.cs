@@ -3,8 +3,11 @@ using JCCommon.Clients.FileServices;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace JCCommon.Models
+namespace Scv.Api.Models.Criminal
 {
+    /// <summary>
+    /// This is used to narrow down the amount of information from CriminalFileDetailResponse. 
+    /// </summary>
     public class RedactedCriminalFileDetailResponse
     {
         [JsonProperty("responseCd", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
