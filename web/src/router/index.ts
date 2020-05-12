@@ -9,9 +9,10 @@ const routes: Array<RouteConfig> = [
     component: Home
   },
   {
-    path: '/civil-documents',
+    path: '/civil-documents/:fileId',
     name: 'CivilDocumentsView',
-    component: CivilDocumentsView
+    component: CivilDocumentsView,
+    props: true
   }
 ]
 
