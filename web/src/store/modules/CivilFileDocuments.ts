@@ -4,7 +4,7 @@ import { VuexModule, Module, Mutation, Action } from 'vuex-module-decorators'
   namespaced: true
 })
 class CivilFileDocuments extends VuexModule {
-  public civilFileDocument = { }      
+  public civilFileDocument = { }  
 
   @Mutation
   public setCivilFile(civilFileDocument): void {
@@ -15,5 +15,6 @@ class CivilFileDocuments extends VuexModule {
   public UpdateCivilFile(newCivilFileDocument): void {
     this.context.commit('setCivilFile', newCivilFileDocument)
   }
+  
 }
 export default CivilFileDocuments

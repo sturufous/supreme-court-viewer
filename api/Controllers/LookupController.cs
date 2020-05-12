@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Scv.Api.Helpers.ContractResolver;
 using Scv.Api.Helpers.Exceptions;
+using Scv.Api.Services;
 
 namespace Scv.Api.Controllers
 {
@@ -18,17 +19,16 @@ namespace Scv.Api.Controllers
         private readonly IConfiguration _configuration;
         private readonly ILogger<LookupController> _logger;
         private readonly IMapper _mapper;
-        private readonly LookupServiceClient _lookupClient;
+        private readonly LookupService _lookupService;
         #endregion
 
         #region Constructor
-        public LookupController(IConfiguration configuration, ILogger<LookupController> logger, LookupServiceClient lookupClient, IMapper mapper)
+        public LookupController(IConfiguration configuration, ILogger<LookupController> logger, LookupService lookupService, IMapper mapper)
         {
             _configuration = configuration;
             _logger = logger;
-            _lookupClient = lookupClient;
+            _lookupService = lookupService;
             _mapper = mapper;
-            SetupLookupServicesClient();
         }
         #endregion
 
@@ -37,16 +37,8 @@ namespace Scv.Api.Controllers
         [Route("codes/documents")]
         public async Task<ActionResult<ICollection<LookupCode>>> GetDocumentCodes()
         {
-            var lookupCodes = await _lookupClient.CodesDocumentsAsync();
+            var lookupCodes = await _lookupService.GetDocumentCodesFromLazyCache();
             return Ok(lookupCodes);
-        }
-        #endregion
-
-        #region Helpers
-        private void SetupLookupServicesClient()
-        {
-            _lookupClient.JsonSerializerSettings.ContractResolver = new SafeContractResolver();
-            _lookupClient.BaseUrl = _configuration.GetValue<string>("LookupServicesClient:Url") ?? throw new ConfigurationException($"Configuration 'LookupServicesClient:Url' is invalid or missing.");
         }
         #endregion
     }
