@@ -1,11 +1,13 @@
 ﻿using JCCommon.Clients.LookupServices;
+using LazyCache;
 using MapsterMapper;
 using Microsoft.Extensions.Logging;
 using Scv.Api.Controllers;
+using Scv.Api.Services;
 using tests.api.Helpers;
 using Xunit;
 
-namespace tests.api
+namespace tests.api.Controllers
 {
     /// <summary>
     /// These tests, ensure Api.LookupControllers and JC-Client-Interface.LookupServiceClient work correctly. 
@@ -21,8 +23,9 @@ namespace tests.api
         #region Constructor
         public LookupControllerTests()
         {
-            var preTest = new ApiControllerEnvironmentBuilder("LookupServicesClient:Username", "LookupServicesClient:Password", typeof(FilesController));
-            _controller = new LookupController(preTest.Configuration, preTest.LogFactory.CreateLogger<LookupController>(), new LookupServiceClient(preTest.HttpClient), new Mapper());
+            var preTest = new EnvironmentBuilder("LookupServicesClient:Username", "LookupServicesClient:Password", typeof(FilesController));
+            var lookupService = new LookupService(preTest.Configuration, new LookupServiceClient(preTest.HttpClient), new CachingService());
+            _controller = new LookupController(preTest.Configuration, preTest.LogFactory.CreateLogger<LookupController>(), lookupService, new Mapper());
         }
         #endregion
 

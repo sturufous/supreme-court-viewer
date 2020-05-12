@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Scv.Api.Helpers.Mapping;
 using Scv.Api.Helpers.Middleware;
+using Scv.Api.Services;
 
 namespace Scv.Api
 {
@@ -43,14 +44,19 @@ namespace Scv.Api
             services.AddHttpClient<FileServicesClient>(client =>
             {
                 client.DefaultRequestHeaders.Authorization = new BasicAuthenticationHeaderValue(
-                    Configuration.GetValue<string>("FileServicesClient:Username"), Configuration.GetValue<string>("FileServicesClient:Password"));
+                    Configuration.GetValue<string>("FileServicesClient:Username"),
+                    Configuration.GetValue<string>("FileServicesClient:Password"));
             });
 
             services.AddHttpClient<LookupServiceClient>(client =>
             {
                 client.DefaultRequestHeaders.Authorization = new BasicAuthenticationHeaderValue(
-                    Configuration.GetValue<string>("LookupServicesClient:Username"), Configuration.GetValue<string>("LookupServicesClient:Password"));
+                    Configuration.GetValue<string>("LookupServicesClient:Username"),
+                    Configuration.GetValue<string>("LookupServicesClient:Password"));
             });
+
+            services.AddScoped<FilesService>();
+            services.AddScoped<LookupService>();
 
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
@@ -64,6 +70,7 @@ namespace Scv.Api
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 options.IncludeXmlComments(xmlPath);
             });
+            services.AddLazyCache();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
