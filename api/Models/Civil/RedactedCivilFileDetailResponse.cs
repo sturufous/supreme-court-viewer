@@ -51,8 +51,14 @@ namespace Scv.Api.Models.Civil
         [JsonProperty("sheriffCommentText", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public string SheriffCommentText { get; set; }
 
+        [JsonProperty("sealedYN")]
+        public string SealedYN { get; set; }
+
+        /// <summary>
+        /// Extended party object. 
+        /// </summary>
         [JsonProperty("party", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public ICollection<CvfcParty3> Party { get; set; }
+        public ICollection<CivilFileDetailParty> Party { get; set; }
 
         /// <summary>
         /// Extended document object. 
@@ -62,5 +68,8 @@ namespace Scv.Api.Models.Civil
 
         [JsonProperty("hearingRestriction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public ICollection<CvfcHearingRestriction2> HearingRestriction { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("appearance", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public ICollection<CvfcAppearance> Appearance { get; set; }
     }
 }
