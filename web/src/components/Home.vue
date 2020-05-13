@@ -45,7 +45,7 @@
         // TODO: add validation so that the user has to enter values before clicking the search button
         navigateToDocumentsView(civilFileDocument): void {
             this.UpdateCivilFile(civilFileDocument)
-            this.$router.push({name:'CivilDocumentsView', params: {fileId: civilFileDocument.fileNumber}})
+            this.$router.push({name:'CivilDocumentsView', query: { fileNumber: civilFileDocument.fileNumber }})
         }        
     }
 </script>
