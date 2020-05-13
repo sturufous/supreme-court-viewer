@@ -29,22 +29,16 @@
                 striped
                 responsive="sm"
                 >   
-                    <template v-for="(f,index) in fields[fieldsTab]" v-slot:[`head(${f.key})`]="data">
-                    <b v-bind:key="index" :class="f.headerStyle" > {{ data.label }}</b>
+                    <template v-for="(field,index) in fields[fieldsTab]" v-slot:[`head(${field.key})`]="data">
+                        <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
                     </template>
-                    <template v-for="(f,index) in fields[fieldsTab]" v-slot:[`cell(${f.key})`]="data" >
-                    <span 
-                            v-bind:key="index" 
-                            v-b-hover="colHover"
-                            v-on:click="(data.item.PdfAvail)&&(index==1)&&(activetab!='COURT SUMMARY')? 
-                            openDocumentsPdf(data.item['Document ID']): 
-                            ((index==0)&&(activetab=='COURT SUMMARY'))? openCourtSummaryPdf(data.item['Appearance ID']) : ''"
-                            :class="(data.item.PdfAvail)&&(index==1)&&(activetab!='COURT SUMMARY')? 
-                            (hoverCol==1 && hoverRow==data.item.Index)?'text-white bg-warning':'text-info'
-                            : (index==0)&&(activetab=='COURT SUMMARY')? 
-                            (hoverCol==0 && hoverRow==data.item.Index)?'text-white bg-warning':'text-info'
-                            : f.cellStyle" 
-                            style="white-space: pre-line"> {{ data.value }}
+                    <template v-for="(field,index) in fields[fieldsTab]" v-slot:[`cell(${field.key})`]="data" >
+                        <span 
+                            v-bind:key= "index" 
+                            v-b-hover= "colHover"                            
+                            v-on:click= "cellClick(index, data)"
+                            :class= "cellClass(field, index, data)"    
+                            style= "white-space: pre-line"> {{ data.value }}
                         </span>
                     </template>
                 </b-table>
@@ -114,6 +108,32 @@ export default class CivilDocumentsView extends Vue {
         ]  
         
     ];
+
+    public cellClick(index, data)
+    {
+        if(data.item.PdfAvail && index==1 && this.activetab!='COURT SUMMARY')
+        {
+            this.openDocumentsPdf(data.item['Document ID']);
+        }
+        else if (index==0 && this.activetab=='COURT SUMMARY')
+        {
+            this.openCourtSummaryPdf(data.item['Appearance ID'])
+        }         
+    }
+
+    public cellClass(field, index, data)
+    {
+        if(data.item.PdfAvail && index==1 && this.activetab!='COURT SUMMARY')
+        {
+            if(this.hoverCol==1 && this.hoverRow==data.item.Index) return 'text-white bg-warning'; else return 'text-info';            
+        }
+        else if(index==0 && this.activetab=='COURT SUMMARY')
+        {
+            if(this.hoverCol==0 && this.hoverRow==data.item.Index) return 'text-white bg-warning'; else return 'text-info';   
+        }
+        else 
+            return field.cellStyle;
+    }
     
     public ExtractDocumentInfo(): void {
         let courtSummaryExists = false 
