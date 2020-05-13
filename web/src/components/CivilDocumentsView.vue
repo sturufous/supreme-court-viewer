@@ -14,42 +14,42 @@
             </b-tabs>
         </b-card>
         
+       
+        <b-card border-variant="white"></b-card>
+ 
         <b-overlay :show="loadingPdf" rounded="sm">  
-            <b-card border-variant="white" :aria-hidden="loadingPdf ? 'true' : null"></b-card>
+            <b-card bg-variant="light" :aria-hidden="loadingPdf ? 'true' : null">           
+                <b-table
+                :items="FilteredDocuments"
+                :fields="fields[fieldsTab]"
+                :sort-by.sync="sortBy"
+                :sort-desc.sync="sortDesc"
+                :no-sort-reset="true"
+                @row-hovered="rowHover"
+                striped
+                responsive="sm"
+                >   
+                    <template v-for="(f,index) in fields[fieldsTab]" v-slot:[`head(${f.key})`]="data">
+                    <b v-bind:key="index" :class="f.headerStyle" > {{ data.label }}</b>
+                    </template>
+                    <template v-for="(f,index) in fields[fieldsTab]" v-slot:[`cell(${f.key})`]="data" >
+                    <span 
+                            v-bind:key="index" 
+                            v-b-hover="colHover"
+                            v-on:click="(data.item.PdfAvail)&&(index==1)&&(activetab!='COURT SUMMARY')? 
+                            openDocumentsPdf(data.item['Document ID']): 
+                            ((index==0)&&(activetab=='COURT SUMMARY'))? openCourtSummaryPdf(data.item['Appearance ID']) : ''"
+                            :class="(data.item.PdfAvail)&&(index==1)&&(activetab!='COURT SUMMARY')? 
+                            (hoverCol==1 && hoverRow==data.item.Index)?'text-white bg-warning':'text-info'
+                            : (index==0)&&(activetab=='COURT SUMMARY')? 
+                            (hoverCol==0 && hoverRow==data.item.Index)?'text-white bg-warning':'text-info'
+                            : f.cellStyle" 
+                            style="white-space: pre-line"> {{ data.value }}
+                        </span>
+                    </template>
+                </b-table>
+            </b-card>
         </b-overlay>
-
-        <b-card bg-variant="light">           
-            <b-table
-            :items="FilteredDocuments"
-            :fields="fields[fieldsTab]"
-            :sort-by.sync="sortBy"
-            :sort-desc.sync="sortDesc"
-            :no-sort-reset="true"
-            @row-hovered="rowHover"
-            striped
-            responsive="sm"
-            >   
-                <template v-for="(f,index) in fields[fieldsTab]" v-slot:[`head(${f.key})`]="data">
-                   <b v-bind:key="index" :class="f.headerStyle" > {{ data.label }}</b>
-                </template>
-                 <template v-for="(f,index) in fields[fieldsTab]" v-slot:[`cell(${f.key})`]="data" >
-                   <span 
-                        v-bind:key="index" 
-                        v-b-hover="colHover"
-                        v-on:click="(data.item.PdfAvail)&&(index==1)&&(activetab!='COURT SUMMARY')? 
-                        openDocumentsPdf(data.item['Document ID']): 
-                        ((index==0)&&(activetab=='COURT SUMMARY'))? openCourtSummaryPdf(data.item['Appearance ID']) : ''"
-                        :class="(data.item.PdfAvail)&&(index==1)&&(activetab!='COURT SUMMARY')? 
-                        (hoverCol==1 && hoverRow==data.item.Index)?'text-info bg-warning':'text-info'
-                        : (index==0)&&(activetab=='COURT SUMMARY')? 
-                        (hoverCol==0 && hoverRow==data.item.Index)?'text-info bg-warning':'text-info'
-                        : f.cellStyle" 
-                        style="white-space: pre-line"> {{ data.value }}
-                    </span>
-                </template>
-            </b-table>
-        </b-card>
-
    </b-card> 
 </body>
 </template>
@@ -70,11 +70,14 @@ export default class CivilDocumentsView extends Vue {
 
     public getDocuments(): void {
 
-        this.$http.get('api/files/civil/'+ this.civilFileDocument.fileNumber)
+
+         this.loadingPdf = true;
+         this.$http.get('api/files/civil/'+ this.civilFileDocument.fileNumber)
             .then(Response => Response.json(), err => console.log('error')        
             ).then(data => {
                 this.documentsDetailsJson = data.document
                 this.ExtractDocumentInfo()
+                 this.loadingPdf = false
             });
     }
 
@@ -133,7 +136,7 @@ export default class CivilDocumentsView extends Vue {
                 const docSupport: any = jDoc.documentSupport.length? jDoc.documentSupport[0]:'{}';
                 docInfo["Act"] = (docSupport==={})? '': docSupport.actCd;
                 docInfo["Document ID"] = jDoc.civilDocumentId;            
-                docInfo["PdfAvail"] = jDoc.civilDocumentId? true : false 
+                docInfo["PdfAvail"] = jDoc.imageId? true : false 
                 docInfo["Date Filed"] = jDoc.filedDt? jDoc.filedDt.split(" ")[0]: ' ';
                 docInfo["Issues"] = jDoc.issue.length? this.ExtractIssues(jDoc.issue) : ' ';
                 this.documents.push(docInfo);
@@ -214,49 +217,51 @@ export default class CivilDocumentsView extends Vue {
 
     public openDocumentsPdf(documentId): void {
         this.loadingPdf = true
-        // TODO: remove the hardcoded documentId once sample data has pdf
-        documentId = 70
         const filename = 'doc'+documentId+'.pdf';
-        // TODO: change to civil when a civil documentID is available 
-
-        this.$http.get('api/files/document/' + documentId + '/filename.pdf?isCriminal=true')
-            .then(Response => Response.json(), err =>  this.loadingPdf = false        
+       
+        this.$http.get('api/files/document/' + documentId + '/filename.pdf?isCriminal=false')
+            .then(Response => Response.json(), err => {console.log(err); this.loadingPdf = false }        
             ).then(data => {
-                
-                if(window.navigator && window.navigator.msSaveOrOpenBlob) {
-                    window.navigator.msSaveOrOpenBlob(this.b64toBlob(data.b64Content,'application/pdf'), filename);
-                }
-                else
+               
+                if(data.b64Content)
                 {
-                    const url = URL.createObjectURL(this.b64toBlob(data.b64Content,'application/pdf'))
-                    window.open(url);
-                }             
-
+                    if(window.navigator && window.navigator.msSaveOrOpenBlob) {
+                        window.navigator.msSaveOrOpenBlob(this.b64toBlob(data.b64Content,'application/pdf'), filename);
+                    }
+                    else
+                    {
+                        const url = URL.createObjectURL(this.b64toBlob(data.b64Content,'application/pdf'))
+                        window.open(url);
+                    }  
+                }
                 this.loadingPdf = false;
  
-            }, err =>  this.loadingPdf = false);        
+            }, err =>  {console.log(err);this.loadingPdf = false});        
     }
     
     public openCourtSummaryPdf(appearanceId): void {
 
         this.loadingPdf = true
-        // TODO: remove the hardcoded appearanceId once sample data has pdf
-        appearanceId = 10098
+        
         const filename = 'court summary'+appearanceId+'.pdf';
 
-        this.$http.get("api/files/civil/court-summary-report/" + appearanceId + "/filename.pdf")
+        this.$http.get("api/files/civil/court-summary-report/" + appearanceId + "/"+ filename)
             .then(Response => Response.json(), err =>  this.loadingPdf = false        
             ).then(data => {
-                
-                if(window.navigator && window.navigator.msSaveOrOpenBlob) {
-                    window.navigator.msSaveOrOpenBlob(this.b64toBlob(data.reportContent,'application/pdf'), filename);
-                }
-                else
+               
+                if(data.reportContent)
                 {
-                    const url = URL.createObjectURL(this.b64toBlob(data.reportContent,'application/pdf'))
-                    window.open(url);
+                    if(window.navigator && window.navigator.msSaveOrOpenBlob) {
+                        window.navigator.msSaveOrOpenBlob(this.b64toBlob(data.reportContent,'application/pdf'), filename);
+                    }
+                    else
+                    {
+                        const url = URL.createObjectURL(this.b64toBlob(data.reportContent,'application/pdf'))
+                        window.open(url);
+                    }
                 }
-                 this.loadingPdf = false 
+                this.loadingPdf = false 
+
             }, err =>  this.loadingPdf = false);
     }
     
