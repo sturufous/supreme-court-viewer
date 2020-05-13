@@ -3,10 +3,10 @@ using JCCommon.Clients.FileServices;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace Scv.Api.Models.Civil
+namespace Scv.Api.Models.Civil.Detail
 {
     /// <summary>
-    /// This is used to narrow down the amount of information from CivilFileDetailResponse. 
+    /// This is used to refine information from CivilFileDetailResponse. 
     /// </summary>
     public class RedactedCivilFileDetailResponse
     {
@@ -24,14 +24,37 @@ namespace Scv.Api.Models.Civil
 
         [JsonProperty("homeLocationAgenId", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public string HomeLocationAgenId { get; set; }
+        /// <summary>
+        /// Additional field for Agency Identifier Code. 
+        /// </summary>
+        /// 
+        [JsonProperty("HomeLocationAgencyCode", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public string HomeLocationAgencyCode { get; set; }
+
+        /// <summary>
+        /// Additional field for Location Name. 
+        /// </summary>
+        [JsonProperty("HomeLocationAgencyName", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public string HomeLocationAgencyName { get; set; }
 
         [JsonProperty("courtLevelCd", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(StringEnumConverter))]
         public CivilFileDetailResponseCourtLevelCd CourtLevelCd { get; set; }
 
+        /// <summary>
+        /// Additional field for description. 
+        /// </summary>
+        [JsonProperty("courtLevelDescription", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public string CourtLevelDescription { get; set; }
+
         [JsonProperty("courtClassCd", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(StringEnumConverter))]
         public CivilFileDetailResponseCourtClassCd CourtClassCd { get; set; }
+        /// <summary>
+        /// Additional field for description. 
+        /// </summary>
+        [JsonProperty("courtClassDescription", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public string CourtClassDescription { get; set; }
 
         [JsonProperty("socTxt", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public string SocTxt { get; set; }
@@ -55,16 +78,16 @@ namespace Scv.Api.Models.Civil
         public string SealedYN { get; set; }
 
         /// <summary>
-        /// Extended party object. 
+        /// Extended party object. Hides fields. 
         /// </summary>
         [JsonProperty("party", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public ICollection<CivilFileDetailParty> Party { get; set; }
+        public ICollection<CivilParty> Party { get; set; }
 
         /// <summary>
         /// Extended document object. 
         /// </summary>
         [JsonProperty("document", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public ICollection<CivilFileDetailDocument> Document { get; set; }
+        public ICollection<CivilDocument> Document { get; set; }
 
         [JsonProperty("hearingRestriction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public ICollection<CvfcHearingRestriction2> HearingRestriction { get; set; }

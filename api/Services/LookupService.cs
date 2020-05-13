@@ -20,9 +20,6 @@ namespace Scv.Api.Services
         private readonly IAppCache _cache;
         private readonly IConfiguration _configuration;
         private readonly LookupServiceClient _lookupClient;
-
-        public const string LookupDocumentDescriptions = nameof(LookupDocumentDescriptions);
-        public const string LookupRoleTypeDescriptions = nameof(LookupRoleTypeDescriptions);
         #endregion
 
         #region Properties
@@ -39,23 +36,23 @@ namespace Scv.Api.Services
         }
         #endregion
 
-        #region Methods
-        /// <summary>
-        /// Gives a document description, based on the provided document code.
-        /// </summary>
-        /// <param name="documentCode"></param>
-        /// <returns></returns>
-        public async Task<string> GetDocumentDescriptionAsync(string documentCode)
-        {
-            var documentLookupCodes = await GetDocumentCodesFromLazyCache();
-            return documentLookupCodes.FirstOrDefault(lookupCode => lookupCode.Code == documentCode)?.ShortDesc ?? "";
-        }
-
+        #region LazyCache
+        public async Task<CodeLookup> GetCourtClassDescriptionsFromLazyCache() => await _cache.GetOrAddAsync("CourtClassDescriptions", async () => await _lookupClient.CodesCourtClassesAsync(), CacheExpiry);
+        public async Task<CodeLookup> GetCourtLevelDescriptionsFromLazyCache() => await _cache.GetOrAddAsync("CourtLevelDescriptions", async () => await _lookupClient.CodesCourtLevelsAsync(), CacheExpiry);
         /// <summary>
         ///  Uses LazyCache to query LookupServiceClient for lookup codes. This is about 600 codes atm.
         /// </summary>
-        /// <returns></returns>
-        public async Task<CodeLookup> GetDocumentCodesFromLazyCache() => await _cache.GetOrAddAsync(LookupDocumentDescriptions, async () => await _lookupClient.CodesDocumentsAsync(), CacheExpiry);
+        /// <returns>Task{CodeLookup}</returns>
+        public async Task<CodeLookup> GetDocumentCodesFromLazyCache() => await _cache.GetOrAddAsync("LookupDocumentDescriptions", async () => await _lookupClient.CodesDocumentsAsync(), CacheExpiry);
+        public async Task<CodeLookup> GetRoleTypeCodesFromLazyCache() => await _cache.GetOrAddAsync("LookupRoleTypeDescriptions", async () => await _lookupClient.CodesRolesAsync(), CacheExpiry);
+        #endregion
+
+        #region Lookup Methods
+        //public async Task<string> GetActivityClassCd(string code) => FindLongDescriptionFromCode(await GetCourtClassDescriptionsFromLazyCache(), code);
+        public async Task<string> GetCourtClassDescription(string code) => FindShortDescriptionFromCode(await GetCourtClassDescriptionsFromLazyCache(), code);
+        public async Task<string> GetCourtLevelDescription(string code) => FindShortDescriptionFromCode(await GetCourtLevelDescriptionsFromLazyCache(), code);
+        public async Task<string> GetCivilRoleTypeDescription(string code) => FindShortDescriptionFromCode(await GetRoleTypeCodesFromLazyCache(), code);
+        public async Task<string> GetDocumentDescriptionAsync(string code) => FindShortDescriptionFromCode(await GetDocumentCodesFromLazyCache(), code);
 
         /// <summary>
         /// Reads from the configuration for the document category.
@@ -69,17 +66,11 @@ namespace Scv.Api.Services
                 throw new ConfigurationException("Couldn't not build dictionary based on DocumentCategories");
             return configurationSections.FirstOrDefault(cs => cs.Value.Split(",").Contains(documentCode)).Key ?? "";
         }
-
-        public async Task<string> GetCivilRoleTypeDescription(string roleTypeCode)
-        {
-            var roleCodes = await GetRoleTypeCodesFromLazyCache();
-            return roleCodes.FirstOrDefault(lookupCode => lookupCode.Code == roleTypeCode)?.ShortDesc ?? "";
-        }
-
-        public async Task<CodeLookup> GetRoleTypeCodesFromLazyCache() => await _cache.GetOrAddAsync(LookupRoleTypeDescriptions, async () => await _lookupClient.CodesRolesAsync(), CacheExpiry);
         #endregion
 
         #region Helpers
+        private string FindShortDescriptionFromCode(CodeLookup lookupCodes, string code) => lookupCodes.FirstOrDefault(lookupCode => lookupCode.Code == code)?.ShortDesc ?? "";
+        private string FindLongDescriptionFromCode(CodeLookup lookupCodes, string code) => lookupCodes.FirstOrDefault(lookupCode => lookupCode.Code == code)?.LongDesc ?? "";
 
         private void SetupLookupServicesClient()
         {
@@ -87,6 +78,5 @@ namespace Scv.Api.Services
             _lookupClient.BaseUrl = _configuration.GetValue<string>("LookupServicesClient:Url") ?? throw new ConfigurationException($"Configuration 'LookupServicesClient:Url' is invalid or missing.");
         }
         #endregion
-
     }
 }

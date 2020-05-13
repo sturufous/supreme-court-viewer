@@ -4,12 +4,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Scv.Api.Constants;
 using Scv.Api.Helpers.Exceptions;
-using Scv.Api.Models.Civil;
-using Scv.Api.Models.Criminal;
+using Scv.Api.Models.Civil.Detail;
+using Scv.Api.Models.Criminal.Content;
+using Scv.Api.Models.Criminal.Detail;
 using Scv.Api.Services;
+using CivilAppearanceDetail = Scv.Api.Models.Civil.Detail.CivilAppearanceDetail;
 
 namespace Scv.Api.Controllers
 {
@@ -73,8 +76,22 @@ namespace Scv.Api.Controllers
         [Route("civil/{fileId}/appearances")]
         public async Task<ActionResult<CivilFileAppearancesResponse>> GetCivilAppearancesByFileId(string fileId, FutureYN2? future, HistoryYN2? history)
         {
-            var criminalFileIdAppearances = await _filesService.FilesCivilFileIdAppearancesAsync(future, history, fileId);
-            return Ok(criminalFileIdAppearances);
+            var civilFileAppearancesResponse = await _filesService.FilesCivilFileIdAppearancesAsync(future, history, fileId);
+            return Ok(civilFileAppearancesResponse);
+        }
+
+        /// <summary>
+        /// Gets detailed information regarding an appearance given civil file id and appearance id.
+        /// </summary>
+        /// <param name="fileId"></param>
+        /// <param name="appearanceId"></param>
+        /// <returns>CivilAppearanceDetail</returns>
+        [HttpGet]
+        [Route("civil/{fileId}/appearance-detail/{appearanceId}")]
+        public async Task<ActionResult<CivilAppearanceDetail>> GetCivilAppearancesByFileIdAndAppearanceId(string fileId, string appearanceId)
+        {
+            var res = await _filesService.FilesCivilDetailedAppearance(fileId, appearanceId);
+            return Ok(res);
         }
 
         /// <summary>
@@ -169,7 +186,20 @@ namespace Scv.Api.Controllers
         public async Task<ActionResult<CriminalFileContent>> GetCriminalFileContent(string agencyId = null, string roomCode = null, DateTime? proceeding = null, string appearanceId = null, string justinNumber = null)
         {
             var criminalFileContent = await _filesService.FilesCriminalFilecontentAsync(agencyId, roomCode, proceeding, appearanceId, justinNumber);
-            ; return Ok(criminalFileContent);
+            return Ok(criminalFileContent);
+        }
+
+        /// <summary>
+        /// Get document details for a given file id.
+        /// </summary>
+        /// <param name="fileId">Target file id.</param>
+        /// <returns>CriminalFileDetailResponse</returns>
+        [HttpGet]
+        [Route("criminal/{fileId}/documents")]
+        public async Task<ActionResult<ICollection<CriminalDocument>>> GetCriminalFilecontentDocumentsAsync(string fileId)
+        {
+            var redactedCriminalFileDetailResponse = await _filesService.FilesCriminalFilecontentDocumentsAsync(fileId);
+            return Ok(redactedCriminalFileDetailResponse);
         }
 
         /// <summary>
