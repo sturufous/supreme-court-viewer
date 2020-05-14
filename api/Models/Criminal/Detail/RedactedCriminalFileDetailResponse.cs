@@ -3,12 +3,12 @@ using JCCommon.Clients.FileServices;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace Scv.Api.Models.Criminal
+namespace Scv.Api.Models.Criminal.Detail
 {
     /// <summary>
     /// This is used to narrow down the amount of information from CriminalFileDetailResponse. 
     /// </summary>
-    public class RedactedCriminalFileDetailResponse
+    public class RedactedCriminalFileDetailResponse 
     {
         [JsonProperty("responseCd", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public string ResponseCd { get; set; }
@@ -60,6 +60,9 @@ namespace Scv.Api.Models.Criminal
         [JsonProperty("mdocCcn", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public string MdocCcn { get; set; }
 
+        /// <summary>
+        /// Custom class to extend. 
+        /// </summary>
         [JsonProperty("participant", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public ICollection<CriminalParticipant> Participant { get; set; }
     }

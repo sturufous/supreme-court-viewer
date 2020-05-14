@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using JCCommon.Clients.FileServices;
+using JCCommon.Clients.LocationServices;
 using JCCommon.Clients.LookupServices;
 using JCCommon.Framework;
 using Microsoft.AspNetCore.Builder;
@@ -55,8 +56,17 @@ namespace Scv.Api
                     Configuration.GetValue<string>("LookupServicesClient:Password"));
             });
 
+            services.AddHttpClient<LocationServicesClient>(client =>
+            {
+                client.DefaultRequestHeaders.Authorization = new BasicAuthenticationHeaderValue(
+                    Configuration.GetValue<string>("LocationServicesClient:Username"),
+                    Configuration.GetValue<string>("LocationServicesClient:Password"));
+            });
+
+
             services.AddScoped<FilesService>();
             services.AddScoped<LookupService>();
+            services.AddScoped<LocationService>();
 
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
