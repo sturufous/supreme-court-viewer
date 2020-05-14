@@ -1,6 +1,6 @@
 <template>
 <body>
-   <b-card bg-variant="white" border-variant="white">   
+   <b-card bg-variant="white" border-variant="white" v-if= "isMounted">   
        
         <b-card bg-variant="light">
             <b-tabs active-nav-item-class="font-weight-bold text-uppercase text-info bg-light" pills >
@@ -12,44 +12,46 @@
                 v-bind:class="[ activetab === tabMapping ? 'active' : '' ]"
                 ></b-tab>
             </b-tabs>
+        </b-card>       
+      
+        <b-card  bg-variant="white" border-variant="white">
+            <b-dropdown  variant="light text-info" :text="getNameOfParticipant(activeparticipant)" class="m-2">    
+                <b-dropdown-item  
+                    v-for="(file,index) in accusedFiles" 
+                    :key="index"
+                    v-on:click="activeparticipant = index">
+                        {{getNameOfParticipant(index)}}
+                </b-dropdown-item> 
+            </b-dropdown>                 
         </b-card>
-        
+
         <b-overlay :show="loadingPdf" rounded="sm">  
-            <b-card border-variant="white" :aria-hidden="loadingPdf ? 'true' : null"></b-card>
+            <b-card bg-variant="light" :aria-hidden="loadingPdf ? 'true' : null">           
+                <b-table
+                :items="FilteredDocuments"
+                :fields="fields[fieldsTab]"
+                :sort-by.sync="sortBy"
+                :sort-desc.sync="sortDesc"
+                :no-sort-reset="true"
+                @row-hovered="rowHover"
+                striped
+                responsive="sm"
+                >   
+                    <template v-for="(field,index) in fields[fieldsTab]" v-slot:[`head(${field.key})`]="data">
+                    <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
+                    </template>
+                    <template v-for="(field,index) in fields[fieldsTab]" v-slot:[`cell(${field.key})`]="data" >
+                    <span 
+                            v-bind:key="index" 
+                            v-b-hover="colHover"
+                            v-on:click= "cellClick(index, data)"
+                            :class= "cellClass(field, index, data)"  
+                            style="white-space: pre-line"> {{ data.value }}
+                        </span>
+                    </template>
+                </b-table>
+            </b-card>
         </b-overlay>
-
-        <b-card bg-variant="light">           
-            <b-table
-            :items="FilteredDocuments"
-            :fields="fields[fieldsTab]"
-            :sort-by.sync="sortBy"
-            :sort-desc.sync="sortDesc"
-            :no-sort-reset="true"
-            @row-hovered="rowHover"
-            striped
-            responsive="sm"
-            >   
-                <template v-for="(f,index) in fields[fieldsTab]" v-slot:[`head(${f.key})`]="data">
-                   <b v-bind:key="index" :class="f.headerStyle" > {{ data.label }}</b>
-                </template>
-                 <template v-for="(f,index) in fields[fieldsTab]" v-slot:[`cell(${f.key})`]="data" >
-                   <span 
-                        v-bind:key="index" 
-                        v-b-hover="colHover"
-                        v-on:click="(data.item.PdfAvail)&&(index==1)&&(activetab!='COURT SUMMARY')? 
-                        openDocumentsPdf(data.item['Document ID']): 
-                        ((index==0)&&(activetab=='COURT SUMMARY'))? openCourtSummaryPdf(data.item['Appearance ID']) : ''"
-                        :class="(data.item.PdfAvail)&&(index==1)&&(activetab!='COURT SUMMARY')? 
-                        (hoverCol==1 && hoverRow==data.item.Index)?'text-info bg-warning':'text-info'
-                        : (index==0)&&(activetab=='COURT SUMMARY')? 
-                        (hoverCol==0 && hoverRow==data.item.Index)?'text-info bg-warning':'text-info'
-                        : f.cellStyle" 
-                        style="white-space: pre-line"> {{ data.value }}
-                    </span>
-                </template>
-            </b-table>
-        </b-card>
-
    </b-card> 
 </body>
 </template>
@@ -57,132 +59,156 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
-import CivilFileDocuments from '../store/modules/CivilFileDocuments';
-const civilState = namespace('CivilFileDocuments');
+import CriminalFileDocuments from '../store/modules/CriminalFileDocuments';
+const criminalState = namespace('CriminalFileDocuments');
 
 enum fieldTab {Categories=0, Summary}
 
 @Component
 export default class CriminalDocumentsView extends Vue {
 
-    @civilState.State
-    public civilFileDocument!: any
+    @criminalState.State
+    public criminalFileDocument!: any
 
     public getDocuments(): void {
 
-        this.$http.get('api/files/civil/'+ this.civilFileDocument.fileNumber)
-            .then(Response => Response.json(), err => console.log('error')        
-            ).then(data => {
-                this.documentsDetailsJson = data.document
-                this.ExtractDocumentInfo()
-            });
+        Promise.all([            
+            this.$http.get('api/files/criminal/'+ this.criminalFileDocument.fileNumber),
+            this.$http.get('api/files/criminal/file-content?justinNumber='+ this.criminalFileDocument.fileNumber) 
+        ]).then(responses =>                
+            Promise.all(responses.map(res => res.json()))            
+        ).then(data => {           
+            this.participantJson = data[0].participant                
+            this.accusedFileJson = data[1].accusedFile               
+            this.ExtractDocumentInfo()
+            this.isMounted = true
+        });
     }
 
     mounted () {         
         this.getDocuments();        
     }
 
-    documentsDetailsJson;
-    loadingPdf = false;
+    participantJson;
+    accusedFileJson;
 
-    activetab = 'ALL';            
-    sortBy = 'Seq.';
+    loadingPdf = false;
+    isMounted = false
+    activetab = 'ALL'; 
+    activeparticipant = 0;           
+    sortBy = 'Date Filed/Issued';
     sortDesc = false;
     hoverRow =-1;
     hoverCol = 0;
 
-    documents: any[] = [];
-    summaryDocuments: any[] = [];
-    categories: any=[]; 
+    accusedFiles: any[] = [];
+    ropDocuments: any[] = [];
+    categories: any = []; 
 
     fieldsTab = fieldTab.Categories;
 
     fields = [ 
         [
-            {key:'Seq.',           sortable:true,  headerStyle:'text-primary',  cellStyle:'text'},
-            {key:'Document Type',  sortable:true,  headerStyle:'text-primary',  cellStyle:'text-muted'},
-            {key:'Act',            sortable:false, headerStyle:'text',          cellStyle:'text-white bg-secondary'},
-            {key:'Date Filed',     sortable:true,  headerStyle:'text-danger',   cellStyle:'text'},
-            {key:'Issues',         sortable:false, headerStyle:'text',          cellStyle:'text-muted'}
+            {key:'Date Filed/Issued',  sortable:true,  headerStyle:'text-danger',   cellStyle:'text'},
+            {key:'Document Type',      sortable:true,  headerStyle:'text-primary',  cellStyle:'text-muted'},
+            {key:'Category',           sortable:false, headerStyle:'text',          cellStyle:'text'},
+            {key:'Pages',              sortable:false, headerStyle:'text',          cellStyle:'text'},
         ],
         [
             {key:'Document Type',    sortable:false, headerStyle:'text-primary',    cellStyle:'text-info'},
-            {key:'Appearance Date',  sortable:true, headerStyle:'text-danger',     cellStyle:'text'},
+            {key:'Category',         sortable:true,  headerStyle:'text',            cellStyle:'text'},
+            {key:'Pages',            sortable:false, headerStyle:'text',            cellStyle:'text'},
         ]  
         
     ];
+
+    public getNameOfParticipant(value)
+    {        
+        return  this.accusedFiles[value]["Last Name"]+', '+this.accusedFiles[value]["First Name"];     
+    }
+
+    public cellClick(index, data)
+    {        
+        if(data.item.PdfAvail && index==1 && this.activetab!='ROP')
+        {
+            console.log("open PDF")
+        }
+        else if (index==0 && this.activetab=='ROP')
+        {
+             console.log("open ROP pdf")     
+        }         
+    }
+
+    public cellClass(field, index, data)
+    {
+         if(data.item.PdfAvail && index==1 && this.activetab!='ROP')
+        {
+            if(this.hoverCol==1 && this.hoverRow==data.item.Index) return 'text-white bg-warning'; else return 'text-info';            
+        }
+        else if(index==0 && this.activetab=='ROP')
+        {
+            if(this.hoverCol==0 && this.hoverRow==data.item.Index) return 'text-white bg-warning'; else return 'text-info';   
+        }
+        else 
+            return field.cellStyle;
+    }
     
     public ExtractDocumentInfo(): void {
-        let courtSummaryExists = false 
-        for(const docIndex in this.documentsDetailsJson)
+       
+        for(const fileIndex in this.accusedFileJson)
         {
-            const docInfo = {}; 
-            const jDoc =  this.documentsDetailsJson[docIndex];
-            docInfo["Index"] = docIndex;
-            if(jDoc.documentTypeCd != 'CSR') {
-                docInfo["Seq."] = jDoc.fileSeqNo;
-                docInfo["Document Type"] = jDoc.documentTypeDescription;
-                docInfo["Concluded"] = jDoc.concludedYn;
-                if((this.categories.indexOf("CONCLUDED") < 0) && docInfo["Concluded"].toUpperCase() =="Y") this.categories.push("CONCLUDED")        
-                docInfo["Appearance Date"] = jDoc.lastAppearanceDt? jDoc.lastAppearanceDt.split(" ")[0]: ' ';
-                if(new Date(docInfo["Appearance Date"]) > new Date() && this.categories.indexOf("SCHEDULED") < 0) this.categories.push("SCHEDULED")   
+            const fileInfo = {}; 
+            const jFile =  this.accusedFileJson[fileIndex];
+            
+            fileInfo["Index"] = fileIndex;
+            fileInfo["Part ID"] = jFile.partId; 
+            
+            
+            fileInfo["Documents"] = [];
 
-                docInfo["Category"] = jDoc.category
-                if((this.categories.indexOf(docInfo["Category"]) < 0) && docInfo["Category"].length > 0) this.categories.push(docInfo["Category"])
-                // ensure all documentSupport elements only have one row
-                const docSupport: any = jDoc.documentSupport.length? jDoc.documentSupport[0]:'{}';
-                docInfo["Act"] = (docSupport==={})? '': docSupport.actCd;
-                docInfo["Document ID"] = jDoc.civilDocumentId;            
-                docInfo["PdfAvail"] = jDoc.civilDocumentId? true : false 
-                docInfo["Date Filed"] = jDoc.filedDt? jDoc.filedDt.split(" ")[0]: ' ';
-                docInfo["Issues"] = jDoc.issue.length? this.ExtractIssues(jDoc.issue) : ' ';
-                this.documents.push(docInfo);
+            const document: any[] = [];
+            for(const doc of jFile.document)
+            {
+                const docInfo = {}; 
+                docInfo["Date Filed/Issued"]= doc.issueDate.split(" ")[0];
+                docInfo["Document Type"]= doc.docmFormDsc;
+                docInfo["Category"]= doc.docmClassification;
+                docInfo["Pages"]= doc.documentPageCount;
+                docInfo["PdfAvail"]= doc.imageId
 
-            } else {                
-                docInfo["Document Type"] = 'CourtSummary';
-                docInfo["Appearance Date"] = jDoc.lastAppearanceDt.split(" ")[0]
-                docInfo["Appearance ID"] = jDoc.imageId;
-                this.summaryDocuments.push(docInfo);
-                courtSummaryExists = true
+                if((this.categories.indexOf(docInfo["Category"]) < 0) ) this.categories.push(docInfo["Category"]) 
+                
+                document.push(docInfo);
             }
-        } 
-        
-        this.categories.sort()
-        if(courtSummaryExists) this.categories.push("COURT SUMMARY")
-        this.categories.unshift("ALL")        
-    }
-
-    public ExtractIssues(issues) {
-        let issueString =''; 
-        for (const issue of issues)
-        {
-            issueString += issue.issueDsc + '\n';
+            fileInfo["Documents"] = document;
+            
+            this.accusedFiles.push(fileInfo);
         }
-        return issueString
+
+        for(const file of this.accusedFiles)
+        {
+            const index = file["Index"];
+            file["First Name"] = this.participantJson[index].givenNm
+            file["Last Name"] = this.participantJson[index].lastNm
+        }
+
+         this.categories.sort()
+         this.categories.push("ROP")
+         this.categories.unshift("ALL") 
     }
 
-    get FilteredDocuments() {
 
-        if(this.activetab == 'COURT SUMMARY')
+
+    get FilteredDocuments() {       
+        if(this.activetab == 'ROP')
         {
             this.fieldsTab = fieldTab.Summary;
-            return this.summaryDocuments;
+            return this.ropDocuments;
         }
-        else{       
-            return this.documents.filter(doc => {                
+        else{  
+            return this.accusedFiles[this.activeparticipant]["Documents"].filter(doc => {                
                 this.fieldsTab = fieldTab.Categories;
-                if(this.activetab == 'CONCLUDED') {
-                    if(doc["Concluded"] === "Y") return true; else return false;
-                
-                } else if(this.activetab == 'SCHEDULED') {
-                    if(doc["Appearance Date"]){        
-                        if(new Date(doc["Appearance Date"]) > new Date()) return true; else return false;
-                    
-                    } else {
-                        return false
-                    }  
-
-                } else if ( this.activetab != 'ALL' )
+                if ( this.activetab != 'ALL' )
                 {
                     if (doc["Category"].toUpperCase() == this.activetab.toUpperCase()) return true;                                   
                                   
@@ -193,71 +219,7 @@ export default class CriminalDocumentsView extends Vue {
                     return true;
                 }
             }); 
-        }       
-    }
-
-    public b64toBlob(b64Data, contentType) {
-
-        const byteCharacters = atob(b64Data);
-        const byteArrays: any = [];
-        for ( let offset = 0; offset < byteCharacters.length; offset = offset + 512 ) {
-            const slice = byteCharacters.slice(offset, offset + 512);
-            const byteNumbers = new Array(slice.length);
-            for (let i = 0; i < slice.length; i++) {
-                byteNumbers[i] = slice.charCodeAt(i);
-            }
-            const byteArray = new Uint8Array(byteNumbers);
-            byteArrays.push(byteArray);
-        }
-        return new Blob(byteArrays, { type: contentType });
-    }
-
-    public openDocumentsPdf(documentId): void {
-        this.loadingPdf = true
-        // TODO: remove the hardcoded documentId once sample data has pdf
-        documentId = 70
-        const filename = 'doc'+documentId+'.pdf';
-        // TODO: change to civil when a civil documentID is available 
-
-        this.$http.get('api/files/document/' + documentId + '/filename.pdf?isCriminal=true')
-            .then(Response => Response.json(), err =>  this.loadingPdf = false        
-            ).then(data => {
-                
-                if(window.navigator && window.navigator.msSaveOrOpenBlob) {
-                    window.navigator.msSaveOrOpenBlob(this.b64toBlob(data.b64Content,'application/pdf'), filename);
-                }
-                else
-                {
-                    const url = URL.createObjectURL(this.b64toBlob(data.b64Content,'application/pdf'))
-                    window.open(url);
-                }             
-
-                this.loadingPdf = false;
- 
-            }, err =>  this.loadingPdf = false);        
-    }
-    
-    public openCourtSummaryPdf(appearanceId): void {
-
-        this.loadingPdf = true
-        // TODO: remove the hardcoded appearanceId once sample data has pdf
-        appearanceId = 10098
-        const filename = 'court summary'+appearanceId+'.pdf';
-
-        this.$http.get("api/files/civil/court-summary-report/" + appearanceId + "/filename.pdf")
-            .then(Response => Response.json(), err =>  this.loadingPdf = false        
-            ).then(data => {
-                
-                if(window.navigator && window.navigator.msSaveOrOpenBlob) {
-                    window.navigator.msSaveOrOpenBlob(this.b64toBlob(data.reportContent,'application/pdf'), filename);
-                }
-                else
-                {
-                    const url = URL.createObjectURL(this.b64toBlob(data.reportContent,'application/pdf'))
-                    window.open(url);
-                }
-                 this.loadingPdf = false 
-            }, err =>  this.loadingPdf = false);
+        }    
     }
     
     public colHover(hovered, mouseEvent) {            

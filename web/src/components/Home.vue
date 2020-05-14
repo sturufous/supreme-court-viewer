@@ -36,7 +36,7 @@
     @Component
     export default class Home extends Vue {
 
-        selected = 'civil';
+        selected = 'criminal';
         options= [
           { value: 'civil', text: 'Civil' },
           { value: 'criminal', text: 'Criminal' }
@@ -53,12 +53,12 @@
         // TODO: add validation so that the user has to enter values before clicking the search button
         navigateToDocumentsView(fileDocument): void {
 
-            if(this.selected == 'civil'){
+            if(this.selected == 'civil') {
                 this.UpdateCivilFile(fileDocument)
-                this.$router.push({name:'CivilDocumentsView', params: {fileId: fileDocument.fileNumber}})
+                this.$router.push({name:'CivilDocumentsView', query: {fileNumber: fileDocument.fileNumber}})
             } else if(this.selected == 'criminal') {
                 this.UpdateCriminalFile(fileDocument)
-                this.$router.push({name:'CriminalDocumentsView', params: {fileId: fileDocument.fileNumber}})
+                this.$router.push({name:'CriminalDocumentsView', query: {fileNumber: fileDocument.fileNumber}})
             }
             
         }        

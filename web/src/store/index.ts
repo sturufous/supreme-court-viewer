@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import CivilFileDocuments from '@/store/modules/CivilFileDocuments'
-import CriminalFileDocuments from '@/store/modules/CivilFileDocuments'
+import CriminalFileDocuments from '@/store/modules/CriminalFileDocuments'
 
 Vue.use(Vuex)
 
