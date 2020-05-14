@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Linq;
 using JCCommon.Clients.FileServices;
+using JCCommon.Clients.LocationServices;
 using JCCommon.Clients.LookupServices;
 using JCCommon.Models;
 using LazyCache;
 using MapsterMapper;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Moq;
 using Scv.Api.Controllers;
 using Scv.Api.Services;
 using tests.api.Helpers;
@@ -28,10 +32,13 @@ namespace tests.api.Controllers
         {
             var preTest = new EnvironmentBuilder("FileServicesClient:Username", "FileServicesClient:Password", typeof(FilesController));
             var lookupServiceClient = new LookupServiceClient(preTest.HttpClient);
+            var locationServiceClient = new LocationServicesClient(preTest.HttpClient);
             var fileServicesClient = new FileServicesClient(preTest.HttpClient);
             var lookupService = new LookupService(preTest.Configuration, lookupServiceClient, new CachingService());
-            var filesService = new FilesService(preTest.Configuration, fileServicesClient, new Mapper(), lookupService );
+            var locationService = new LocationService(preTest.Configuration, locationServiceClient, new CachingService());
+            var filesService = new FilesService(preTest.Configuration, fileServicesClient, new Mapper(), lookupService, locationService);
             _controller = new FilesController(preTest.Configuration, preTest.LogFactory.CreateLogger<FilesController>(), filesService);
+            SetupMocks();
         }
         #endregion
 
@@ -172,7 +179,7 @@ namespace tests.api.Controllers
             var actionResult = await _controller.GetCriminalFileContent("4801", "101", DateTime.Parse("2016-04-04"), "44150.0734");
 
             var criminalFileContent = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
-            Assert.Equal("4801",criminalFileContent.CourtLocaCd);
+            Assert.Equal("4801", criminalFileContent.CourtLocaCd);
             Assert.Equal("101", criminalFileContent.CourtRoomCd);
             Assert.Equal("2016-04-04", criminalFileContent.CourtProceedingDate);
         }
@@ -244,8 +251,8 @@ namespace tests.api.Controllers
             {
                 SearchMode = SearchMode2.FILENO,
                 FileHomeAgencyId = "83.0001",
-                FileNumber =  "11011",
-                CourtLevel =  CourtLevelCd3.P
+                FileNumber = "11011",
+                CourtLevel = CourtLevelCd3.P
             };
             var actionResult = await _controller.FilesCivilSearchAsync(fcq);
 
@@ -259,23 +266,21 @@ namespace tests.api.Controllers
         [Fact]
         public async void Civil_Court_Summary_Report()
         {
-            var actionResult = await _controller.GetCivilCourtSummaryReport("984");
+            var actionResult = await _controller.GetCivilCourtSummaryReport("984", "test123.pdf");
 
-            var civilFileContent = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
-            Assert.Equal("0", civilFileContent.ResponseCd);
-            Assert.Null(civilFileContent.ResponseMessageTxt);
-            Assert.Equal(6852, civilFileContent.ReportContent.Length);
+            var fileContentResult = actionResult as FileContentResult;
+            Assert.NotNull(fileContentResult);
+            Assert.Equal(5139, fileContentResult.FileContents.Length);
         }
 
         [Fact]
         public async void Criminal_Record_Of_Proceeding()
         {
-            var actionResult = await _controller.GetRecordsOfProceeding("12971.0026", "24", CourtLevelCd.P , CourtClassCd.A);
+            var actionResult = await _controller.GetRecordsOfProceeding("12971.0026", "ropTest.pdf", "24", CourtLevelCd.P, CourtClassCd.A);
 
-            var ropResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
-            Assert.Equal(105548, ropResponse.B64Content.Length);
-            Assert.Equal("success", ropResponse.ResultMessage);
-            Assert.Equal("1", ropResponse.ResultCd);
+            var fileContentResult = actionResult as FileContentResult;
+            Assert.NotNull(fileContentResult);
+            Assert.Equal(79161, fileContentResult.FileContents.Length);
         }
 
 
@@ -295,23 +300,21 @@ namespace tests.api.Controllers
         [Fact]
         public async void Document_Civil()
         {
-            var actionResult = await _controller.GetDocument("10010");
+            var actionResult = await _controller.GetDocument("10010", "test.pdf");
 
-            var documentResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
-            Assert.Equal(19500, documentResponse.B64Content.Length);
-            Assert.Equal("success", documentResponse.ResultMessage);
-            Assert.Equal("1", documentResponse.ResultCd);
+            var fileContentResult = actionResult as FileContentResult;
+            Assert.NotNull(fileContentResult);
+            Assert.Equal(14625, fileContentResult.FileContents.Length);
         }
 
         [Fact]
         public async void Document_Criminal()
         {
-            var actionResult = await _controller.GetDocument(documentId: "40", true);
+            var actionResult = await _controller.GetDocument(documentId: "40", "test.pdf", true);
 
-            var documentResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
-            Assert.Equal(1043248, documentResponse.B64Content.Length);
-            Assert.Equal("success", documentResponse.ResultMessage);
-            Assert.Equal("1", documentResponse.ResultCd);
+            var fileContentResult = actionResult as FileContentResult;
+            Assert.NotNull(fileContentResult);
+            Assert.Equal(782434, fileContentResult.FileContents.Length);
         }
 
         [Fact]
@@ -325,6 +328,37 @@ namespace tests.api.Controllers
             Assert.Equal("", criminalFileContent.CourtProceedingDate);
             Assert.Equal(1, criminalFileContent.AccusedFile.Count);
             Assert.Equal("3179", criminalFileContent.AccusedFile.First().MdocJustinNo);
+        }
+        #endregion
+
+        [Fact]
+
+        public async void Criminal_File_Content_Document_By_JustinNumber()
+        {
+            var actionResult = await _controller.GetCriminalFilecontentDocumentsAsync(fileId: "35840");
+
+            var criminalFileDocuments = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+
+            Assert.Equal(4, criminalFileDocuments.Count);
+            Assert.Contains(criminalFileDocuments, doc => doc.PartId == "61145.0002");
+        }
+
+        #region Helpers
+
+        private void SetupMocks()
+        {
+            var headerDictionary = new HeaderDictionary();
+            var response = new Mock<HttpResponse>();
+            response.SetupGet(r => r.Headers).Returns(headerDictionary);
+
+            var httpContext = new Mock<HttpContext>();
+            httpContext.SetupGet(a => a.Response).Returns(response.Object);
+
+            _controller.ControllerContext = new ControllerContext()
+            {
+                HttpContext = httpContext.Object
+            };
+
         }
         #endregion
     }
