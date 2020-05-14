@@ -2,6 +2,7 @@
 using JCCommon.Clients.FileServices;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Scv.Api.Models.Criminal.Content;
 
 namespace Scv.Api.Models.Criminal.Detail
 {

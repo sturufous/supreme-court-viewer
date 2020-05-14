@@ -88,7 +88,7 @@ namespace Scv.Api.Controllers
         /// <returns>CivilAppearanceDetail</returns>
         [HttpGet]
         [Route("civil/{fileId}/appearance-detail/{appearanceId}")]
-        public async Task<ActionResult<CivilAppearanceDetail>> GetCivilAppearancesByFileIdAndAppearanceId(string fileId, string appearanceId)
+        public async Task<ActionResult<CivilAppearanceDetail>> GetCivilAppearanceDetails(string fileId, string appearanceId)
         {
             var res = await _filesService.FilesCivilDetailedAppearance(fileId, appearanceId);
             return Ok(res);
@@ -187,19 +187,6 @@ namespace Scv.Api.Controllers
         {
             var criminalFileContent = await _filesService.FilesCriminalFilecontentAsync(agencyId, roomCode, proceeding, appearanceId, justinNumber);
             return Ok(criminalFileContent);
-        }
-
-        /// <summary>
-        /// Get document details for a given file id.
-        /// </summary>
-        /// <param name="fileId">Target file id.</param>
-        /// <returns>CriminalFileDetailResponse</returns>
-        [HttpGet]
-        [Route("criminal/{fileId}/documents")]
-        public async Task<ActionResult<ICollection<CriminalDocument>>> GetCriminalFilecontentDocumentsAsync(string fileId)
-        {
-            var redactedCriminalFileDetailResponse = await _filesService.FilesCriminalFilecontentDocumentsAsync(fileId);
-            return Ok(redactedCriminalFileDetailResponse);
         }
 
         /// <summary>

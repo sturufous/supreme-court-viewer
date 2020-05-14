@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using JCCommon.Clients.LocationServices;
 using LazyCache;
 using Microsoft.Extensions.Configuration;
+using Scv.Api.Helpers;
 using Scv.Api.Helpers.ContractResolver;
 using Scv.Api.Helpers.Exceptions;
 using CodeValue = System.Collections.Generic.ICollection<JCCommon.Clients.LocationServices.CodeValue>;
@@ -49,7 +50,7 @@ namespace Scv.Api.Services
         private void SetupLocationServicesClient()
         {
             _locationClient.JsonSerializerSettings.ContractResolver = new SafeContractResolver();
-            _locationClient.BaseUrl = _configuration.GetValue<string>("LocationServicesClient:Url") ?? throw new ConfigurationException($"Configuration 'LocationServicesClient:Url' is invalid or missing.");
+            _locationClient.BaseUrl = _configuration.GetNonEmptyValue("LocationServicesClient:Url");
         }
         #endregion
     }

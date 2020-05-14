@@ -6,6 +6,7 @@ using JCCommon.Clients.FileServices;
 using JCCommon.Models;
 using MapsterMapper;
 using Microsoft.Extensions.Configuration;
+using Scv.Api.Helpers;
 using Scv.Api.Helpers.ContractResolver;
 using Scv.Api.Helpers.Exceptions;
 using Scv.Api.Models.Civil;
@@ -37,13 +38,13 @@ namespace Scv.Api.Services
         {
             _fileServicesClient = fileServicesClient;
             _fileServicesClient.JsonSerializerSettings.ContractResolver = new SafeContractResolver();
-            _fileServicesClient.BaseUrl = configuration.GetValue<string>("FileServicesClient:Url") ?? throw new ConfigurationException($"Configuration 'FileServicesClient:Url' is invalid or missing.");
+            _fileServicesClient.BaseUrl = configuration.GetNonEmptyValue("FileServicesClient:Url");
             _lookupService = lookupService;
             _locationService = locationService;
             _mapper = mapper;
-            _requestApplicationCode = configuration.GetValue<string>("Request:ApplicationCd") ?? throw new ConfigurationException($"Configuration 'Request:ApplicationCd' is invalid or missing.");
-            _requestAgencyIdentifierId = configuration.GetValue<string>("Request:AgencyIdentifierId") ?? throw new ConfigurationException($"Configuration 'Request:AgencyIdentifierId' is invalid or missing.");
-            _requestPartId = configuration.GetValue<string>("Request:PartId") ?? throw new ConfigurationException($"Configuration 'Request:PartId' is invalid or missing.");
+            _requestApplicationCode = configuration.GetNonEmptyValue("Request:ApplicationCd");
+            _requestAgencyIdentifierId = configuration.GetNonEmptyValue("Request:AgencyIdentifierId");
+            _requestPartId = configuration.GetNonEmptyValue("Request:PartId");
         }
         #endregion
 
@@ -128,8 +129,7 @@ namespace Scv.Api.Services
         {
             var detailedAppearance = new CivilAppearanceDetail();
             detailedAppearance.PhysicalFileId = fileId;
-
-            //TODO: Permission pending CIVIL_DOCUMENTS_LIST
+       
             var fileDetailResponse = await _fileServicesClient.FilesCivilFileIdAsync(_requestAgencyIdentifierId, _requestPartId, fileId);
             detailedAppearance.Document = _mapper.Map<ICollection<CivilDocument>>(fileDetailResponse.Document);
 
@@ -139,8 +139,12 @@ namespace Scv.Api.Services
                 document.DocumentTypeDescription = await _lookupService.GetDocumentDescriptionAsync(document.DocumentTypeCd);
             }
 
-            //detailedAppearance.Party = _fileServicesClient.FilesCivilAppearanceParties(appearanceId);
-            //detailedAppearance.AppearanceMethods = _fileServicesClient.FilesCivilAppearanceMethods(appearanceId);
+            var civilFileAppearancePartyResponse = await _fileServicesClient.FilesCivilAppearancesAppearanceIdPartyAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
+            detailedAppearance.Party = civilFileAppearancePartyResponse.Party;
+
+            var civilFileAppearanceApprMethodResponse = await _fileServicesClient.FilesCivilAppearancesAppearanceIdAppearancemethodAsync(
+                    _requestAgencyIdentifierId, _requestPartId, appearanceId);
+            detailedAppearance.AppearanceMethod = civilFileAppearanceApprMethodResponse.AppearanceMethod;
 
             return detailedAppearance;
         }
@@ -182,6 +186,45 @@ namespace Scv.Api.Services
             var criminalFileDetailResponse = await _fileServicesClient.FilesCriminalFileIdAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode, fileId);
             var redactedCriminalFileDetailResponse = _mapper.Map<RedactedCriminalFileDetailResponse>(criminalFileDetailResponse);
 
+            var criminalFileContent = await _fileServicesClient.FilesCriminalFilecontentAsync(null, null,
+                null, null, fileId);
+
+            //Generate documents from AccusedFile. 
+            var documents = criminalFileContent.AccusedFile.SelectMany(ac =>
+            {
+                var criminalDocuments = _mapper.Map<List<CriminalDocument>>(ac.Document);
+
+                //Create ROPs. 
+                if (ac.Appearance != null && ac.Appearance.Any())
+                {
+                    criminalDocuments.Insert(0, new CriminalDocument
+                    {
+                        DocumentTypeDescription = "Record of Proceedings",
+                        ImageId = ac.PartId,
+                        Category = "rop",
+                        PartId = ac.PartId,
+                        HasFutureAppearance = ac.Appearance?.Any(a =>
+                            a?.AppearanceDate != null && DateTime.Parse(a.AppearanceDate) >= DateTime.Today)
+                    });
+                }
+
+                //Populate extra fields. 
+                foreach (var document in criminalDocuments)
+                {
+                    document.Category = string.IsNullOrEmpty(document.Category) ? _lookupService.GetDocumentCategory(document.DocmFormId) : document.Category;
+                    document.DocumentTypeDescription = document.DocmFormDsc;
+                    document.PartId = ac.PartId;
+                }
+
+                return criminalDocuments;
+            }).ToList();
+
+            //Attach documents to participants.
+            foreach (var participant in redactedCriminalFileDetailResponse.Participant)
+            {
+                participant.Document = documents.Where(doc => doc.PartId == participant.PartId).ToList();
+            }
+
             return redactedCriminalFileDetailResponse;
         }
 
@@ -189,46 +232,6 @@ namespace Scv.Api.Services
         {
             var criminalFileIdAppearances = await _fileServicesClient.FilesCriminalFileIdAppearancesAsync(_requestAgencyIdentifierId, _requestPartId, future, history, fileId);
             return criminalFileIdAppearances;
-        }
-
-        public async Task<ICollection<CriminalDocument>> FilesCriminalFilecontentDocumentsAsync(string justinNumber)
-        {
-            var criminalFileContent = await _fileServicesClient.FilesCriminalFilecontentAsync(null, null,
-                null, null, justinNumber);
-
-            //Flatten Accused file. 
-            var documents = criminalFileContent.AccusedFile.SelectMany(ac =>
-            {
-                var criminalFileContentDocuments = ac.Document.Select(doc =>
-                    _mapper.Map<CriminalDocument>(ac.Document)
-                ).ToList();
-
-                //Create ROPs. 
-                if (ac.Appearance != null && ac.Appearance.Any())
-                {
-                    criminalFileContentDocuments.Insert(0, new CriminalDocument
-                    {
-                        DocumentTypeDescription = "Record of Proceedings",
-                        ImageId = ac.PartId,
-                        Category = "rop",
-                        PartId = ac.PartId,
-                        HasFutureAppearance = ac.Appearance?.Any(a => 
-                            a?.AppearanceDate != null && DateTime.Parse(a.AppearanceDate) >= DateTime.Today)
-                    });
-                }
-
-                //Populate extra fields. 
-                foreach (var document in criminalFileContentDocuments)
-                {
-                    document.Category = _lookupService.GetDocumentCategory(document.DocmFormId);
-                    document.DocumentTypeDescription = document.DocmFormDsc;
-                    document.PartId = ac.PartId;
-                }
-
-                return criminalFileContentDocuments;
-            }).ToList();
-
-            return documents;
         }
 
         public async Task<CriminalFileContent> FilesCriminalFilecontentAsync(string agencyId, string roomCode, DateTime? proceeding, string appearanceId, string justinNumber)
