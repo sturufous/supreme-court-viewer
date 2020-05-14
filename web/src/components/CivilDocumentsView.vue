@@ -1,6 +1,6 @@
 <template>
 <body>
-   <b-card bg-variant="white" border-variant="white">   
+   <b-card bg-variant="white" border-variant="white" v-if="isMounted">   
        
         <b-card bg-variant="light">
             <b-tabs active-nav-item-class="font-weight-bold text-uppercase text-info bg-light" pills >
@@ -64,14 +64,14 @@ export default class CivilDocumentsView extends Vue {
 
     public getDocuments(): void {
 
-
          this.loadingPdf = true;
          this.$http.get('api/files/civil/'+ this.civilFileDocument.fileNumber)
             .then(Response => Response.json(), err => console.log('error')        
             ).then(data => {
                 this.documentsDetailsJson = data.document
                 this.ExtractDocumentInfo()
-                 this.loadingPdf = false
+                this.isMounted = true;
+                this.loadingPdf = false
             });
     }
 
@@ -81,6 +81,7 @@ export default class CivilDocumentsView extends Vue {
 
     documentsDetailsJson;
     loadingPdf = false;
+    isMounted = false;
 
     activetab = 'ALL';            
     sortBy = 'Seq.';
@@ -117,7 +118,8 @@ export default class CivilDocumentsView extends Vue {
         }
         else if (index==0 && this.activetab=='COURT SUMMARY')
         {
-            this.openCourtSummaryPdf(data.item['Appearance ID'])
+            console.log(data.item['Appearance ID']);
+            this.openCourtSummaryPdf(data.item['Appearance ID']);
         }         
     }
 
@@ -150,7 +152,7 @@ export default class CivilDocumentsView extends Vue {
                 docInfo["Appearance Date"] = jDoc.lastAppearanceDt? jDoc.lastAppearanceDt.split(" ")[0]: ' ';
                 if(new Date(docInfo["Appearance Date"]) > new Date() && this.categories.indexOf("SCHEDULED") < 0) this.categories.push("SCHEDULED")   
 
-                docInfo["Category"] = jDoc.category
+                docInfo["Category"] = jDoc.category;
                 if((this.categories.indexOf(docInfo["Category"]) < 0) && docInfo["Category"].length > 0) this.categories.push(docInfo["Category"])
                 // ensure all documentSupport elements only have one row
                 const docSupport: any = jDoc.documentSupport.length? jDoc.documentSupport[0]:'{}';
@@ -163,10 +165,12 @@ export default class CivilDocumentsView extends Vue {
 
             } else {                
                 docInfo["Document Type"] = 'CourtSummary';
-                docInfo["Appearance Date"] = jDoc.lastAppearanceDt.split(" ")[0]
+                docInfo["Appearance Date"] = jDoc.lastAppearanceDt.split(" ")[0];
+                console.log(jDoc)
                 docInfo["Appearance ID"] = jDoc.imageId;
+                docInfo["PdfAvail"] = jDoc.imageId? true : false
                 this.summaryDocuments.push(docInfo);
-                courtSummaryExists = true
+                courtSummaryExists = true;
             }
         } 
         
@@ -191,7 +195,7 @@ export default class CivilDocumentsView extends Vue {
             this.fieldsTab = fieldTab.Summary;
             return this.summaryDocuments;
         }
-        else{       
+        else {       
             return this.documents.filter(doc => {                
                 this.fieldsTab = fieldTab.Categories;
                 if(this.activetab == 'CONCLUDED') {
@@ -217,72 +221,21 @@ export default class CivilDocumentsView extends Vue {
                 }
             }); 
         }       
-    }
-
-    public b64toBlob(b64Data, contentType) {
-
-        const byteCharacters = atob(b64Data);
-        const byteArrays: any = [];
-        for ( let offset = 0; offset < byteCharacters.length; offset = offset + 512 ) {
-            const slice = byteCharacters.slice(offset, offset + 512);
-            const byteNumbers = new Array(slice.length);
-            for (let i = 0; i < slice.length; i++) {
-                byteNumbers[i] = slice.charCodeAt(i);
-            }
-            const byteArray = new Uint8Array(byteNumbers);
-            byteArrays.push(byteArray);
-        }
-        return new Blob(byteArrays, { type: contentType });
-    }
+    }    
 
     public openDocumentsPdf(documentId): void {
-        this.loadingPdf = true
+        this.loadingPdf = true;
         const filename = 'doc'+documentId+'.pdf';
-       
-        this.$http.get('api/files/document/' + documentId + '/filename.pdf?isCriminal=false')
-            .then(Response => Response.json(), err => {console.log(err); this.loadingPdf = false }        
-            ).then(data => {
-               
-                if(data.b64Content)
-                {
-                    if(window.navigator && window.navigator.msSaveOrOpenBlob) {
-                        window.navigator.msSaveOrOpenBlob(this.b64toBlob(data.b64Content,'application/pdf'), filename);
-                    }
-                    else
-                    {
-                        const url = URL.createObjectURL(this.b64toBlob(data.b64Content,'application/pdf'))
-                        window.open(url);
-                    }  
-                }
-                this.loadingPdf = false;
- 
-            }, err =>  {console.log(err);this.loadingPdf = false});        
+        window.open(`api/files/document/${documentId}/${filename}?isCriminal=false`)
+        this.loadingPdf = false;
     }
     
     public openCourtSummaryPdf(appearanceId): void {
 
-        this.loadingPdf = true
-        
-        const filename = 'court summary'+appearanceId+'.pdf';
-
-        this.$http.get("api/files/civil/court-summary-report/" + appearanceId + "/"+ filename)
-            .then(Response => Response.json(), err =>  this.loadingPdf = false        
-            ).then(data => {
-               
-                if(data.reportContent)
-                {
-                    if(window.navigator && window.navigator.msSaveOrOpenBlob) {
-                        window.navigator.msSaveOrOpenBlob(this.b64toBlob(data.reportContent,'application/pdf'), filename);
-                    }
-                    else
-                    {
-                        const url = URL.createObjectURL(this.b64toBlob(data.reportContent,'application/pdf'))
-                        window.open(url);
-                    }
-                }
-                this.loadingPdf = false 
-
-            }, err =>  this.loadingPdf = false);
+        this.loadingPdf = true;        
+        const filename = 'court summary_'+appearanceId+'.pdf';
+        window.open(`api/files/civil/court-summary-report/${appearanceId}/${filename}`)
+        this.loadingPdf = false;
     }
     
     public colHover(hovered, mouseEvent) {            
