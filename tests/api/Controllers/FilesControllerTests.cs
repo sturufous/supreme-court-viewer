@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using JCCommon.Clients.FileServices;
+using JCCommon.Clients.LocationServices;
 using JCCommon.Clients.LookupServices;
 using JCCommon.Models;
 using LazyCache;
@@ -31,9 +32,11 @@ namespace tests.api.Controllers
         {
             var preTest = new EnvironmentBuilder("FileServicesClient:Username", "FileServicesClient:Password", typeof(FilesController));
             var lookupServiceClient = new LookupServiceClient(preTest.HttpClient);
+            var locationServiceClient = new LocationServicesClient(preTest.HttpClient);
             var fileServicesClient = new FileServicesClient(preTest.HttpClient);
             var lookupService = new LookupService(preTest.Configuration, lookupServiceClient, new CachingService());
-            var filesService = new FilesService(preTest.Configuration, fileServicesClient, new Mapper(), lookupService);
+            var locationService = new LocationService(preTest.Configuration, locationServiceClient, new CachingService());
+            var filesService = new FilesService(preTest.Configuration, fileServicesClient, new Mapper(), lookupService, locationService);
             _controller = new FilesController(preTest.Configuration, preTest.LogFactory.CreateLogger<FilesController>(), filesService);
             SetupMocks();
         }
@@ -327,6 +330,18 @@ namespace tests.api.Controllers
             Assert.Equal("3179", criminalFileContent.AccusedFile.First().MdocJustinNo);
         }
         #endregion
+
+        [Fact]
+
+        public async void Criminal_File_Content_Document_By_JustinNumber()
+        {
+            var actionResult = await _controller.GetCriminalFilecontentDocumentsAsync(fileId: "35840");
+
+            var criminalFileDocuments = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+
+            Assert.Equal(4, criminalFileDocuments.Count);
+            Assert.Contains(criminalFileDocuments, doc => doc.PartId == "61145.0002");
+        }
 
         #region Helpers
 
