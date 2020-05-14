@@ -280,7 +280,7 @@ namespace tests.api.Controllers
 
             var fileContentResult = actionResult as FileContentResult;
             Assert.NotNull(fileContentResult);
-            Assert.Equal(79161, fileContentResult.FileContents.Length);
+            Assert.True(fileContentResult.FileContents.Length > 79000);
         }
 
 
@@ -333,13 +333,15 @@ namespace tests.api.Controllers
 
         [Fact]
 
-        public async void Criminal_File_Content_Document_By_JustinNumber()
+        public async void Criminal_File_Detail_Document_By_JustinNumber()
         {
-            var actionResult = await _controller.GetCriminalFilecontentDocumentsAsync(fileId: "35840");
+            var actionResult = await _controller.GetCriminalFileDetailByFileId(fileId: "35840");
 
             var criminalFileDocuments = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
-            Assert.Equal(4, criminalFileDocuments.Count);
-            Assert.Contains(criminalFileDocuments, doc => doc.PartId == "61145.0002");
+            Assert.Equal(4, criminalFileDocuments.Participant.First().Document.Count);
+            Assert.Contains(criminalFileDocuments.Participant.First().Document,
+                doc => doc.DocmFormDsc == "Summons Criminal Code (With a very long name so I can test Cannabis names)");
+            Assert.Contains(criminalFileDocuments.Participant.First().Document, doc => doc.PartId == "61145.0002");
         }
 
         [Fact]
