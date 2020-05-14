@@ -333,13 +333,15 @@ namespace tests.api.Controllers
 
         [Fact]
 
-        public async void Criminal_File_Content_Document_By_JustinNumber()
+        public async void Criminal_File_Detail_Document_By_JustinNumber()
         {
-            var actionResult = await _controller.GetCriminalFilecontentDocumentsAsync(fileId: "35840");
+            var actionResult = await _controller.GetCriminalFileDetailByFileId(fileId: "35840");
 
             var criminalFileDocuments = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
-            Assert.Equal(4, criminalFileDocuments.Count);
-            Assert.Contains(criminalFileDocuments, doc => doc.PartId == "61145.0002");
+            Assert.Equal(4, criminalFileDocuments.Document.Count);
+            Assert.Contains(criminalFileDocuments.Document,
+                doc => doc.DocmFormDsc == "Summons Criminal Code (With a very long name so I can test Cannabis names)");
+            Assert.Contains(criminalFileDocuments.Document, doc => doc.PartId == "61145.0002");
         }
 
         [Fact]

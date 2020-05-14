@@ -190,19 +190,6 @@ namespace Scv.Api.Controllers
         }
 
         /// <summary>
-        /// Get document details for a given file id.
-        /// </summary>
-        /// <param name="fileId">Target file id.</param>
-        /// <returns>CriminalFileDetailResponse</returns>
-        [HttpGet]
-        [Route("criminal/{fileId}/documents")]
-        public async Task<ActionResult<ICollection<CriminalDocument>>> GetCriminalFilecontentDocumentsAsync(string fileId)
-        {
-            var redactedCriminalFileDetailResponse = await _filesService.FilesCriminalFilecontentDocumentsAsync(fileId);
-            return Ok(redactedCriminalFileDetailResponse);
-        }
-
-        /// <summary>
         /// Gets records of proceedings.
         /// </summary>
         /// <param name="partId">The participant id associated to the Record Of Proceedings.</param>
