@@ -19,7 +19,6 @@ namespace tests.api.Controllers
         private readonly LookupController _controller;
         #endregion
 
-
         #region Constructor
         public LookupControllerTests()
         {
@@ -28,7 +27,6 @@ namespace tests.api.Controllers
             _controller = new LookupController(preTest.Configuration, preTest.LogFactory.CreateLogger<LookupController>(), lookupService, new Mapper());
         }
         #endregion
-
 
         #region Tests
         [Fact]

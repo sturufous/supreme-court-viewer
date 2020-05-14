@@ -338,11 +338,27 @@ namespace tests.api.Controllers
             var actionResult = await _controller.GetCriminalFilecontentDocumentsAsync(fileId: "35840");
 
             var criminalFileDocuments = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
-
             Assert.Equal(4, criminalFileDocuments.Count);
             Assert.Contains(criminalFileDocuments, doc => doc.PartId == "61145.0002");
         }
 
+        [Fact]
+        public async void Civil_Appearance_Details()
+        {
+            //Has party data. 
+            var actionResult = await _controller.GetCivilAppearanceDetails("2506", "11034");
+
+            var civilAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+            Assert.Equal(3, civilAppearanceDetail.Party.Count);
+            Assert.Contains(civilAppearanceDetail.Party, p => p.LastNm == "BYSTANDER");
+
+            //Has appearanceMethod data. 
+            actionResult = await _controller.GetCivilAppearanceDetails("3499", "13410");
+
+            civilAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+            Assert.Equal(1, civilAppearanceDetail.AppearanceMethod.Count);
+            Assert.Equal("IP",civilAppearanceDetail.AppearanceMethod.First().AppearanceMethodCd);
+        }
         #region Helpers
 
         private void SetupMocks()
