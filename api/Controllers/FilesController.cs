@@ -88,7 +88,7 @@ namespace Scv.Api.Controllers
         /// <returns>CivilAppearanceDetail</returns>
         [HttpGet]
         [Route("civil/{fileId}/appearance-detail/{appearanceId}")]
-        public async Task<ActionResult<CivilAppearanceDetail>> GetCivilAppearancesByFileIdAndAppearanceId(string fileId, string appearanceId)
+        public async Task<ActionResult<CivilAppearanceDetail>> GetCivilAppearanceDetails(string fileId, string appearanceId)
         {
             var res = await _filesService.FilesCivilDetailedAppearance(fileId, appearanceId);
             return Ok(res);

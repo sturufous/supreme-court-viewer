@@ -128,8 +128,7 @@ namespace Scv.Api.Services
         {
             var detailedAppearance = new CivilAppearanceDetail();
             detailedAppearance.PhysicalFileId = fileId;
-
-            //TODO: Permission pending CIVIL_DOCUMENTS_LIST
+       
             var fileDetailResponse = await _fileServicesClient.FilesCivilFileIdAsync(_requestAgencyIdentifierId, _requestPartId, fileId);
             detailedAppearance.Document = _mapper.Map<ICollection<CivilDocument>>(fileDetailResponse.Document);
 
@@ -139,8 +138,12 @@ namespace Scv.Api.Services
                 document.DocumentTypeDescription = await _lookupService.GetDocumentDescriptionAsync(document.DocumentTypeCd);
             }
 
-            //detailedAppearance.Party = _fileServicesClient.FilesCivilAppearanceParties(appearanceId);
-            //detailedAppearance.AppearanceMethods = _fileServicesClient.FilesCivilAppearanceMethods(appearanceId);
+            var civilFileAppearancePartyResponse = await _fileServicesClient.FilesCivilAppearancesAppearanceIdPartyAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
+            detailedAppearance.Party = civilFileAppearancePartyResponse.Party;
+
+            var civilFileAppearanceApprMethodResponse = await _fileServicesClient.FilesCivilAppearancesAppearanceIdAppearancemethodAsync(
+                    _requestAgencyIdentifierId, _requestPartId, appearanceId);
+            detailedAppearance.AppearanceMethod = civilFileAppearanceApprMethodResponse.AppearanceMethod;
 
             return detailedAppearance;
         }
