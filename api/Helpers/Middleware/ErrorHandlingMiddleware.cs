@@ -113,7 +113,7 @@ namespace Scv.Api.Helpers.Middleware
                         await using var responseStream = await exception?.Response.Content.ReadAsStreamAsync();
                         responseStream.Position = 0;
                         using var readStream = new StreamReader(responseStream, Encoding.UTF8);
-                        details = await readStream.ReadToEndAsync(); // TODO: Rewrite this logic.
+                        details = await readStream.ReadToEndAsync();
                         _logger.LogError(exception, details);
                     }
                     catch (Exception streamEx)
