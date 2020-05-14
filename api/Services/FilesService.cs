@@ -124,13 +124,12 @@ namespace Scv.Api.Services
             return civilFileAppearancesResponse;
         }
 
-        //TODO unfinished. 
         public async Task<CivilAppearanceDetail> FilesCivilDetailedAppearance(string fileId, string appearanceId)
         {
             var detailedAppearance = new CivilAppearanceDetail();
             detailedAppearance.PhysicalFileId = fileId;
 
-            //TODO: Documents - Generated from GetCivilFileDetailByFileId - Permission pending CIVIL_DOCUMENTS_LIST
+            //TODO: Permission pending CIVIL_DOCUMENTS_LIST
             var fileDetailResponse = await _fileServicesClient.FilesCivilFileIdAsync(_requestAgencyIdentifierId, _requestPartId, fileId);
             detailedAppearance.Document = _mapper.Map<ICollection<CivilDocument>>(fileDetailResponse.Document);
 
@@ -142,6 +141,10 @@ namespace Scv.Api.Services
 
             //TODO: Parties - Generated from GetAppearanceParties
             //TODO: AppearanceMethods - Generated from GetCivilAppearanceMethods
+
+            //detailedAppearance.Party = _filesServicesClient.FilesCivilAppearanceParties(appearanceId);
+            //detailedAppearance.AppearanceMethods = _filesServicesClient.FilesCivilAppearanceMethods(appearanceId);
+
             return detailedAppearance;
         }
 

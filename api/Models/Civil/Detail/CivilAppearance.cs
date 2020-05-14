@@ -21,9 +21,9 @@ namespace Scv.Api.Models.Civil.Detail
         [JsonProperty("document", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public ICollection<CivilDocument> Document { get; set; }
 
-        //TODO still incomplete populating these. 
-        public string EquipmentBookings { get; set; }
         public string AppearanceMethods { get; set; }
+
+        //OfferedDates requires database access. 
         public string OfferedDates { get; set; }
     }
 }

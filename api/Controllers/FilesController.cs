@@ -255,7 +255,7 @@ namespace Scv.Api.Controllers
         {
             var documentResponse = await _filesService.FilesDocumentAsync(documentId, isCriminal);
 
-            if (documentResponse.B64Content.Length <= 0)
+            if (documentResponse.B64Content == null || documentResponse.B64Content.Length <= 0)
                 throw new BadRequestException("Couldn't find document with this id.");
 
             return BuildFileResponse(fileNameAndExtension, documentResponse.B64Content);
@@ -265,15 +265,8 @@ namespace Scv.Api.Controllers
         #region Helpers
         private FileContentResult BuildFileResponse(string fileNameAndExtension, string content)
         {
-            System.Net.Mime.ContentDisposition cd = new System.Net.Mime.ContentDisposition
-            {
-                FileName = $"{fileNameAndExtension}",
-                Inline = true  // false = prompt the user for downloading;  true = browser to try to show the file inline
-            };
-            Response.Headers.Add("Content-Disposition", cd.ToString());
             Response.Headers.Add("X-Content-Type-Options", "nosniff");
-
-            return File(Convert.FromBase64String(content), "application/pdf", $"{fileNameAndExtension}");
+            return File(Convert.FromBase64String(content), "application/pdf");
         }
         #endregion
 
