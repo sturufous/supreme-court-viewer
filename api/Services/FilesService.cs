@@ -110,7 +110,7 @@ namespace Scv.Api.Services
             {
                 document.Category = _lookupService.GetDocumentCategory(document.DocumentTypeCd);
                 document.DocumentTypeDescription = await _lookupService.GetDocumentDescriptionAsync(document.DocumentTypeCd);
-                document.ImageId = document.SealedYN != "N" ? null : document.ImageId;
+                document.ImageId = document.DocumentTypeCd != "CSR" && document.SealedYN != "N" ? null : document.ImageId;
             }
 
             //Filter for hearingRestriction?
@@ -139,11 +139,8 @@ namespace Scv.Api.Services
                 document.DocumentTypeDescription = await _lookupService.GetDocumentDescriptionAsync(document.DocumentTypeCd);
             }
 
-            //TODO: Parties - Generated from GetAppearanceParties
-            //TODO: AppearanceMethods - Generated from GetCivilAppearanceMethods
-
-            //detailedAppearance.Party = _filesServicesClient.FilesCivilAppearanceParties(appearanceId);
-            //detailedAppearance.AppearanceMethods = _filesServicesClient.FilesCivilAppearanceMethods(appearanceId);
+            //detailedAppearance.Party = _fileServicesClient.FilesCivilAppearanceParties(appearanceId);
+            //detailedAppearance.AppearanceMethods = _fileServicesClient.FilesCivilAppearanceMethods(appearanceId);
 
             return detailedAppearance;
         }
