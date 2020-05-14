@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using JCCommon.Clients.FileServices;
+﻿using JCCommon.Clients.FileServices;
 using Newtonsoft.Json;
 
-namespace Scv.Api.Models.Civil
+namespace Scv.Api.Models.Civil.Detail
 {
-    public class CivilFileDetailParty : CvfcParty3
+    /// <summary>
+    /// Extends CvfcParty3.
+    /// </summary>
+    public class CivilParty : CvfcParty3
     {
         [JsonProperty("roleTypeDescription", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public string RoleTypeDescription { get; set; }
