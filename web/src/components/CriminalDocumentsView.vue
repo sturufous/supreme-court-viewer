@@ -131,10 +131,11 @@ export default class CriminalDocumentsView extends Vue {
     {        
         if(data.item.PdfAvail && index==1 && this.activetab!='ROP')
         {
-            console.log("open PDF")
+            this.openDocumentsPdf(data.item["Image ID"]);
         }
         else if (index==0 && this.activetab=='ROP')
         {
+             //TODO replace with ROP file open 
              console.log("open ROP pdf")     
         }         
     }
@@ -174,7 +175,8 @@ export default class CriminalDocumentsView extends Vue {
                 docInfo["Document Type"]= doc.docmFormDsc;
                 docInfo["Category"]= doc.docmClassification;
                 docInfo["Pages"]= doc.documentPageCount;
-                docInfo["PdfAvail"]= doc.imageId
+                docInfo["PdfAvail"]= doc.imageId? true : false
+                docInfo["Image ID"]= doc.imageId
 
                 if((this.categories.indexOf(docInfo["Category"]) < 0) ) this.categories.push(docInfo["Category"]) 
                 
@@ -228,6 +230,13 @@ export default class CriminalDocumentsView extends Vue {
 
     public rowHover(row) {
         this.hoverRow = row.Index;
+    }
+
+    public openDocumentsPdf(imageId): void {
+        this.loadingPdf = true;
+        const filename = 'doc'+imageId+'.pdf';
+        window.open(`api/files/document/${imageId}/${filename}?isCriminal=true`)
+        this.loadingPdf = false;
     }
     
 }
