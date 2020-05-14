@@ -8,10 +8,7 @@ using MapsterMapper;
 using Microsoft.Extensions.Configuration;
 using Scv.Api.Helpers;
 using Scv.Api.Helpers.ContractResolver;
-using Scv.Api.Helpers.Exceptions;
-using Scv.Api.Models.Civil;
 using Scv.Api.Models.Civil.Detail;
-using Scv.Api.Models.Criminal;
 using Scv.Api.Models.Criminal.Content;
 using Scv.Api.Models.Criminal.Detail;
 using CivilAppearanceDetail = Scv.Api.Models.Civil.Detail.CivilAppearanceDetail;
@@ -84,28 +81,17 @@ namespace Scv.Api.Services
             var civilFileDetail = _mapper.Map<RedactedCivilFileDetailResponse>(civilFileDetailResponse);
 
             //Populate location information.
-            //Note I didn't see any address information from the location lookup service, this means we may need a database lookup? 
             civilFileDetail.HomeLocationAgencyCode = await _locationService.GetLocationAgencyIdentifier(civilFileDetail.HomeLocationAgenId);
             civilFileDetail.HomeLocationAgencyName = await _locationService.GetLocationName(civilFileDetail.HomeLocationAgenId);
-            //HomeLocationRegionName
-            //HomeLocationAddresses - database?
-            //NextAppearanceDt?
 
             civilFileDetail.CourtClassDescription = await _lookupService.GetCourtClassDescription(civilFileDetail.CourtClassCd.ToString());
             civilFileDetail.CourtLevelDescription = await _lookupService.GetCourtLevelDescription(civilFileDetail.CourtLevelCd.ToString());
-            //ActivityClassCd?
+            civilFileDetail.ActivityClassCd = await _lookupService.GetActivityClassCd(civilFileDetail.CourtClassCd.ToString());
 
             //Populate extra fields for party. 
             foreach (var party in civilFileDetail.Party)
-            {
                 party.RoleTypeDescription = await _lookupService.GetCivilRoleTypeDescription(party.RoleTypeCd);
-                //SelfRepresentedYN - counselRepository.GetSelfRepresentedFlagForCivilParty(p.PartyId) - Database
-                //OtherRepresentedYN -  counselRepository.GetOtherRepresentedFlagForCivilParty(p.PartyId)  - Database
-                //Counsel - counselRepository.FindCivilPartyCounsel(p.PartyId) - Database  - Needs permission to view witness list
-                //CeisCounsel? - Needs permission to view witness list
-            }
 
-            //civilFileDetail.Document requires CIVIL_DOCUMENT_LIST permission
             //Populate extra fields for document.
             foreach (var document in civilFileDetail.Document)
             {
@@ -114,7 +100,11 @@ namespace Scv.Api.Services
                 document.ImageId = document.DocumentTypeCd != "CSR" && document.SealedYN != "N" ? null : document.ImageId;
             }
 
-            //Filter for hearingRestriction?
+            //TODO need permission for this filter. 
+            var hearingRescriptionPermission = true;
+            civilFileDetail.HearingRestriction = civilFileDetail.HearingRestriction.Where(hr =>
+                hearingRescriptionPermission &&
+                hr.HearingRestrictionTypeCd != CvfcHearingRestriction2HearingRestrictionTypeCd.S).ToList();
             return civilFileDetail;
         }
 
@@ -127,9 +117,8 @@ namespace Scv.Api.Services
 
         public async Task<CivilAppearanceDetail> FilesCivilDetailedAppearance(string fileId, string appearanceId)
         {
-            var detailedAppearance = new CivilAppearanceDetail();
-            detailedAppearance.PhysicalFileId = fileId;
-       
+            var detailedAppearance = new CivilAppearanceDetail {PhysicalFileId = fileId};
+
             var fileDetailResponse = await _fileServicesClient.FilesCivilFileIdAsync(_requestAgencyIdentifierId, _requestPartId, fileId);
             detailedAppearance.Document = _mapper.Map<ICollection<CivilDocument>>(fileDetailResponse.Document);
 

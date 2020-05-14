@@ -106,7 +106,7 @@ namespace Scv.Api.Controllers
         {
             var justinReportResponse = await _filesService.FilesCivilCourtsummaryreportAsync(appearanceId, JustinReportName.CEISR035);
 
-            if (justinReportResponse.ReportContent.Length <= 0)
+            if (justinReportResponse.ReportContent == null || justinReportResponse.ReportContent.Length <= 0)
                 throw new BadRequestException("Couldn't find CSR with this appearance id.");
 
             return BuildFileResponse(fileNameAndExtension, justinReportResponse.ReportContent);
@@ -195,7 +195,7 @@ namespace Scv.Api.Controllers
         /// <param name="partId">The participant id associated to the Record Of Proceedings.</param>
         /// <param name="fileNameAndExtension"></param>
         /// <param name="profSequenceNumber"></param>
-        /// <param name="courtLevelCode">The associated court level code.</param>
+        /// <param name="courtLevelCode">The associated court level code. P = 0, S = 1, A = 2: Provincial, Supreme, All</param>
         /// <param name="courtClassCode">The associated court class code.</param>
         /// <returns></returns>
         [HttpGet]
@@ -204,7 +204,7 @@ namespace Scv.Api.Controllers
         {
             var recordsOfProceeding = await _filesService.FilesRecordOfProceedingsAsync(partId, profSequenceNumber, courtLevelCode, courtClassCode);
 
-            if (recordsOfProceeding.B64Content.Length <= 0)
+            if (recordsOfProceeding.B64Content == null || recordsOfProceeding.B64Content.Length <= 0)
                 throw new BadRequestException("Couldn't find ROP with this part id.");
 
             return BuildFileResponse(fileNameAndExtension, recordsOfProceeding.B64Content);

@@ -49,7 +49,7 @@ namespace Scv.Api.Services
         #endregion
 
         #region Lookup Methods
-        //public async Task<string> GetActivityClassCd(string code) => FindLongDescriptionFromCode(await GetCourtClassDescriptionsFromLazyCache(), code);
+        public async Task<string> GetActivityClassCd(string code) => FindLongDescriptionFromCode(await GetCourtClassDescriptionsFromLazyCache(), code);
         public async Task<string> GetCourtClassDescription(string code) => FindShortDescriptionFromCode(await GetCourtClassDescriptionsFromLazyCache(), code);
         public async Task<string> GetCourtLevelDescription(string code) => FindShortDescriptionFromCode(await GetCourtLevelDescriptionsFromLazyCache(), code);
         public async Task<string> GetCivilRoleTypeDescription(string code) => FindShortDescriptionFromCode(await GetRoleTypeCodesFromLazyCache(), code);

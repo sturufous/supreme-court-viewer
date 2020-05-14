@@ -94,5 +94,6 @@ namespace Scv.Api.Models.Civil.Detail
 
         [Newtonsoft.Json.JsonProperty("appearance", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public ICollection<CvfcAppearance> Appearance { get; set; }
+        public string ActivityClassCd { get; set; }
     }
 }
