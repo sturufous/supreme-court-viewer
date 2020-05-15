@@ -8,6 +8,7 @@ using MapsterMapper;
 using Microsoft.Extensions.Configuration;
 using Scv.Api.Helpers;
 using Scv.Api.Helpers.ContractResolver;
+using Scv.Api.Helpers.Exceptions;
 using Scv.Api.Models.Civil.Detail;
 using Scv.Api.Models.Criminal.Content;
 using Scv.Api.Models.Criminal.Detail;
@@ -178,11 +179,14 @@ namespace Scv.Api.Services
 
         public async Task<RedactedCriminalFileDetailResponse> FilesCriminalFileIdAsync(string fileId)
         {
-            var criminalFileDetailResponse = await _fileServicesClient.FilesCriminalFileIdAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode, fileId);
-            var redactedCriminalFileDetailResponse = _mapper.Map<RedactedCriminalFileDetailResponse>(criminalFileDetailResponse);
+            var criminalFileDetail = await _fileServicesClient.FilesCriminalFileIdAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode, fileId);
+            var criminalFileContent = await _fileServicesClient.FilesCriminalFilecontentAsync(null, null, null, null, fileId);
 
-            var criminalFileContent = await _fileServicesClient.FilesCriminalFilecontentAsync(null, null,
-                null, null, fileId);
+            //CriminalFileContent can return null when an invalid fileId is inserted. 
+            if (criminalFileDetail == null || criminalFileContent == null)
+                return null;
+
+            var redactedCriminalFileDetailResponse = _mapper.Map<RedactedCriminalFileDetailResponse>(criminalFileDetail);
 
             //Generate documents from AccusedFile. 
             var documents = criminalFileContent.AccusedFile.SelectMany(ac =>

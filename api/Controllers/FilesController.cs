@@ -4,12 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Scv.Api.Constants;
 using Scv.Api.Helpers.Exceptions;
 using Scv.Api.Models.Civil.Detail;
-using Scv.Api.Models.Criminal.Content;
 using Scv.Api.Models.Criminal.Detail;
 using Scv.Api.Services;
 using CivilAppearanceDetail = Scv.Api.Models.Civil.Detail.CivilAppearanceDetail;
@@ -107,7 +105,7 @@ namespace Scv.Api.Controllers
             var justinReportResponse = await _filesService.FilesCivilCourtsummaryreportAsync(appearanceId, JustinReportName.CEISR035);
 
             if (justinReportResponse.ReportContent == null || justinReportResponse.ReportContent.Length <= 0)
-                throw new BadRequestException("Couldn't find CSR with this appearance id.");
+                throw new NotFoundException("Couldn't find CSR with this appearance id.");
 
             return BuildFileResponse(fileNameAndExtension, justinReportResponse.ReportContent);
         }
@@ -154,7 +152,7 @@ namespace Scv.Api.Controllers
         public async Task<ActionResult<RedactedCriminalFileDetailResponse>> GetCriminalFileDetailByFileId(string fileId)
         {
             var redactedCriminalFileDetailResponse = await _filesService.FilesCriminalFileIdAsync(fileId);
-            return Ok(redactedCriminalFileDetailResponse);
+            return Ok(redactedCriminalFileDetailResponse ?? throw new NotFoundException("Couldn't find criminal file with this id."));
         }
 
         /// <summary>
@@ -205,7 +203,7 @@ namespace Scv.Api.Controllers
             var recordsOfProceeding = await _filesService.FilesRecordOfProceedingsAsync(partId, profSequenceNumber, courtLevelCode, courtClassCode);
 
             if (recordsOfProceeding.B64Content == null || recordsOfProceeding.B64Content.Length <= 0)
-                throw new BadRequestException("Couldn't find ROP with this part id.");
+                throw new NotFoundException("Couldn't find ROP with this part id.");
 
             return BuildFileResponse(fileNameAndExtension, recordsOfProceeding.B64Content);
         }
@@ -243,7 +241,7 @@ namespace Scv.Api.Controllers
             var documentResponse = await _filesService.FilesDocumentAsync(documentId, isCriminal);
 
             if (documentResponse.B64Content == null || documentResponse.B64Content.Length <= 0)
-                throw new BadRequestException("Couldn't find document with this id.");
+                throw new NotFoundException("Couldn't find document with this id.");
 
             return BuildFileResponse(fileNameAndExtension, documentResponse.B64Content);
         }

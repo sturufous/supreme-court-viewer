@@ -48,7 +48,7 @@ namespace Scv.Api.Helpers.Middleware
 
         #region Methods
         /// <summary>
-        /// Handle the exception if one occurs.
+        /// Handle the exception if one occurs. Note this wont catch exceptions created from async void functions.
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
@@ -85,20 +85,21 @@ namespace Scv.Api.Helpers.Middleware
                 case KeyNotFoundException _:
                     code = HttpStatusCode.BadRequest;
                     message = "Item does not exist.";
-
                     _logger.LogDebug(ex, "Middleware caught unhandled exception.");
                     break;
                 case NotAuthorizedException _:
                     code = HttpStatusCode.Forbidden;
                     message = "User is not authorized to perform this action.";
-
                     _logger.LogWarning(ex, ex.Message);
                     break;
                 case ConfigurationException _:
                     code = HttpStatusCode.InternalServerError;
                     message = "Application configuration details invalid or missing.";
-
                     _logger.LogError(ex, ex.Message);
+                    break;
+                case NotFoundException _:
+                    code = HttpStatusCode.NotFound;
+                    message = ex.Message;
                     break;
                 case BadRequestException _:
                 case InvalidOperationException _:
@@ -108,19 +109,16 @@ namespace Scv.Api.Helpers.Middleware
                 case JCCommon.Clients.FileServices.ApiException exception:
                     code = (HttpStatusCode)exception.StatusCode;
                     message = exception.Message;
-
                     _logger.LogError(ex, ex.Message);
                     break;
                 case JCCommon.Clients.LocationServices.ApiException exception:
                     code = (HttpStatusCode)exception.StatusCode;
                     message = exception.Message;
-
                     _logger.LogError(ex, ex.Message);
                     break;
                 case JCCommon.Clients.LookupServices.ApiException exception:
                     code = (HttpStatusCode)exception.StatusCode;
                     message = exception.Message;
-
                     _logger.LogError(ex, ex.Message);
                     break;
                 default:
