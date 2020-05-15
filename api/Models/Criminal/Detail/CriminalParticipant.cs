@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using JCCommon.Clients.FileServices;
 using Newtonsoft.Json;
+using Scv.Api.Models.Criminal.Content;
 
 namespace Scv.Api.Models.Criminal.Detail
 {
@@ -10,7 +11,7 @@ namespace Scv.Api.Models.Criminal.Detail
     public class CriminalParticipant
     {
         [JsonProperty("fullName")]
-        public string FullName => $"{GivenNm} {LastNm}";
+        public string FullName => $"{GivenNm?.Trim()} {LastNm?.Trim()}";
 
         [JsonProperty("partId", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public string PartId { get; set; }
@@ -70,5 +71,11 @@ namespace Scv.Api.Models.Criminal.Detail
 
         [JsonProperty("charge", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public ICollection<Charge> Charge { get; set; }
+
+        /// <summary>
+        /// Custom class to extend. 
+        /// </summary>
+        [JsonProperty("document", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public ICollection<CriminalDocument> Document { get; set; }
     }
 }

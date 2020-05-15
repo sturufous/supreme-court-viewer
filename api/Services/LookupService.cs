@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using JCCommon.Clients.LookupServices;
 using LazyCache;
 using Microsoft.Extensions.Configuration;
+using Scv.Api.Helpers;
 using Scv.Api.Helpers.ContractResolver;
 using Scv.Api.Helpers.Exceptions;
 using CodeLookup = System.Collections.Generic.ICollection<JCCommon.Clients.LookupServices.LookupCode>;
@@ -75,7 +76,7 @@ namespace Scv.Api.Services
         private void SetupLookupServicesClient()
         {
             _lookupClient.JsonSerializerSettings.ContractResolver = new SafeContractResolver();
-            _lookupClient.BaseUrl = _configuration.GetValue<string>("LookupServicesClient:Url") ?? throw new ConfigurationException($"Configuration 'LookupServicesClient:Url' is invalid or missing.");
+            _lookupClient.BaseUrl = _configuration.GetNonEmptyValue("LookupServicesClient:Url");
         }
         #endregion
     }

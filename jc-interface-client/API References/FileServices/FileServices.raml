@@ -2895,6 +2895,90 @@ schemas:
           }
         }
       }
+      
+  - civilAppearanceParty: |
+      {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type" : "object",
+        "properties" : {
+          "partyId" : {
+            "type" : "string"
+          },
+          "partyRoleTypeCd" : {
+            "type" : "string"
+           },
+          "lastNm" : {
+            "type" : "string"
+           },
+           "givenNm" : {
+            "type" : "string"
+           },
+           "orgNm" : {
+            "type" : "string"
+           },
+           "counselNm" : {
+            "type" : "string"
+           },
+           "courtParticipantId" : {
+            "type" : "string"
+           },
+           "courtParticipantCcn" : {
+            "type" : "string"
+           }
+         }
+      }
+      
+  - civilFileAppearancePartyResponse: | 
+      {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type" : "object",
+        "properties" : {
+          "responseCd" : {
+            "type" : "string"
+          },
+          "responseMessageTxt" : {
+            "type" : "string"
+          },
+          "party" : {
+            "type" : "array",
+            "items" : { "$ref" : "civilAppearanceParty" }
+          }
+        }
+      }
+      
+  - civilAppearanceMethod: |
+      {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type" : "object",
+        "properties" : {
+          "roleTypeCd" : {
+            "type" : "string"
+          },
+          "appearanceMethodCd" : {
+            "type" : "string"
+           },
+           "apprMethodCcn" : {
+             "type" : "string"
+           }
+         }
+      } 
+  - civilFileAppearanceApprMethodResponse: | 
+       {
+         "$schema": "http://json-schema.org/draft-04/schema#",
+         "type" : "object",
+         "properties" : {
+           "responseCd" : {
+             "type" : "string"
+          },
+          "responseMessageTxt" : {
+            "type" : "string"
+          },
+          "appearanceMethod" : {
+            "type" : "array",
+            "items" : { "$ref" : "civilAppearanceMethod" }
+          }
+        }
+       } 
 
 /files:
   displayName: Court File Resources
@@ -3333,7 +3417,59 @@ schemas:
             application/json:
               example: |
                 {"message": "No items matching the given criteria were found."}
-
+                
+    /appearances: #civil
+      get: 
+      /{appearanceId}: #civil
+          get:   
+          /party: #civil
+            get:
+              description: |
+                Get appearance parties for a given appearanceId.
+              headers:
+                requestAgencyIdentifierId:
+                  description: Requesting Agency Identifier
+                  type: string
+                  required: true
+                requestPartId:
+                  description: Requesting Participant Id
+                  type: string
+                  required: true
+              responses:
+                200:
+                  body:
+                    application/json:
+                      schema: civilFileAppearancePartyResponse
+                404:
+                  body:
+                    application/json:
+                      example: |
+                          {"message": "No items matching the given criteria were found."}
+                          
+          /appearancemethod: #civil
+            get:
+              description: |
+                Get appearance methods for a given appearanceId.
+              headers:
+                requestAgencyIdentifierId:
+                  description: Requesting Agency Identifier
+                  type: string
+                  required: true
+                requestPartId:
+                  description: Requesting Participant Id
+                  type: string
+                  required: true
+              responses:
+                200:
+                  body:
+                    application/json:
+                      schema: civilFileAppearanceApprMethodResponse
+                404:
+                  body:
+                    application/json:
+                      example: |
+                        {"message": "No items matching the given criteria were found."}
+                          
     /courtsummaryreport: # civil
       get:
         description: |
@@ -3467,3 +3603,4 @@ schemas:
                 application/json:
                   example: |
                     {"message": "No items matching the given criteria were found."}
+

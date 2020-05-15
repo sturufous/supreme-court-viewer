@@ -41,6 +41,7 @@ namespace JCCommon.Clients.FileServices
             set { _baseUrl = value; }
         }
 
+
         public Newtonsoft.Json.JsonSerializerSettings JsonSerializerSettings { get { return _settings.Value; } }
 
         partial void UpdateJsonSerializerSettings(Newtonsoft.Json.JsonSerializerSettings settings);
@@ -924,6 +925,176 @@ namespace JCCommon.Clients.FileServices
                         }
 
                         return default(FileSearchResponse);
+                    }
+                    finally
+                    {
+                        if (response_ != null)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+            }
+        }
+
+        /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
+        /// <param name="requestPartId">Requesting Participant Id</param>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public System.Threading.Tasks.Task<CivilFileAppearancePartyResponse> FilesCivilAppearancesAppearanceIdPartyAsync(string requestAgencyIdentifierId, string requestPartId, string appearanceId)
+        {
+            return FilesCivilAppearancesAppearanceIdPartyAsync(requestAgencyIdentifierId, requestPartId, appearanceId, System.Threading.CancellationToken.None);
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
+        /// <param name="requestPartId">Requesting Participant Id</param>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public async System.Threading.Tasks.Task<CivilFileAppearancePartyResponse> FilesCivilAppearancesAppearanceIdPartyAsync(string requestAgencyIdentifierId, string requestPartId, string appearanceId, System.Threading.CancellationToken cancellationToken)
+        {
+            if (appearanceId == null)
+                throw new System.ArgumentNullException("appearanceId");
+
+            var urlBuilder_ = new System.Text.StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/files/civil/appearances/{appearanceId}/party");
+            urlBuilder_.Replace("{appearanceId}", System.Uri.EscapeDataString(ConvertToString(appearanceId, System.Globalization.CultureInfo.InvariantCulture)));
+
+            var client_ = _httpClient;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    if (requestAgencyIdentifierId == null)
+                        throw new System.ArgumentNullException("requestAgencyIdentifierId");
+                    request_.Headers.TryAddWithoutValidation("requestAgencyIdentifierId", ConvertToString(requestAgencyIdentifierId, System.Globalization.CultureInfo.InvariantCulture));
+                    if (requestPartId == null)
+                        throw new System.ArgumentNullException("requestPartId");
+                    request_.Headers.TryAddWithoutValidation("requestPartId", ConvertToString(requestPartId, System.Globalization.CultureInfo.InvariantCulture));
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    try
+                    {
+                        var headers_ = System.Linq.Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = ((int)response_.StatusCode).ToString();
+                        if (status_ == "200")
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<CivilFileAppearancePartyResponse>(response_, headers_).ConfigureAwait(false);
+                            return objectResponse_.Object;
+                        }
+                        else
+                        if (status_ == "404")
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<object>(response_, headers_).ConfigureAwait(false);
+                            throw new ApiException<object>("A server side error occurred.", (int)response_.StatusCode, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                        }
+                        else
+                        if (status_ != "200" && status_ != "204")
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + (int)response_.StatusCode + ").", (int)response_.StatusCode, responseData_, headers_, null);
+                        }
+
+                        return default(CivilFileAppearancePartyResponse);
+                    }
+                    finally
+                    {
+                        if (response_ != null)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+            }
+        }
+
+        /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
+        /// <param name="requestPartId">Requesting Participant Id</param>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public System.Threading.Tasks.Task<CivilFileAppearanceApprMethodResponse> FilesCivilAppearancesAppearanceIdAppearancemethodAsync(string requestAgencyIdentifierId, string requestPartId, string appearanceId)
+        {
+            return FilesCivilAppearancesAppearanceIdAppearancemethodAsync(requestAgencyIdentifierId, requestPartId, appearanceId, System.Threading.CancellationToken.None);
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
+        /// <param name="requestPartId">Requesting Participant Id</param>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public async System.Threading.Tasks.Task<CivilFileAppearanceApprMethodResponse> FilesCivilAppearancesAppearanceIdAppearancemethodAsync(string requestAgencyIdentifierId, string requestPartId, string appearanceId, System.Threading.CancellationToken cancellationToken)
+        {
+            if (appearanceId == null)
+                throw new System.ArgumentNullException("appearanceId");
+
+            var urlBuilder_ = new System.Text.StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/files/civil/appearances/{appearanceId}/appearancemethod");
+            urlBuilder_.Replace("{appearanceId}", System.Uri.EscapeDataString(ConvertToString(appearanceId, System.Globalization.CultureInfo.InvariantCulture)));
+
+            var client_ = _httpClient;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    if (requestAgencyIdentifierId == null)
+                        throw new System.ArgumentNullException("requestAgencyIdentifierId");
+                    request_.Headers.TryAddWithoutValidation("requestAgencyIdentifierId", ConvertToString(requestAgencyIdentifierId, System.Globalization.CultureInfo.InvariantCulture));
+                    if (requestPartId == null)
+                        throw new System.ArgumentNullException("requestPartId");
+                    request_.Headers.TryAddWithoutValidation("requestPartId", ConvertToString(requestPartId, System.Globalization.CultureInfo.InvariantCulture));
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    try
+                    {
+                        var headers_ = System.Linq.Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = ((int)response_.StatusCode).ToString();
+                        if (status_ == "200")
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<CivilFileAppearanceApprMethodResponse>(response_, headers_).ConfigureAwait(false);
+                            return objectResponse_.Object;
+                        }
+                        else
+                        if (status_ == "404")
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<object>(response_, headers_).ConfigureAwait(false);
+                            throw new ApiException<object>("A server side error occurred.", (int)response_.StatusCode, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                        }
+                        else
+                        if (status_ != "200" && status_ != "204")
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + (int)response_.StatusCode + ").", (int)response_.StatusCode, responseData_, headers_, null);
+                        }
+
+                        return default(CivilFileAppearanceApprMethodResponse);
                     }
                     finally
                     {
@@ -4788,6 +4959,117 @@ namespace JCCommon.Clients.FileServices
 
         [Newtonsoft.Json.JsonProperty("reportContent", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ReportContent { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
+
+        [Newtonsoft.Json.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties; }
+            set { _additionalProperties = value; }
+        }
+
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.1.11.0 (Newtonsoft.Json v12.0.0.0)")]
+    public partial class CivilAppearanceParty
+    {
+        [Newtonsoft.Json.JsonProperty("partyId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string PartyId { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("partyRoleTypeCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string PartyRoleTypeCd { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("lastNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string LastNm { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("givenNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string GivenNm { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("orgNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string OrgNm { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("counselNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string CounselNm { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("courtParticipantId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string CourtParticipantId { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("courtParticipantCcn", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string CourtParticipantCcn { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
+
+        [Newtonsoft.Json.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties; }
+            set { _additionalProperties = value; }
+        }
+
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.1.11.0 (Newtonsoft.Json v12.0.0.0)")]
+    public partial class CivilFileAppearancePartyResponse
+    {
+        [Newtonsoft.Json.JsonProperty("responseCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string ResponseCd { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("responseMessageTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string ResponseMessageTxt { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("party", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<CivilAppearanceParty> Party { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
+
+        [Newtonsoft.Json.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties; }
+            set { _additionalProperties = value; }
+        }
+
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.1.11.0 (Newtonsoft.Json v12.0.0.0)")]
+    public partial class CivilAppearanceMethod
+    {
+        [Newtonsoft.Json.JsonProperty("roleTypeCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string RoleTypeCd { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("appearanceMethodCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string AppearanceMethodCd { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("apprMethodCcn", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string ApprMethodCcn { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
+
+        [Newtonsoft.Json.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties; }
+            set { _additionalProperties = value; }
+        }
+
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.1.11.0 (Newtonsoft.Json v12.0.0.0)")]
+    public partial class CivilFileAppearanceApprMethodResponse
+    {
+        [Newtonsoft.Json.JsonProperty("responseCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string ResponseCd { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("responseMessageTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string ResponseMessageTxt { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("appearanceMethod", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<CivilAppearanceMethod> AppearanceMethod { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
