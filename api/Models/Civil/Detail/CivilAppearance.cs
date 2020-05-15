@@ -16,7 +16,7 @@ namespace Scv.Api.Models.Civil.Detail
         /// Extended document object. 
         /// </summary>
         [JsonProperty("document", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public ICollection<CivilDocument> Document { get; set; }
+        public ICollection<CivilAppearanceDocument> Document { get; set; }
 
         public ICollection<CivilAppearanceMethod> AppearanceMethod { get; set; }
 

@@ -120,7 +120,13 @@ namespace Scv.Api.Services
             var detailedAppearance = new CivilAppearanceDetail {PhysicalFileId = fileId};
 
             var fileDetailResponse = await _fileServicesClient.FilesCivilFileIdAsync(_requestAgencyIdentifierId, _requestPartId, fileId);
-            detailedAppearance.Document = _mapper.Map<ICollection<CivilDocument>>(fileDetailResponse.Document);
+
+            var documentsWithSameAppearanceId = fileDetailResponse.Document.Where(doc =>
+                    doc.Appearance != null && doc.Appearance.Any(app => app.AppearanceId == appearanceId))
+                .ToList();
+
+            //CivilAppearanceDocument, doesn't include appearances. 
+            detailedAppearance.Document = _mapper.Map<ICollection<CivilAppearanceDocument>>(documentsWithSameAppearanceId);
 
             foreach (var document in detailedAppearance.Document)
             {

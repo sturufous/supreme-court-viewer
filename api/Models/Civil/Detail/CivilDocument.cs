@@ -10,7 +10,7 @@ namespace Scv.Api.Models.Civil.Detail
     {
         [JsonProperty("category", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public string Category { get; set; }
-        [Newtonsoft.Json.JsonProperty("documentTypeDescription", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("documentTypeDescription", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public string DocumentTypeDescription { get; set; }
     }
 }
