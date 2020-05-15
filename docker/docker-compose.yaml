@@ -21,6 +21,9 @@ services:
       - LookupServicesClient__Username=${LookupServicesClientUsername}
       - LookupServicesClient__Password=${LookupServicesClientPassword}
       - LookupServicesClient__Url=${LookupServicesClientUrl}
+      - LocationServicesClient__Username=${LocationServicesClientUsername}
+      - LocationServicesClient__Password=${LocationServicesClientPassword}
+      - LocationServicesClient__Url=${LocationServicesClientUrl}
       - Request__ApplicationCd=${RequestApplicationCd}
       - Request__AgencyIdentifierId=${RequestAgencyIdentifierId}
       - Request__PartId=${RequestPartId}
