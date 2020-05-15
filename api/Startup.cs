@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Scv.Api.Helpers;
 using Scv.Api.Helpers.Mapping;
 using Scv.Api.Helpers.Middleware;
 using Scv.Api.Services;
@@ -45,22 +46,22 @@ namespace Scv.Api
             services.AddHttpClient<FileServicesClient>(client =>
             {
                 client.DefaultRequestHeaders.Authorization = new BasicAuthenticationHeaderValue(
-                    Configuration.GetValue<string>("FileServicesClient:Username"),
-                    Configuration.GetValue<string>("FileServicesClient:Password"));
+                    Configuration.GetNonEmptyValue("FileServicesClient:Username"),
+                    Configuration.GetNonEmptyValue("FileServicesClient:Password"));
             });
 
             services.AddHttpClient<LookupServiceClient>(client =>
             {
                 client.DefaultRequestHeaders.Authorization = new BasicAuthenticationHeaderValue(
-                    Configuration.GetValue<string>("LookupServicesClient:Username"),
-                    Configuration.GetValue<string>("LookupServicesClient:Password"));
+                    Configuration.GetNonEmptyValue("LookupServicesClient:Username"),
+                    Configuration.GetNonEmptyValue("LookupServicesClient:Password"));
             });
 
             services.AddHttpClient<LocationServicesClient>(client =>
             {
                 client.DefaultRequestHeaders.Authorization = new BasicAuthenticationHeaderValue(
-                    Configuration.GetValue<string>("LocationServicesClient:Username"),
-                    Configuration.GetValue<string>("LocationServicesClient:Password"));
+                    Configuration.GetNonEmptyValue("LocationServicesClient:Username"),
+                    Configuration.GetNonEmptyValue("LocationServicesClient:Password"));
             });
 
 

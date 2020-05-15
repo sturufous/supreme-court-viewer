@@ -4,11 +4,7 @@
     "title": "JC-Interface - File Services",
     "version": "0.0.1"
   },
-  "servers": [
-    {
-      "url": ""
-    }
-  ],
+  "servers": [],
   "paths": {
     "/files/courtlist": {
       "get": {
@@ -934,6 +930,126 @@
           }
         ]
       }
+    },
+    "/files/civil/appearances/{appearanceId}/party": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/civilFileAppearancePartyResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "No items matching the given criteria were found."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Get appearance parties for a given appearanceId.\n",
+        "operationId": "GET_files-civil-appearances-appearanceId-party",
+        "parameters": [
+          {
+            "name": "requestAgencyIdentifierId",
+            "in": "header",
+            "required": true,
+            "description": "Requesting Agency Identifier",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "requestPartId",
+            "in": "header",
+            "required": true,
+            "description": "Requesting Participant Id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "name": "appearanceId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/files/civil/appearances/{appearanceId}/appearancemethod": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/civilFileAppearanceApprMethodResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "No items matching the given criteria were found."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Get appearance methods for a given appearanceId.\n",
+        "operationId": "GET_files-civil-appearances-appearanceId-appearancemethod",
+        "parameters": [
+          {
+            "name": "requestAgencyIdentifierId",
+            "in": "header",
+            "required": true,
+            "description": "Requesting Agency Identifier",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "requestPartId",
+            "in": "header",
+            "required": true,
+            "description": "Requesting Participant Id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "name": "appearanceId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
     },
     "/files/civil/courtsummaryreport": {
       "get": {
@@ -4192,6 +4308,83 @@
           },
           "reportContent": {
             "type": "string"
+          }
+        }
+      },
+      "civilAppearanceParty": {
+        "type": "object",
+        "properties": {
+          "partyId": {
+            "type": "string"
+          },
+          "partyRoleTypeCd": {
+            "type": "string"
+          },
+          "lastNm": {
+            "type": "string"
+          },
+          "givenNm": {
+            "type": "string"
+          },
+          "orgNm": {
+            "type": "string"
+          },
+          "counselNm": {
+            "type": "string"
+          },
+          "courtParticipantId": {
+            "type": "string"
+          },
+          "courtParticipantCcn": {
+            "type": "string"
+          }
+        }
+      },
+      "civilFileAppearancePartyResponse": {
+        "type": "object",
+        "properties": {
+          "responseCd": {
+            "type": "string"
+          },
+          "responseMessageTxt": {
+            "type": "string"
+          },
+          "party": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/civilAppearanceParty"
+            }
+          }
+        }
+      },
+      "civilAppearanceMethod": {
+        "type": "object",
+        "properties": {
+          "roleTypeCd": {
+            "type": "string"
+          },
+          "appearanceMethodCd": {
+            "type": "string"
+          },
+          "apprMethodCcn": {
+            "type": "string"
+          }
+        }
+      },
+      "civilFileAppearanceApprMethodResponse": {
+        "type": "object",
+        "properties": {
+          "responseCd": {
+            "type": "string"
+          },
+          "responseMessageTxt": {
+            "type": "string"
+          },
+          "appearanceMethod": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/civilAppearanceMethod"
+            }
           }
         }
       }

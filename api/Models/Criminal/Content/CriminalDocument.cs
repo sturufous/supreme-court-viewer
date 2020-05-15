@@ -17,7 +17,7 @@ namespace Scv.Api.Models.Criminal.Content
             NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocumentTypeDescription { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("documentTypeDescription", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonProperty("hasFutureAppearance", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public bool? HasFutureAppearance { get; set; }
     }
 }
