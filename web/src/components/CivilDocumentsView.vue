@@ -1,5 +1,12 @@
 <template>
 <body>
+
+    <b-card bg-variant="light" v-if= "!isMounted"> 
+        <b-overlay :show="!isMounted" rounded="sm" >  
+            <b :aria-hidden="!isMounted ? 'true' : null"> Loading </b>
+        </b-overlay> 
+    </b-card>
+    
    <b-card bg-variant="white" border-variant="white" v-if="isMounted">   
        
         <b-card bg-variant="light">
