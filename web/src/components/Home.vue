@@ -55,10 +55,10 @@
 
             if(this.selected == 'civil') {
                 this.UpdateCivilFile(fileDocument)
-                this.$router.push({name:'CivilDocumentsView', query: {fileNumber: fileDocument.fileNumber}})
+                this.$router.push({name:'CivilDocumentsView', params: {fileNumber: fileDocument.fileNumber}})
             } else if(this.selected == 'criminal') {
                 this.UpdateCriminalFile(fileDocument)
-                this.$router.push({name:'CriminalDocumentsView', query: {fileNumber: fileDocument.fileNumber}})
+                this.$router.push({name:'CriminalDocumentsView', params: {fileNumber: fileDocument.fileNumber}})
             }
             
         }        

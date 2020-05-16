@@ -89,6 +89,9 @@ export default class CivilDocumentsView extends Vue {
     @civilState.State
     public civilFileDocument!: any
 
+    @civilState.Action
+    public UpdateCivilFile!: (newCivilFileDocument: any) => void
+
     public getDocuments(): void {
 
         
@@ -109,7 +112,9 @@ export default class CivilDocumentsView extends Vue {
             });
     }
 
-    mounted () {         
+    mounted () { 
+        this.civilFileDocument.fileNumber = this.$route.params.fileNumber;
+        this.UpdateCivilFile(this.civilFileDocument);        
         this.getDocuments();        
     }
 
@@ -264,7 +269,7 @@ export default class CivilDocumentsView extends Vue {
         this.loadingPdf = true;
         const filename = 'doc'+documentId+'.pdf';
         window.open(`api/files/document/${documentId}/${filename}?isCriminal=false`)
-        this.loadingPdf = true;
+        this.loadingPdf = false;
     }
     
     public openCourtSummaryPdf(appearanceId): void {
@@ -272,7 +277,7 @@ export default class CivilDocumentsView extends Vue {
         this.loadingPdf = true;        
         const filename = 'court summary_'+appearanceId+'.pdf';
         window.open(`api/files/civil/court-summary-report/${appearanceId}/${filename}`)
-        this.loadingPdf = true;
+        this.loadingPdf = false;
     }
     
     public colHover(hovered, mouseEvent) {            
