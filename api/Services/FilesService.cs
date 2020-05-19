@@ -121,28 +121,23 @@ namespace Scv.Api.Services
         public async Task<CivilAppearanceDetail> FilesCivilDetailedAppearanceAsync(string fileId, string appearanceId)
         {
             var detailedAppearance = new CivilAppearanceDetail {PhysicalFileId = fileId};
-
             var fileDetailResponse = await _fileServicesClient.FilesCivilFileIdAsync(_requestAgencyIdentifierId, _requestPartId, fileId);
+            var fileAppearancePartyResponse = await _fileServicesClient.FilesCivilAppearanceAppearanceIdPartiesAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
+            var appearanceMethods = await _fileServicesClient.FilesCivilAppearanceAppearanceIdAppearancemethodsAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
 
             var documentsWithSameAppearanceId = fileDetailResponse.Document.Where(doc =>
                     doc.Appearance != null && doc.Appearance.Any(app => app.AppearanceId == appearanceId))
                 .ToList();
 
             //CivilAppearanceDocument, doesn't include appearances. 
+            detailedAppearance.AppearanceMethod = appearanceMethods.AppearanceMethod;
+            detailedAppearance.Party = fileAppearancePartyResponse.Party;
             detailedAppearance.Document = _mapper.Map<ICollection<CivilAppearanceDocument>>(documentsWithSameAppearanceId);
-
             foreach (var document in detailedAppearance.Document)
             {
                 document.Category = _lookupService.GetDocumentCategory(document.DocumentTypeCd);
                 document.DocumentTypeDescription = await _lookupService.GetDocumentDescriptionAsync(document.DocumentTypeCd);
             }
-
-            var civilFileAppearancePartyResponse = await _fileServicesClient.FilesCivilAppearanceAppearanceIdPartiesAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
-            detailedAppearance.Party = civilFileAppearancePartyResponse.Party;
-
-            var civilFileAppearanceApprMethodResponse = await _fileServicesClient.FilesCivilAppearanceAppearanceIdAppearancemethodsAsync(
-                    _requestAgencyIdentifierId, _requestPartId, appearanceId);
-            detailedAppearance.AppearanceMethod = civilFileAppearanceApprMethodResponse.AppearanceMethod;
 
             return detailedAppearance;
         }

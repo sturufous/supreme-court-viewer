@@ -2,6 +2,7 @@
 using JCCommon.Clients.FileServices;
 using Mapster;
 using Newtonsoft.Json;
+using Scv.Api.Models.Civil.Detail;
 
 namespace Scv.Api.Models.Civil.AppearanceDetail
 {
@@ -13,6 +14,11 @@ namespace Scv.Api.Models.Civil.AppearanceDetail
     {
         public string Category { get; set; }
         public string DocumentTypeDescription { get; set; }
+
+        /// <summary>
+        /// Modified class, hides fields. 
+        /// </summary>
+        public new ICollection<CivilIssue> Issue { get; set; }
 
         /// <summary>
         /// Exclude this property, even though it exists in CvfcDocument3. 
