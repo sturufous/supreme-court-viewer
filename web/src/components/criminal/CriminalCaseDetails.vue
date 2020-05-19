@@ -38,6 +38,12 @@ const criminalState = namespace('CriminalFileInformation');
 export default class CriminalCaseDetails extends Vue {
 
     @criminalState.State
+    public criminalFileInformation!: any
+
+    @criminalState.Action
+    public UpdateCriminalFile!: (newCriminalFileInformation: any) => void
+    
+    @criminalState.State
     public showCaseDetails
 
     @criminalState.State
@@ -53,7 +59,23 @@ export default class CriminalCaseDetails extends Vue {
     public showDocuments
 
     @criminalState.State
-    public showSentenceOrderDetails  
+    public showSentenceOrderDetails
+    
+    mounted () { 
+        this.criminalFileInformation.fileNumber = this.$route.params.fileNumber
+        this.UpdateCriminalFile(this.criminalFileInformation);        
+        this.getFileDetails();  
+    }
+
+    public getFileDetails(): void {
+       
+        this.$http.get('api/files/criminal/'+ this.criminalFileInformation.fileNumber)
+            .then(Response => Response.json(), err => {console.log(err);}        
+            ).then(data => {
+                this.criminalFileInformation.detailsData = data;
+                this.UpdateCriminalFile(this.criminalFileInformation);
+            });
+    }
     
 }
 </script>

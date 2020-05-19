@@ -31,10 +31,20 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-
+import { namespace } from 'vuex-class';
+import '@store/modules/CriminalFileInformation';
+const criminalState = namespace('CriminalFileInformation');
 
 @Component
 export default class CriminalHeader extends Vue {
+  
+
+  @criminalState.State
+  public criminalFileInformation!: any
+
+  @criminalState.Action
+  public UpdateCriminalFile!: (newCriminalFileInformation: any) => void
+    
 
 
     
