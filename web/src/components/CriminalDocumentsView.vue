@@ -83,9 +83,9 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
-import CriminalFileDocuments from '../store/modules/CriminalFileDocuments';
+import '@/store/modules/CriminalFileDocuments';
 const criminalState = namespace('CriminalFileDocuments');
 
 enum fieldTab {Categories=0, Summary}
@@ -106,7 +106,6 @@ export default class CriminalDocumentsView extends Vue {
     public UpdateCriminalFile!: (newCriminalFileDocument: any) => void
     
     public getDocuments(): void {
-
        
         this.$http.get('api/files/criminal/'+ this.criminalFileDocument.fileNumber)
             .then(Response => Response.json(), err => {console.log(err);this.isMounted = true;}        
@@ -127,6 +126,13 @@ export default class CriminalDocumentsView extends Vue {
                     this.isMounted = true;
                 }
             });
+    }
+
+    @Watch('$route', { immediate: false, deep: true })
+    onUrlChange() {
+        this.criminalFileDocument.fileNumber = this.$route.params.fileNumber
+        this.UpdateCriminalFile(this.criminalFileDocument) 
+        location.reload();
     }
 
     mounted () { 
