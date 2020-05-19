@@ -361,6 +361,23 @@ namespace tests.api.Controllers
             Assert.Equal(1, civilAppearanceDetail.AppearanceMethod.Count);
             Assert.Equal("IP",civilAppearanceDetail.AppearanceMethod.First().AppearanceMethodCd);
         }
+
+        [Fact]
+        public async void Criminal_Appearance_Details()
+        {
+            //Unrelated fileID and appearance Id. 
+            var actionResult = await _controller.GetCriminalAppearanceDetails("2000", "36548.0734");
+
+            var criminalAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+            Assert.Equal(1, criminalAppearanceDetail.Charges.Count);
+            Assert.Equal("2000", criminalAppearanceDetail.JustinNo);
+            Assert.Contains(criminalAppearanceDetail.Charges, p => p.AppearanceReasonDsc == "First Appearance");
+            Assert.Contains(criminalAppearanceDetail.Charges, p => p.StatuteDsc == "offer bribe to justice/pol comm/peac off");
+            Assert.Contains(criminalAppearanceDetail.Charges, p => p.StatuteSectionDsc == "CCC - 120(b)");
+            Assert.Equal(1, criminalAppearanceDetail.AppearanceMethods.Count);
+            Assert.Equal("TC", criminalAppearanceDetail.AppearanceMethods.First().AppearanceMethodCd);
+        }
+
         #region Helpers
 
         private void SetupMocks()

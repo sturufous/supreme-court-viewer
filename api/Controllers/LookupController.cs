@@ -5,8 +5,6 @@ using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Scv.Api.Helpers.ContractResolver;
-using Scv.Api.Helpers.Exceptions;
 using Scv.Api.Services;
 
 namespace Scv.Api.Controllers
@@ -37,7 +35,7 @@ namespace Scv.Api.Controllers
         [Route("codes/documents")]
         public async Task<ActionResult<ICollection<LookupCode>>> GetDocumentCodes()
         {
-            var lookupCodes = await _lookupService.GetDocumentCodesFromLazyCache();
+            var lookupCodes = await _lookupService.GetDocuments();
             return Ok(lookupCodes);
         }
         #endregion
