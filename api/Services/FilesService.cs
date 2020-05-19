@@ -122,16 +122,16 @@ namespace Scv.Api.Services
         {
             var detailedAppearance = new CivilAppearanceDetail {PhysicalFileId = fileId};
             var fileDetailResponse = await _fileServicesClient.FilesCivilFileIdAsync(_requestAgencyIdentifierId, _requestPartId, fileId);
-            var fileAppearancePartyResponse = await _fileServicesClient.FilesCivilAppearanceAppearanceIdPartiesAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
-            var appearanceMethods = await _fileServicesClient.FilesCivilAppearanceAppearanceIdAppearancemethodsAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
+            var appearancePartyResponse = await _fileServicesClient.FilesCivilAppearanceAppearanceIdPartiesAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
+            var appearanceMethodsResponse = await _fileServicesClient.FilesCivilAppearanceAppearanceIdAppearancemethodsAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
 
             var documentsWithSameAppearanceId = fileDetailResponse.Document.Where(doc =>
                     doc.Appearance != null && doc.Appearance.Any(app => app.AppearanceId == appearanceId))
                 .ToList();
 
             //CivilAppearanceDocument, doesn't include appearances. 
-            detailedAppearance.AppearanceMethod = appearanceMethods.AppearanceMethod;
-            detailedAppearance.Party = fileAppearancePartyResponse.Party;
+            detailedAppearance.AppearanceMethod = appearanceMethodsResponse.AppearanceMethod;
+            detailedAppearance.Party = appearancePartyResponse.Party;
             detailedAppearance.Document = _mapper.Map<ICollection<CivilAppearanceDocument>>(documentsWithSameAppearanceId);
             foreach (var document in detailedAppearance.Document)
             {

@@ -11,6 +11,7 @@ using Scv.Api.Models.Civil.Detail;
 using Scv.Api.Models.Criminal.Detail;
 using Scv.Api.Services;
 using CivilAppearanceDetail = Scv.Api.Models.Civil.AppearanceDetail.CivilAppearanceDetail;
+using CriminalAppearanceDetail = Scv.Api.Models.Criminal.AppearanceDetail.CriminalAppearanceDetail;
 
 namespace Scv.Api.Controllers
 {
@@ -182,7 +183,7 @@ namespace Scv.Api.Controllers
         /// <returns>CriminalAppearanceDetail</returns>
         [HttpGet]
         [Route("criminal/{fileId}/appearance-detail/{appearanceId}")]
-        public async Task<ActionResult<Models.Criminal.AppearanceDetail.CriminalAppearanceDetail>> GetCriminalAppearanceDetails(string fileId, string appearanceId, string partId = null, string profSeqNo = null)
+        public async Task<ActionResult<CriminalAppearanceDetail>> GetCriminalAppearanceDetails(string fileId, string appearanceId, string partId = null, string profSeqNo = null)
         {
             var res = await _filesService.FilesCriminalAppearanceDetailAsync(fileId, appearanceId, partId, profSeqNo);
             return Ok(res);
