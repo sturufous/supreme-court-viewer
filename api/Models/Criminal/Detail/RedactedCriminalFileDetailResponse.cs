@@ -38,7 +38,10 @@ namespace Scv.Api.Models.Criminal.Detail
         /// We need this for our witness page. 
         /// </summary>
         public ICollection<CriminalWitness> Witness { get; set; }
-
+        /// <summary>
+        /// Extended.
+        /// </summary>
+        public ICollection<CrownWitness> Crown { get; set; }
         public ICollection<CriminalHearingRestriction> HearingRestriction { get; set; }
     }
 }

@@ -225,9 +225,7 @@ namespace Scv.Api.Services
 
             //Attach documents to participants.
             foreach (var participant in redactedDetail.Participant)
-            {
                 participant.Document = documents.Where(doc => doc.PartId == participant.PartId).ToList();
-            }
 
             //Populate location and region.
             redactedDetail.HomeLocationAgenName =  await _locationService.GetLocationName(redactedDetail.HomeLocationAgenId);
@@ -238,9 +236,12 @@ namespace Scv.Api.Services
 
             //Populate hearing restrictions.
             foreach (var hearingRestriction in redactedDetail.HearingRestriction)
-            {
                 hearingRestriction.HearingRestrictionTypeDsc =  await _lookupService.GetHearingRestrictionDescription(hearingRestriction.HearingRestrictionTypeCd.ToString());
-            }
+
+            //Populate crown.
+            redactedDetail.Crown = _mapper.Map<ICollection<CrownWitness>>(redactedDetail.Witness.Where(w => w.RoleTypeCd == CriminalWitnessRoleTypeCd.CRN).ToList());
+            foreach (var crownWitness in redactedDetail.Crown)
+                crownWitness.Assigned = crownWitness.IsAssigned(redactedDetail.AssignedPartNm);
 
             return redactedDetail;
         }
