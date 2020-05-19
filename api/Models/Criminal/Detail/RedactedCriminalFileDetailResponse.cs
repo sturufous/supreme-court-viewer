@@ -16,6 +16,9 @@ namespace Scv.Api.Models.Criminal.Detail
         public string HomeLocationAgenName { get; set; }
         public string HomeLocationAgenCode { get; set; }
         public string HomeLocationRegionName { get; set; }
+        public string AssignedPartNm { get; set; }
+        public string ApprovedByAgencyCd { get; set; }
+        public string CaseAgeDays { get; set; }
         public CriminalFileDetailResponseCourtLevelCd CourtLevelCd { get; set; }
         public string CourtLevelDsc { get; set; }
         public CriminalFileDetailResponseCourtClassCd CourtClassCd { get; set; }
