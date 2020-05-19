@@ -6,6 +6,7 @@ using JCCommon.Clients.FileServices;
 using JCCommon.Models;
 using MapsterMapper;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Serialization;
 using Scv.Api.Helpers;
 using Scv.Api.Helpers.ContractResolver;
 using Scv.Api.Helpers.Exceptions;
@@ -37,7 +38,7 @@ namespace Scv.Api.Services
         public FilesService(IConfiguration configuration, FileServicesClient fileServicesClient, IMapper mapper, LookupService lookupService, LocationService locationService)
         {
             _fileServicesClient = fileServicesClient;
-            _fileServicesClient.JsonSerializerSettings.ContractResolver = new SafeContractResolver();
+            _fileServicesClient.JsonSerializerSettings.ContractResolver = new SafeContractResolver { NamingStrategy = new CamelCaseNamingStrategy() };
             _fileServicesClient.BaseUrl = configuration.GetNonEmptyValue("FileServicesClient:Url");
             _lookupService = lookupService;
             _locationService = locationService;
@@ -129,9 +130,9 @@ namespace Scv.Api.Services
                     doc.Appearance != null && doc.Appearance.Any(app => app.AppearanceId == appearanceId))
                 .ToList();
 
-            //CivilAppearanceDocument, doesn't include appearances. 
             detailedAppearance.AppearanceMethod = appearanceMethodsResponse.AppearanceMethod;
             detailedAppearance.Party = appearancePartyResponse.Party;
+            //CivilAppearanceDocument, doesn't include appearances. 
             detailedAppearance.Document = _mapper.Map<ICollection<CivilAppearanceDocument>>(documentsWithSameAppearanceId);
             foreach (var document in detailedAppearance.Document)
             {
@@ -183,7 +184,7 @@ namespace Scv.Api.Services
             if (criminalFileDetail == null || criminalFileContent == null)
                 return null;
 
-            var redactedCriminalFileDetailResponse = _mapper.Map<RedactedCriminalFileDetailResponse>(criminalFileDetail);
+            var redactedDetail = _mapper.Map<RedactedCriminalFileDetailResponse>(criminalFileDetail);
 
             //Generate documents from AccusedFile. 
             var documents = criminalFileContent.AccusedFile.SelectMany(ac =>
@@ -215,13 +216,33 @@ namespace Scv.Api.Services
                 return criminalDocuments;
             }).ToList();
 
+            foreach (var witness in redactedDetail.Witness)
+            {
+                //witness.AgencyCd Not available, comes from database. 
+                //witness.AgencyDsc Not available, comes from database. 
+                witness.WitnessTypeDsc = await _lookupService.GetWitnessRoleTypeDescription(witness.WitnessTypeCd);
+            }
+
             //Attach documents to participants.
-            foreach (var participant in redactedCriminalFileDetailResponse.Participant)
+            foreach (var participant in redactedDetail.Participant)
             {
                 participant.Document = documents.Where(doc => doc.PartId == participant.PartId).ToList();
             }
 
-            return redactedCriminalFileDetailResponse;
+            //Populate location and region.
+            redactedDetail.HomeLocationAgenName =  await _locationService.GetLocationName(redactedDetail.HomeLocationAgenId);
+            redactedDetail.HomeLocationAgenCode = await _locationService.GetLocationAgencyIdentifier(redactedDetail.HomeLocationAgenId);
+            redactedDetail.HomeLocationRegionName = await _locationService.GetRegionName(redactedDetail.HomeLocationAgenCode);
+            redactedDetail.CourtLevelDsc = await _lookupService.GetCourtLevelDescription(redactedDetail.CourtLevelCd.ToString());
+            redactedDetail.CourtClassDsc = await _lookupService.GetCourtClassDescription(redactedDetail.CourtClassCd.ToString());
+
+            //Populate hearing restrictions.
+            foreach (var hearingRestriction in redactedDetail.HearingRestriction)
+            {
+                hearingRestriction.HearingRestrictionTypeDsc =  await _lookupService.GetHearingRestrictionDescription(hearingRestriction.HearingRestrictionTypeCd.ToString());
+            }
+
+            return redactedDetail;
         }
 
         public async Task<CriminalFileAppearancesResponse> FilesCriminalFileIdAppearancesAsync(string fileId, FutureYN? future, HistoryYN? history)
