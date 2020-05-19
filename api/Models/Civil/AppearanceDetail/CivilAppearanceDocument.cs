@@ -3,7 +3,7 @@ using JCCommon.Clients.FileServices;
 using Mapster;
 using Newtonsoft.Json;
 
-namespace Scv.Api.Models.Civil.Detail
+namespace Scv.Api.Models.Civil.AppearanceDetail
 {
     /// <summary>
     /// This includes extra fields that our API doesn't give us.
@@ -11,9 +11,7 @@ namespace Scv.Api.Models.Civil.Detail
     /// </summary>
     public class CivilAppearanceDocument : CvfcDocument3
     {
-        [JsonProperty("category", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public string Category { get; set; }
-        [JsonProperty("documentTypeDescription", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public string DocumentTypeDescription { get; set; }
 
         /// <summary>

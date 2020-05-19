@@ -37,23 +37,29 @@ namespace Scv.Api.Services
         }
         #endregion
 
-        #region LazyCache
-        public async Task<CodeLookup> GetCourtClassDescriptionsFromLazyCache() => await _cache.GetOrAddAsync("CourtClassDescriptions", async () => await _lookupClient.CodesCourtClassesAsync(), CacheExpiry);
-        public async Task<CodeLookup> GetCourtLevelDescriptionsFromLazyCache() => await _cache.GetOrAddAsync("CourtLevelDescriptions", async () => await _lookupClient.CodesCourtLevelsAsync(), CacheExpiry);
-        /// <summary>
-        ///  Uses LazyCache to query LookupServiceClient for lookup codes. This is about 600 codes atm.
-        /// </summary>
-        /// <returns>Task{CodeLookup}</returns>
-        public async Task<CodeLookup> GetDocumentCodesFromLazyCache() => await _cache.GetOrAddAsync("LookupDocumentDescriptions", async () => await _lookupClient.CodesDocumentsAsync(), CacheExpiry);
-        public async Task<CodeLookup> GetRoleTypeCodesFromLazyCache() => await _cache.GetOrAddAsync("LookupRoleTypeDescriptions", async () => await _lookupClient.CodesRolesAsync(), CacheExpiry);
+        #region Collection methods
+        public async Task<CodeLookup> GetCriminalAppearanceReasons() => await GetDataFromCache("CriminalAppearanceReasons", async () => await _lookupClient.CodesCriminalAppearanceReasonsAsync());
+        public async Task<CodeLookup> GetCriminalAppearanceResults() => await GetDataFromCache("CriminalAppearanceResults", async () => await _lookupClient.CodesCriminalAppearanceResultsAsync());
+        public async Task<CodeLookup> GetFindings() => await GetDataFromCache("Findings", async() => await _lookupClient.CodesFindingsAsync());
+        public async Task<CodeLookup> GetCourtClass() => await GetDataFromCache("CourtClasses", async () => await _lookupClient.CodesCourtClassesAsync());
+        public async Task<CodeLookup> GetCourtLevel() => await GetDataFromCache("CourtLevels", async () => await _lookupClient.CodesCourtLevelsAsync());
+        public async Task<CodeLookup> GetCriminalAssets() => await GetDataFromCache("CriminalAssets", async() => await _lookupClient.CodesCriminalAssetsAsync());
+        public async Task<CodeLookup> GetDocuments() => await GetDataFromCache("Documents", async () => await _lookupClient.CodesDocumentsAsync());
+        public async Task<CodeLookup> GetRoles() => await GetDataFromCache("Roles", async () => await _lookupClient.CodesRolesAsync());
+        public async Task<CodeLookup> GetParticipantRoles() => await GetDataFromCache("ParticipantRoles", async () => await _lookupClient.CodesParticipantRolesAsync());
         #endregion
 
         #region Lookup Methods
-        public async Task<string> GetActivityClassCd(string code) => FindLongDescriptionFromCode(await GetCourtClassDescriptionsFromLazyCache(), code);
-        public async Task<string> GetCourtClassDescription(string code) => FindShortDescriptionFromCode(await GetCourtClassDescriptionsFromLazyCache(), code);
-        public async Task<string> GetCourtLevelDescription(string code) => FindShortDescriptionFromCode(await GetCourtLevelDescriptionsFromLazyCache(), code);
-        public async Task<string> GetCivilRoleTypeDescription(string code) => FindShortDescriptionFromCode(await GetRoleTypeCodesFromLazyCache(), code);
-        public async Task<string> GetDocumentDescriptionAsync(string code) => FindShortDescriptionFromCode(await GetDocumentCodesFromLazyCache(), code);
+        public async Task<string> GetCriminalAssetsDescriptions(string code) => FindLongDescriptionFromCode(await GetCriminalAssets(), code);
+        public async Task<string> GetCriminalAppearanceReasonsDescription(string code) => FindShortDescriptionFromCode(await GetCriminalAppearanceReasons(), code);
+        public async Task<string> GetCriminalAppearanceResultsDescription(string code) => FindShortDescriptionFromCode(await GetCriminalAppearanceResults(), code);
+        public async Task<string> GetFindingDescription(string code) => FindShortDescriptionFromCode(await GetFindings(), code);
+        public async Task<string> GetActivityClassCd(string code) => FindLongDescriptionFromCode(await GetCourtClass(), code);
+        public async Task<string> GetCourtClassDescription(string code) => FindShortDescriptionFromCode(await GetCourtClass(), code);
+        public async Task<string> GetCourtLevelDescription(string code) => FindShortDescriptionFromCode(await GetCourtLevel(), code);
+        public async Task<string> GetCivilRoleTypeDescription(string code) => FindShortDescriptionFromCode(await GetRoles(), code);
+        public async Task<string> GetCriminalParticipantRoleDescription(string code) => FindLongDescriptionFromCode(await GetParticipantRoles(), code);
+        public async Task<string> GetDocumentDescriptionAsync(string code) => FindShortDescriptionFromCode(await GetDocuments(), code);
 
         /// <summary>
         /// Reads from the configuration for the document category.
@@ -70,6 +76,12 @@ namespace Scv.Api.Services
         #endregion
 
         #region Helpers
+        private async Task<T> GetDataFromCache<T>(string key, Func<Task<T>> fetchFunction)
+        {
+            return await _cache.GetOrAddAsync(key,
+                async () => await fetchFunction.Invoke(), CacheExpiry);
+        }
+
         private string FindShortDescriptionFromCode(CodeLookup lookupCodes, string code) => lookupCodes.FirstOrDefault(lookupCode => lookupCode.Code == code)?.ShortDesc ?? "";
         private string FindLongDescriptionFromCode(CodeLookup lookupCodes, string code) => lookupCodes.FirstOrDefault(lookupCode => lookupCode.Code == code)?.LongDesc ?? "";
 

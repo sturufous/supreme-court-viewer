@@ -10,7 +10,7 @@ using Scv.Api.Helpers.Exceptions;
 using Scv.Api.Models.Civil.Detail;
 using Scv.Api.Models.Criminal.Detail;
 using Scv.Api.Services;
-using CivilAppearanceDetail = Scv.Api.Models.Civil.Detail.CivilAppearanceDetail;
+using CivilAppearanceDetail = Scv.Api.Models.Civil.AppearanceDetail.CivilAppearanceDetail;
 
 namespace Scv.Api.Controllers
 {
@@ -67,8 +67,8 @@ namespace Scv.Api.Controllers
         /// Gets appearances for a given civil file id.
         /// </summary>
         /// <param name="fileId"></param>
-        /// <param name="future">Y to show future, N to hide future</param>
-        /// <param name="history">Y to show history, N to hide history</param>
+        /// <param name="future">Y to show future, N to hide future Y = 0, N = 1</param>
+        /// <param name="history">Y to show history, N to hide history Y = 0, N = 1</param>
         /// <returns>CivilFileAppearancesResponse</returns>
         [HttpGet]
         [Route("civil/{fileId}/appearances")]
@@ -88,7 +88,7 @@ namespace Scv.Api.Controllers
         [Route("civil/{fileId}/appearance-detail/{appearanceId}")]
         public async Task<ActionResult<CivilAppearanceDetail>> GetCivilAppearanceDetails(string fileId, string appearanceId)
         {
-            var res = await _filesService.FilesCivilDetailedAppearance(fileId, appearanceId);
+            var res = await _filesService.FilesCivilDetailedAppearanceAsync(fileId, appearanceId);
             return Ok(res);
         }
 
@@ -159,8 +159,8 @@ namespace Scv.Api.Controllers
         /// Gets appearances for a given criminal file id.
         /// </summary>
         /// <param name="fileId">Target file id.</param>
-        /// <param name="future">Y to show future, N to hide future.</param>
-        /// <param name="history">Y to show history, N to hide history.</param>
+        /// <param name="future">Y to show future, N to hide future. Y = 0, N = 1</param>
+        /// <param name="history">Y to show history, N to hide history. Y = 0, N = 1</param>
         /// <returns></returns>
         [HttpGet]
         [Route("criminal/{fileId}/appearances")]
@@ -168,6 +168,22 @@ namespace Scv.Api.Controllers
         {
             var criminalFileIdAppearances = await _filesService.FilesCriminalFileIdAppearancesAsync(fileId, future, history);
             return Ok(criminalFileIdAppearances);
+        }
+
+
+
+        /// <summary>
+        /// Gets detailed information regarding an appearance given criminal file id and appearance id.
+        /// </summary>
+        /// <param name="fileId"></param>
+        /// <param name="appearanceId"></param>
+        /// <returns>CriminalAppearanceDetail</returns>
+        [HttpGet]
+        [Route("criminal/{fileId}/appearance-detail/{appearanceId}")]
+        public async Task<ActionResult<Models.Criminal.AppearanceDetail.CriminalAppearanceDetail>> GetCriminalAppearanceDetails(string fileId, string appearanceId, string partId = null, string profSeqNo = null)
+        {
+            var res = await _filesService.FilesCriminalAppearanceDetailAsync(fileId, appearanceId, partId, profSeqNo);
+            return Ok(res);
         }
 
         /// <summary>
@@ -194,7 +210,7 @@ namespace Scv.Api.Controllers
         /// <param name="fileNameAndExtension"></param>
         /// <param name="profSequenceNumber"></param>
         /// <param name="courtLevelCode">The associated court level code. P = 0, S = 1, A = 2: Provincial, Supreme, All</param>
-        /// <param name="courtClassCode">The associated court class code.</param>
+        /// <param name="courtClassCode">The associated court class code. A = 0, Y = 1, T = 2, F = 3, C = 4, M = 5, L = 6, R = 7, B = 8, D = 9, E = 10, G = 11, H = 12, N = 13, O = 14, P = 15, S = 16, V = 17</param>
         /// <returns></returns>
         [HttpGet]
         [Route("criminal/record-of-proceedings/{partId}/{fileNameAndExtension}")]

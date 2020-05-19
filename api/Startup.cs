@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Scv.Api.Helpers;
 using Scv.Api.Helpers.Mapping;
@@ -73,7 +74,10 @@ namespace Scv.Api
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
             services.AddControllers().AddNewtonsoftJson(options =>
-                options.SerializerSettings.Converters.Add(new StringEnumConverter()));
+            {
+                options.SerializerSettings.Converters.Add(new StringEnumConverter());
+                options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+            });
 
             services.AddSwaggerGen(options =>
             {

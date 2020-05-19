@@ -9,10 +9,12 @@ using Microsoft.Extensions.Configuration;
 using Scv.Api.Helpers;
 using Scv.Api.Helpers.ContractResolver;
 using Scv.Api.Helpers.Exceptions;
+using Scv.Api.Models.Civil.AppearanceDetail;
 using Scv.Api.Models.Civil.Detail;
-using Scv.Api.Models.Criminal.Content;
+using Scv.Api.Models.Criminal.AppearanceDetail;
 using Scv.Api.Models.Criminal.Detail;
-using CivilAppearanceDetail = Scv.Api.Models.Civil.Detail.CivilAppearanceDetail;
+using CivilAppearanceDetail = Scv.Api.Models.Civil.AppearanceDetail.CivilAppearanceDetail;
+using CriminalAppearanceDetail = Scv.Api.Models.Criminal.AppearanceDetail.CriminalAppearanceDetail;
 
 namespace Scv.Api.Services
 {
@@ -116,7 +118,7 @@ namespace Scv.Api.Services
             return civilFileAppearancesResponse;
         }
 
-        public async Task<CivilAppearanceDetail> FilesCivilDetailedAppearance(string fileId, string appearanceId)
+        public async Task<CivilAppearanceDetail> FilesCivilDetailedAppearanceAsync(string fileId, string appearanceId)
         {
             var detailedAppearance = new CivilAppearanceDetail {PhysicalFileId = fileId};
 
@@ -135,10 +137,10 @@ namespace Scv.Api.Services
                 document.DocumentTypeDescription = await _lookupService.GetDocumentDescriptionAsync(document.DocumentTypeCd);
             }
 
-            var civilFileAppearancePartyResponse = await _fileServicesClient.FilesCivilAppearancesAppearanceIdPartyAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
+            var civilFileAppearancePartyResponse = await _fileServicesClient.FilesCivilAppearanceAppearanceIdPartiesAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
             detailedAppearance.Party = civilFileAppearancePartyResponse.Party;
 
-            var civilFileAppearanceApprMethodResponse = await _fileServicesClient.FilesCivilAppearancesAppearanceIdAppearancemethodAsync(
+            var civilFileAppearanceApprMethodResponse = await _fileServicesClient.FilesCivilAppearanceAppearanceIdAppearancemethodsAsync(
                     _requestAgencyIdentifierId, _requestPartId, appearanceId);
             detailedAppearance.AppearanceMethod = civilFileAppearanceApprMethodResponse.AppearanceMethod;
 
@@ -231,6 +233,43 @@ namespace Scv.Api.Services
         {
             var criminalFileIdAppearances = await _fileServicesClient.FilesCriminalFileIdAppearancesAsync(_requestAgencyIdentifierId, _requestPartId, future, history, fileId);
             return criminalFileIdAppearances;
+        }
+
+        public async Task<CriminalAppearanceDetail> FilesCriminalAppearanceDetailAsync(string fileId, string appearanceId, string partId = null, string profSeqNo = null)
+        {
+            var detail = await _fileServicesClient.FilesCriminalFileIdAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode, fileId);
+            var appearanceCount = await _fileServicesClient.FilesCriminalAppearanceAppearanceIdCountsAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
+            var appearanceMethods = await _fileServicesClient.FilesCriminalAppearanceAppearanceIdAppearancemethodsAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
+
+            var redactedDetail = _mapper.Map<RedactedCriminalFileDetailResponse>(detail);
+            var accused = redactedDetail.Participant.FirstOrDefault(x => x.PartId == partId && x.ProfSeqNo == profSeqNo);
+
+            var appearanceDetail = new CriminalAppearanceDetail
+            {
+                JustinNo = fileId,
+                PartId = partId,
+                ProfSeqNo = profSeqNo,
+                Charges = _mapper.Map<ICollection<CriminalCharges>>(appearanceCount.ApprCount),
+                AppearanceMethods = _mapper.Map<ICollection<Models.Criminal.AppearanceDetail.CriminalAppearanceMethod>>(appearanceMethods.AppearanceMethod),
+                JustinCounsel = accused != null ? _mapper.Map<JustinCounsel>(accused) : null
+            };
+
+            //Populate charges or counts extra fields. 
+            foreach (var charge in appearanceDetail.Charges)
+            {
+                charge.AppearanceReasonDsc = await _lookupService.GetCriminalAppearanceReasonsDescription(charge.AppearanceReasonCd);
+                charge.AppearanceResultDesc = await _lookupService.GetCriminalAppearanceResultsDescription(charge.AppearanceResultCd);
+                charge.FindingDsc = await _lookupService.GetFindingDescription(charge.FindingCd);
+            }
+
+            //Populate appearance methods extra fields. 
+            foreach (var appearanceMethod in appearanceDetail.AppearanceMethods)
+            {
+                appearanceMethod.AppearanceMethodDesc = await _lookupService.GetCriminalAssetsDescriptions(appearanceMethod.AppearanceMethodCd);
+                appearanceMethod.RoleTypeDsc = await _lookupService.GetCriminalParticipantRoleDescription(appearanceMethod.RoleTypeCd);
+            }
+
+            return appearanceDetail;
         }
 
         public async Task<CriminalFileContent> FilesCriminalFilecontentAsync(string agencyId, string roomCode, DateTime? proceeding, string appearanceId, string justinNumber)
