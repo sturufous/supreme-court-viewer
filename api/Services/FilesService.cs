@@ -82,22 +82,23 @@ namespace Scv.Api.Services
                 });
             }
 
-            var civilFileDetail = _mapper.Map<RedactedCivilFileDetailResponse>(civilFileDetailResponse);
+            var detail = _mapper.Map<RedactedCivilFileDetailResponse>(civilFileDetailResponse);
 
             //Populate location information.
-            civilFileDetail.HomeLocationAgencyCode = await _locationService.GetLocationAgencyIdentifier(civilFileDetail.HomeLocationAgenId);
-            civilFileDetail.HomeLocationAgencyName = await _locationService.GetLocationName(civilFileDetail.HomeLocationAgenId);
+            detail.HomeLocationAgencyCode = await _locationService.GetLocationAgencyIdentifier(detail.HomeLocationAgenId);
+            detail.HomeLocationAgencyName = await _locationService.GetLocationName(detail.HomeLocationAgenId);
+            detail.HomeLocationRegionName = await _locationService.GetRegionName(detail.HomeLocationAgencyCode);
 
-            civilFileDetail.CourtClassDescription = await _lookupService.GetCourtClassDescription(civilFileDetail.CourtClassCd.ToString());
-            civilFileDetail.CourtLevelDescription = await _lookupService.GetCourtLevelDescription(civilFileDetail.CourtLevelCd.ToString());
-            civilFileDetail.ActivityClassCd = await _lookupService.GetActivityClassCd(civilFileDetail.CourtClassCd.ToString());
+            detail.CourtClassDescription = await _lookupService.GetCourtClassDescription(detail.CourtClassCd.ToString());
+            detail.CourtLevelDescription = await _lookupService.GetCourtLevelDescription(detail.CourtLevelCd.ToString());
+            detail.ActivityClassCd = await _lookupService.GetActivityClassCd(detail.CourtClassCd.ToString());
 
             //Populate extra fields for party. 
-            foreach (var party in civilFileDetail.Party)
+            foreach (var party in detail.Party)
                 party.RoleTypeDescription = await _lookupService.GetCivilRoleTypeDescription(party.RoleTypeCd);
 
             //Populate extra fields for document.
-            foreach (var document in civilFileDetail.Document)
+            foreach (var document in detail.Document)
             {
                 document.Category = _lookupService.GetDocumentCategory(document.DocumentTypeCd);
                 document.DocumentTypeDescription = await _lookupService.GetDocumentDescriptionAsync(document.DocumentTypeCd);
@@ -106,10 +107,11 @@ namespace Scv.Api.Services
 
             //TODO need permission for this filter. 
             var hearingRescriptionPermission = true;
-            civilFileDetail.HearingRestriction = civilFileDetail.HearingRestriction.Where(hr =>
+            detail.HearingRestriction = detail.HearingRestriction.Where(hr =>
                 hearingRescriptionPermission &&
                 hr.HearingRestrictionTypeCd != CvfcHearingRestriction2HearingRestrictionTypeCd.S).ToList();
-            return civilFileDetail;
+
+            return detail;
         }
 
         public async Task<CivilFileAppearancesResponse> FilesCivilFileIdAppearancesAsync(FutureYN2? future, HistoryYN2? history, string fileId)
@@ -184,7 +186,7 @@ namespace Scv.Api.Services
             if (criminalFileDetail == null || criminalFileContent == null)
                 return null;
 
-            var redactedDetail = _mapper.Map<RedactedCriminalFileDetailResponse>(criminalFileDetail);
+            var detail = _mapper.Map<RedactedCriminalFileDetailResponse>(criminalFileDetail);
 
             //Generate documents from AccusedFile. 
             var documents = criminalFileContent.AccusedFile.SelectMany(ac =>
@@ -216,7 +218,7 @@ namespace Scv.Api.Services
                 return criminalDocuments;
             }).ToList();
 
-            foreach (var witness in redactedDetail.Witness)
+            foreach (var witness in detail.Witness)
             {
                 //witness.AgencyCd Not available, comes from database. 
                 //witness.AgencyDsc Not available, comes from database. 
@@ -224,26 +226,28 @@ namespace Scv.Api.Services
             }
 
             //Attach documents to participants.
-            foreach (var participant in redactedDetail.Participant)
+            foreach (var participant in detail.Participant)
                 participant.Document = documents.Where(doc => doc.PartId == participant.PartId).ToList();
 
             //Populate location and region.
-            redactedDetail.HomeLocationAgenName =  await _locationService.GetLocationName(redactedDetail.HomeLocationAgenId);
-            redactedDetail.HomeLocationAgenCode = await _locationService.GetLocationAgencyIdentifier(redactedDetail.HomeLocationAgenId);
-            redactedDetail.HomeLocationRegionName = await _locationService.GetRegionName(redactedDetail.HomeLocationAgenCode);
-            redactedDetail.CourtLevelDsc = await _lookupService.GetCourtLevelDescription(redactedDetail.CourtLevelCd.ToString());
-            redactedDetail.CourtClassDsc = await _lookupService.GetCourtClassDescription(redactedDetail.CourtClassCd.ToString());
+            detail.HomeLocationAgenName =  await _locationService.GetLocationName(detail.HomeLocationAgenId);
+            detail.HomeLocationAgenCode = await _locationService.GetLocationAgencyIdentifier(detail.HomeLocationAgenId);
+            detail.HomeLocationRegionName = await _locationService.GetRegionName(detail.HomeLocationAgenCode);
+
+            detail.CourtClassDescription = await _lookupService.GetCourtClassDescription(detail.CourtClassCd.ToString());
+            detail.CourtLevelDescription = await _lookupService.GetCourtLevelDescription(detail.CourtLevelCd.ToString());
+            detail.ActivityClassCd = await _lookupService.GetActivityClassCd(detail.CourtClassCd.ToString());
 
             //Populate hearing restrictions.
-            foreach (var hearingRestriction in redactedDetail.HearingRestriction)
+            foreach (var hearingRestriction in detail.HearingRestriction)
                 hearingRestriction.HearingRestrictionTypeDsc =  await _lookupService.GetHearingRestrictionDescription(hearingRestriction.HearingRestrictionTypeCd.ToString());
 
             //Populate crown.
-            redactedDetail.Crown = _mapper.Map<ICollection<CrownWitness>>(redactedDetail.Witness.Where(w => w.RoleTypeCd == CriminalWitnessRoleTypeCd.CRN).ToList());
-            foreach (var crownWitness in redactedDetail.Crown)
-                crownWitness.Assigned = crownWitness.IsAssigned(redactedDetail.AssignedPartNm);
+            detail.Crown = _mapper.Map<ICollection<CrownWitness>>(detail.Witness.Where(w => w.RoleTypeCd == CriminalWitnessRoleTypeCd.CRN).ToList());
+            foreach (var crownWitness in detail.Crown)
+                crownWitness.Assigned = crownWitness.IsAssigned(detail.AssignedPartNm);
 
-            return redactedDetail;
+            return detail;
         }
 
         public async Task<CriminalFileAppearancesResponse> FilesCriminalFileIdAppearancesAsync(string fileId, FutureYN? future, HistoryYN? history)
