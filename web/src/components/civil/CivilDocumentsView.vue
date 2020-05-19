@@ -78,8 +78,8 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
-import CivilFileDocuments from '../store/modules/CivilFileDocuments';
-const civilState = namespace('CivilFileDocuments');
+import '@store/modules/CivilFileInformation';
+const civilState = namespace('CivilFileInformation');
 
 enum fieldTab {Categories=0, Summary}
 
@@ -87,15 +87,14 @@ enum fieldTab {Categories=0, Summary}
 export default class CivilDocumentsView extends Vue {
 
     @civilState.State
-    public civilFileDocument!: any
+    public civilFileInformation!: any
 
     @civilState.Action
-    public UpdateCivilFile!: (newCivilFileDocument: any) => void
+    public UpdateCivilFile!: (newCivilFileInformation: any) => void
 
     public getDocuments(): void {
-
         
-         this.$http.get('api/files/civil/'+ this.civilFileDocument.fileNumber)
+        this.$http.get('api/files/civil/'+ this.civilFileInformation.fileNumber)
             .then(Response => Response.json(), err => {console.log('error');this.isMounted = true;}        
             ).then(data => {
                 this.documentsDetailsJson = data.document
@@ -113,8 +112,8 @@ export default class CivilDocumentsView extends Vue {
     }
 
     mounted () { 
-        this.civilFileDocument.fileNumber = this.$route.params.fileNumber;
-        this.UpdateCivilFile(this.civilFileDocument);        
+        this.civilFileInformation.fileNumber = this.$route.params.fileNumber
+        this.UpdateCivilFile(this.civilFileInformation);        
         this.getDocuments();        
     }
 

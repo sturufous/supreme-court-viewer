@@ -85,8 +85,8 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
-import CriminalFileDocuments from '../store/modules/CriminalFileDocuments';
-const criminalState = namespace('CriminalFileDocuments');
+import '@store/modules/CriminalFileInformation';
+const criminalState = namespace('CriminalFileInformation');
 
 enum fieldTab {Categories=0, Summary}
 enum DecodeCourtLevel {'P'= 0, 'S' = 1, 'A' = 2 }
@@ -100,15 +100,15 @@ enum DecodeCourtClass {
 export default class CriminalDocumentsView extends Vue {
 
     @criminalState.State
-    public criminalFileDocument!: any
+    public criminalFileInformation!: any
 
     @criminalState.Action
-    public UpdateCriminalFile!: (newCriminalFileDocument: any) => void
+    public UpdateCriminalFile!: (newCriminalFileInformation: any) => void
     
     public getDocuments(): void {
 
        
-        this.$http.get('api/files/criminal/'+ this.criminalFileDocument.fileNumber)
+        this.$http.get('api/files/criminal/'+ this.criminalFileInformation.fileNumber)
             .then(Response => Response.json(), err => {console.log(err);this.isMounted = true;}        
             ).then(data => {
                 this.participantJson = data.participant 
@@ -130,8 +130,8 @@ export default class CriminalDocumentsView extends Vue {
     }
 
     mounted () { 
-        this.criminalFileDocument.fileNumber = this.$route.params.fileNumber
-        this.UpdateCriminalFile(this.criminalFileDocument)        
+        this.criminalFileInformation.fileNumber = this.$route.params.fileNumber
+        this.UpdateCriminalFile(this.criminalFileInformation);        
         this.getDocuments();  
     }
 
