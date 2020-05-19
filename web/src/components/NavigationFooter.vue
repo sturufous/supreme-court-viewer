@@ -1,6 +1,6 @@
 <template>
   <footer class="fixed-bottom">
-    <nav class="navbar navbar-expand-lg navbar-dark">
+    <b-navbar class="navbar navbar-expand-lg navbar-dark">
       <!-- Navbar content -->
       <ul class="navbar-nav">
         <li class="nav-item">
@@ -47,7 +47,7 @@
           >
         </li>
       </ul>
-    </nav>
+    </b-navbar>
   </footer>
 </template>
 

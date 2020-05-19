@@ -1,6 +1,28 @@
 <template>
 <body>
-   <b-card bg-variant="white" border-variant="white">   
+
+     <b-card bg-variant="light" v-if= "!isMounted && !isDataValid">
+        <b-overlay :show= "true"> 
+            <b-card style="min-height: 100px;"/>                   
+            <template v-slot:overlay>               
+               <div> 
+                    <loading-spinner/> 
+                    <p id="loading-label">Loading ...</p>
+               </div>                
+            </template> 
+      </b-overlay> 
+    </b-card>
+
+    <b-card bg-variant="light" v-if= "isMounted && !isDataValid">
+        <b-card  style="min-height: 100px;">
+            <span>This <b>File-Number '{{this.civilFileDocument.fileNumber}}'</b> doesn't exist in the <b>civil</b> records. </span>
+        </b-card>
+        <b-card>    
+            <b-button variant="info" @click="navigateToLandingPage">Back to the Landing Page</b-button>
+        </b-card>
+    </b-card>
+
+   <b-card  v-if= "isMounted && isDataValid">  
        
         <b-card bg-variant="light">
             <b-tabs active-nav-item-class="font-weight-bold text-uppercase text-info bg-light" pills >
@@ -12,44 +34,43 @@
                 v-bind:class="[ activetab === tabMapping ? 'active' : '' ]"
                 ></b-tab>
             </b-tabs>
-        </b-card>
-        
+        </b-card>        
+       
+        <b-card/>
+ 
         <b-overlay :show="loadingPdf" rounded="sm">  
-            <b-card border-variant="white" :aria-hidden="loadingPdf ? 'true' : null"></b-card>
+            <b-card bg-variant="light">           
+                <b-table
+                :items="FilteredDocuments"
+                :fields="fields[fieldsTab]"
+                :sort-by.sync="sortBy"
+                :sort-desc.sync="sortDesc"
+                :no-sort-reset="true"
+                @row-hovered="rowHover"
+                striped
+                responsive="sm"
+                >   
+                    <template v-for="(field,index) in fields[fieldsTab]" v-slot:[`head(${field.key})`]="data">
+                        <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
+                    </template>
+                    <template v-for="(field,index) in fields[fieldsTab]" v-slot:[`cell(${field.key})`]="data" >
+                        <span 
+                            v-bind:key= "index" 
+                            v-b-hover= "colHover"                            
+                            v-on:click= "cellClick(index, data)"
+                            :class= "cellClass(field, index, data)"    
+                            style= "white-space: pre-line"> {{ data.value }}
+                        </span>
+                    </template>
+                </b-table>
+            </b-card>
+            <template v-slot:overlay>               
+               <div> 
+                    <loading-spinner/> 
+                    <p id="Downloading-label">Downloading PDF file ...</p>
+               </div>                
+            </template> 
         </b-overlay>
-
-        <b-card bg-variant="light">           
-            <b-table
-            :items="FilteredDocuments"
-            :fields="fields[fieldsTab]"
-            :sort-by.sync="sortBy"
-            :sort-desc.sync="sortDesc"
-            :no-sort-reset="true"
-            @row-hovered="rowHover"
-            striped
-            responsive="sm"
-            >   
-                <template v-for="(f,index) in fields[fieldsTab]" v-slot:[`head(${f.key})`]="data">
-                   <b v-bind:key="index" :class="f.headerStyle" > {{ data.label }}</b>
-                </template>
-                 <template v-for="(f,index) in fields[fieldsTab]" v-slot:[`cell(${f.key})`]="data" >
-                   <span 
-                        v-bind:key="index" 
-                        v-b-hover="colHover"
-                        v-on:click="(data.item.PdfAvail)&&(index==1)&&(activetab!='COURT SUMMARY')? 
-                        openDocumentsPdf(data.item['Document ID']): 
-                        ((index==0)&&(activetab=='COURT SUMMARY'))? openCourtSummaryPdf(data.item['Appearance ID']) : ''"
-                        :class="(data.item.PdfAvail)&&(index==1)&&(activetab!='COURT SUMMARY')? 
-                        (hoverCol==1 && hoverRow==data.item.Index)?'text-info bg-warning':'text-info'
-                        : (index==0)&&(activetab=='COURT SUMMARY')? 
-                        (hoverCol==0 && hoverRow==data.item.Index)?'text-info bg-warning':'text-info'
-                        : f.cellStyle" 
-                        style="white-space: pre-line"> {{ data.value }}
-                    </span>
-                </template>
-            </b-table>
-        </b-card>
-
    </b-card> 
 </body>
 </template>
@@ -68,22 +89,39 @@ export default class CivilDocumentsView extends Vue {
     @civilState.State
     public civilFileDocument!: any
 
+    @civilState.Action
+    public UpdateCivilFile!: (newCivilFileDocument: any) => void
+
     public getDocuments(): void {
 
-        this.$http.get('api/files/civil/'+ this.civilFileDocument.fileNumber)
-            .then(Response => Response.json(), err => console.log('error')        
+        
+         this.$http.get('api/files/civil/'+ this.civilFileDocument.fileNumber)
+            .then(Response => Response.json(), err => {console.log('error');this.isMounted = true;}        
             ).then(data => {
                 this.documentsDetailsJson = data.document
                 this.ExtractDocumentInfo()
+                if(this.documents.length)
+                {
+                    this.isMounted = true;
+                    this.isDataValid = true;
+                }
+                else
+                {
+                    this.isMounted = true;
+                }
             });
     }
 
-    mounted () {         
+    mounted () { 
+        this.civilFileDocument.fileNumber = this.$route.params.fileNumber;
+        this.UpdateCivilFile(this.civilFileDocument);        
         this.getDocuments();        
     }
 
     documentsDetailsJson;
     loadingPdf = false;
+    isMounted = false;
+    isDataValid = false
 
     activetab = 'ALL';            
     sortBy = 'Seq.';
@@ -111,6 +149,36 @@ export default class CivilDocumentsView extends Vue {
         ]  
         
     ];
+
+    public cellClick(index, data)
+    {
+        if(data.item.PdfAvail && index==1 && this.activetab!='COURT SUMMARY')
+        {
+            this.openDocumentsPdf(data.item['Document ID']);
+        }
+        else if (index==0 && this.activetab=='COURT SUMMARY')
+        {
+            this.openCourtSummaryPdf(data.item['Appearance ID']);
+        }         
+    }
+
+    public cellClass(field, index, data)
+    {
+        if(data.item.PdfAvail && index==1 && this.activetab!='COURT SUMMARY')
+        {
+            if(this.hoverCol==1 && this.hoverRow==data.item.Index) return 'text-white bg-warning'; else return 'text-info';            
+        }
+        else if(index==0 && this.activetab=='COURT SUMMARY')
+        {
+            if(this.hoverCol==0 && this.hoverRow==data.item.Index) return 'text-white bg-warning'; else return 'text-info';   
+        }
+        else 
+            return field.cellStyle;
+    }
+
+    public navigateToLandingPage() {
+        this.$router.push({name:'Home'})
+    }
     
     public ExtractDocumentInfo(): void {
         let courtSummaryExists = false 
@@ -127,29 +195,30 @@ export default class CivilDocumentsView extends Vue {
                 docInfo["Appearance Date"] = jDoc.lastAppearanceDt? jDoc.lastAppearanceDt.split(" ")[0]: ' ';
                 if(new Date(docInfo["Appearance Date"]) > new Date() && this.categories.indexOf("SCHEDULED") < 0) this.categories.push("SCHEDULED")   
 
-                docInfo["Category"] = jDoc.category
+                docInfo["Category"] = jDoc.category;
                 if((this.categories.indexOf(docInfo["Category"]) < 0) && docInfo["Category"].length > 0) this.categories.push(docInfo["Category"])
                 // ensure all documentSupport elements only have one row
                 const docSupport: any = jDoc.documentSupport.length? jDoc.documentSupport[0]:'{}';
                 docInfo["Act"] = (docSupport==={})? '': docSupport.actCd;
                 docInfo["Document ID"] = jDoc.civilDocumentId;            
-                docInfo["PdfAvail"] = jDoc.civilDocumentId? true : false 
+                docInfo["PdfAvail"] = jDoc.imageId? true : false 
                 docInfo["Date Filed"] = jDoc.filedDt? jDoc.filedDt.split(" ")[0]: ' ';
                 docInfo["Issues"] = jDoc.issue.length? this.ExtractIssues(jDoc.issue) : ' ';
                 this.documents.push(docInfo);
 
             } else {                
                 docInfo["Document Type"] = 'CourtSummary';
-                docInfo["Appearance Date"] = jDoc.lastAppearanceDt.split(" ")[0]
+                docInfo["Appearance Date"] = jDoc.lastAppearanceDt.split(" ")[0];
                 docInfo["Appearance ID"] = jDoc.imageId;
+                docInfo["PdfAvail"] = jDoc.imageId? true : false
                 this.summaryDocuments.push(docInfo);
-                courtSummaryExists = true
+                courtSummaryExists = true;
             }
         } 
         
         this.categories.sort()
         if(courtSummaryExists) this.categories.push("COURT SUMMARY")
-        this.categories.unshift("ALL")        
+        this.categories.unshift("ALL")  
     }
 
     public ExtractIssues(issues) {
@@ -168,7 +237,7 @@ export default class CivilDocumentsView extends Vue {
             this.fieldsTab = fieldTab.Summary;
             return this.summaryDocuments;
         }
-        else{       
+        else {       
             return this.documents.filter(doc => {                
                 this.fieldsTab = fieldTab.Categories;
                 if(this.activetab == 'CONCLUDED') {
@@ -194,70 +263,21 @@ export default class CivilDocumentsView extends Vue {
                 }
             }); 
         }       
-    }
-
-    public b64toBlob(b64Data, contentType) {
-
-        const byteCharacters = atob(b64Data);
-        const byteArrays: any = [];
-        for ( let offset = 0; offset < byteCharacters.length; offset = offset + 512 ) {
-            const slice = byteCharacters.slice(offset, offset + 512);
-            const byteNumbers = new Array(slice.length);
-            for (let i = 0; i < slice.length; i++) {
-                byteNumbers[i] = slice.charCodeAt(i);
-            }
-            const byteArray = new Uint8Array(byteNumbers);
-            byteArrays.push(byteArray);
-        }
-        return new Blob(byteArrays, { type: contentType });
-    }
+    }    
 
     public openDocumentsPdf(documentId): void {
-        this.loadingPdf = true
-        // TODO: remove the hardcoded documentId once sample data has pdf
-        documentId = 70
+        this.loadingPdf = true;
         const filename = 'doc'+documentId+'.pdf';
-        // TODO: change to civil when a civil documentID is available 
-
-        this.$http.get('api/files/document/' + documentId + '/filename.pdf?isCriminal=true')
-            .then(Response => Response.json(), err =>  this.loadingPdf = false        
-            ).then(data => {
-                
-                if(window.navigator && window.navigator.msSaveOrOpenBlob) {
-                    window.navigator.msSaveOrOpenBlob(this.b64toBlob(data.b64Content,'application/pdf'), filename);
-                }
-                else
-                {
-                    const url = URL.createObjectURL(this.b64toBlob(data.b64Content,'application/pdf'))
-                    window.open(url);
-                }             
-
-                this.loadingPdf = false;
- 
-            }, err =>  this.loadingPdf = false);        
+        window.open(`api/files/document/${documentId}/${filename}?isCriminal=false`)
+        this.loadingPdf = false;
     }
     
     public openCourtSummaryPdf(appearanceId): void {
 
-        this.loadingPdf = true
-        // TODO: remove the hardcoded appearanceId once sample data has pdf
-        appearanceId = 10098
-        const filename = 'court summary'+appearanceId+'.pdf';
-
-        this.$http.get("api/files/civil/court-summary-report/" + appearanceId + "/filename.pdf")
-            .then(Response => Response.json(), err =>  this.loadingPdf = false        
-            ).then(data => {
-                
-                if(window.navigator && window.navigator.msSaveOrOpenBlob) {
-                    window.navigator.msSaveOrOpenBlob(this.b64toBlob(data.reportContent,'application/pdf'), filename);
-                }
-                else
-                {
-                    const url = URL.createObjectURL(this.b64toBlob(data.reportContent,'application/pdf'))
-                    window.open(url);
-                }
-                 this.loadingPdf = false 
-            }, err =>  this.loadingPdf = false);
+        this.loadingPdf = true;        
+        const filename = 'court summary_'+appearanceId+'.pdf';
+        window.open(`api/files/civil/court-summary-report/${appearanceId}/${filename}`)
+        this.loadingPdf = false;
     }
     
     public colHover(hovered, mouseEvent) {            
@@ -270,3 +290,10 @@ export default class CivilDocumentsView extends Vue {
     
 }
 </script>
+
+<style scoped>
+ .card {
+        border: white;
+    }
+
+</style>
