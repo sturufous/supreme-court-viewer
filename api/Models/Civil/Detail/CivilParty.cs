@@ -1,5 +1,4 @@
 ﻿using JCCommon.Clients.FileServices;
-using Newtonsoft.Json;
 
 namespace Scv.Api.Models.Civil.Detail
 {
@@ -8,8 +7,6 @@ namespace Scv.Api.Models.Civil.Detail
     /// </summary>
     public class CivilParty : CvfcParty3
     {
-        [JsonProperty("roleTypeDescription", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public string RoleTypeDescription { get; set; }
-
     }
 }
