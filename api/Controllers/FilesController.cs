@@ -177,6 +177,8 @@ namespace Scv.Api.Controllers
         /// </summary>
         /// <param name="fileId"></param>
         /// <param name="appearanceId"></param>
+        /// <param name="partId"></param>
+        /// <param name="profSeqNo"></param>
         /// <returns>CriminalAppearanceDetail</returns>
         [HttpGet]
         [Route("criminal/{fileId}/appearance-detail/{appearanceId}")]
