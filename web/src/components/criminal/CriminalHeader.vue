@@ -61,17 +61,25 @@ export default class CriminalHeader extends Vue {
     this.getDocuments();
   }
 
-  public getDocuments(): void {
-    const data = this.criminalFileInformation.detailsData;
-    this.fileNumberText = data.fileNumberTxt;
-    this.participantJson = data.participant;
-    this.ExtractDocumentInfo();
-    this.isMounted = true;
-  }
+  public getDocuments(): void {      
+      const data = this.criminalFileInformation.detailsData;
+      this.fileNumberText = data.fileNumberTxt;      
+      this.agencyLocationName = data.homeLocationAgenName;
+      this.agencyLocationCode = data.homeLocationAgenCode;
+      this.agencyLocationRegion = data.homeLocationRegionName;
+      this.adjudicatorRestrictions = data.hearingRestriction;
+      this.participantJson = data.participant 
+      this.ExtractDocumentInfo();
+      this.isMounted = true;          
+  } 
 
   activeparticipant = 0;
   numberOfParticipants = 0;
   fileNumberText;
+  agencyLocationName;
+  agencyLocationCode;
+  agencyLocationRegion;
+  adjudicatorRestrictions;
   isMounted = false;
   participantJson;
   participantList: any[] = [];
