@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using JCCommon.Clients.LocationServices;
 using LazyCache;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Serialization;
 using Scv.Api.Helpers;
 using Scv.Api.Helpers.ContractResolver;
-using Scv.Api.Helpers.Exceptions;
 using CodeValue = System.Collections.Generic.ICollection<JCCommon.Clients.LocationServices.CodeValue>;
 
 namespace Scv.Api.Services
@@ -41,6 +41,7 @@ namespace Scv.Api.Services
         #region Lookup Methods
         public async Task<string> GetLocationName(string code) => FindLongDescriptionFromCode(await GetLocationsFromLazyCache(), code);
         public async Task<string> GetLocationAgencyIdentifier(string code) => FindShortDescriptionFromCode(await GetLocationsFromLazyCache(), code);
+        public async Task<string> GetRegionName(string code) => (await _locationClient.LocationsLocationIdRegionAsync(code))?.RegionName;
         #endregion
 
         #region Helpers
@@ -49,7 +50,7 @@ namespace Scv.Api.Services
 
         private void SetupLocationServicesClient()
         {
-            _locationClient.JsonSerializerSettings.ContractResolver = new SafeContractResolver();
+            _locationClient.JsonSerializerSettings.ContractResolver = new SafeContractResolver { NamingStrategy = new CamelCaseNamingStrategy() };
             _locationClient.BaseUrl = _configuration.GetNonEmptyValue("LocationServicesClient:Url");
         }
         #endregion
