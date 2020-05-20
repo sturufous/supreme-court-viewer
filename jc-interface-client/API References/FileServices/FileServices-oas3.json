@@ -465,6 +465,126 @@
         ]
       }
     },
+    "/files/criminal/appearance/{appearanceId}/counts": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/criminalFileAppearanceCountResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "No items matching the given criteria were found."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Get counts for a given appearanceId.\n",
+        "operationId": "GET_files-criminal-appearance-appearanceId-counts",
+        "parameters": [
+          {
+            "name": "requestAgencyIdentifierId",
+            "in": "header",
+            "required": true,
+            "description": "Requesting Agency Identifier",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "requestPartId",
+            "in": "header",
+            "required": true,
+            "description": "Requesting Participant Id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "name": "appearanceId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/files/criminal/appearance/{appearanceId}/appearancemethods": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/criminalFileAppearanceApprMethodResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "No items matching the given criteria were found."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Get appearance methods for a given appearanceId.\n",
+        "operationId": "GET_files-criminal-appearance-appearanceId-appearancemethods",
+        "parameters": [
+          {
+            "name": "requestAgencyIdentifierId",
+            "in": "header",
+            "required": true,
+            "description": "Requesting Agency Identifier",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "requestPartId",
+            "in": "header",
+            "required": true,
+            "description": "Requesting Participant Id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "name": "appearanceId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
     "/files/criminal/filecontent": {
       "get": {
         "responses": {
@@ -931,7 +1051,7 @@
         ]
       }
     },
-    "/files/civil/appearances/{appearanceId}/party": {
+    "/files/civil/appearance/{appearanceId}/parties": {
       "get": {
         "responses": {
           "200": {
@@ -958,7 +1078,7 @@
           }
         },
         "description": "Get appearance parties for a given appearanceId.\n",
-        "operationId": "GET_files-civil-appearances-appearanceId-party",
+        "operationId": "GET_files-civil-appearance-appearanceId-parties",
         "parameters": [
           {
             "name": "requestAgencyIdentifierId",
@@ -991,7 +1111,7 @@
         }
       ]
     },
-    "/files/civil/appearances/{appearanceId}/appearancemethod": {
+    "/files/civil/appearance/{appearanceId}/appearancemethods": {
       "get": {
         "responses": {
           "200": {
@@ -1018,7 +1138,7 @@
           }
         },
         "description": "Get appearance methods for a given appearanceId.\n",
-        "operationId": "GET_files-civil-appearances-appearanceId-appearancemethod",
+        "operationId": "GET_files-civil-appearance-appearanceId-appearancemethods",
         "parameters": [
           {
             "name": "requestAgencyIdentifierId",
@@ -4384,6 +4504,86 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/civilAppearanceMethod"
+            }
+          }
+        }
+      },
+      "criminalAppearanceMethod": {
+        "type": "object",
+        "properties": {
+          "assetUsageSeqNo": {
+            "type": "string"
+          },
+          "roleTypeCd": {
+            "type": "string"
+          },
+          "appearanceMethodCd": {
+            "type": "string"
+          },
+          "phoneNumberTxt": {
+            "type": "string"
+          },
+          "instructionTxt": {
+            "type": "string"
+          },
+          "apprMethodCcn": {
+            "type": "string"
+          }
+        }
+      },
+      "criminalFileAppearanceApprMethodResponse": {
+        "type": "object",
+        "properties": {
+          "responseCd": {
+            "type": "string"
+          },
+          "responseMessageTxt": {
+            "type": "string"
+          },
+          "appearanceMethod": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/criminalAppearanceMethod"
+            }
+          }
+        }
+      },
+      "criminalAppearanceCount": {
+        "type": "object",
+        "properties": {
+          "printSeqNo": {
+            "type": "string"
+          },
+          "statuteSectionDsc": {
+            "type": "string"
+          },
+          "statuteDsc": {
+            "type": "string"
+          },
+          "appearanceReasonCd": {
+            "type": "string"
+          },
+          "appearanceResultCd": {
+            "type": "string"
+          },
+          "findingCd": {
+            "type": "string"
+          }
+        }
+      },
+      "criminalFileAppearanceCountResponse": {
+        "type": "object",
+        "properties": {
+          "responseCd": {
+            "type": "string"
+          },
+          "responseMessageTxt": {
+            "type": "string"
+          },
+          "apprCount": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/criminalAppearanceCount"
             }
           }
         }

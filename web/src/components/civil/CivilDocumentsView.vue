@@ -1,6 +1,5 @@
 <template>
 <body>
-
      <b-card bg-variant="light" v-if= "!isMounted && !isDataValid">
         <b-overlay :show= "true"> 
             <b-card style="min-height: 100px;"/>                   
@@ -76,7 +75,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch} from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
 import '@store/modules/CivilFileInformation';
 const civilState = namespace('CivilFileInformation');
@@ -94,7 +93,7 @@ export default class CivilDocumentsView extends Vue {
 
     public getDocuments(): void {
         
-        this.$http.get('api/files/civil/'+ this.civilFileInformation.fileNumber)
+        this.$http.get('/api/files/civil/'+ this.civilFileInformation.fileNumber)
             .then(Response => Response.json(), err => {console.log('error');this.isMounted = true;}        
             ).then(data => {
                 this.documentsDetailsJson = data.document
@@ -109,6 +108,13 @@ export default class CivilDocumentsView extends Vue {
                     this.isMounted = true;
                 }
             });
+    }
+
+    @Watch('$route', { immediate: false, deep: true })
+    onUrlChange() {
+        this.civilFileInformation.fileNumber = this.$route.params.fileNumber;
+        this.UpdateCivilFile(this.civilFileInformation);
+        location.reload();
     }
 
     mounted () { 
@@ -267,7 +273,7 @@ export default class CivilDocumentsView extends Vue {
     public openDocumentsPdf(documentId): void {
         this.loadingPdf = true;
         const filename = 'doc'+documentId+'.pdf';
-        window.open(`api/files/document/${documentId}/${filename}?isCriminal=false`)
+        window.open(`/api/files/document/${documentId}/${filename}?isCriminal=false`)
         this.loadingPdf = false;
     }
     
@@ -275,7 +281,7 @@ export default class CivilDocumentsView extends Vue {
 
         this.loadingPdf = true;        
         const filename = 'court summary_'+appearanceId+'.pdf';
-        window.open(`api/files/civil/court-summary-report/${appearanceId}/${filename}`)
+        window.open(`/api/files/civil/court-summary-report/${appearanceId}/${filename}`)
         this.loadingPdf = false;
     }
     
