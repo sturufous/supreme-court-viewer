@@ -294,7 +294,14 @@ export default class CriminalDocumentsView extends Vue {
         const partID = this.participantFiles[index]["Part ID"];
         const profSeqNo = this.participantFiles[index]["Prof Seq No"];      
         const filename = 'ROP_'+partID+'.pdf';
-        window.open(`/api/files/criminal/record-of-proceedings/${partID}/${filename}?profSequenceNumber=${profSeqNo}&courtLevelCode=${this.courtLevel}&courtClassCode=${this.courtClass}`)
+      
+        const url =`/api/files/criminal/record-of-proceedings/${partID}/${filename}?profSequenceNumber=${profSeqNo}&courtLevelCode=${this.courtLevel}&courtClassCode=${this.courtClass}`;
+
+        this.$http.get(url)
+            .then(Response => {window.open(url)},
+             err => {console.log(err); window.alert("Broken PDF File")}
+            );
+
         this.loadingPdf = false;
     }
     
