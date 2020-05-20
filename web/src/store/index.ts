@@ -1,14 +1,14 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import CivilFileDocuments from '@/store/modules/CivilFileDocuments'
-import CriminalFileDocuments from '@/store/modules/CriminalFileDocuments'
+import CivilFileInformation from '@/store/modules/CivilFileInformation'
+import CriminalFileInformation from '@/store/modules/CriminalFileInformation'
 
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
   modules: {
-    CivilFileDocuments,
-    CriminalFileDocuments
+    CivilFileInformation,
+    CriminalFileInformation
   }
 })
 

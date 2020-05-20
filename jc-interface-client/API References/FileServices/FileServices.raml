@@ -2895,6 +2895,180 @@ schemas:
           }
         }
       }
+      
+  - civilAppearanceParty: |
+      {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type" : "object",
+        "properties" : {
+          "partyId" : {
+            "type" : "string"
+          },
+          "partyRoleTypeCd" : {
+            "type" : "string"
+           },
+          "lastNm" : {
+            "type" : "string"
+           },
+           "givenNm" : {
+            "type" : "string"
+           },
+           "orgNm" : {
+            "type" : "string"
+           },
+           "counselNm" : {
+            "type" : "string"
+           },
+           "courtParticipantId" : {
+            "type" : "string"
+           },
+           "courtParticipantCcn" : {
+            "type" : "string"
+           }
+         }
+      }
+      
+  - civilFileAppearancePartyResponse: | 
+      {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type" : "object",
+        "properties" : {
+          "responseCd" : {
+            "type" : "string"
+          },
+          "responseMessageTxt" : {
+            "type" : "string"
+          },
+          "party" : {
+            "type" : "array",
+            "items" : { "$ref" : "civilAppearanceParty" }
+          }
+        }
+      }
+      
+  - civilAppearanceMethod: |
+      {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type" : "object",
+        "properties" : {
+          "roleTypeCd" : {
+            "type" : "string"
+          },
+          "appearanceMethodCd" : {
+            "type" : "string"
+           },
+           "apprMethodCcn" : {
+             "type" : "string"
+           }
+         }
+      }
+      
+  - civilFileAppearanceApprMethodResponse: | 
+       {
+         "$schema": "http://json-schema.org/draft-04/schema#",
+         "type" : "object",
+         "properties" : {
+           "responseCd" : {
+             "type" : "string"
+          },
+          "responseMessageTxt" : {
+            "type" : "string"
+          },
+          "appearanceMethod" : {
+            "type" : "array",
+            "items" : { "$ref" : "civilAppearanceMethod" }
+          }
+        }
+       }
+       
+  - criminalAppearanceMethod: |
+      {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type" : "object",
+        "properties" : {
+          "assetUsageSeqNo" : {
+            "type" : "string"
+          },
+          "roleTypeCd" : {
+            "type" : "string"
+           },
+           "appearanceMethodCd" : {
+             "type" : "string"
+           },
+           "phoneNumberTxt" : {
+             "type" : "string"
+           },
+           "instructionTxt" : {
+             "type" : "string"
+           },
+           "apprMethodCcn" : {
+             "type" : "string"
+           }
+         }
+      } 
+       
+  - criminalFileAppearanceApprMethodResponse: | 
+       {
+         "$schema": "http://json-schema.org/draft-04/schema#",
+         "type" : "object",
+         "properties" : {
+           "responseCd" : {
+             "type" : "string"
+           },
+           "responseMessageTxt" : {
+            "type" : "string"
+           },
+           "appearanceMethod" : {
+            "type" : "array",
+            "items" : { "$ref" : "criminalAppearanceMethod" }
+           }
+        }
+       }
+       
+  - criminalAppearanceCount: |
+      {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type" : "object",
+        "properties" : {
+          "printSeqNo" : {
+            "type" : "string"
+          },
+          "statuteSectionDsc" : {
+            "type" : "string"
+           },
+           "statuteDsc" : {
+             "type" : "string"
+           },
+           "appearanceReasonCd" : {
+             "type" : "string"
+           },
+           "appearanceResultCd" : {
+             "type" : "string"
+           },
+           "findingCd" : {
+             "type" : "string"
+           }
+         }
+      } 
+      
+  - criminalFileAppearanceCountResponse: | 
+       {
+         "$schema": "http://json-schema.org/draft-04/schema#",
+         "type" : "object",
+         "properties" : {
+           "responseCd" : {
+             "type" : "string"
+           },
+           "responseMessageTxt" : {
+            "type" : "string"
+           },
+           "apprCount" : {
+            "type" : "array",
+            "items" : { "$ref" : "criminalAppearanceCount" }
+           }
+        }
+       }   
+
 
 /files:
   displayName: Court File Resources
@@ -3114,7 +3288,57 @@ schemas:
             application/json:
               example: |
                 {"message": "No items matching the given criteria were found."}
-
+                
+    /appearance: #criminal
+      /{appearanceId}: #criminal
+          /counts: #criminal
+            get:
+              description: |
+                Get counts for a given appearanceId.
+              headers:
+                requestAgencyIdentifierId:
+                  description: Requesting Agency Identifier
+                  type: string
+                  required: true
+                requestPartId:
+                  description: Requesting Participant Id
+                  type: string
+                  required: true
+              responses:
+                200:
+                  body:
+                    application/json:
+                      schema: criminalFileAppearanceCountResponse
+                404:
+                  body:
+                    application/json:
+                      example: |
+                          {"message": "No items matching the given criteria were found."}
+                          
+          /appearancemethods: #criminal
+            get:
+              description: |
+                Get appearance methods for a given appearanceId.
+              headers:
+                requestAgencyIdentifierId:
+                  description: Requesting Agency Identifier
+                  type: string
+                  required: true
+                requestPartId:
+                  description: Requesting Participant Id
+                  type: string
+                  required: true
+              responses:
+                200:
+                  body:
+                    application/json:
+                      schema: criminalFileAppearanceApprMethodResponse
+                404:
+                  body:
+                    application/json:
+                      example: |
+                        {"message": "No items matching the given criteria were found."}
+                                          
     /filecontent: # criminal
       get:
         description: |
@@ -3333,7 +3557,57 @@ schemas:
             application/json:
               example: |
                 {"message": "No items matching the given criteria were found."}
-
+                
+    /appearance: #civil
+      /{appearanceId}: #civil
+          /parties: #civil
+            get:
+              description: |
+                Get appearance parties for a given appearanceId.
+              headers:
+                requestAgencyIdentifierId:
+                  description: Requesting Agency Identifier
+                  type: string
+                  required: true
+                requestPartId:
+                  description: Requesting Participant Id
+                  type: string
+                  required: true
+              responses:
+                200:
+                  body:
+                    application/json:
+                      schema: civilFileAppearancePartyResponse
+                404:
+                  body:
+                    application/json:
+                      example: |
+                          {"message": "No items matching the given criteria were found."}
+                          
+          /appearancemethods: #civil
+            get:
+              description: |
+                Get appearance methods for a given appearanceId.
+              headers:
+                requestAgencyIdentifierId:
+                  description: Requesting Agency Identifier
+                  type: string
+                  required: true
+                requestPartId:
+                  description: Requesting Participant Id
+                  type: string
+                  required: true
+              responses:
+                200:
+                  body:
+                    application/json:
+                      schema: civilFileAppearanceApprMethodResponse
+                404:
+                  body:
+                    application/json:
+                      example: |
+                        {"message": "No items matching the given criteria were found."}
+                          
     /courtsummaryreport: # civil
       get:
         description: |
@@ -3467,3 +3741,4 @@ schemas:
                 application/json:
                   example: |
                     {"message": "No items matching the given criteria were found."}
+
