@@ -242,6 +242,8 @@ namespace Scv.Api.Services
             detail.CourtLevelDescription = await _lookupService.GetCourtLevelDescription(detail.CourtLevelCd.ToString());
             detail.ActivityClassCd = await _lookupService.GetActivityClassCd(detail.CourtClassCd.ToString());
 
+            detail.CrownEstimateLenDsc = await _lookupService.GetAppearanceDuration(detail.CrownEstimateLenUnit);
+
             //Populate hearing restrictions.
             foreach (var hearingRestriction in detail.HearingRestriction)
                 hearingRestriction.HearingRestrictionTypeDsc =  await _lookupService.GetHearingRestrictionDescription(hearingRestriction.HearingRestrictionTypeCd.ToString());

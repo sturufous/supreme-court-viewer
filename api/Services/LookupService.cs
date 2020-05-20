@@ -42,6 +42,7 @@ namespace Scv.Api.Services
         public async Task<CodeLookup> GetAgencyLocations() => await GetDataFromCache("AgencyLocations", async () => await _lookupClient.CodesAgencyLocationsAsync());
         public async Task<CodeLookup> GetCriminalAppearanceReasons() => await GetDataFromCache("CriminalAppearanceReasons", async () => await _lookupClient.CodesCriminalAppearanceReasonsAsync());
         public async Task<CodeLookup> GetCriminalAppearanceResults() => await GetDataFromCache("CriminalAppearanceResults", async () => await _lookupClient.CodesCriminalAppearanceResultsAsync());
+        public async Task<CodeLookup> GetAppearanceDurations() => await GetDataFromCache("AppearanceDurations", async () => await _lookupClient.CodesCriminalAppearanceDurationAsync());
         public async Task<CodeLookup> GetFindings() => await GetDataFromCache("Findings", async() => await _lookupClient.CodesFindingsAsync());
         public async Task<CodeLookup> GetCourtClass() => await GetDataFromCache("CourtClasses", async () => await _lookupClient.CodesCourtClassesAsync());
         public async Task<CodeLookup> GetCourtLevel() => await GetDataFromCache("CourtLevels", async () => await _lookupClient.CodesCourtLevelsAsync());
@@ -59,6 +60,7 @@ namespace Scv.Api.Services
         public async Task<string> GetCriminalAssetsDescriptions(string code) => FindLongDescriptionFromCode(await GetCriminalAssets(), code);
         public async Task<string> GetCriminalAppearanceReasonsDescription(string code) => FindShortDescriptionFromCode(await GetCriminalAppearanceReasons(), code);
         public async Task<string> GetCriminalAppearanceResultsDescription(string code) => FindShortDescriptionFromCode(await GetCriminalAppearanceResults(), code);
+        public async Task<string> GetAppearanceDuration(string code) => FindLongDescriptionFromCode(await GetAppearanceDurations(), code);
         public async Task<string> GetFindingDescription(string code) => FindShortDescriptionFromCode(await GetFindings(), code);
         public async Task<string> GetActivityClassCd(string code) => FindLongDescriptionFromCode(await GetCourtClass(), code);
         public async Task<string> GetCourtClassDescription(string code) => FindShortDescriptionFromCode(await GetCourtClass(), code);

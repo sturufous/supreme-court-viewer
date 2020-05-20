@@ -31,9 +31,12 @@ namespace Scv.Api.Models.Criminal.Detail
         public string MdocCcn { get; set; }
         public string AssignedPartNm { get; set; }
         public string ApprovedByAgencyCd { get; set; }
+        public string ApprovedByPartNm { get; set; }
         public string ApprovalCrownAgencyTypeCd { get; set; }
         public string CaseAgeDays { get; set; }
-
+        public string CrownEstimateLenQty { get; set; }
+        public string CrownEstimateLenDsc { get; set; }
+        public string CrownEstimateLenUnit { get; set; }
         /// <summary>
         /// Custom class to extend. 
         /// </summary>
@@ -51,5 +54,11 @@ namespace Scv.Api.Models.Criminal.Detail
         /// Extended.
         /// </summary>
         public ICollection<CriminalHearingRestriction> HearingRestriction { get; set; }
+
+        /// <summary>
+        /// Used for Crown Notes to JCM. 
+        /// </summary>
+        public ICollection<TrialRemark> TrialRemark { get; set; }
+
     }
 }
