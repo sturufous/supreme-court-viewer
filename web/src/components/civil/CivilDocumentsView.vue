@@ -15,7 +15,7 @@
 
     <b-card bg-variant="light" v-if= "isMounted && !isDataValid">
         <b-card  style="min-height: 100px;">
-            <span>This <b>File-Number '{{this.civilFileDocument.fileNumber}}'</b> doesn't exist in the <b>civil</b> records. </span>
+            <span>This <b>File-Number '{{this.civilFileInformation.fileNumber}}'</b> doesn't exist in the <b>civil</b> records. </span>
         </b-card>
         <b-card>    
             <b-button variant="info" @click="navigateToLandingPage">Back to the Landing Page</b-button>

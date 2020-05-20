@@ -1,27 +1,6 @@
 <template>
 <body>
-    <b-card bg-variant="light" v-if= "!isMounted && !isDataValid">
-        <b-overlay :show= "true"> 
-            <b-card  style="min-height: 100px;"/>                   
-            <template v-slot:overlay>               
-               <div> 
-                    <loading-spinner/> 
-                    <p id="loading-label">Loading ...</p>
-               </div>                
-            </template> 
-      </b-overlay> 
-    </b-card>
-
-    <b-card bg-variant="light" v-if= "isMounted && !isDataValid">
-        <b-card  style="min-height: 100px;">
-            <span>This <b>File-Number '{{this.criminalFileDocument.fileNumber}}'</b> doesn't have participant information. </span>
-        </b-card>
-        <b-card>         
-            <b-button variant="info" @click="navigateToLandingPage">Back to the Landing Page</b-button>
-        </b-card>
-    </b-card>
-
-   <b-card  v-if= "isMounted && isDataValid">
+   <b-card  v-if= "isMounted">
         <b-card bg-variant="light">
             <b-tabs active-nav-item-class="font-weight-bold text-uppercase text-info bg-light" pills >
                 <b-tab 
@@ -104,29 +83,19 @@ export default class CriminalDocumentsView extends Vue {
 
     @criminalState.Action
     public UpdateCriminalFile!: (newCriminalFileInformation: any) => void
-    
+
+
     public getDocuments(): void {
-
        
-        this.$http.get('api/files/criminal/'+ this.criminalFileInformation.fileNumber)
-            .then(Response => Response.json(), err => {console.log(err);this.isMounted = true;}        
-            ).then(data => {
-                this.participantJson = data.participant 
-                this.courtLevel = DecodeCourtLevel[data.courtLevelCd];
-                this.courtClass = DecodeCourtClass[data.courtClassCd];
+        const data = this.criminalFileInformation.detailsData;
 
-                this.ExtractDocumentInfo()           
+        this.participantJson = data.participant 
 
-                if(this.participantFiles.length)
-                {
-                    this.isMounted = true;
-                    this.isDataValid = true;
-                }
-                else
-                {
-                    this.isMounted = true;
-                }
-            });
+        this.courtLevel = DecodeCourtLevel[data.courtLevelCd];
+        this.courtClass = DecodeCourtClass[data.courtClassCd];
+
+        this.ExtractDocumentInfo()          
+        this.isMounted = true;
     }
 
     mounted () { 
