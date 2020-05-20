@@ -1,51 +1,66 @@
 <template>
-    <div class="home">
-        <br />
-        <div class="mb-2">
-            <h2> Temporary landing page for SCV </h2>
-        </div>
-        <div>
-            <!-- <b-col class="mb-2" sm="9">
-                <label for="proceeding-datepicker">Proceeding date:</label>
-                <b-form-datepicker id="proceeding-datepicker" v-model="civilFileDocument.proceedingDate" class="mb-2"></b-form-datepicker>
-            </b-col>
-            <b-col class="mb-2" sm="9">
-                <label for="location"> Location: </label>
-                <b-form-input id="location" v-model="civilFileDocument.location" placeholder="Enter location"></b-form-input>
-            </b-col>
-            <b-col class="mb-2" sm="9">
-                <label for="room"> Room: </label>
-                <b-form-input id="room" v-model="civilFileDocument.room" placeholder="Enter room"></b-form-input>
-            </b-col> -->
-            <b-col class="mb-3" sm="9">
-                <label for="filenumber"> File number: </label>
-                <b-form-input id="filenumber" v-model="civilFileDocument.fileNumber" placeholder="Enter file number"></b-form-input>
-            </b-col>
-            <b-col class="mb-3" sm="9">
-                <b-button @click="navigateToDocumentsView(civilFileDocument)">Search</b-button>
-            </b-col>
-        </div>
-    </div>
+    <b-card bg-variant="white" class="home">    
+      
+        <b-card  align="left" >
+            
+            <b-card >
+                <b-card-title class="h2"> Temporary landing page for SCV </b-card-title>
+            </b-card>
+
+            <b-card >
+                <b-card-text for="filenumber"> File number: </b-card-text>                
+                <b-form-input id="filenumber" v-model="fileInformation.fileNumber" placeholder="Enter file number"></b-form-input>                
+            </b-card>
+
+            <b-card> 
+                <b-card-text for="civil/criminal"> Civil/Criminal: </b-card-text>
+                <b-form-select v-model="selected" :options="options"></b-form-select>               
+            </b-card>
+        
+            <b-card >
+                <b-button @click="navigateToDocumentsView(fileInformation)">Search</b-button>
+            </b-card>          
+
+        </b-card>
+    </b-card>
 </template>
 
 <script lang="ts">
     import { Component, Vue } from 'vue-property-decorator';
     import { namespace } from 'vuex-class'
-    import CivilFileDocuments from '../store/modules/CivilFileDocuments';
-    const civilState = namespace('CivilFileDocuments');
+    import '@store/modules/CivilFileInformation';
+    import '@store/modules/CriminalFileInformation';
+    const civilState = namespace('CivilFileInformation');
+    const criminalState = namespace('CriminalFileInformation');
 
     @Component
     export default class Home extends Vue {
+
+        selected = 'criminal';
+        options= [
+          { value: 'civil', text: 'Civil' },
+          { value: 'criminal', text: 'Criminal' }
+        ]
         
-        @civilState.State
-        public civilFileDocument!: any
+        fileInformation = { }
 
         @civilState.Action
-        public UpdateCivilFile!: (newCivilFileDocument: any) => void
+        public UpdateCivilFile!: (newCivilFileInformation: any) => void
+
+        @criminalState.Action
+        public UpdateCriminalFile!: (newCriminalFileInformation: any) => void           
+        
         // TODO: add validation so that the user has to enter values before clicking the search button
-        navigateToDocumentsView(civilFileDocument): void {
-            this.UpdateCivilFile(civilFileDocument)
-            this.$router.push('/civil-documents')
+        navigateToDocumentsView(fileInformation): void {
+
+            if(this.selected == 'civil') {
+                this.UpdateCivilFile(fileInformation)
+                this.$router.push({name:'CivilDocumentsView', params: {fileNumber: fileInformation.fileNumber}})
+            } else if(this.selected == 'criminal') {
+                this.UpdateCriminalFile(fileInformation)
+                this.$router.push({name:'CriminalCaseDetails', params: {fileNumber: fileInformation.fileNumber}})
+            }
+            
         }        
     }
 </script>
@@ -56,23 +71,12 @@
         background-color: #036
     }
 
-    input {
+    input, select {
         width: 300px;
     }
 
-    #proceeding-datepicker__outer_ {
-        width: 300px;
+    .card {
+        border: white;
     }
 
-    .home {
-        margin-left: 25px;
-    }
-
-    .fade-enter-active, .fade-leave-active {
-        transition: opacity .5s;
-    }
-
-    .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-        opacity: 0;
-    }
 </style>
