@@ -4,11 +4,7 @@
     "title": "JC-Interface - Lookup Code Services",
     "version": "0.0.1"
   },
-  "servers": [
-    {
-      "url": ""
-    }
-  ],
+  "servers": [],
   "paths": {
     "/codes/adjudicators": {
       "get": {
@@ -79,6 +75,36 @@
           }
         }
       ]
+    },
+    "/codes/agencyLocations": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/lookupCodes"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "No items matching the given criteria were found."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Get a list of available agencyLocations.\n",
+        "operationId": "GET_codes-agencyLocations"
+      }
     },
     "/codes/asset/roleCombos": {
       "get": {
