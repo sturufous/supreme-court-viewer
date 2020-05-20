@@ -9,7 +9,7 @@
               </b-nav-text>
 
               <b-nav-text class="mt-1 ml-1 mr-2" style="font-size: 11px;">Robson Square Provincial Court (2045)</b-nav-text>
-              <b-nav-text class="text-muted mr-5 mt-1" style="font-size: 11px;">Vancouver</b-nav-text>
+              <b-nav-text class="text-muted mr-3 mt-1" style="font-size: 11px;">Vancouver</b-nav-text>
 
               <b-nav-text class="mr-2" >
                   <b-icon icon="person-fill"></b-icon>
@@ -19,7 +19,7 @@
                   <b>{{getNameOfParticipant(activeparticipant)}}</b> and {{(participantList.length-1)}} other(s)
               </b-nav-text> 
               
-              <b-nav-item-dropdown class="mr-5" text="" right>
+              <b-nav-item-dropdown class="mr-3" text="" right>
                   <b-dropdown-item  
                     v-for="(participant, index) in SortedParticipants" 
                     :key="index"
@@ -28,12 +28,12 @@
                   </b-dropdown-item>        
               </b-nav-item-dropdown>
 
-              <b-nav-text style="background-color: #CCA993; white-space: pre; border-radius: 15px;">
+              <b-nav-text class="mt-1" style="background-color: #CCA993; white-space: pre; border-radius: 15px; font-size: 13px;">
                   {{adjudicatorRes}}
               </b-nav-text>
 
-              <b-nav-item-dropdown text="Adjudicator Restrictions" right>
-                  <b-dropdown-item href="#">Account</b-dropdown-item>       
+              <b-nav-item-dropdown text="Adjudicator Restrictions" right style="font-size: 13px;">
+                  <b-dropdown-item href="#">None</b-dropdown-item>       
               </b-nav-item-dropdown>
           </b-navbar-nav>
       </b-navbar>
@@ -75,7 +75,7 @@ export default class CriminalHeader extends Vue {
   isMounted = false;
   participantJson;
   participantList: any[] = [];
-  adjudicatorRes = '  0  '
+  adjudicatorRes = ' 0 '
 
   public ExtractDocumentInfo(): void {
       for(const fileIndex in this.participantJson)

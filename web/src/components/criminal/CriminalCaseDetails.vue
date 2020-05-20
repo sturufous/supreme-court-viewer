@@ -70,7 +70,7 @@ export default class CriminalCaseDetails extends Vue {
 
     public getFileDetails(): void {
        
-        this.$http.get('api/files/criminal/'+ this.criminalFileInformation.fileNumber)
+        this.$http.get('/api/files/criminal/'+ this.criminalFileInformation.fileNumber)
             .then(Response => Response.json(), err => {console.log(err);}        
             ).then(data => {
                 this.criminalFileInformation.detailsData = data; 
