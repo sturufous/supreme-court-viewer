@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using JCCommon.Clients.LookupServices;
 using LazyCache;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Serialization;
 using Scv.Api.Helpers;
 using Scv.Api.Helpers.ContractResolver;
 using Scv.Api.Helpers.Exceptions;
@@ -47,6 +48,8 @@ namespace Scv.Api.Services
         public async Task<CodeLookup> GetDocuments() => await GetDataFromCache("Documents", async () => await _lookupClient.CodesDocumentsAsync());
         public async Task<CodeLookup> GetRoles() => await GetDataFromCache("Roles", async () => await _lookupClient.CodesRolesAsync());
         public async Task<CodeLookup> GetParticipantRoles() => await GetDataFromCache("ParticipantRoles", async () => await _lookupClient.CodesParticipantRolesAsync());
+        public async Task<CodeLookup> GetWitnessRoles() => await GetDataFromCache("WitnessRoles", async () => await _lookupClient.CodesWitnessRolesAsync());
+        public async Task<CodeLookup> GetHearingRestrictions() => await GetDataFromCache("HearingRestrictions", async() => await _lookupClient.CodesHearingRestrictionsAsync());
         #endregion
 
         #region Lookup Methods
@@ -60,6 +63,9 @@ namespace Scv.Api.Services
         public async Task<string> GetCivilRoleTypeDescription(string code) => FindShortDescriptionFromCode(await GetRoles(), code);
         public async Task<string> GetCriminalParticipantRoleDescription(string code) => FindLongDescriptionFromCode(await GetParticipantRoles(), code);
         public async Task<string> GetDocumentDescriptionAsync(string code) => FindShortDescriptionFromCode(await GetDocuments(), code);
+        public async Task<string> GetWitnessRoleTypeDescription(string code) => FindShortDescriptionFromCode(await GetWitnessRoles(), code);
+        public async Task<string> GetHearingRestrictionDescription(string code) => FindLongDescriptionFromCode(await GetHearingRestrictions(), code);
+
 
         /// <summary>
         /// Reads from the configuration for the document category.
@@ -87,7 +93,7 @@ namespace Scv.Api.Services
 
         private void SetupLookupServicesClient()
         {
-            _lookupClient.JsonSerializerSettings.ContractResolver = new SafeContractResolver();
+            _lookupClient.JsonSerializerSettings.ContractResolver = new SafeContractResolver { NamingStrategy = new CamelCaseNamingStrategy() };
             _lookupClient.BaseUrl = _configuration.GetNonEmptyValue("LookupServicesClient:Url");
         }
         #endregion

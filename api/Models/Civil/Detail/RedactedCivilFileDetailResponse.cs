@@ -13,29 +13,13 @@ namespace Scv.Api.Models.Civil.Detail
         public string PhysicalFileId { get; set; }
         public string FileNumberTxt { get; set; }
         public string HomeLocationAgenId { get; set; }
-
-        /// <summary>
-        /// Additional field for Agency Identifier Code. 
-        /// </summary>
-        /// 
         public string HomeLocationAgencyCode { get; set; }
-
-        /// <summary>
-        /// Additional field for Location Name. 
-        /// </summary>
         public string HomeLocationAgencyName { get; set; }
+        public string HomeLocationRegionName { get; set; }
+        public string ActivityClassCd { get; set; }
         public CivilFileDetailResponseCourtLevelCd CourtLevelCd { get; set; }
-
-        /// <summary>
-        /// Additional field for description. 
-        /// </summary>
         public string CourtLevelDescription { get; set; }
-
         public CivilFileDetailResponseCourtClassCd CourtClassCd { get; set; }
-
-        /// <summary>
-        /// Additional field for description. 
-        /// </summary>
         public string CourtClassDescription { get; set; }
         public string SocTxt { get; set; }
         public string LeftRoleDsc { get; set; }
@@ -56,6 +40,5 @@ namespace Scv.Api.Models.Civil.Detail
         public ICollection<CivilDocument> Document { get; set; }
         public ICollection<CvfcHearingRestriction2> HearingRestriction { get; set; }
         public ICollection<CvfcAppearance> Appearance { get; set; }
-        public string ActivityClassCd { get; set; }
     }
 }
