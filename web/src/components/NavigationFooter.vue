@@ -1,6 +1,6 @@
 <template>
-  <footer class="fixed-bottom">
-    <nav class="navbar navbar-expand-lg navbar-dark">
+  <footer :class="footerPosition">
+    <b-navbar class="navbar navbar-expand-lg navbar-dark">
       <!-- Navbar content -->
       <ul class="navbar-nav">
         <li class="nav-item">
@@ -47,7 +47,7 @@
           >
         </li>
       </ul>
-    </nav>
+    </b-navbar>
   </footer>
 </template>
 
@@ -58,6 +58,22 @@
   @Component
   export default class NavigationFooter extends Vue {   
 
+  created() {
+    window.addEventListener("resize", this.onResize);
+  }
+
+  destroyed() {
+    window.removeEventListener("resize", this.onResize);
+  }
+
+  public onResize() {
+    if(window.innerWidth > 768) { this.footerPosition ='fixed-bottom';}
+    else {this.footerPosition = 'flex-bottom';}
+  }
+
+  footerPosition = 'fixed-bottom';
+   
+  
   }
 </script>
 
