@@ -107,7 +107,7 @@ export default class CriminalDocumentsView extends Vue {
     
     public getDocuments(): void {
        
-        this.$http.get('api/files/criminal/'+ this.criminalFileDocument.fileNumber)
+        this.$http.get('/api/files/criminal/'+ this.criminalFileDocument.fileNumber)
             .then(Response => Response.json(), err => {console.log(err);this.isMounted = true;}        
             ).then(data => {
                 this.participantJson = data.participant 
@@ -315,7 +315,7 @@ export default class CriminalDocumentsView extends Vue {
     public openDocumentsPdf(imageId): void {
         this.loadingPdf = true;
         const filename = 'doc'+imageId+'.pdf';
-        window.open(`api/files/document/${imageId}/${filename}?isCriminal=true`)
+        window.open(`/api/files/document/${imageId}/${filename}?isCriminal=true`)
         this.loadingPdf = false;
     }
     
@@ -324,7 +324,7 @@ export default class CriminalDocumentsView extends Vue {
         const partID = this.participantFiles[index]["Part ID"];
         const profSeqNo = this.participantFiles[index]["Prof Seq No"];      
         const filename = 'ROP_'+partID+'.pdf';
-        window.open(`api/files/criminal/record-of-proceedings/${partID}/${filename}?profSequenceNumber=${profSeqNo}&courtLevelCode=${this.courtLevel}&courtClassCode=${this.courtClass}`)
+        window.open(`/api/files/criminal/record-of-proceedings/${partID}/${filename}?profSequenceNumber=${profSeqNo}&courtLevelCode=${this.courtLevel}&courtClassCode=${this.courtClass}`)
         this.loadingPdf = false;
     }
     

@@ -93,7 +93,7 @@ export default class CivilDocumentsView extends Vue {
 
     public getDocuments(): void {
         
-         this.$http.get('api/files/civil/'+ this.civilFileDocument.fileNumber)
+         this.$http.get('/api/files/civil/'+ this.civilFileDocument.fileNumber)
             .then(Response => Response.json(), err => {console.log('error');this.isMounted = true;}        
             ).then(data => {
                 this.documentsDetailsJson = data.document
@@ -273,7 +273,7 @@ export default class CivilDocumentsView extends Vue {
     public openDocumentsPdf(documentId): void {
         this.loadingPdf = true;
         const filename = 'doc'+documentId+'.pdf';
-        window.open(`api/files/document/${documentId}/${filename}?isCriminal=false`)
+        window.open(`/api/files/document/${documentId}/${filename}?isCriminal=false`)
         this.loadingPdf = false;
     }
     
@@ -281,7 +281,7 @@ export default class CivilDocumentsView extends Vue {
 
         this.loadingPdf = true;        
         const filename = 'court summary_'+appearanceId+'.pdf';
-        window.open(`api/files/civil/court-summary-report/${appearanceId}/${filename}`)
+        window.open(`/api/files/civil/court-summary-report/${appearanceId}/${filename}`)
         this.loadingPdf = false;
     }
     
