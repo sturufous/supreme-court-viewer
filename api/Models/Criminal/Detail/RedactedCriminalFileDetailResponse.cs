@@ -6,8 +6,13 @@ namespace Scv.Api.Models.Criminal.Detail
     /// <summary>
     /// This is used to narrow down the amount of information from CriminalFileDetailResponse. 
     /// </summary>
-    public class RedactedCriminalFileDetailResponse
+    public class RedactedCriminalFileDetailResponse : CriminalFileDetailResponse
     {
+        public RedactedCriminalFileDetailResponse()
+        {
+            Ban = new List<CriminalBan>();
+        }
+
         public string ResponseCd { get; set; }
         public string ResponseMessageTxt { get; set; }
         public string JustinNo { get; set; }
@@ -60,5 +65,9 @@ namespace Scv.Api.Models.Criminal.Detail
         /// </summary>
         public ICollection<TrialRemark> TrialRemark { get; set; }
 
+        /// <summary>
+        /// Extended, with PartId. 
+        /// </summary>
+        public List<CriminalBan> Ban { get; set; }
     }
 }

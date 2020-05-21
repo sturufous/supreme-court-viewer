@@ -189,7 +189,7 @@ namespace Scv.Api.Services
 
             var detail = _mapper.Map<RedactedCriminalFileDetailResponse>(criminalFileDetail);
 
-            //Generate documents from AccusedFile. 
+            //Populate documents from AccusedFile. 
             var documents = criminalFileContent.AccusedFile.SelectMany(ac =>
             {
                 var criminalDocuments = _mapper.Map<List<CriminalDocument>>(ac.Document);
@@ -219,6 +219,7 @@ namespace Scv.Api.Services
                 return criminalDocuments;
             }).ToList();
 
+            //Populate witnesses.
             foreach (var witness in detail.Witness)
             {
                 witness.AgencyCd = await _lookupService.GetAgencyLocationCode(witness.AgencyId);
@@ -226,11 +227,20 @@ namespace Scv.Api.Services
                 witness.WitnessTypeDsc = await _lookupService.GetWitnessRoleTypeDescription(witness.WitnessTypeCd);
             }
 
-            //Attach documents to participants.
+            //Populate participants.
             foreach (var participant in detail.Participant)
             {
                 participant.Document = documents.Where(doc => doc.PartId == participant.PartId).ToList();
-                //TODO Counsel and JustinCounsel here. 
+                //TODO tie this to a permission. View Witness List permission  
+                participant.HideJustinCounsel = false;
+            }
+
+            //Populate bans. 
+            foreach (var accusedFile in criminalFileContent.AccusedFile)
+            {
+                var bans = _mapper.Map<List<CriminalBan>>(accusedFile.Ban);
+                bans.ForEach(b => b.PartId = accusedFile.PartId);
+                detail.Ban.AddRange(bans);
             }
 
             //Populate location and region.
