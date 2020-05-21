@@ -108,8 +108,9 @@ namespace Scv.Api.Services
             //TODO need permission for this filter. 
             var hearingRescriptionPermission = true;
             detail.HearingRestriction = detail.HearingRestriction.Where(hr =>
-                hearingRescriptionPermission &&
-                hr.HearingRestrictionTypeCd != CvfcHearingRestriction2HearingRestrictionTypeCd.S).ToList();
+                    hearingRescriptionPermission &&
+                    hr.HearingRestrictionTypeCd != CvfcHearingRestriction2HearingRestrictionTypeCd.S)
+                .ToList();
 
             return detail;
         }
@@ -220,19 +221,22 @@ namespace Scv.Api.Services
 
             foreach (var witness in detail.Witness)
             {
-                //witness.AgencyCd Not available, comes from database. 
-                //witness.AgencyDsc Not available, comes from database. 
+                witness.AgencyCd = await _lookupService.GetAgencyLocationCode(witness.AgencyId);
+                witness.AgencyDsc = await _lookupService.GetAgencyLocationDescription(witness.AgencyId);
                 witness.WitnessTypeDsc = await _lookupService.GetWitnessRoleTypeDescription(witness.WitnessTypeCd);
             }
 
             //Attach documents to participants.
             foreach (var participant in detail.Participant)
+            {
                 participant.Document = documents.Where(doc => doc.PartId == participant.PartId).ToList();
+                //TODO Counsel and JustinCounsel here. 
+            }
 
             //Populate location and region.
-            detail.HomeLocationAgenName =  await _locationService.GetLocationName(detail.HomeLocationAgenId);
-            detail.HomeLocationAgenCode = await _locationService.GetLocationAgencyIdentifier(detail.HomeLocationAgenId);
-            detail.HomeLocationRegionName = await _locationService.GetRegionName(detail.HomeLocationAgenCode);
+            detail.HomeLocationAgencyName =  await _locationService.GetLocationName(detail.HomeLocationAgenId);
+            detail.HomeLocationAgencyCode = await _locationService.GetLocationAgencyIdentifier(detail.HomeLocationAgenId);
+            detail.HomeLocationRegionName = await _locationService.GetRegionName(detail.HomeLocationAgencyCode);
 
             detail.CourtClassDescription = await _lookupService.GetCourtClassDescription(detail.CourtClassCd.ToString());
             detail.CourtLevelDescription = await _lookupService.GetCourtLevelDescription(detail.CourtLevelCd.ToString());

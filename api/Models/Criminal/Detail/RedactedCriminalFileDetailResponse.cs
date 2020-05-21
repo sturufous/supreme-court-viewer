@@ -13,13 +13,10 @@ namespace Scv.Api.Models.Criminal.Detail
         public string JustinNo { get; set; }
         public string FileNumberTxt { get; set; }
         public string HomeLocationAgenId { get; set; }
-        public string HomeLocationAgenName { get; set; }
-        public string HomeLocationAgenCode { get; set; }
+        public string HomeLocationAgencyName { get; set; }
+        public string HomeLocationAgencyCode { get; set; }
         public string HomeLocationRegionName { get; set; }
         public string ActivityClassCd { get; set; }
-        public string AssignedPartNm { get; set; }
-        public string ApprovedByAgencyCd { get; set; }
-        public string CaseAgeDays { get; set; }
         public CriminalFileDetailResponseCourtLevelCd CourtLevelCd { get; set; }
         public string CourtLevelDescription { get; set; }
         public CriminalFileDetailResponseCourtClassCd CourtClassCd { get; set; }
@@ -32,6 +29,10 @@ namespace Scv.Api.Models.Criminal.Detail
         public string MdocSubCategoryDsc { get; set; }
         public CriminalFileDetailResponseIndictableYN IndictableYN { get; set; }
         public string MdocCcn { get; set; }
+        public string AssignedPartNm { get; set; }
+        public string ApprovedByAgencyCd { get; set; }
+        public string ApprovalCrownAgencyTypeCd { get; set; }
+        public string CaseAgeDays { get; set; }
 
         /// <summary>
         /// Custom class to extend. 
@@ -46,6 +47,9 @@ namespace Scv.Api.Models.Criminal.Detail
         /// Extended.
         /// </summary>
         public ICollection<CrownWitness> Crown { get; set; }
+        /// <summary>
+        /// Extended.
+        /// </summary>
         public ICollection<CriminalHearingRestriction> HearingRestriction { get; set; }
     }
 }

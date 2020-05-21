@@ -13,8 +13,8 @@ namespace Scv.Api.Models.Civil.Detail
         public string PhysicalFileId { get; set; }
         public string FileNumberTxt { get; set; }
         public string HomeLocationAgenId { get; set; }
-        public string HomeLocationAgencyCode { get; set; }
         public string HomeLocationAgencyName { get; set; }
+        public string HomeLocationAgencyCode { get; set; }
         public string HomeLocationRegionName { get; set; }
         public string ActivityClassCd { get; set; }
         public CivilFileDetailResponseCourtLevelCd CourtLevelCd { get; set; }
