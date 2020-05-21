@@ -1,13 +1,27 @@
 <template>
 <body>
-
-    <b-card bg-variant="light" v-if= "!isMounted"> 
-        <b-overlay :show="!isMounted" rounded="sm" >  
-            <b :aria-hidden="!isMounted ? 'true' : null"> Loading </b>
-        </b-overlay> 
+     <b-card bg-variant="light" v-if= "!isMounted && !isDataValid">
+        <b-overlay :show= "true"> 
+            <b-card style="min-height: 100px;"/>                   
+            <template v-slot:overlay>               
+               <div> 
+                    <loading-spinner/> 
+                    <p id="loading-label">Loading ...</p>
+               </div>                
+            </template> 
+      </b-overlay> 
     </b-card>
-    
-   <b-card bg-variant="white" border-variant="white" v-if="isMounted">   
+
+    <b-card bg-variant="light" v-if= "isMounted && !isDataValid">
+        <b-card  style="min-height: 100px;">
+            <span>This <b>File-Number '{{this.civilFileInformation.fileNumber}}'</b> doesn't exist in the <b>civil</b> records. </span>
+        </b-card>
+        <b-card>    
+            <b-button variant="info" @click="navigateToLandingPage">Back to the Landing Page</b-button>
+        </b-card>
+    </b-card>
+
+   <b-card  v-if= "isMounted && isDataValid">  
        
         <b-card bg-variant="light">
             <b-tabs active-nav-item-class="font-weight-bold text-uppercase text-info bg-light" pills >
@@ -19,13 +33,12 @@
                 v-bind:class="[ activetab === tabMapping ? 'active' : '' ]"
                 ></b-tab>
             </b-tabs>
-        </b-card>
-        
+        </b-card>        
        
-        <b-card border-variant="white"></b-card>
+        <b-card/>
  
         <b-overlay :show="loadingPdf" rounded="sm">  
-            <b-card bg-variant="light" :aria-hidden="loadingPdf ? 'true' : null">           
+            <b-card bg-variant="light">           
                 <b-table
                 :items="FilteredDocuments"
                 :fields="fields[fieldsTab]"
@@ -50,16 +63,22 @@
                     </template>
                 </b-table>
             </b-card>
+            <template v-slot:overlay>               
+               <div> 
+                    <loading-spinner/> 
+                    <p id="Downloading-label">Downloading PDF file ...</p>
+               </div>                
+            </template> 
         </b-overlay>
    </b-card> 
 </body>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch} from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
-import CivilFileDocuments from '../store/modules/CivilFileDocuments';
-const civilState = namespace('CivilFileDocuments');
+import '@store/modules/CivilFileInformation';
+const civilState = namespace('CivilFileInformation');
 
 enum fieldTab {Categories=0, Summary}
 
@@ -67,28 +86,47 @@ enum fieldTab {Categories=0, Summary}
 export default class CivilDocumentsView extends Vue {
 
     @civilState.State
-    public civilFileDocument!: any
+    public civilFileInformation!: any
+
+    @civilState.Action
+    public UpdateCivilFile!: (newCivilFileInformation: any) => void
 
     public getDocuments(): void {
-
-         this.loadingPdf = true;
-         this.$http.get('api/files/civil/'+ this.civilFileDocument.fileNumber)
-            .then(Response => Response.json(), err => console.log('error')        
+        
+        this.$http.get('/api/files/civil/'+ this.civilFileInformation.fileNumber)
+            .then(Response => Response.json(), err => {console.log('error');this.isMounted = true;}        
             ).then(data => {
                 this.documentsDetailsJson = data.document
                 this.ExtractDocumentInfo()
-                this.isMounted = true;
-                this.loadingPdf = false
+                if(this.documents.length)
+                {
+                    this.isMounted = true;
+                    this.isDataValid = true;
+                }
+                else
+                {
+                    this.isMounted = true;
+                }
             });
     }
 
-    mounted () {         
+    @Watch('$route', { immediate: false, deep: true })
+    onUrlChange() {
+        this.civilFileInformation.fileNumber = this.$route.params.fileNumber;
+        this.UpdateCivilFile(this.civilFileInformation);
+        location.reload();
+    }
+
+    mounted () { 
+        this.civilFileInformation.fileNumber = this.$route.params.fileNumber
+        this.UpdateCivilFile(this.civilFileInformation);        
         this.getDocuments();        
     }
 
     documentsDetailsJson;
     loadingPdf = false;
     isMounted = false;
+    isDataValid = false
 
     activetab = 'ALL';            
     sortBy = 'Seq.';
@@ -125,7 +163,6 @@ export default class CivilDocumentsView extends Vue {
         }
         else if (index==0 && this.activetab=='COURT SUMMARY')
         {
-            console.log(data.item['Appearance ID']);
             this.openCourtSummaryPdf(data.item['Appearance ID']);
         }         
     }
@@ -142,6 +179,10 @@ export default class CivilDocumentsView extends Vue {
         }
         else 
             return field.cellStyle;
+    }
+
+    public navigateToLandingPage() {
+        this.$router.push({name:'Home'})
     }
     
     public ExtractDocumentInfo(): void {
@@ -173,7 +214,6 @@ export default class CivilDocumentsView extends Vue {
             } else {                
                 docInfo["Document Type"] = 'CourtSummary';
                 docInfo["Appearance Date"] = jDoc.lastAppearanceDt.split(" ")[0];
-                console.log(jDoc)
                 docInfo["Appearance ID"] = jDoc.imageId;
                 docInfo["PdfAvail"] = jDoc.imageId? true : false
                 this.summaryDocuments.push(docInfo);
@@ -183,7 +223,7 @@ export default class CivilDocumentsView extends Vue {
         
         this.categories.sort()
         if(courtSummaryExists) this.categories.push("COURT SUMMARY")
-        this.categories.unshift("ALL")        
+        this.categories.unshift("ALL")  
     }
 
     public ExtractIssues(issues) {
@@ -233,7 +273,7 @@ export default class CivilDocumentsView extends Vue {
     public openDocumentsPdf(documentId): void {
         this.loadingPdf = true;
         const filename = 'doc'+documentId+'.pdf';
-        window.open(`api/files/document/${documentId}/${filename}?isCriminal=false`)
+        window.open(`/api/files/document/${documentId}/${filename}?isCriminal=false`)
         this.loadingPdf = false;
     }
     
@@ -241,7 +281,7 @@ export default class CivilDocumentsView extends Vue {
 
         this.loadingPdf = true;        
         const filename = 'court summary_'+appearanceId+'.pdf';
-        window.open(`api/files/civil/court-summary-report/${appearanceId}/${filename}`)
+        window.open(`/api/files/civil/court-summary-report/${appearanceId}/${filename}`)
         this.loadingPdf = false;
     }
     
@@ -255,3 +295,10 @@ export default class CivilDocumentsView extends Vue {
     
 }
 </script>
+
+<style scoped>
+ .card {
+        border: white;
+    }
+
+</style>

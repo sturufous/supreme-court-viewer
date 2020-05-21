@@ -5,6 +5,7 @@ using System.Net;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using JCCommon.Clients;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -47,7 +48,7 @@ namespace Scv.Api.Helpers.Middleware
 
         #region Methods
         /// <summary>
-        /// Handle the exception if one occurs.
+        /// Handle the exception if one occurs. Note this wont catch exceptions created from async void functions.
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
@@ -84,44 +85,41 @@ namespace Scv.Api.Helpers.Middleware
                 case KeyNotFoundException _:
                     code = HttpStatusCode.BadRequest;
                     message = "Item does not exist.";
-
                     _logger.LogDebug(ex, "Middleware caught unhandled exception.");
                     break;
                 case NotAuthorizedException _:
                     code = HttpStatusCode.Forbidden;
                     message = "User is not authorized to perform this action.";
-
                     _logger.LogWarning(ex, ex.Message);
                     break;
                 case ConfigurationException _:
                     code = HttpStatusCode.InternalServerError;
                     message = "Application configuration details invalid or missing.";
-
                     _logger.LogError(ex, ex.Message);
+                    break;
+                case NotFoundException _:
+                    code = HttpStatusCode.NotFound;
+                    message = ex.Message;
                     break;
                 case BadRequestException _:
                 case InvalidOperationException _:
                     code = HttpStatusCode.BadRequest;
                     message = ex.Message;
                     break;
-                case ApiHttpRequestException exception:
-                    code = exception.StatusCode;
+                case JCCommon.Clients.FileServices.ApiException exception:
+                    code = (HttpStatusCode)exception.StatusCode;
                     message = exception.Message;
-
-                    try
-                    {
-                        await using var responseStream = await exception?.Response.Content.ReadAsStreamAsync();
-                        responseStream.Position = 0;
-                        using var readStream = new StreamReader(responseStream, Encoding.UTF8);
-                        details = await readStream.ReadToEndAsync();
-                        _logger.LogError(exception, details);
-                    }
-                    catch (Exception streamEx)
-                    {
-                        // Ignore for now.
-                        _logger.LogError(streamEx, $"Failed to read the {nameof(ApiHttpRequestException)} error stream.");
-                    }
-
+                    _logger.LogError(ex, ex.Message);
+                    break;
+                case JCCommon.Clients.LocationServices.ApiException exception:
+                    code = (HttpStatusCode)exception.StatusCode;
+                    message = exception.Message;
+                    _logger.LogError(ex, ex.Message);
+                    break;
+                case JCCommon.Clients.LookupServices.ApiException exception:
+                    code = (HttpStatusCode)exception.StatusCode;
+                    message = exception.Message;
+                    _logger.LogError(ex, ex.Message);
                     break;
                 default:
                     _logger.LogError(ex, "Middleware caught unhandled exception.");
@@ -130,7 +128,6 @@ namespace Scv.Api.Helpers.Middleware
 
             if (!context.Response.HasStarted)
             {
-                var isDev = _env.IsDevelopment();
                 var result = JsonSerializer.Serialize(new Models.ErrorResponseModel(_env, ex, message, details), _options.JsonSerializerOptions);
                 context.Response.ContentType = "application/json";
                 context.Response.StatusCode = (int)code;

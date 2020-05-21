@@ -9,7 +9,7 @@
 
             <b-card >
                 <b-card-text for="filenumber"> File number: </b-card-text>                
-                <b-form-input id="filenumber" v-model="fileDocument.fileNumber" placeholder="Enter file number"></b-form-input>                
+                <b-form-input id="filenumber" v-model="fileInformation.fileNumber" placeholder="Enter file number"></b-form-input>                
             </b-card>
 
             <b-card> 
@@ -18,7 +18,7 @@
             </b-card>
         
             <b-card >
-                <b-button @click="navigateToDocumentsView(fileDocument)">Search</b-button>
+                <b-button @click="navigateToDocumentsView(fileInformation)">Search</b-button>
             </b-card>          
 
         </b-card>
@@ -28,10 +28,10 @@
 <script lang="ts">
     import { Component, Vue } from 'vue-property-decorator';
     import { namespace } from 'vuex-class'
-    import CivilFileDocuments from '../store/modules/CivilFileDocuments';
-    import CriminalFileDocuments from '../store/modules/CriminalFileDocuments';
-    const civilState = namespace('CivilFileDocuments');
-    const criminalState = namespace('CriminalFileDocuments');
+    import '@store/modules/CivilFileInformation';
+    import '@store/modules/CriminalFileInformation';
+    const civilState = namespace('CivilFileInformation');
+    const criminalState = namespace('CriminalFileInformation');
 
     @Component
     export default class Home extends Vue {
@@ -42,23 +42,23 @@
           { value: 'criminal', text: 'Criminal' }
         ]
         
-        fileDocument = { }
+        fileInformation = { }
 
         @civilState.Action
-        public UpdateCivilFile!: (newCivilFileDocument: any) => void
+        public UpdateCivilFile!: (newCivilFileInformation: any) => void
 
         @criminalState.Action
-        public UpdateCriminalFile!: (newCriminalFileDocument: any) => void           
+        public UpdateCriminalFile!: (newCriminalFileInformation: any) => void           
         
         // TODO: add validation so that the user has to enter values before clicking the search button
-        navigateToDocumentsView(fileDocument): void {
+        navigateToDocumentsView(fileInformation): void {
 
             if(this.selected == 'civil') {
-                this.UpdateCivilFile(fileDocument)
-                this.$router.push({name:'CivilDocumentsView', query: {fileNumber: fileDocument.fileNumber}})
+                this.UpdateCivilFile(fileInformation)
+                this.$router.push({name:'CivilDocumentsView', params: {fileNumber: fileInformation.fileNumber}})
             } else if(this.selected == 'criminal') {
-                this.UpdateCriminalFile(fileDocument)
-                this.$router.push({name:'CriminalDocumentsView', query: {fileNumber: fileDocument.fileNumber}})
+                this.UpdateCriminalFile(fileInformation)
+                this.$router.push({name:'CriminalCaseDetails', params: {fileNumber: fileInformation.fileNumber}})
             }
             
         }        
