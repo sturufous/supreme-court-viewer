@@ -1,27 +1,6 @@
 <template>
 <body>
-    <b-card bg-variant="light" v-if= "!isMounted && !isDataValid">
-        <b-overlay :show= "true"> 
-            <b-card  style="min-height: 100px;"/>                   
-            <template v-slot:overlay>               
-               <div> 
-                    <loading-spinner/> 
-                    <p id="loading-label">Loading ...</p>
-               </div>                
-            </template> 
-      </b-overlay> 
-    </b-card>
-
-    <b-card bg-variant="light" v-if= "isMounted && !isDataValid">
-        <b-card  style="min-height: 100px;">
-            <span>This <b>File-Number '{{this.criminalFileDocument.fileNumber}}'</b> doesn't have participant information. </span>
-        </b-card>
-        <b-card>         
-            <b-button variant="info" @click="navigateToLandingPage">Back to the Landing Page</b-button>
-        </b-card>
-    </b-card>
-
-   <b-card  v-if= "isMounted && isDataValid">
+   <b-card  v-if= "isMounted">
         <b-card bg-variant="light">
             <b-tabs active-nav-item-class="font-weight-bold text-uppercase text-info bg-light" pills >
                 <b-tab 
@@ -83,10 +62,10 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
-import CriminalFileDocuments from '../store/modules/CriminalFileDocuments';
-const criminalState = namespace('CriminalFileDocuments');
+import '@store/modules/CriminalFileInformation';
+const criminalState = namespace('CriminalFileInformation');
 
 enum fieldTab {Categories=0, Summary}
 enum DecodeCourtLevel {'P'= 0, 'S' = 1, 'A' = 2 }
@@ -100,38 +79,35 @@ enum DecodeCourtClass {
 export default class CriminalDocumentsView extends Vue {
 
     @criminalState.State
-    public criminalFileDocument!: any
+    public criminalFileInformation!: any
 
     @criminalState.Action
-    public UpdateCriminalFile!: (newCriminalFileDocument: any) => void
-    
+    public UpdateCriminalFile!: (newCriminalFileInformation: any) => void
+
+
     public getDocuments(): void {
-
        
-        this.$http.get('api/files/criminal/'+ this.criminalFileDocument.fileNumber)
-            .then(Response => Response.json(), err => {console.log(err);this.isMounted = true;}        
-            ).then(data => {
-                this.participantJson = data.participant 
-                this.courtLevel = DecodeCourtLevel[data.courtLevelCd];
-                this.courtClass = DecodeCourtClass[data.courtClassCd];
+        const data = this.criminalFileInformation.detailsData;
 
-                this.ExtractDocumentInfo()           
+        this.participantJson = data.participant 
 
-                if(this.participantFiles.length)
-                {
-                    this.isMounted = true;
-                    this.isDataValid = true;
-                }
-                else
-                {
-                    this.isMounted = true;
-                }
-            });
+        this.courtLevel = DecodeCourtLevel[data.courtLevelCd];
+        this.courtClass = DecodeCourtClass[data.courtClassCd];
+
+        this.ExtractDocumentInfo()          
+        this.isMounted = true;
+    }
+
+    @Watch('$route', { immediate: false, deep: true })
+    onUrlChange() {
+        this.criminalFileInformation.fileNumber = this.$route.params.fileNumber
+        this.UpdateCriminalFile(this.criminalFileInformation) 
+        location.reload();
     }
 
     mounted () { 
-        this.criminalFileDocument.fileNumber = this.$route.params.fileNumber
-        this.UpdateCriminalFile(this.criminalFileDocument)        
+        this.criminalFileInformation.fileNumber = this.$route.params.fileNumber
+        this.UpdateCriminalFile(this.criminalFileInformation);        
         this.getDocuments();  
     }
 
@@ -309,7 +285,7 @@ export default class CriminalDocumentsView extends Vue {
     public openDocumentsPdf(imageId): void {
         this.loadingPdf = true;
         const filename = 'doc'+imageId+'.pdf';
-        window.open(`api/files/document/${imageId}/${filename}?isCriminal=true`)
+        window.open(`/api/files/document/${imageId}/${filename}?isCriminal=true`)
         this.loadingPdf = false;
     }
     
@@ -318,7 +294,7 @@ export default class CriminalDocumentsView extends Vue {
         const partID = this.participantFiles[index]["Part ID"];
         const profSeqNo = this.participantFiles[index]["Prof Seq No"];      
         const filename = 'ROP_'+partID+'.pdf';
-        window.open(`api/files/criminal/record-of-proceedings/${partID}/${filename}?profSequenceNumber=${profSeqNo}&courtLevelCode=${this.courtLevel}&courtClassCode=${this.courtClass}`)
+        window.open(`/api/files/criminal/record-of-proceedings/${partID}/${filename}?profSequenceNumber=${profSeqNo}&courtLevelCode=${this.courtLevel}&courtClassCode=${this.courtClass}`)
         this.loadingPdf = false;
     }
     

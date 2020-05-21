@@ -39,6 +39,7 @@ namespace Scv.Api.Services
         #endregion
 
         #region Collection methods
+        public async Task<CodeLookup> GetAgencyLocations() => await GetDataFromCache("AgencyLocations", async () => await _lookupClient.CodesAgencyLocationsAsync());
         public async Task<CodeLookup> GetCriminalAppearanceReasons() => await GetDataFromCache("CriminalAppearanceReasons", async () => await _lookupClient.CodesCriminalAppearanceReasonsAsync());
         public async Task<CodeLookup> GetCriminalAppearanceResults() => await GetDataFromCache("CriminalAppearanceResults", async () => await _lookupClient.CodesCriminalAppearanceResultsAsync());
         public async Task<CodeLookup> GetFindings() => await GetDataFromCache("Findings", async() => await _lookupClient.CodesFindingsAsync());
@@ -53,6 +54,8 @@ namespace Scv.Api.Services
         #endregion
 
         #region Lookup Methods
+        public async Task<string> GetAgencyLocationDescription(string code) => FindLongDescriptionFromCode(await GetAgencyLocations(), code);
+        public async Task<string> GetAgencyLocationCode(string code) => FindShortDescriptionFromCode(await GetAgencyLocations(), code);
         public async Task<string> GetCriminalAssetsDescriptions(string code) => FindLongDescriptionFromCode(await GetCriminalAssets(), code);
         public async Task<string> GetCriminalAppearanceReasonsDescription(string code) => FindShortDescriptionFromCode(await GetCriminalAppearanceReasons(), code);
         public async Task<string> GetCriminalAppearanceResultsDescription(string code) => FindShortDescriptionFromCode(await GetCriminalAppearanceResults(), code);

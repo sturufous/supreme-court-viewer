@@ -1,6 +1,5 @@
 <template>
 <body>
-
      <b-card bg-variant="light" v-if= "!isMounted && !isDataValid">
         <b-overlay :show= "true"> 
             <b-card style="min-height: 100px;"/>                   
@@ -15,7 +14,7 @@
 
     <b-card bg-variant="light" v-if= "isMounted && !isDataValid">
         <b-card  style="min-height: 100px;">
-            <span>This <b>File-Number '{{this.civilFileDocument.fileNumber}}'</b> doesn't exist in the <b>civil</b> records. </span>
+            <span>This <b>File-Number '{{this.civilFileInformation.fileNumber}}'</b> doesn't exist in the <b>civil</b> records. </span>
         </b-card>
         <b-card>    
             <b-button variant="info" @click="navigateToLandingPage">Back to the Landing Page</b-button>
@@ -76,10 +75,10 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch} from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
-import CivilFileDocuments from '../store/modules/CivilFileDocuments';
-const civilState = namespace('CivilFileDocuments');
+import '@store/modules/CivilFileInformation';
+const civilState = namespace('CivilFileInformation');
 
 enum fieldTab {Categories=0, Summary}
 
@@ -87,15 +86,14 @@ enum fieldTab {Categories=0, Summary}
 export default class CivilDocumentsView extends Vue {
 
     @civilState.State
-    public civilFileDocument!: any
+    public civilFileInformation!: any
 
     @civilState.Action
-    public UpdateCivilFile!: (newCivilFileDocument: any) => void
+    public UpdateCivilFile!: (newCivilFileInformation: any) => void
 
     public getDocuments(): void {
-
         
-         this.$http.get('api/files/civil/'+ this.civilFileDocument.fileNumber)
+        this.$http.get('/api/files/civil/'+ this.civilFileInformation.fileNumber)
             .then(Response => Response.json(), err => {console.log('error');this.isMounted = true;}        
             ).then(data => {
                 this.documentsDetailsJson = data.document
@@ -112,9 +110,16 @@ export default class CivilDocumentsView extends Vue {
             });
     }
 
+    @Watch('$route', { immediate: false, deep: true })
+    onUrlChange() {
+        this.civilFileInformation.fileNumber = this.$route.params.fileNumber;
+        this.UpdateCivilFile(this.civilFileInformation);
+        location.reload();
+    }
+
     mounted () { 
-        this.civilFileDocument.fileNumber = this.$route.params.fileNumber;
-        this.UpdateCivilFile(this.civilFileDocument);        
+        this.civilFileInformation.fileNumber = this.$route.params.fileNumber
+        this.UpdateCivilFile(this.civilFileInformation);        
         this.getDocuments();        
     }
 
@@ -268,7 +273,7 @@ export default class CivilDocumentsView extends Vue {
     public openDocumentsPdf(documentId): void {
         this.loadingPdf = true;
         const filename = 'doc'+documentId+'.pdf';
-        window.open(`api/files/document/${documentId}/${filename}?isCriminal=false`)
+        window.open(`/api/files/document/${documentId}/${filename}?isCriminal=false`)
         this.loadingPdf = false;
     }
     
@@ -276,7 +281,7 @@ export default class CivilDocumentsView extends Vue {
 
         this.loadingPdf = true;        
         const filename = 'court summary_'+appearanceId+'.pdf';
-        window.open(`api/files/civil/court-summary-report/${appearanceId}/${filename}`)
+        window.open(`/api/files/civil/court-summary-report/${appearanceId}/${filename}`)
         this.loadingPdf = false;
     }
     
