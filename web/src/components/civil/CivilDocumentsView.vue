@@ -286,7 +286,7 @@ export default class CivilDocumentsView extends Vue {
     }
     
     public colHover(hovered, mouseEvent) {            
-        hovered? this.hoverCol = mouseEvent.fromElement.cellIndex: this.hoverCol =-1;
+        hovered && mouseEvent.fromElement != null? this.hoverCol = mouseEvent.fromElement.cellIndex: this.hoverCol =-1;
     }
 
     public rowHover(row) {

@@ -1,6 +1,9 @@
 <template>
 <body>
    <b-card  v-if= "isMounted">
+        <div>
+            <b> Documents () </b>
+        </div>
         <b-card bg-variant="light">
             <b-tabs active-nav-item-class="font-weight-bold text-uppercase text-info bg-light" pills >
                 <b-tab 
@@ -194,8 +197,8 @@ export default class CriminalDocumentsView extends Vue {
             fileInfo["Index"] = fileIndex; 
             fileInfo["Part ID"] = jFile.partId;
             fileInfo["Prof Seq No"] = jFile.profSeqNo;
-            fileInfo["First Name"] = jFile.givenNm? jFile.givenNm: '_noGivenname';
-            fileInfo["Last Name"] =  jFile.lastNm? jFile.lastNm: '_noLastname' ;            
+            fileInfo["First Name"] = jFile.givenNm ? jFile.givenNm : "";
+            fileInfo["Last Name"] = jFile.lastNm ? jFile.lastNm : jFile.orgNm;            
             
             fileInfo["Documents"] = [];
             fileInfo["Record of Proceedings"] = [];
@@ -275,7 +278,7 @@ export default class CriminalDocumentsView extends Vue {
     }
     
     public colHover(hovered, mouseEvent) {            
-        hovered? this.hoverCol = mouseEvent.fromElement.cellIndex: this.hoverCol =-1;
+        hovered && mouseEvent.fromElement != null? this.hoverCol = mouseEvent.fromElement.cellIndex: this.hoverCol =-1;
     }
 
     public rowHover(row) {
