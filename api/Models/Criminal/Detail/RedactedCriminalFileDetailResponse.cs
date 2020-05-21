@@ -36,7 +36,7 @@ namespace Scv.Api.Models.Criminal.Detail
         public string CaseAgeDays { get; set; }
         public string CrownEstimateLenQty { get; set; }
         public string CrownEstimateLenDsc { get; set; }
-        public string CrownEstimateLenUnit { get; set; }
+        public CriminalFileDetailResponseCrownEstimateLenUnit? CrownEstimateLenUnit { get; set; }
         /// <summary>
         /// Custom class to extend. 
         /// </summary>

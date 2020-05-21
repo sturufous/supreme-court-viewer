@@ -242,7 +242,7 @@ namespace Scv.Api.Services
             detail.CourtLevelDescription = await _lookupService.GetCourtLevelDescription(detail.CourtLevelCd.ToString());
             detail.ActivityClassCd = await _lookupService.GetActivityClassCd(detail.CourtClassCd.ToString());
 
-            detail.CrownEstimateLenDsc = await _lookupService.GetAppearanceDuration(detail.CrownEstimateLenUnit);
+            detail.CrownEstimateLenDsc = detail.CrownEstimateLenUnit.HasValue ? await _lookupService.GetAppearanceDuration(detail.CrownEstimateLenUnit.Value.ToString()) : null;
 
             //Populate hearing restrictions.
             foreach (var hearingRestriction in detail.HearingRestriction)
