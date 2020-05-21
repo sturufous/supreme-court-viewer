@@ -6,7 +6,7 @@ namespace Scv.Api.Models.Criminal.Detail
     /// <summary>
     /// This is used to narrow down the amount of information from CriminalFileDetailResponse. 
     /// </summary>
-    public class RedactedCriminalFileDetailResponse : CriminalFileDetailResponse
+    public class RedactedCriminalFileDetailResponse
     {
         public RedactedCriminalFileDetailResponse()
         {
