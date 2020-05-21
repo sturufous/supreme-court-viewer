@@ -252,9 +252,7 @@ namespace Scv.Api.Services
 
             //Populate crown.
             detail.Crown = _mapper.Map<ICollection<CrownWitness>>(detail.Witness.Where(w => w.RoleTypeCd == CriminalWitnessRoleTypeCd.CRN).ToList());
-            foreach (var crownWitness in detail.Crown)
-                crownWitness.Assigned = crownWitness.IsAssigned(detail.AssignedPartNm);
-
+            
             //Populate bans. 
             foreach (var accusedFile in criminalFileContent.AccusedFile)
             {
