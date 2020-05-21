@@ -189,7 +189,7 @@ namespace Scv.Api.Services
 
             var detail = _mapper.Map<RedactedCriminalFileDetailResponse>(criminalFileDetail);
 
-            //Generate documents from AccusedFile. 
+            //Populate documents from AccusedFile. 
             var documents = criminalFileContent.AccusedFile.SelectMany(ac =>
             {
                 var criminalDocuments = _mapper.Map<List<CriminalDocument>>(ac.Document);
@@ -219,6 +219,7 @@ namespace Scv.Api.Services
                 return criminalDocuments;
             }).ToList();
 
+            //Populate witnesses.
             foreach (var witness in detail.Witness)
             {
                 witness.AgencyCd = await _lookupService.GetAgencyLocationCode(witness.AgencyId);
@@ -226,11 +227,12 @@ namespace Scv.Api.Services
                 witness.WitnessTypeDsc = await _lookupService.GetWitnessRoleTypeDescription(witness.WitnessTypeCd);
             }
 
-            //Attach documents to participants.
+            //Populate participants.
             foreach (var participant in detail.Participant)
             {
                 participant.Document = documents.Where(doc => doc.PartId == participant.PartId).ToList();
-                //TODO Counsel and JustinCounsel here. 
+                participant.HideJustinCounsel = false;   //TODO tie this to a permission. View Witness List permission  
+                //TODO COUNSEL? Not sure where  to get this data from
             }
 
             //Populate location and region.
@@ -242,14 +244,22 @@ namespace Scv.Api.Services
             detail.CourtLevelDescription = await _lookupService.GetCourtLevelDescription(detail.CourtLevelCd.ToString());
             detail.ActivityClassCd = await _lookupService.GetActivityClassCd(detail.CourtClassCd.ToString());
 
+            detail.CrownEstimateLenDsc = detail.CrownEstimateLenUnit.HasValue ? await _lookupService.GetAppearanceDuration(detail.CrownEstimateLenUnit.Value.ToString()) : null;
+
             //Populate hearing restrictions.
             foreach (var hearingRestriction in detail.HearingRestriction)
                 hearingRestriction.HearingRestrictionTypeDsc =  await _lookupService.GetHearingRestrictionDescription(hearingRestriction.HearingRestrictionTypeCd.ToString());
 
             //Populate crown.
             detail.Crown = _mapper.Map<ICollection<CrownWitness>>(detail.Witness.Where(w => w.RoleTypeCd == CriminalWitnessRoleTypeCd.CRN).ToList());
-            foreach (var crownWitness in detail.Crown)
-                crownWitness.Assigned = crownWitness.IsAssigned(detail.AssignedPartNm);
+            
+            //Populate bans. 
+            foreach (var accusedFile in criminalFileContent.AccusedFile)
+            {
+                var bans = _mapper.Map<List<CriminalBan>>(accusedFile.Ban.Where(b=> b != null));
+                bans.ForEach(b => b.PartId = accusedFile.PartId);
+                detail.Ban.AddRange(bans);
+            }
 
             return detail;
         }
