@@ -3,7 +3,7 @@
 title: JC-Interface - Lookup Code Services
 version: 0.0.1
 protocols: [HTTPS]
-baseUri: 
+baseUri:
 mediaType: application/json
 securedBy: [basic]
 
@@ -119,6 +119,10 @@ resourceTypes:
     /{adjudicatorId}:
       type:
         readOnlyCollectionItem:
+  
+  /agencyLocations:
+    type:
+      readOnlyCollection:
   
   /asset:
     /roleCombos:
