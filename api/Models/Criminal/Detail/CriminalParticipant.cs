@@ -7,7 +7,9 @@ namespace Scv.Api.Models.Criminal.Detail
     /// </summary>
     public class CriminalParticipant : JCCommon.Clients.FileServices.CriminalParticipant
     {
-        public string FullName => $"{GivenNm?.Trim()} {LastNm?.Trim()}";
+        public string FullName => GivenNm != null && LastNm != null
+            ? $"{GivenNm?.Trim()} {LastNm?.Trim()}"
+            : OrgNm;
 
         /// <summary>
         /// Custom class to extend.

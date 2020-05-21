@@ -231,16 +231,8 @@ namespace Scv.Api.Services
             foreach (var participant in detail.Participant)
             {
                 participant.Document = documents.Where(doc => doc.PartId == participant.PartId).ToList();
-                //TODO tie this to a permission. View Witness List permission  
-                participant.HideJustinCounsel = false;
-            }
-
-            //Populate bans. 
-            foreach (var accusedFile in criminalFileContent.AccusedFile)
-            {
-                var bans = _mapper.Map<List<CriminalBan>>(accusedFile.Ban);
-                bans.ForEach(b => b.PartId = accusedFile.PartId);
-                detail.Ban.AddRange(bans);
+                participant.HideJustinCounsel = false;   //TODO tie this to a permission. View Witness List permission  
+                //TODO COUNSEL? Not sure where  to get this data from
             }
 
             //Populate location and region.
@@ -262,6 +254,14 @@ namespace Scv.Api.Services
             detail.Crown = _mapper.Map<ICollection<CrownWitness>>(detail.Witness.Where(w => w.RoleTypeCd == CriminalWitnessRoleTypeCd.CRN).ToList());
             foreach (var crownWitness in detail.Crown)
                 crownWitness.Assigned = crownWitness.IsAssigned(detail.AssignedPartNm);
+
+            //Populate bans. 
+            foreach (var accusedFile in criminalFileContent.AccusedFile)
+            {
+                var bans = _mapper.Map<List<CriminalBan>>(accusedFile.Ban.Where(b=> b != null));
+                bans.ForEach(b => b.PartId = accusedFile.PartId);
+                detail.Ban.AddRange(bans);
+            }
 
             return detail;
         }
