@@ -15,7 +15,7 @@
 
     <b-card bg-variant="light" v-if= "isMounted && !isDataReady">
         <b-card  style="min-height: 100px;">
-            <span>This <b>File-Number '{{this.criminalFileInformation.fileNumber}}'</b> doesn't have participant information. </span>
+            <span>This <b>File-Number '{{this.criminalFileInformation.fileNumber}}'</b> doesn't exist in the <b>criminal</b> records. </span>
         </b-card>
         <b-card>         
             <b-button variant="info" @click="navigateToLandingPage">Back to the Landing Page</b-button>
@@ -27,7 +27,9 @@
             <criminal-side-panel v-if="isDataReady"/> 
         </b-col>
         <b-col col md="10" cols="10" style="overflow: auto;">
-            <criminal-header v-if="isDataReady"/>       
+            <criminal-header-top v-if="isDataReady"/> 
+            <criminal-header v-if="isDataReady"/> 
+            <criminal-participants v-if="showCaseDetails"/>            
             <criminal-documents-view v-if="showDocuments"/>  
         </b-col>
     </b-row>
@@ -38,8 +40,10 @@
 import { Component, Vue } from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
 import CriminalDocumentsView from '@components/criminal/CriminalDocumentsView.vue';
+import CriminalHeaderTop from './CriminalHeaderTop.vue';
 import CriminalHeader from './CriminalHeader.vue';
 import CriminalSidePanel from './CriminalSidePanel.vue';
+import CriminalParticipants from './CriminalParticipants.vue'
 
 import '@store/modules/CriminalFileInformation';
 const criminalState = namespace('CriminalFileInformation');
@@ -48,7 +52,9 @@ const criminalState = namespace('CriminalFileInformation');
     components: {
         CriminalDocumentsView,
         CriminalSidePanel,
-        CriminalHeader
+        CriminalHeaderTop,
+        CriminalHeader,
+        CriminalParticipants
     }
 })
 export default class CriminalCaseDetails extends Vue {
@@ -73,13 +79,15 @@ export default class CriminalCaseDetails extends Vue {
         this.$http.get('/api/files/criminal/'+ this.criminalFileInformation.fileNumber)
             .then(Response => Response.json(), err => {console.log(err);}        
             ).then(data => {
-                this.criminalFileInformation.detailsData = data; 
-                this.participantJson = data.participant                
-                this.UpdateCriminalFile(this.criminalFileInformation);               
-                this.ExtractDocumentInfo()
-                if(this.participantFiles.length)
-                {                    
-                    this.isDataReady = true;
+                if(data){
+                    this.criminalFileInformation.detailsData = data; 
+                    this.participantJson = data.participant                
+                    this.UpdateCriminalFile(this.criminalFileInformation);               
+                    this.ExtractDocumentInfo()
+                    if(this.participantFiles.length)
+                    {                    
+                        this.isDataReady = true;
+                    }
                 }
                 this.isMounted = true;
                        
@@ -90,6 +98,11 @@ export default class CriminalCaseDetails extends Vue {
     isMounted = false
     participantJson;
     participantFiles: any[] = [];
+
+    get showCaseDetails()
+    {        
+        return (this.showSections['Case Details'] && this.isDataReady)
+    }
     
     get showDocuments()
     {        

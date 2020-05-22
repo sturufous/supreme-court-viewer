@@ -13,7 +13,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 using Scv.Api.Helpers;
+using Scv.Api.Helpers.ContractResolver;
 using Scv.Api.Helpers.Mapping;
 using Scv.Api.Helpers.Middleware;
 using Scv.Api.Services;
@@ -75,6 +77,8 @@ namespace Scv.Api
 
             services.AddControllers().AddNewtonsoftJson(options =>
             {
+                options.SerializerSettings.ContractResolver = new SafeContractResolver { NamingStrategy = new CamelCaseNamingStrategy() };
+                options.SerializerSettings.Formatting = Formatting.Indented;
                 options.SerializerSettings.Converters.Add(new StringEnumConverter());
                 options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
             });
