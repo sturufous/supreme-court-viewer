@@ -153,7 +153,9 @@ namespace Scv.Api.Controllers
         public async Task<ActionResult<RedactedCriminalFileDetailResponse>> GetCriminalFileDetailByFileId(string fileId)
         {
             var redactedCriminalFileDetailResponse = await _filesService.FilesCriminalFileIdAsync(fileId);
-            return Ok(redactedCriminalFileDetailResponse ?? throw new NotFoundException("Couldn't find criminal file with this id."));
+            if (redactedCriminalFileDetailResponse?.JustinNo == null)
+                throw new NotFoundException("Couldn't find criminal file with this id.");
+            return Ok(redactedCriminalFileDetailResponse);
         }
 
         /// <summary>
