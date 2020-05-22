@@ -11,12 +11,5 @@
             : null;
         public string LastNm { get; set; }
         public string GivenNm { get; set; }
-        public bool Assigned { get; set; }
-        public bool IsAssigned(string assignedPartName)
-        {
-            if (assignedPartName == null || LastNm == null || GivenNm == null)
-                return false;
-            return assignedPartName.Trim() == $"{LastNm.Trim()}, {GivenNm.Trim()}";
-        }
     }
 }
