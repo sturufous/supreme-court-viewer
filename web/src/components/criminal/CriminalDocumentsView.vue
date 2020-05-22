@@ -2,12 +2,14 @@
 <body>
    <b-card  v-if= "isMounted">
         <div>
-            <b> Documents () </b>
+            <b> Documents ({{NumberOfDocuments}}) </b>
         </div>
-        <b-card bg-variant="light">
-            <b-tabs active-nav-item-class="font-weight-bold text-uppercase text-info bg-light" pills >
+        <b-card bg-variant="white">
+            <b-tabs  nav-wrapper-class = "bg-light text-dark"
+                     active-nav-item-class="text-uppercase font-weight-bold text-white bg-primary"                     
+                     pills >
                 <b-tab 
-                v-for="(tabMapping, index) in categories" 
+                v-for="(tabMapping, index) in categories"                 
                 :key="index"                 
                 :title="tabMapping"                 
                 v-on:click="activetab = tabMapping" 
@@ -123,7 +125,8 @@ export default class CriminalDocumentsView extends Vue {
 
     loadingPdf = false;
     
-    activetab = 'ALL'; 
+    activetab = 'ALL';
+    tabIndex = 0; 
     activeparticipant = 0;           
     sortBy = 'Date Filed/Issued';
     sortDesc = false;
@@ -279,6 +282,17 @@ export default class CriminalDocumentsView extends Vue {
         }    
     }
     
+
+    get NumberOfDocuments() {       
+        if(this.activetab == 'ROP')
+        {           
+            return(this.participantFiles[this.activeparticipant]["Record of Proceedings"].length)
+        }
+        else{  
+            return(this.participantFiles[this.activeparticipant]["Documents"].length)            
+        }    
+    }
+
     public colHover(hovered, mouseEvent) {            
         hovered && mouseEvent.fromElement != null? this.hoverCol = mouseEvent.fromElement.cellIndex: this.hoverCol =-1;
     }
@@ -292,6 +306,7 @@ export default class CriminalDocumentsView extends Vue {
         const filename = 'doc'+imageId+'.pdf';
         window.open(`/api/files/document/${imageId}/${filename}?isCriminal=true`)
         this.loadingPdf = false;
+        this.NumberOfDocuments();
     }
     
     public openRopPdf(index): void {
@@ -300,6 +315,7 @@ export default class CriminalDocumentsView extends Vue {
         const profSeqNo = this.participantFiles[index]["Prof Seq No"];      
         const filename = 'ROP_'+partID+'.pdf';
       
+      this.NumberOfDocuments();
         const url =`/api/files/criminal/record-of-proceedings/${partID}/${filename}?profSequenceNumber=${profSeqNo}&courtLevelCode=${this.courtLevel}&courtClassCode=${this.courtClass}`;
 
         this.$http.get(url)

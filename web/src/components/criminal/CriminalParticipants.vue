@@ -18,9 +18,22 @@
                     <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
                 </template>
                 <template v-for="(field,index) in fields" v-slot:[`cell(${field.key})`]="data" >
-                    <span v-bind:key="index" :class="field.cellStyle" v-if="data.field.key != 'Status'">  {{ data.value }} </span>
+                    <span v-bind:key="index" :class="field.cellStyle" v-if="data.field.key != 'Status' && data.field.key != 'Name'">  {{ data.value }} </span>
+                    <span v-bind:key="index" :class="data.item.Charges.length>0?field.cellStyle:''" v-if="data.field.key == 'Name'"> 
+                         {{ data.value }}
+                        <b-dropdown size="sm" variant="white text-info" v-if="data.item.Charges.length>0" >
+                            <b-dropdown-text variant="white text-danger">Charges</b-dropdown-text>
+                            <b-dropdown-divider></b-dropdown-divider>
+                            <b-dropdown-item-button 
+                                disabled                                                               
+                                v-for="(file,index) in data.item.Charges" 
+                                :key="index">                                
+                                   <b>{{file["Code"]}}</b> &mdash; {{file["Description"]}}
+                            </b-dropdown-item-button> 
+                        </b-dropdown>                       
+                    </span>
                     <span v-bind:key="index" v-if="data.field.key == 'Status'">  
-                        <b-badge 
+                        <b-badge  
                             v-for="(field,index) in data.value"
                             :key="index" 
                             class="mr-1"
@@ -60,7 +73,6 @@ export default class CriminalParticipants extends Vue {
         this.ExtractDocumentInfo();
         this.isMounted = true;          
     } 
-
   
     isMounted = false;
     participantJson;
@@ -72,7 +84,7 @@ export default class CriminalParticipants extends Vue {
 
     fields =  
     [
-        {key:'Name',                    sortable:true,  headerStyle:'text-info',   cellStyle:'text-info'},
+        {key:'Name',                    sortable:true,  headerStyle:'text-primary',   cellStyle:'text-info'},
         {key:'D.O.B.',                  sortable:false,  headerStyle:'text',         cellStyle:'text'},
         {key:'Status',                  sortable:false, headerStyle:'text',         cellStyle:'text-white bg-secondary'},
         {key:'Counsel',                 sortable:false, headerStyle:'text',         cellStyle:'text'},
@@ -92,13 +104,25 @@ export default class CriminalParticipants extends Vue {
         for (const fileIndex in this.participantJson) {
             const fileInfo = {};
             const jFile = this.participantJson[fileIndex];
+
             fileInfo["Index"] = fileIndex;
             fileInfo["First Name"] = jFile.givenNm ? jFile.givenNm : "";
             fileInfo["Last Name"] = jFile.lastNm ? jFile.lastNm : jFile.orgNm;
             fileInfo["Name"] = this.getNameOfParticipant(fileInfo["Last Name"], fileInfo["First Name"]);            
             fileInfo["D.O.B."] = jFile.birthDt? (new Date(jFile.birthDt.split(' ')[0])).toUTCString().substr(4,12) : '';
-            fileInfo["Status"] = [];
 
+            fileInfo["Charges"] = [];         
+            const charges: any[] = [];         
+            for(const charge of jFile.charge)
+            {              
+                    const docInfo = {};                   
+                    docInfo["Description"]= charge.sectionDscTxt
+                    docInfo["Code"]= charge.sectionTxt
+                    charges.push(docInfo);
+            }
+            fileInfo["Charges"] = charges;
+
+            fileInfo["Status"] = [];
             for (const status of this.statusFields)
             {
                 if(jFile[status.code] =='Y')
@@ -106,9 +130,8 @@ export default class CriminalParticipants extends Vue {
             }
    
             fileInfo['Counsel'] = ''
-            fileInfo['Counsel Designation Filed'] = jFile.designatedCounselYN
-
-            this.participantList.push(fileInfo);
+            fileInfo['Counsel Designation Filed'] = jFile.designatedCounselYN           
+            this.participantList.push(fileInfo); 
         }
         this.numberOfParticipants = this.participantList.length;
     }

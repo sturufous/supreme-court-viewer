@@ -23,8 +23,10 @@
 
    <b-card  v-if= "isMounted && isDataValid">  
        
-        <b-card bg-variant="light">
-            <b-tabs active-nav-item-class="font-weight-bold text-uppercase text-info bg-light" pills >
+        <b-card bg-variant="white">
+            <b-tabs  nav-wrapper-class = "bg-light text-dark"
+                     active-nav-item-class="text-uppercase font-weight-bold text-white bg-primary"                     
+                     pills >
                 <b-tab 
                 v-for="(tabMapping, index) in categories" 
                 :key="index"                 
