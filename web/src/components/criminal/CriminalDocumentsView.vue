@@ -306,7 +306,6 @@ export default class CriminalDocumentsView extends Vue {
         const filename = 'doc'+imageId+'.pdf';
         window.open(`/api/files/document/${imageId}/${filename}?isCriminal=true`)
         this.loadingPdf = false;
-        this.NumberOfDocuments();
     }
     
     public openRopPdf(index): void {
@@ -315,7 +314,6 @@ export default class CriminalDocumentsView extends Vue {
         const profSeqNo = this.participantFiles[index]["Prof Seq No"];      
         const filename = 'ROP_'+partID+'.pdf';
       
-      this.NumberOfDocuments();
         const url =`/api/files/criminal/record-of-proceedings/${partID}/${filename}?profSequenceNumber=${profSeqNo}&courtLevelCode=${this.courtLevel}&courtClassCode=${this.courtClass}`;
 
         this.$http.get(url)
