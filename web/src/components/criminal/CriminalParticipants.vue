@@ -2,7 +2,8 @@
 <body>
     <b-card bg-variant="white">
         <div>
-            <b> Participants ({{numberOfParticipants}}) </b>
+            <h3 class="mx-2"> Participants ({{numberOfParticipants}}) </h3>
+            <hr class="mx-1 bg-light" style="height: 5px;"/> 
         </div>
 
         <b-card bg-variant="white">           
@@ -45,8 +46,7 @@
                 </template>
             </b-table>
         </b-card>
-    </b-card>
-    <hr class="mx-3" style="height: 2px;"/>  
+    </b-card> 
 
 </body>
 </template>

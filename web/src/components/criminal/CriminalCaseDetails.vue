@@ -29,7 +29,8 @@
         <b-col col md="10" cols="10" style="overflow: auto;">
             <criminal-header-top v-if="isDataReady"/> 
             <criminal-header v-if="isDataReady"/> 
-            <criminal-participants v-if="showCaseDetails"/>            
+            <criminal-participants v-if="showCaseDetails"/>
+            <adjudicator-restrictions v-if="showCaseDetails"/>            
             <criminal-documents-view v-if="showDocuments"/>  
         </b-col>
     </b-row>
@@ -44,6 +45,7 @@ import CriminalHeaderTop from './CriminalHeaderTop.vue';
 import CriminalHeader from './CriminalHeader.vue';
 import CriminalSidePanel from './CriminalSidePanel.vue';
 import CriminalParticipants from './CriminalParticipants.vue'
+import AdjudicatorRestrictions from './AdjudicatorRestrictions.vue'
 
 import '@store/modules/CriminalFileInformation';
 const criminalState = namespace('CriminalFileInformation');
@@ -54,7 +56,8 @@ const criminalState = namespace('CriminalFileInformation');
         CriminalSidePanel,
         CriminalHeaderTop,
         CriminalHeader,
-        CriminalParticipants
+        CriminalParticipants,
+        AdjudicatorRestrictions
     }
 })
 export default class CriminalCaseDetails extends Vue {
