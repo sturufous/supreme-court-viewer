@@ -16,6 +16,8 @@ using Scv.Api.Models.Criminal.AppearanceDetail;
 using Scv.Api.Models.Criminal.Detail;
 using CivilAppearanceDetail = Scv.Api.Models.Civil.AppearanceDetail.CivilAppearanceDetail;
 using CriminalAppearanceDetail = Scv.Api.Models.Criminal.AppearanceDetail.CriminalAppearanceDetail;
+using CriminalParticipant = Scv.Api.Models.Criminal.Detail.CriminalParticipant;
+using CriminalWitness = Scv.Api.Models.Criminal.Detail.CriminalWitness;
 
 namespace Scv.Api.Services
 {
@@ -189,78 +191,17 @@ namespace Scv.Api.Services
 
             var detail = _mapper.Map<RedactedCriminalFileDetailResponse>(criminalFileDetail);
 
-            //Populate documents from AccusedFile. 
-            var documents = criminalFileContent.AccusedFile.SelectMany(ac =>
-            {
-                var criminalDocuments = _mapper.Map<List<CriminalDocument>>(ac.Document);
-
-                //Create ROPs. 
-                if (ac.Appearance != null && ac.Appearance.Any())
-                {
-                    criminalDocuments.Insert(0, new CriminalDocument
-                    {
-                        DocumentTypeDescription = "Record of Proceedings",
-                        ImageId = ac.PartId,
-                        Category = "rop",
-                        PartId = ac.PartId,
-                        HasFutureAppearance = ac.Appearance?.Any(a =>
-                            a?.AppearanceDate != null && DateTime.Parse(a.AppearanceDate) >= DateTime.Today)
-                    });
-                }
-
-                //Populate extra fields. 
-                foreach (var document in criminalDocuments)
-                {
-                    document.Category = string.IsNullOrEmpty(document.Category) ? _lookupService.GetDocumentCategory(document.DocmFormId) : document.Category;
-                    document.DocumentTypeDescription = document.DocmFormDsc;
-                    document.PartId = ac.PartId;
-                }
-
-                return criminalDocuments;
-            }).ToList();
-
-            //Populate witnesses.
-            foreach (var witness in detail.Witness)
-            {
-                witness.AgencyCd = await _lookupService.GetAgencyLocationCode(witness.AgencyId);
-                witness.AgencyDsc = await _lookupService.GetAgencyLocationDescription(witness.AgencyId);
-                witness.WitnessTypeDsc = await _lookupService.GetWitnessRoleTypeDescription(witness.WitnessTypeCd);
-            }
-
-            //Populate participants.
-            foreach (var participant in detail.Participant)
-            {
-                participant.Document = documents.Where(doc => doc.PartId == participant.PartId).ToList();
-                participant.HideJustinCounsel = false;   //TODO tie this to a permission. View Witness List permission  
-                //TODO COUNSEL? Not sure where  to get this data from
-            }
-
-            //Populate location and region.
-            detail.HomeLocationAgencyName =  await _locationService.GetLocationName(detail.HomeLocationAgenId);
-            detail.HomeLocationAgencyCode = await _locationService.GetLocationAgencyIdentifier(detail.HomeLocationAgenId);
-            detail.HomeLocationRegionName = await _locationService.GetRegionName(detail.HomeLocationAgencyCode);
-
-            detail.CourtClassDescription = await _lookupService.GetCourtClassDescription(detail.CourtClassCd.ToString());
-            detail.CourtLevelDescription = await _lookupService.GetCourtLevelDescription(detail.CourtLevelCd.ToString());
-            detail.ActivityClassCd = await _lookupService.GetActivityClassCd(detail.CourtClassCd.ToString());
-
-            detail.CrownEstimateLenDsc = detail.CrownEstimateLenUnit.HasValue ? await _lookupService.GetAppearanceDuration(detail.CrownEstimateLenUnit.Value.ToString()) : null;
-
-            //Populate hearing restrictions.
-            foreach (var hearingRestriction in detail.HearingRestriction)
-                hearingRestriction.HearingRestrictionTypeDsc =  await _lookupService.GetHearingRestrictionDescription(hearingRestriction.HearingRestrictionTypeCd.ToString());
-
-            //Populate crown.
-            detail.Crown = _mapper.Map<ICollection<CrownWitness>>(detail.Witness.Where(w => w.RoleTypeCd == CriminalWitnessRoleTypeCd.CRN).ToList());
-            
-            //Populate bans. 
+            var documents = PopulateDocuments(criminalFileContent);
+            detail = await PopulateBaseDetails(detail);
+            detail.Witness = await PopulateWitnesses(detail);
+            detail.Participant = PopulateParticipants(detail, documents);
+            detail.HearingRestriction = await PopulateHearingRestrictions(detail);
+            detail.Crown = PopulateCrown(detail);
             foreach (var accusedFile in criminalFileContent.AccusedFile)
             {
-                var bans = _mapper.Map<List<CriminalBan>>(accusedFile.Ban.Where(b=> b != null));
-                bans.ForEach(b => b.PartId = accusedFile.PartId);
-                detail.Ban.AddRange(bans);
+                detail.Count.AddRange( PopulateCounts(accusedFile, detail));
+                detail.Ban.AddRange(PopulateBans(accusedFile));
             }
-
             return detail;
         }
 
@@ -337,6 +278,112 @@ namespace Scv.Api.Services
             var documentResponse = await _fileServicesClient.FilesDocumentAsync(documentId, isCriminal ? "R" : "I");
             return documentResponse;
         }
+        #endregion
+
+        #region Helpers
+
+        #region Criminal Details
+        private string GetParticipantIdFromDetail(string partId, RedactedCriminalFileDetailResponse detail) => detail.Participant?.FirstOrDefault(p => p != null && p.PartId == partId)?.PartId;
+
+        private List<CriminalBan> PopulateBans(CfcAccusedFile accusedFile)
+        {
+            var bans = _mapper.Map<List<CriminalBan>>(accusedFile.Ban.Where(b => b != null));
+            bans.ForEach(b => b.PartId = accusedFile.PartId);
+            return bans;
+        }
+
+        private List<CriminalCount> PopulateCounts(CfcAccusedFile accusedFile, RedactedCriminalFileDetailResponse detail)
+        {
+            var criminalCount = new List<CriminalCount>();
+            foreach (var appearance in accusedFile.Appearance)
+            {
+                foreach (var count in _mapper.Map<ICollection<CriminalCount>>(appearance.AppearanceCount.Where(a => a?.AppearanceResult == "END")))
+                {
+                    count.PartId = GetParticipantIdFromDetail(accusedFile.PartId, detail);
+                    count.AppearanceDate = appearance.AppearanceDate;
+                    criminalCount.Add(count);
+                }
+            }
+            return criminalCount;
+        }
+
+        private List<CriminalDocument> PopulateDocuments(CriminalFileContent criminalFileContent)
+        {
+            return criminalFileContent.AccusedFile.SelectMany(ac =>
+            {
+                var criminalDocuments = _mapper.Map<List<CriminalDocument>>(ac.Document);
+
+                //Create ROPs. 
+                if (ac.Appearance != null && ac.Appearance.Any())
+                {
+                    criminalDocuments.Insert(0, new CriminalDocument
+                    {
+                        DocumentTypeDescription = "Record of Proceedings",
+                        ImageId = ac.PartId,
+                        Category = "rop",
+                        PartId = ac.PartId,
+                        HasFutureAppearance = ac.Appearance?.Any(a =>
+                            a?.AppearanceDate != null && DateTime.Parse(a.AppearanceDate) >= DateTime.Today)
+                    });
+                }
+
+                //Populate extra fields. 
+                foreach (var document in criminalDocuments)
+                {
+                    document.Category = string.IsNullOrEmpty(document.Category) ? _lookupService.GetDocumentCategory(document.DocmFormId) : document.Category;
+                    document.DocumentTypeDescription = document.DocmFormDsc;
+                    document.PartId = ac.PartId;
+                }
+
+                return criminalDocuments;
+            }).ToList();
+        }
+
+        private async Task<ICollection<CriminalWitness>> PopulateWitnesses(RedactedCriminalFileDetailResponse detail)
+        {
+            foreach (var witness in detail.Witness)
+            {
+                witness.AgencyCd = await _lookupService.GetAgencyLocationCode(witness.AgencyId);
+                witness.AgencyDsc = await _lookupService.GetAgencyLocationDescription(witness.AgencyId);
+                witness.WitnessTypeDsc = await _lookupService.GetWitnessRoleTypeDescription(witness.WitnessTypeCd);
+            }
+            return detail.Witness;
+        }
+
+        private ICollection<CriminalParticipant> PopulateParticipants(RedactedCriminalFileDetailResponse detail, ICollection<CriminalDocument> documents)
+        {
+            foreach (var participant in detail.Participant)
+            {
+                participant.Document = documents.Where(doc => doc.PartId == participant.PartId).ToList();
+                participant.HideJustinCounsel = false;   //TODO tie this to a permission. View Witness List permission  
+                //TODO COUNSEL? Not sure where  to get this data from
+            }
+            return detail.Participant;
+        }
+
+        private async Task<RedactedCriminalFileDetailResponse> PopulateBaseDetails(RedactedCriminalFileDetailResponse detail)
+        {
+            detail.HomeLocationAgencyName = await _locationService.GetLocationName(detail.HomeLocationAgenId);
+            detail.HomeLocationAgencyCode = await _locationService.GetLocationAgencyIdentifier(detail.HomeLocationAgenId);
+            detail.HomeLocationRegionName = await _locationService.GetRegionName(detail.HomeLocationAgencyCode);
+            detail.CourtClassDescription = await _lookupService.GetCourtClassDescription(detail.CourtClassCd.ToString());
+            detail.CourtLevelDescription = await _lookupService.GetCourtLevelDescription(detail.CourtLevelCd.ToString());
+            detail.ActivityClassCd = await _lookupService.GetActivityClassCd(detail.CourtClassCd.ToString());
+            detail.CrownEstimateLenDsc = detail.CrownEstimateLenUnit.HasValue ? await _lookupService.GetAppearanceDuration(detail.CrownEstimateLenUnit.Value.ToString()) : null;
+            return detail;
+        }
+
+        private async Task<ICollection<CriminalHearingRestriction>> PopulateHearingRestrictions(RedactedCriminalFileDetailResponse detail)
+        {
+            foreach (var hearingRestriction in detail.HearingRestriction)
+                hearingRestriction.HearingRestrictionTypeDsc = await _lookupService.GetHearingRestrictionDescription(hearingRestriction.HearingRestrictionTypeCd.ToString());
+            return detail.HearingRestriction;
+        }
+
+        private ICollection<CrownWitness> PopulateCrown(RedactedCriminalFileDetailResponse detail) => _mapper.Map<ICollection<CrownWitness>>(detail.Witness.Where(w => w.RoleTypeCd == CriminalWitnessRoleTypeCd.CRN).ToList());
+        #endregion
+
+
         #endregion
     }
 }
