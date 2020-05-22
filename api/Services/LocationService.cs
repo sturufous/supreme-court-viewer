@@ -41,12 +41,12 @@ namespace Scv.Api.Services
         #region Lookup Methods
         public async Task<string> GetLocationName(string code) => FindLongDescriptionFromCode(await GetLocationsFromLazyCache(), code);
         public async Task<string> GetLocationAgencyIdentifier(string code) => FindShortDescriptionFromCode(await GetLocationsFromLazyCache(), code);
-        public async Task<string> GetRegionName(string code) => (await _locationClient.LocationsLocationIdRegionAsync(code))?.RegionName;
+        public async Task<string> GetRegionName(string code) => string.IsNullOrEmpty(code) ? null : (await _locationClient.LocationsLocationIdRegionAsync(code))?.RegionName;
         #endregion
 
         #region Helpers
-        private string FindLongDescriptionFromCode(CodeValue lookupCodes, string code) => lookupCodes.FirstOrDefault(lookupCode => lookupCode.Code == code)?.LongDesc ?? "";
-        private string FindShortDescriptionFromCode(CodeValue lookupCodes, string code) => lookupCodes.FirstOrDefault(lookupCode => lookupCode.Code == code)?.ShortDesc ?? "";
+        private string FindLongDescriptionFromCode(CodeValue lookupCodes, string code) => lookupCodes.FirstOrDefault(lookupCode => lookupCode.Code == code)?.LongDesc;
+        private string FindShortDescriptionFromCode(CodeValue lookupCodes, string code) => lookupCodes.FirstOrDefault(lookupCode => lookupCode.Code == code)?.ShortDesc;
 
         private void SetupLocationServicesClient()
         {
