@@ -60,6 +60,7 @@
                </div>                
             </template> 
         </b-overlay>
+        <hr class="mx-3" style="height: 2px;"/>  
    </b-card> 
 </body>
 </template>
@@ -189,7 +190,8 @@ export default class CriminalDocumentsView extends Vue {
     }
     
     public ExtractDocumentInfo(): void {
-       let ropExists = false 
+        let ropExists = false 
+        
         for(const fileIndex in this.participantJson)
         {            
             const fileInfo = {};
@@ -209,7 +211,7 @@ export default class CriminalDocumentsView extends Vue {
             {
                 if(doc.category != 'rop') {
                     const docInfo = {}; 
-                    docInfo["Date Filed/Issued"]= doc.issueDate? doc.issueDate.split(" ")[0] : '';
+                    docInfo["Date Filed/Issued"]= doc.issueDate? (new Date(doc.issueDate.split(' ')[0])).toUTCString().substr(4,12) : ''; 
                     docInfo["Document Type"]= doc.docmFormDsc;
                     docInfo["Category"]= doc.docmClassification;
                     docInfo["Pages"]= doc.documentPageCount;
@@ -301,11 +303,14 @@ export default class CriminalDocumentsView extends Vue {
         const url =`/api/files/criminal/record-of-proceedings/${partID}/${filename}?profSequenceNumber=${profSeqNo}&courtLevelCode=${this.courtLevel}&courtClassCode=${this.courtClass}`;
 
         this.$http.get(url)
-            .then(Response => {window.open(url)},
-             err => {console.log(err); window.alert("Broken PDF File")}
-            );
-
-        this.loadingPdf = false;
+            .then(Response => {
+                window.open(url);
+                this.loadingPdf = false;},
+              err => {
+                console.log(err); 
+                window.alert("Broken PDF File");
+                this.loadingPdf = false;}
+            );        
     }
     
 }

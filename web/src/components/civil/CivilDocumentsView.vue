@@ -94,19 +94,18 @@ export default class CivilDocumentsView extends Vue {
     public getDocuments(): void {
         
         this.$http.get('/api/files/civil/'+ this.civilFileInformation.fileNumber)
-            .then(Response => Response.json(), err => {console.log('error');this.isMounted = true;}        
+            .then(Response => Response.json(), err => {console.log(err);}        
             ).then(data => {
-                this.documentsDetailsJson = data.document
-                this.ExtractDocumentInfo()
-                if(this.documents.length)
+                if(data)
                 {
-                    this.isMounted = true;
-                    this.isDataValid = true;
+                    this.documentsDetailsJson = data.document
+                    this.ExtractDocumentInfo()
+                    if(this.documents.length)
+                    {                   
+                        this.isDataValid = true;
+                    }
                 }
-                else
-                {
-                    this.isMounted = true;
-                }
+                this.isMounted = true;                
             });
     }
 
@@ -186,6 +185,7 @@ export default class CivilDocumentsView extends Vue {
     }
     
     public ExtractDocumentInfo(): void {
+        
         let courtSummaryExists = false 
         for(const docIndex in this.documentsDetailsJson)
         {
@@ -197,7 +197,7 @@ export default class CivilDocumentsView extends Vue {
                 docInfo["Document Type"] = jDoc.documentTypeDescription;
                 docInfo["Concluded"] = jDoc.concludedYn;
                 if((this.categories.indexOf("CONCLUDED") < 0) && docInfo["Concluded"].toUpperCase() =="Y") this.categories.push("CONCLUDED")        
-                docInfo["Appearance Date"] = jDoc.lastAppearanceDt? jDoc.lastAppearanceDt.split(" ")[0]: ' ';
+                docInfo["Appearance Date"] = jDoc.lastAppearanceDt? (new Date(jDoc.lastAppearanceDt.split(' ')[0])).toUTCString().substr(4,12) : ''; 
                 if(new Date(docInfo["Appearance Date"]) > new Date() && this.categories.indexOf("SCHEDULED") < 0) this.categories.push("SCHEDULED")   
 
                 docInfo["Category"] = jDoc.category;
@@ -207,13 +207,13 @@ export default class CivilDocumentsView extends Vue {
                 docInfo["Act"] = (docSupport==={})? '': docSupport.actCd;
                 docInfo["Document ID"] = jDoc.civilDocumentId;            
                 docInfo["PdfAvail"] = jDoc.imageId? true : false 
-                docInfo["Date Filed"] = jDoc.filedDt? jDoc.filedDt.split(" ")[0]: ' ';
+                docInfo["Date Filed"] = jDoc.filedDt? (new Date(jDoc.filedDt.split(' ')[0])).toUTCString().substr(4,12) : '';
                 docInfo["Issues"] = jDoc.issue.length? this.ExtractIssues(jDoc.issue) : ' ';
                 this.documents.push(docInfo);
 
             } else {                
                 docInfo["Document Type"] = 'CourtSummary';
-                docInfo["Appearance Date"] = jDoc.lastAppearanceDt.split(" ")[0];
+                docInfo["Appearance Date"] = (new Date(jDoc.lastAppearanceDt.split(' ')[0])).toUTCString().substr(4,12);
                 docInfo["Appearance ID"] = jDoc.imageId;
                 docInfo["PdfAvail"] = jDoc.imageId? true : false
                 this.summaryDocuments.push(docInfo);

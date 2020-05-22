@@ -33,6 +33,7 @@
             </b-table>
         </b-card>
     </b-card>
+    <hr class="mx-3" style="height: 2px;"/>  
 
 </body>
 </template>
@@ -94,8 +95,8 @@ export default class CriminalParticipants extends Vue {
             fileInfo["Index"] = fileIndex;
             fileInfo["First Name"] = jFile.givenNm ? jFile.givenNm : "";
             fileInfo["Last Name"] = jFile.lastNm ? jFile.lastNm : jFile.orgNm;
-            fileInfo["Name"] = this.getNameOfParticipant(fileInfo["Last Name"], fileInfo["First Name"]);
-            fileInfo["D.O.B."] = jFile.birthDt
+            fileInfo["Name"] = this.getNameOfParticipant(fileInfo["Last Name"], fileInfo["First Name"]);            
+            fileInfo["D.O.B."] = jFile.birthDt? (new Date(jFile.birthDt.split(' ')[0])).toUTCString().substr(4,12) : '';
             fileInfo["Status"] = [];
 
             for (const status of this.statusFields)

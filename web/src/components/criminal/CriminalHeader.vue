@@ -11,7 +11,10 @@
         <b-nav-text
             class="mt-1 ml-1 mr-2"
             style="font-size: 11px;">
-            {{agencyLocation.Name}} ({{agencyLocation.Code}})
+              {{agencyLocation.Name}} 
+              <span v-if="agencyLocation.Code"> 
+                ({{agencyLocation.Code}}) 
+              </span>
         </b-nav-text>
 
         <b-nav-text class="text-muted mr-3 mt-1" style="font-size: 11px;">{{agencyLocation.Region}}</b-nav-text>
@@ -72,8 +75,8 @@ export default class CriminalHeader extends Vue {
   public getDocuments(): void {      
       const data = this.criminalFileInformation.detailsData;
       this.fileNumberText = data.fileNumberTxt;      
-      this.agencyLocation.Name = data.homeLocationAgenName;
-      this.agencyLocation.Code = data.homeLocationAgenCode;
+      this.agencyLocation.Name = data.homeLocationAgencyName;
+      this.agencyLocation.Code = data.homeLocationAgencyCode;
       this.agencyLocation.Region = data.homeLocationRegionName;
       this.adjudicatorRestrictionsJson = data.hearingRestriction;
       this.participantJson = data.participant 
@@ -84,7 +87,7 @@ export default class CriminalHeader extends Vue {
   activeparticipant = 0;
   numberOfParticipants = 0;
   fileNumberText;
-  agencyLocation = {'Name':'','Code':0, 'Region':'' };
+  agencyLocation = {Name:'',Code:0, Region:'' };
   adjudicatorRestrictionsJson;
   isMounted = false;
   participantJson;
