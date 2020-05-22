@@ -309,7 +309,7 @@ namespace Scv.Api.Services
         private List<CriminalCount> PopulateCounts(CfcAccusedFile accusedFile, RedactedCriminalFileDetailResponse detail)
         {
             var criminalCount = new List<CriminalCount>();
-            foreach (var appearance in accusedFile.Appearance)
+            foreach (var appearance in accusedFile.Appearance.Where(a => a != null))
             {
                 foreach (var count in _mapper.Map<ICollection<CriminalCount>>(appearance.AppearanceCount.Where(a => a?.AppearanceResult == "END")))
                 {
