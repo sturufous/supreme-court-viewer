@@ -8,6 +8,7 @@ using Scv.Api.Helpers.ContractResolver;
 using Scv.Api.Models.Civil.AppearanceDetail;
 using Scv.Api.Models.Civil.Detail;
 using Scv.Api.Models.Criminal.AppearanceDetail;
+using Scv.Api.Models.Criminal.Appearances;
 using Scv.Api.Models.Criminal.Detail;
 using System;
 using System.Collections.Generic;
@@ -212,10 +213,19 @@ namespace Scv.Api.Services
             return detail;
         }
 
-        public async Task<CriminalFileAppearancesResponse> FilesCriminalFileIdAppearancesAsync(string fileId, FutureYN? future, HistoryYN? history)
+        public async Task<CriminalFileAppearances> FilesCriminalFileIdAppearancesAsync(string fileId, FutureYN? future, HistoryYN? history)
         {
             var criminalFileIdAppearances = await _fileServicesClient.FilesCriminalFileIdAppearancesAsync(_requestAgencyIdentifierId, _requestPartId, future, history, fileId);
-            return criminalFileIdAppearances;
+            var criminalAppearances = _mapper.Map<CriminalFileAppearances>(criminalFileIdAppearances);
+            foreach ( var appearance in criminalAppearances.ApprDetail )
+            {
+                appearance.AppearanceReasonDsc = await _lookupService.GetCriminalAppearanceReasonsDescription(appearance.AppearanceReasonCd);
+                appearance.AppearanceResultDsc = await _lookupService.GetCriminalAppearanceResultsDescription(appearance.AppearanceResultCd);
+                appearance.AppearanceStatusDsc = await _lookupService.GetCriminalAppearanceStatusDescription(appearance.AppearanceStatusCd.ToString());
+                appearance.CourtLocationId = await _locationService.GetLocationAgencyIdentifier(appearance.CourtAgencyId);
+                appearance.CourtLocation = await _locationService.GetLocationName(appearance.CourtAgencyId);
+            }
+            return criminalAppearances;
         }
 
         public async Task<CriminalAppearanceDetail> FilesCriminalAppearanceDetailAsync(string fileId, string appearanceId, string partId = null, string profSeqNo = null)
