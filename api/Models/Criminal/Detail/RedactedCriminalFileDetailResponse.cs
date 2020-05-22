@@ -4,13 +4,14 @@ using JCCommon.Clients.FileServices;
 namespace Scv.Api.Models.Criminal.Detail
 {
     /// <summary>
-    /// This is used to narrow down the amount of information from CriminalFileDetailResponse. 
+    /// This is used to narrow down the amount of information from CriminalFileDetailResponse.
     /// </summary>
     public class RedactedCriminalFileDetailResponse
     {
         public RedactedCriminalFileDetailResponse()
         {
             Ban = new List<CriminalBan>();
+            Count = new List<CriminalCount>();
         }
 
         public string ResponseCd { get; set; }
@@ -69,5 +70,10 @@ namespace Scv.Api.Models.Criminal.Detail
         /// Extended, with PartId. 
         /// </summary>
         public List<CriminalBan> Ban { get; set; }
+
+        /// <summary>
+        /// Slimmed down version of CfcAppearanceCount.
+        /// </summary>
+        public List<CriminalCount> Count { get; set; }
     }
 }
