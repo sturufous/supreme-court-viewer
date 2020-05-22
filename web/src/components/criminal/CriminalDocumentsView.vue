@@ -7,7 +7,7 @@
         </div>
         <b-card bg-variant="white">
             <b-tabs  nav-wrapper-class = "bg-light text-dark"
-                     active-nav-item-class="text-uppercase font-weight-bold text-white bg-primary"                     
+                     active-nav-item-class="text-white bg-primary"                     
                      pills >
                 <b-tab 
                 v-for="(tabMapping, index) in categories"                 
@@ -21,12 +21,12 @@
       
         <b-card>
             <b-dropdown  variant="light text-info" :text="getNameOfParticipant(activeparticipant)" class="m-2">    
-                <b-dropdown-item  
+                <b-dropdown-item-button  
                     v-for="(file,index) in SortedParticipants" 
                     :key="index"
                     v-on:click="activeparticipant = index">
                         {{getNameOfParticipant(index)}}
-                </b-dropdown-item> 
+                </b-dropdown-item-button> 
             </b-dropdown>                 
         </b-card>
 
@@ -40,6 +40,7 @@
                 :no-sort-reset="true"
                 @row-hovered="rowHover"
                 striped
+                borderless
                 responsive="sm"
                 >   
                     <template v-for="(field,index) in fields[fieldsTab]" v-slot:[`head(${field.key})`]="data">
@@ -63,7 +64,7 @@
                </div>                
             </template> 
         </b-overlay>
-        <hr class="mx-3" style="height: 2px;"/>  
+
    </b-card> 
 </body>
 </template>
@@ -145,15 +146,15 @@ export default class CriminalDocumentsView extends Vue {
 
     fields = [ 
         [
-            {key:'Date Filed/Issued',  sortable:true,  headerStyle:'text-danger',   cellStyle:'text'},
-            {key:'Document Type',      sortable:true,  headerStyle:'text-primary',  cellStyle:'text-muted'},
-            {key:'Category',           sortable:false, headerStyle:'text',          cellStyle:'text'},
-            {key:'Pages',              sortable:false, headerStyle:'text',          cellStyle:'text'},
+            {key:'Date Filed/Issued',  sortable:true,  tdClass: 'border-top',  headerStyle:'text-danger',   cellStyle:'text'},
+            {key:'Document Type',      sortable:true,  tdClass: 'border-top',  headerStyle:'text-primary',  cellStyle:'text-muted'},
+            {key:'Category',           sortable:false,  tdClass: 'border-top', headerStyle:'text',          cellStyle:'text'},
+            {key:'Pages',              sortable:false,  tdClass: 'border-top', headerStyle:'text',          cellStyle:'text'},
         ],
         [
-            {key:'Document Type',    sortable:false, headerStyle:'text-primary',    cellStyle:'text-info'},
-            {key:'Category',         sortable:true,  headerStyle:'text',            cellStyle:'text'},
-            {key:'Pages',            sortable:false, headerStyle:'text',            cellStyle:'text'},
+            {key:'Document Type',    sortable:false,  tdClass: 'border-top', headerStyle:'text-primary',    cellStyle:'text-info'},
+            {key:'Category',         sortable:true,  tdClass: 'border-top',  headerStyle:'text',            cellStyle:'text'},
+            {key:'Pages',            sortable:false,  tdClass: 'border-top', headerStyle:'text',            cellStyle:'text'},
         ]  
         
     ];

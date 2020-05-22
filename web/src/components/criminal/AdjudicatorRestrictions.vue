@@ -8,12 +8,12 @@
         </div>
 
         <b-card bg-variant="white">           
-            <b-table
+            <b-table        
+            borderless
             :items="adjudicatorRestrictions"
             :fields="fields"
             :sort-by.sync="sortBy"
             :sort-desc.sync="sortDesc"
-            :no-sort-reset="true"
             responsive="sm"
             >   
                 <template v-for="(field,index) in fields" v-slot:[`head(${field.key})`]="data">
@@ -37,6 +37,7 @@ const criminalState = namespace("CriminalFileInformation");
 
 @Component
 export default class  AdjudicatorRestrictions extends Vue {
+
   @criminalState.State
   public criminalFileInformation!: any;
 
@@ -60,9 +61,10 @@ export default class  AdjudicatorRestrictions extends Vue {
 
   fields =  
   [
-      {key:'Adjudicator', sortable:true,  headerStyle:'text-primary',   cellStyle:'text'},       
-      {key:'Status',      sortable:true,  headerStyle:'text-primary',   cellStyle:'text-white bg-primary'},
-      {key:'Applies to',  sortable:true,  headerStyle:'text-primary',   cellStyle:'text'},       
+      {key:'Adjudicator', sortable:true, tdClass: 'border-top',  headerStyle:'table-borderless text-primary',   cellStyle:'text'},       
+      {key:'Status',      sortable:true, tdClass: 'border-top',  headerStyle:'text-primary',                    cellStyle:'text-white bg-primary'},
+      {key:'Applies to',  sortable:true, tdClass: 'border-top',  headerStyle:'text-primary',                    cellStyle:'text'},
+           
   ];
 
   public ExtractAdjudicatorRestrictionsInfo(): void {
@@ -83,5 +85,4 @@ export default class  AdjudicatorRestrictions extends Vue {
  .card {
         border: white;
     }
-
 </style>

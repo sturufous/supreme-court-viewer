@@ -27,10 +27,10 @@ export default class CriminalHeader extends Vue {
   public criminalFileInformation!: any;
 
   mounted() {
-    this.getDocuments();
+    this.getFileDescription();
   }
 
-  public getDocuments(): void {      
+  public getFileDescription(): void {      
       const data = this.criminalFileInformation.detailsData;
       this.courtClassDescription = data.courtClassDescription;      
       this.courtLevelDescription = data.courtLevelDescription;
