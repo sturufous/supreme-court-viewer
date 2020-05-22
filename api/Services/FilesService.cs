@@ -346,7 +346,9 @@ namespace Scv.Api.Services
                 {
                     document.Category = string.IsNullOrEmpty(document.Category) ? _lookupService.GetDocumentCategory(document.DocmFormId) : document.Category;
                     document.DocumentTypeDescription = document.DocmFormDsc;
-                    document.PartId = ac.PartId;
+                    document.PartId = string.IsNullOrEmpty(ac.PartId) ? null : ac.PartId;
+                    document.DocmId = string.IsNullOrEmpty(document.DocmId) ? null : document.DocmId;
+                    document.ImageId = string.IsNullOrEmpty(document.ImageId) ? null : document.ImageId;
                 }
 
                 return criminalDocuments;

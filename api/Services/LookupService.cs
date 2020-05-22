@@ -82,7 +82,7 @@ namespace Scv.Api.Services
             var configurationSections =
                 _configuration.GetSection("DocumentCategories").Get<Dictionary<string, string>>() ??
                 throw new ConfigurationException("Couldn't not build dictionary based on DocumentCategories");
-            return configurationSections.FirstOrDefault(cs => cs.Value.Split(",").Contains(documentCode)).Key ?? "";
+            return configurationSections.FirstOrDefault(cs => cs.Value.Split(",").Contains(documentCode)).Key ?? null;
         }
         #endregion
 
