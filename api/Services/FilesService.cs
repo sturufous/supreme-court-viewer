@@ -6,6 +6,7 @@ using JCCommon.Clients.FileServices;
 using JCCommon.Models;
 using MapsterMapper;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Serialization;
 using Scv.Api.Helpers;
 using Scv.Api.Helpers.ContractResolver;
 using Scv.Api.Helpers.Exceptions;
@@ -37,7 +38,7 @@ namespace Scv.Api.Services
         public FilesService(IConfiguration configuration, FileServicesClient fileServicesClient, IMapper mapper, LookupService lookupService, LocationService locationService)
         {
             _fileServicesClient = fileServicesClient;
-            _fileServicesClient.JsonSerializerSettings.ContractResolver = new SafeContractResolver();
+            _fileServicesClient.JsonSerializerSettings.ContractResolver = new SafeContractResolver { NamingStrategy = new CamelCaseNamingStrategy() };
             _fileServicesClient.BaseUrl = configuration.GetNonEmptyValue("FileServicesClient:Url");
             _lookupService = lookupService;
             _locationService = locationService;
@@ -81,22 +82,23 @@ namespace Scv.Api.Services
                 });
             }
 
-            var civilFileDetail = _mapper.Map<RedactedCivilFileDetailResponse>(civilFileDetailResponse);
+            var detail = _mapper.Map<RedactedCivilFileDetailResponse>(civilFileDetailResponse);
 
             //Populate location information.
-            civilFileDetail.HomeLocationAgencyCode = await _locationService.GetLocationAgencyIdentifier(civilFileDetail.HomeLocationAgenId);
-            civilFileDetail.HomeLocationAgencyName = await _locationService.GetLocationName(civilFileDetail.HomeLocationAgenId);
+            detail.HomeLocationAgencyCode = await _locationService.GetLocationAgencyIdentifier(detail.HomeLocationAgenId);
+            detail.HomeLocationAgencyName = await _locationService.GetLocationName(detail.HomeLocationAgenId);
+            detail.HomeLocationRegionName = await _locationService.GetRegionName(detail.HomeLocationAgencyCode);
 
-            civilFileDetail.CourtClassDescription = await _lookupService.GetCourtClassDescription(civilFileDetail.CourtClassCd.ToString());
-            civilFileDetail.CourtLevelDescription = await _lookupService.GetCourtLevelDescription(civilFileDetail.CourtLevelCd.ToString());
-            civilFileDetail.ActivityClassCd = await _lookupService.GetActivityClassCd(civilFileDetail.CourtClassCd.ToString());
+            detail.CourtClassDescription = await _lookupService.GetCourtClassDescription(detail.CourtClassCd.ToString());
+            detail.CourtLevelDescription = await _lookupService.GetCourtLevelDescription(detail.CourtLevelCd.ToString());
+            detail.ActivityClassCd = await _lookupService.GetActivityClassCd(detail.CourtClassCd.ToString());
 
             //Populate extra fields for party. 
-            foreach (var party in civilFileDetail.Party)
+            foreach (var party in detail.Party)
                 party.RoleTypeDescription = await _lookupService.GetCivilRoleTypeDescription(party.RoleTypeCd);
 
             //Populate extra fields for document.
-            foreach (var document in civilFileDetail.Document)
+            foreach (var document in detail.Document)
             {
                 document.Category = _lookupService.GetDocumentCategory(document.DocumentTypeCd);
                 document.DocumentTypeDescription = await _lookupService.GetDocumentDescriptionAsync(document.DocumentTypeCd);
@@ -105,10 +107,12 @@ namespace Scv.Api.Services
 
             //TODO need permission for this filter. 
             var hearingRescriptionPermission = true;
-            civilFileDetail.HearingRestriction = civilFileDetail.HearingRestriction.Where(hr =>
-                hearingRescriptionPermission &&
-                hr.HearingRestrictionTypeCd != CvfcHearingRestriction2HearingRestrictionTypeCd.S).ToList();
-            return civilFileDetail;
+            detail.HearingRestriction = detail.HearingRestriction.Where(hr =>
+                    hearingRescriptionPermission &&
+                    hr.HearingRestrictionTypeCd != CvfcHearingRestriction2HearingRestrictionTypeCd.S)
+                .ToList();
+
+            return detail;
         }
 
         public async Task<CivilFileAppearancesResponse> FilesCivilFileIdAppearancesAsync(FutureYN2? future, HistoryYN2? history, string fileId)
@@ -129,9 +133,9 @@ namespace Scv.Api.Services
                     doc.Appearance != null && doc.Appearance.Any(app => app.AppearanceId == appearanceId))
                 .ToList();
 
-            //CivilAppearanceDocument, doesn't include appearances. 
             detailedAppearance.AppearanceMethod = appearanceMethodsResponse.AppearanceMethod;
             detailedAppearance.Party = appearancePartyResponse.Party;
+            //CivilAppearanceDocument, doesn't include appearances. 
             detailedAppearance.Document = _mapper.Map<ICollection<CivilAppearanceDocument>>(documentsWithSameAppearanceId);
             foreach (var document in detailedAppearance.Document)
             {
@@ -183,7 +187,7 @@ namespace Scv.Api.Services
             if (criminalFileDetail == null || criminalFileContent == null)
                 return null;
 
-            var redactedCriminalFileDetailResponse = _mapper.Map<RedactedCriminalFileDetailResponse>(criminalFileDetail);
+            var detail = _mapper.Map<RedactedCriminalFileDetailResponse>(criminalFileDetail);
 
             //Generate documents from AccusedFile. 
             var documents = criminalFileContent.AccusedFile.SelectMany(ac =>
@@ -215,13 +219,39 @@ namespace Scv.Api.Services
                 return criminalDocuments;
             }).ToList();
 
-            //Attach documents to participants.
-            foreach (var participant in redactedCriminalFileDetailResponse.Participant)
+            foreach (var witness in detail.Witness)
             {
-                participant.Document = documents.Where(doc => doc.PartId == participant.PartId).ToList();
+                witness.AgencyCd = await _lookupService.GetAgencyLocationCode(witness.AgencyId);
+                witness.AgencyDsc = await _lookupService.GetAgencyLocationDescription(witness.AgencyId);
+                witness.WitnessTypeDsc = await _lookupService.GetWitnessRoleTypeDescription(witness.WitnessTypeCd);
             }
 
-            return redactedCriminalFileDetailResponse;
+            //Attach documents to participants.
+            foreach (var participant in detail.Participant)
+            {
+                participant.Document = documents.Where(doc => doc.PartId == participant.PartId).ToList();
+                //TODO Counsel and JustinCounsel here. 
+            }
+
+            //Populate location and region.
+            detail.HomeLocationAgencyName =  await _locationService.GetLocationName(detail.HomeLocationAgenId);
+            detail.HomeLocationAgencyCode = await _locationService.GetLocationAgencyIdentifier(detail.HomeLocationAgenId);
+            detail.HomeLocationRegionName = await _locationService.GetRegionName(detail.HomeLocationAgencyCode);
+
+            detail.CourtClassDescription = await _lookupService.GetCourtClassDescription(detail.CourtClassCd.ToString());
+            detail.CourtLevelDescription = await _lookupService.GetCourtLevelDescription(detail.CourtLevelCd.ToString());
+            detail.ActivityClassCd = await _lookupService.GetActivityClassCd(detail.CourtClassCd.ToString());
+
+            //Populate hearing restrictions.
+            foreach (var hearingRestriction in detail.HearingRestriction)
+                hearingRestriction.HearingRestrictionTypeDsc =  await _lookupService.GetHearingRestrictionDescription(hearingRestriction.HearingRestrictionTypeCd.ToString());
+
+            //Populate crown.
+            detail.Crown = _mapper.Map<ICollection<CrownWitness>>(detail.Witness.Where(w => w.RoleTypeCd == CriminalWitnessRoleTypeCd.CRN).ToList());
+            foreach (var crownWitness in detail.Crown)
+                crownWitness.Assigned = crownWitness.IsAssigned(detail.AssignedPartNm);
+
+            return detail;
         }
 
         public async Task<CriminalFileAppearancesResponse> FilesCriminalFileIdAppearancesAsync(string fileId, FutureYN? future, HistoryYN? history)

@@ -1,10 +1,15 @@
 <template>
 <body>
    <b-card  v-if= "isMounted">
-        <b-card bg-variant="light">
-            <b-tabs active-nav-item-class="font-weight-bold text-uppercase text-info bg-light" pills >
+        <div>
+            <b> Documents ({{NumberOfDocuments}}) </b>
+        </div>
+        <b-card bg-variant="white">
+            <b-tabs  nav-wrapper-class = "bg-light text-dark"
+                     active-nav-item-class="text-uppercase font-weight-bold text-white bg-primary"                     
+                     pills >
                 <b-tab 
-                v-for="(tabMapping, index) in categories" 
+                v-for="(tabMapping, index) in categories"                 
                 :key="index"                 
                 :title="tabMapping"                 
                 v-on:click="activetab = tabMapping" 
@@ -57,6 +62,7 @@
                </div>                
             </template> 
         </b-overlay>
+        <hr class="mx-3" style="height: 2px;"/>  
    </b-card> 
 </body>
 </template>
@@ -119,7 +125,8 @@ export default class CriminalDocumentsView extends Vue {
 
     loadingPdf = false;
     
-    activetab = 'ALL'; 
+    activetab = 'ALL';
+    tabIndex = 0; 
     activeparticipant = 0;           
     sortBy = 'Date Filed/Issued';
     sortDesc = false;
@@ -186,7 +193,8 @@ export default class CriminalDocumentsView extends Vue {
     }
     
     public ExtractDocumentInfo(): void {
-       let ropExists = false 
+        let ropExists = false 
+        
         for(const fileIndex in this.participantJson)
         {            
             const fileInfo = {};
@@ -194,8 +202,8 @@ export default class CriminalDocumentsView extends Vue {
             fileInfo["Index"] = fileIndex; 
             fileInfo["Part ID"] = jFile.partId;
             fileInfo["Prof Seq No"] = jFile.profSeqNo;
-            fileInfo["First Name"] = jFile.givenNm? jFile.givenNm: '_noGivenname';
-            fileInfo["Last Name"] =  jFile.lastNm? jFile.lastNm: '_noLastname' ;            
+            fileInfo["First Name"] = jFile.givenNm ? jFile.givenNm : "";
+            fileInfo["Last Name"] = jFile.lastNm ? jFile.lastNm : jFile.orgNm;            
             
             fileInfo["Documents"] = [];
             fileInfo["Record of Proceedings"] = [];
@@ -206,7 +214,7 @@ export default class CriminalDocumentsView extends Vue {
             {
                 if(doc.category != 'rop') {
                     const docInfo = {}; 
-                    docInfo["Date Filed/Issued"]= doc.issueDate? doc.issueDate.split(" ")[0] : '';
+                    docInfo["Date Filed/Issued"]= doc.issueDate? (new Date(doc.issueDate.split(' ')[0])).toUTCString().substr(4,12) : ''; 
                     docInfo["Document Type"]= doc.docmFormDsc;
                     docInfo["Category"]= doc.docmClassification;
                     docInfo["Pages"]= doc.documentPageCount;
@@ -274,8 +282,19 @@ export default class CriminalDocumentsView extends Vue {
         }    
     }
     
+
+    get NumberOfDocuments() {       
+        if(this.activetab == 'ROP')
+        {           
+            return(this.participantFiles[this.activeparticipant]["Record of Proceedings"].length)
+        }
+        else{  
+            return(this.participantFiles[this.activeparticipant]["Documents"].length)            
+        }    
+    }
+
     public colHover(hovered, mouseEvent) {            
-        hovered? this.hoverCol = mouseEvent.fromElement.cellIndex: this.hoverCol =-1;
+        hovered && mouseEvent.fromElement != null? this.hoverCol = mouseEvent.fromElement.cellIndex: this.hoverCol =-1;
     }
 
     public rowHover(row) {
@@ -294,8 +313,18 @@ export default class CriminalDocumentsView extends Vue {
         const partID = this.participantFiles[index]["Part ID"];
         const profSeqNo = this.participantFiles[index]["Prof Seq No"];      
         const filename = 'ROP_'+partID+'.pdf';
-        window.open(`/api/files/criminal/record-of-proceedings/${partID}/${filename}?profSequenceNumber=${profSeqNo}&courtLevelCode=${this.courtLevel}&courtClassCode=${this.courtClass}`)
-        this.loadingPdf = false;
+      
+        const url =`/api/files/criminal/record-of-proceedings/${partID}/${filename}?profSequenceNumber=${profSeqNo}&courtLevelCode=${this.courtLevel}&courtClassCode=${this.courtClass}`;
+
+        this.$http.get(url)
+            .then(Response => {
+                window.open(url);
+                this.loadingPdf = false;},
+              err => {
+                console.log(err); 
+                window.alert("Broken PDF File");
+                this.loadingPdf = false;}
+            );        
     }
     
 }
