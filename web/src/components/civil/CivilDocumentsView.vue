@@ -200,8 +200,9 @@ export default class CivilDocumentsView extends Vue {
                 docInfo["Concluded"] = jDoc.concludedYn;
                 if((this.categories.indexOf("CONCLUDED") < 0) && docInfo["Concluded"].toUpperCase() =="Y") this.categories.push("CONCLUDED")        
                 docInfo["Appearance Date"] = jDoc.lastAppearanceDt? (new Date(jDoc.lastAppearanceDt.split(' ')[0])).toUTCString().substr(4,12) : ''; 
-                if(new Date(docInfo["Appearance Date"]) > new Date() && this.categories.indexOf("SCHEDULED") < 0) this.categories.push("SCHEDULED")
-                docInfo["Category"] = jDoc.category? jDoc.category:'' ;
+                if(new Date(docInfo["Appearance Date"]) > new Date() && this.categories.indexOf("SCHEDULED") < 0) this.categories.push("SCHEDULED")   
+
+                docInfo["Category"] = jDoc.category? jDoc.category : '';
                 if((this.categories.indexOf(docInfo["Category"]) < 0) && docInfo["Category"].length > 0) this.categories.push(docInfo["Category"])
                 // ensure all documentSupport elements only have one row
                 const docSupport: any = jDoc.documentSupport.length? jDoc.documentSupport[0]:'{}';
