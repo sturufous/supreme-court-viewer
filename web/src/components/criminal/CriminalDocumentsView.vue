@@ -2,7 +2,7 @@
 <body>
    <b-card  v-if= "isMounted">
         <div>         
-            <h3 class="mx-2"> Documents ({{NumberOfDocuments}}) </h3>
+            <h3 class="mx-2 font-weight-normal"> Documents ({{NumberOfDocuments}}) </h3>
             <hr class="mx-1 bg-light" style="height: 5px;"/>         
         </div>
         <b-card bg-variant="white">

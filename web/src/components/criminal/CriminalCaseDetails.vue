@@ -29,6 +29,11 @@
         <b-col col md="10" cols="10" style="overflow: auto;">
             <criminal-header-top v-if="isDataReady"/> 
             <criminal-header v-if="isDataReady"/> 
+
+            <h2 style= "white-space: pre" v-if="isDataReady">
+                {{selectedSideBar}}
+            </h2>
+
             <criminal-participants v-if="showCaseDetails"/>
             <adjudicator-restrictions v-if="showCaseDetails"/>            
             <criminal-documents-view v-if="showDocuments"/>  
@@ -101,6 +106,18 @@ export default class CriminalCaseDetails extends Vue {
     isMounted = false
     participantJson;
     participantFiles: any[] = [];
+    sidePanelTitles = [ 
+       'Case Details', 'Future Appearance', 'Past Appearance', 'Witnesses', 'Criminal Documents', 'Sentence/Order Details'    
+    ];
+    
+    get selectedSideBar()
+    {
+        for(const title of this.sidePanelTitles)
+        {
+          if (this.showSections[title] == true ) return '   '+ title
+        }
+        return ''
+    }
 
     get showCaseDetails()
     {        
@@ -109,7 +126,7 @@ export default class CriminalCaseDetails extends Vue {
     
     get showDocuments()
     {        
-        return ((this.showSections['Case Details'] || this.showSections['Documents'] ) && this.isDataReady)
+        return ((this.showSections['Case Details'] || this.showSections['Criminal Documents'] ) && this.isDataReady)
     }
 
     get showFutureAppearance()

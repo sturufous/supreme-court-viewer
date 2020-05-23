@@ -3,11 +3,15 @@
 
     <b-card bg-variant="white">
         <div>
-            <h3 class="mx-2"> Adjudicator Restrictions </h3>
+            <h3 class="mx-2 font-weight-normal"> Adjudicator Restrictions </h3>
             <hr class="mx-1 bg-light" style="height: 5px;"/> 
         </div>
 
-        <b-card bg-variant="white">           
+        <b-card v-if="!(adjudicatorRestrictions.length>0)">
+            <span class="text-muted"> No adjudicator restrictions. </span>
+        </b-card>
+
+        <b-card bg-variant="white" v-if="isMounted && (adjudicatorRestrictions.length>0)">           
             <b-table        
             borderless
             :items="adjudicatorRestrictions"
@@ -77,7 +81,7 @@ export default class  AdjudicatorRestrictions extends Vue {
       this.adjudicatorRestrictions.push(restrictionInfo);      
     }
   }
-
+  
 }
 </script>
 

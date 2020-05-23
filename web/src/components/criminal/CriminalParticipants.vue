@@ -2,7 +2,7 @@
 <body>
     <b-card bg-variant="white">
         <div>
-            <h3 class="mx-2"> Participants ({{numberOfParticipants}}) </h3>
+            <h3 class="mx-2 font-weight-normal"> Participants ({{numberOfParticipants}}) </h3>
             <hr class="mx-1 bg-light" style="height: 5px;"/> 
         </div>
 
@@ -129,7 +129,7 @@ export default class CriminalParticipants extends Vue {
                     fileInfo["Status"].push(status);
             }
    
-            fileInfo['Counsel'] = ''
+            fileInfo['Counsel'] = jFile.counselLastNm? 'JUSTIN: '+ jFile.counselGivenNm +' '+ jFile.counselLastNm : ''
             fileInfo['Counsel Designation Filed'] = jFile.designatedCounselYN           
             this.participantList.push(fileInfo); 
         }
