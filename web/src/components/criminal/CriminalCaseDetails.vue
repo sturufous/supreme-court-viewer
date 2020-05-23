@@ -34,8 +34,9 @@
                 {{selectedSideBar}}
             </h2>
 
-            <criminal-participants v-if="showCaseDetails"/>
-            <adjudicator-restrictions v-if="showCaseDetails"/>            
+            <criminal-participants v-if="showCaseDetails"/>            
+            <adjudicator-restrictions v-if="showCaseDetails"/> 
+            <criminal-crown-information v-if="showCaseDetails"/>             
             <criminal-documents-view v-if="showDocuments"/>  
         </b-col>
     </b-row>
@@ -46,12 +47,12 @@
 import { Component, Vue } from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
 import CriminalDocumentsView from '@components/criminal/CriminalDocumentsView.vue';
-import CriminalHeaderTop from './CriminalHeaderTop.vue';
-import CriminalHeader from './CriminalHeader.vue';
-import CriminalSidePanel from './CriminalSidePanel.vue';
-import CriminalParticipants from './CriminalParticipants.vue'
-import AdjudicatorRestrictions from './AdjudicatorRestrictions.vue'
-
+import CriminalHeaderTop from '@components/criminal/CriminalHeaderTop.vue';
+import CriminalHeader from '@components/criminal/CriminalHeader.vue';
+import CriminalSidePanel from '@components/criminal/CriminalSidePanel.vue';
+import CriminalParticipants from '@components/criminal/CriminalParticipants.vue';
+import AdjudicatorRestrictions from '@components/criminal/AdjudicatorRestrictions.vue'
+import CriminalCrownInformation from '@components/criminal/CriminalCrownInformation.vue';
 import '@store/modules/CriminalFileInformation';
 const criminalState = namespace('CriminalFileInformation');
 
@@ -62,7 +63,8 @@ const criminalState = namespace('CriminalFileInformation');
         CriminalHeaderTop,
         CriminalHeader,
         CriminalParticipants,
-        AdjudicatorRestrictions
+        AdjudicatorRestrictions,
+        CriminalCrownInformation
     }
 })
 export default class CriminalCaseDetails extends Vue {
