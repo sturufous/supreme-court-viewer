@@ -14,27 +14,14 @@
             borderless               
             striped
             >
-            <template  v-slot:cell(CrownInfoValue)="data">
-                <span v-if="data.item['CrownInfoFieldName'] == 'Crown Assigned' ">
-                    <b v-for="(assignee, index) in data.item['CrownInfoValue']"  v-bind:key="index" style= "white-space: pre-line">{{ assignee }} <br></b>
-                </span>
-                <span v-if="data.item['CrownInfoFieldName'] != 'Crown Assigned' ">
-                    <b > {{ data.value }}</b>
-                </span>                    
-            </template>  
-            <!-- <template v-for="(field,index) in fields" v-slot:[`cell(${field.key})`]="data">
-                <span v-bind:key="index" v-if="data.items.value != 'Crown Assigned'">
-                    <b > {{ data.value }}</b>
-                </span>
-            <span v-bind:key="index" v-if="data.items.value == 'Crown Assigned'">  
-                <p  
-                    v-for="(assigned,index) in assignedCrown"
-                    :key="index" 
-                    class="mr-1"> 
-                    {{ assigned }} 
-                </p>
-            </span>
-            </template> -->
+                <template  v-slot:cell(CrownInfoValue)="data">
+                    <span v-if="data.item['CrownInfoFieldName'] == 'Crown Assigned' ">
+                        <b v-for="(assignee, index) in data.item['CrownInfoValue']"  v-bind:key="index" style= "white-space: pre-line">{{ assignee }} <br></b>
+                    </span>
+                    <span v-if="data.item['CrownInfoFieldName'] != 'Crown Assigned' ">
+                        <b > {{ data.value }}</b>
+                    </span>                    
+                </template> 
             </b-table>            
         </b-card>       
    </b-card> 
@@ -64,50 +51,54 @@ export default class CriminalCrownInformation extends Vue {
         const assignedCrown: string[] = [];
         if (data.crown.length > 0) {
             for (const assignee of data.crown) {
-                assignedCrown.push(assignee.lastNm + ", " + assignee.givenNm)
+                assignedCrown.push(this.formatNames(assignee.lastNm) + ", " + this.formatNames(assignee.givenNm))
             }
-            console.log(assignedCrown)
         }
-        let crownInfo = {};    
-
+        let crownInfo = {};
         crownInfo['CrownInfoFieldName'] = "Crown Assigned";
         crownInfo['CrownInfoValue'] = assignedCrown;
-        this.CrownInformation.push(crownInfo);
+        this.crownInformation.push(crownInfo);
         crownInfo = {};
         crownInfo['CrownInfoFieldName'] = "Crown Time Estimate";
-        crownInfo['CrownInfoValue'] = " Days"
-        this.CrownInformation.push(crownInfo);
+        if (data.crownEstimateLenQty) {
+            if (data.crownEstimateLenQty == 1) {
+                crownInfo['CrownInfoValue'] = data.crownEstimateLenQty + " " + data.crownEstimateLenDsc.replace('s', '')
+            } else {
+                crownInfo['CrownInfoValue'] = data.crownEstimateLenQty + " " + data.crownEstimateLenDsc
+            }
+
+        } else {
+            crownInfo['CrownInfoValue'] = ''
+        }        
+        this.crownInformation.push(crownInfo);
         crownInfo = {};
         crownInfo['CrownInfoFieldName'] = "Case Age";
-        crownInfo['CrownInfoValue'] = data.caseAgeDays + " Days";
-        this.CrownInformation.push(crownInfo);
+        crownInfo['CrownInfoValue'] = data.caseAgeDays?data.caseAgeDays + " Days":'';
+        this.crownInformation.push(crownInfo);
         crownInfo = {};
         crownInfo['CrownInfoFieldName'] = "Approved By";
-        crownInfo['CrownInfoValue'] = data.approvedByAgencyCd + "-"
-        this.CrownInformation.push(crownInfo);  
+        crownInfo['CrownInfoValue'] = data.approvedByAgencyCd? data.approvedByAgencyCd + "-" + data.approvedByPartNm:'';
+        this.crownInformation.push(crownInfo);  
 
         this.isMounted = true;
 
-    }    
+    }
+    
+    public formatNames (name: string): string {
+        return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+    }
 
     mounted () {              
         this.getCrownInfo();  
     }
-
-    participantJson;
-    crownAssigned;
-    crownTimeEstimate;
-    CaseAge;
-    ApprovedBy;
-    CrownInformation: any[] = [];
-    message = 'Loading';
+    
+    crownInformation: any[] = [];
     isMounted = false  
 }
 </script>
 
-<style>
-    .card {
+<style scoped>
+ .card {
         border: white;
     }
-
 </style>
