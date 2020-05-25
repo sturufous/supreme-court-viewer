@@ -47,9 +47,18 @@
                     <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
                     </template>
                     <template v-for="(field,index) in fields[fieldsTab]" v-slot:[`cell(${field.key})`]="data" >
-                    <span 
+                        <span 
                             v-bind:key="index" 
-                            v-b-hover="colHover"
+                            v-b-hover="colHover"                             
+                            v-if="field.key.includes('Date')"
+                            v-on:click= "cellClick(index, data)"
+                            :class= "cellClass(field, index, data)"  
+                            style="white-space: pre-line"> {{ data.value | beautify-date}}
+                        </span>
+                        <span 
+                            v-bind:key="index" 
+                            v-b-hover="colHover"                             
+                            v-else
                             v-on:click= "cellClick(index, data)"
                             :class= "cellClass(field, index, data)"  
                             style="white-space: pre-line"> {{ data.value }}
@@ -131,7 +140,7 @@ export default class CriminalDocumentsView extends Vue {
     tabIndex = 0; 
     activeparticipant = 0;           
     sortBy = 'Date Filed/Issued';
-    sortDesc = false;
+    sortDesc = true;
     hoverRow =-1;
     hoverCol = 0;
 
@@ -216,7 +225,7 @@ export default class CriminalDocumentsView extends Vue {
             {
                 if(doc.category != 'rop') {
                     const docInfo = {}; 
-                    docInfo["Date Filed/Issued"]= doc.issueDate? (new Date(doc.issueDate.split(' ')[0])).toUTCString().substr(4,12) : ''; 
+                    docInfo["Date Filed/Issued"]= doc.issueDate? doc.issueDate.split(' ')[0] : ''; 
                     docInfo["Document Type"]= doc.docmFormDsc;
                     docInfo["Category"]= doc.docmClassification;
                     docInfo["Pages"]= doc.documentPageCount;
@@ -227,7 +236,7 @@ export default class CriminalDocumentsView extends Vue {
                     
                     document.push(docInfo);
                 }
-                else{
+                else {
                     const docInfo = {};                   
                     docInfo["Document Type"]= 'Record of Proceedings';
                     docInfo["Category"]= "ROP";
