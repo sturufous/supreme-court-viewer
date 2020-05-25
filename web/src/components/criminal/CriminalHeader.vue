@@ -47,9 +47,12 @@
             <b-dropdown-item-button        
             v-for="(restriction, index) in adjudicatorRestrictions"
             :key="index">
-                <b-badge  variant="primary" v-b-tooltip.hover :title='restriction["Full Name"]'>
+                <b-button style="font-size: 10px; padding: 0px 2px; font-weight: bold;" 
+                          variant="primary" 
+                          v-b-tooltip.hover 
+                          :title='restriction["Full Name"]'>
                     {{restriction["Adj Restriction"]}}
-                </b-badge>
+                </b-button>
             </b-dropdown-item-button>
         </b-nav-item-dropdown>
       </b-navbar-nav>
@@ -114,7 +117,7 @@ export default class CriminalHeader extends Vue {
 
     for (const jRestriction of this.adjudicatorRestrictionsJson) {
       const restrictionInfo = {};     
-      restrictionInfo["Adj Restriction"] = jRestriction.hearingRestrictionTypeDsc+ ": " + jRestriction.adjInitialsTxt;
+      restrictionInfo["Adj Restriction"] = jRestriction.adjInitialsTxt?jRestriction.hearingRestrictionTypeDsc+ ": " + jRestriction.adjInitialsTxt:jRestriction.hearingRestrictionTypeDsc;
       restrictionInfo["Full Name"] = jRestriction.adjFullNm;      
       this.adjudicatorRestrictions.push(restrictionInfo);      
     }
