@@ -47,7 +47,7 @@
             <b-dropdown-item-button        
             v-for="(restriction, index) in adjudicatorRestrictions"
             :key="index">
-                <b-button style="font-size: 10px; padding: 0px 2px; font-weight: bold;" 
+                <b-button style="font-size: 12px; padding: 0px 2px;" 
                           variant="primary" 
                           v-b-tooltip.hover 
                           :title='restriction["Full Name"]'>

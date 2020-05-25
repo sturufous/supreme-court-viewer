@@ -7,7 +7,7 @@
         </div>       
         <b-card bg-variant="white">
             <b-table
-            :items="CrownInformation"
+            :items="crownInformation"
             :fields="fields"            
             thead-class="d-none"
             responsive="sm"
@@ -77,9 +77,12 @@ export default class CriminalCrownInformation extends Vue {
         this.crownInformation.push(crownInfo);
         crownInfo = {};
         crownInfo['CrownInfoFieldName'] = "Approved By";
-        crownInfo['CrownInfoValue'] = data.approvedByAgencyCd? data.approvedByAgencyCd + "-" + data.approvedByPartNm:'';
-        this.crownInformation.push(crownInfo);  
-
+        if (data.approvedByAgencyCd) {           
+            crownInfo['CrownInfoValue'] = data.approvedByPartNm?data.approvedByAgencyCd + " - " + data.approvedByPartNm: data.approvedByAgencyCd + " -";           
+        } else {
+            crownInfo['CrownInfoValue'] = '';
+        }        
+        this.crownInformation.push(crownInfo);
         this.isMounted = true;
 
     }
