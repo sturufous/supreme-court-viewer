@@ -310,6 +310,7 @@ namespace Scv.Api.Services
                 {
                     count.PartId = GetParticipantIdFromDetail(accusedFile.PartId, detail);
                     count.AppearanceDate = appearance.AppearanceDate;
+                    count.Sentence = count.Sentence.Where(s => s != null).ToList();
                     criminalCount.Add(count);
                 }
             }

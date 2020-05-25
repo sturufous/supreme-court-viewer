@@ -12,7 +12,7 @@ namespace Scv.Api.Models.Civil.Detail
         [JsonIgnore]
         [AdaptIgnore]
         public new string IssueResultCd { get; }
-        
+
         [JsonIgnore]
         [AdaptIgnore]
         public new string IssueResultDsc { get; }

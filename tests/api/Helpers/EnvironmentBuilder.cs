@@ -1,15 +1,15 @@
-﻿using System;
-using System.Net.Http;
-using JCCommon.Framework;
+﻿using JCCommon.Framework;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Scv.Api.Helpers.Exceptions;
+using System;
+using System.Net.Http;
 using tests.api.Controllers;
 
 namespace tests.api.Helpers
 {
     /// <summary>
-    /// This builds out our environment before injecting into controllers. 
+    /// This builds out our environment before injecting into controllers.
     /// </summary>
     public class EnvironmentBuilder
     {
@@ -19,13 +19,13 @@ namespace tests.api.Helpers
 
         public EnvironmentBuilder(string usernameKey, string passwordKey, Type type)
         {
-            //Load in secrets, this uses the secrets file as the API. 
+            //Load in secrets, this uses the secrets file as the API.
             var builder = new ConfigurationBuilder();
             builder.AddJsonFile("appsettings.json", optional: true);
             builder.AddUserSecrets<FilesControllerTests>();
             Configuration = builder.Build();
 
-            //Create HTTP client, usually done by Startup.cs - which handles the life cycle of HttpClient nicely. 
+            //Create HTTP client, usually done by Startup.cs - which handles the life cycle of HttpClient nicely.
             HttpClient = new HttpClient();
 
             HttpClient.DefaultRequestHeaders.Authorization = new BasicAuthenticationHeaderValue(

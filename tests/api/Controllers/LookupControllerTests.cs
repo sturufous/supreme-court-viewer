@@ -10,25 +10,30 @@ using Xunit;
 namespace tests.api.Controllers
 {
     /// <summary>
-    /// These tests, ensure Api.LookupControllers and JC-Client-Interface.LookupServiceClient work correctly. 
-    /// Credit to DARS for most of these tests. 
+    /// These tests, ensure Api.LookupControllers and JC-Client-Interface.LookupServiceClient work correctly.
+    /// Credit to DARS for most of these tests.
     /// </summary>
     public class LookupControllerTests
     {
         #region Variables
+
         private readonly LookupController _controller;
-        #endregion
+
+        #endregion Variables
 
         #region Constructor
+
         public LookupControllerTests()
         {
             var preTest = new EnvironmentBuilder("LookupServicesClient:Username", "LookupServicesClient:Password", typeof(FilesController));
             var lookupService = new LookupService(preTest.Configuration, new LookupServiceClient(preTest.HttpClient), new CachingService());
             _controller = new LookupController(preTest.Configuration, preTest.LogFactory.CreateLogger<LookupController>(), lookupService, new Mapper());
         }
-        #endregion
+
+        #endregion Constructor
 
         #region Tests
+
         [Fact]
         public async void Document_Codes()
         {
@@ -38,6 +43,6 @@ namespace tests.api.Controllers
             Assert.Contains(lookupCodes, fd => fd.CodeType == "DOCUMENT_TYPES");
         }
 
-        #endregion
+        #endregion Tests
     }
 }

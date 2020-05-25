@@ -1,21 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
-using JCCommon.Clients;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Scv.Api.Helpers.Exceptions;
+using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Text.Json;
+using System.Threading.Tasks;
 
-namespace Scv.Api.Helpers.Middleware 
+namespace Scv.Api.Helpers.Middleware
 {
     /// <summary>
     /// ErrorHandlingMiddleware class, provides a way to catch and handle unhandled errors in a generic way.
@@ -23,13 +19,16 @@ namespace Scv.Api.Helpers.Middleware
     public class ErrorHandlingMiddleware
     {
         #region Variables
+
         private readonly RequestDelegate _next;
         private readonly IWebHostEnvironment _env;
         private readonly ILogger<ErrorHandlingMiddleware> _logger;
         private readonly JsonOptions _options;
-        #endregion
+
+        #endregion Variables
 
         #region Constructors
+
         /// <summary>
         /// Creates a new instance of an ErrorHandlingMiddleware class, and initializes it with the specified arguments.
         /// </summary>
@@ -44,9 +43,11 @@ namespace Scv.Api.Helpers.Middleware
             _logger = logger;
             _options = options.Value;
         }
-        #endregion
+
+        #endregion Constructors
 
         #region Methods
+
         /// <summary>
         /// Handle the exception if one occurs. Note this wont catch exceptions created from async void functions.
         /// </summary>
@@ -82,45 +83,54 @@ namespace Scv.Api.Helpers.Middleware
                     code = HttpStatusCode.Unauthorized;
                     message = "The authentication token is invalid.";
                     break;
+
                 case KeyNotFoundException _:
                     code = HttpStatusCode.BadRequest;
                     message = "Item does not exist.";
                     _logger.LogDebug(ex, "Middleware caught unhandled exception.");
                     break;
+
                 case NotAuthorizedException _:
                     code = HttpStatusCode.Forbidden;
                     message = "User is not authorized to perform this action.";
                     _logger.LogWarning(ex, ex.Message);
                     break;
+
                 case ConfigurationException _:
                     code = HttpStatusCode.InternalServerError;
                     message = "Application configuration details invalid or missing.";
                     _logger.LogError(ex, ex.Message);
                     break;
+
                 case NotFoundException _:
                     code = HttpStatusCode.NotFound;
                     message = ex.Message;
                     break;
+
                 case BadRequestException _:
                 case InvalidOperationException _:
                     code = HttpStatusCode.BadRequest;
                     message = ex.Message;
                     break;
+
                 case JCCommon.Clients.FileServices.ApiException exception:
                     code = (HttpStatusCode)exception.StatusCode;
                     message = exception.Message;
                     _logger.LogError(ex, ex.Message);
                     break;
+
                 case JCCommon.Clients.LocationServices.ApiException exception:
                     code = (HttpStatusCode)exception.StatusCode;
                     message = exception.Message;
                     _logger.LogError(ex, ex.Message);
                     break;
+
                 case JCCommon.Clients.LookupServices.ApiException exception:
                     code = (HttpStatusCode)exception.StatusCode;
                     message = exception.Message;
                     _logger.LogError(ex, ex.Message);
                     break;
+
                 default:
                     _logger.LogError(ex, "Middleware caught unhandled exception.");
                     break;
@@ -139,6 +149,7 @@ namespace Scv.Api.Helpers.Middleware
                 await context.Response.WriteAsync(string.Empty);
             }
         }
-        #endregion
+
+        #endregion Methods
     }
 }

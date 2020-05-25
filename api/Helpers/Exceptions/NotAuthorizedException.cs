@@ -8,6 +8,7 @@ namespace Scv.Api.Helpers.Exceptions
     public class NotAuthorizedException : Exception
     {
         #region Constructors
+
         /// <summary>
         /// Creates a new instance of a NotAuthorizedException class.
         /// </summary>
@@ -28,6 +29,7 @@ namespace Scv.Api.Helpers.Exceptions
         /// <param name="innerException"></param>
         /// <returns></returns>
         public NotAuthorizedException(string message, Exception innerException) : base(message ?? "User is not authorized to perform this action.", innerException) { }
-        #endregion
+
+        #endregion Constructors
     }
 }

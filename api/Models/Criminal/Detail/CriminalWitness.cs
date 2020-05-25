@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Scv.Api.Models.Criminal.Detail
+﻿namespace Scv.Api.Models.Criminal.Detail
 {
     /// <summary>
     /// Extends  JCCommon.Clients.FileServices.CriminalWitness
@@ -13,6 +8,7 @@ namespace Scv.Api.Models.Criminal.Detail
         public string FullName => GivenNm != null && LastNm != null
             ? $"{GivenNm?.Trim()} {LastNm?.Trim()}"
             : null;
+
         public string WitnessTypeDsc { get; set; }
         public string AgencyDsc { get; set; }
         public string AgencyCd { get; set; }
