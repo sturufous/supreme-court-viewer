@@ -33,7 +33,7 @@ namespace tests.api.Controllers
 
         public FilesControllerTests()
         {
-            var preTest = new EnvironmentBuilder("FileServicesClient:Username", "FileServicesClient:Password", typeof(FilesController));
+            var preTest = new EnvironmentBuilder("FileServicesClient:Username", "FileServicesClient:Password");
             var lookupServiceClient = new LookupServiceClient(preTest.HttpClient);
             var locationServiceClient = new LocationServicesClient(preTest.HttpClient);
             var fileServicesClient = new FileServicesClient(preTest.HttpClient);

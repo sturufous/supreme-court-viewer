@@ -45,7 +45,7 @@ namespace tests.api.Services
         #region Helpers
         private void SetupLookupServiceTests()
         {
-            var environmentBuilder = new EnvironmentBuilder("LookupServicesClient:Username", "LookupServicesClient:Password", typeof(LookupService));
+            var environmentBuilder = new EnvironmentBuilder("LookupServicesClient:Username", "LookupServicesClient:Password");
             _lookupService = new LookupService(environmentBuilder.Configuration,
                 new LookupServiceClient(environmentBuilder.HttpClient), new CachingService());
         }

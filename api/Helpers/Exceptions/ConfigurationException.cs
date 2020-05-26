@@ -13,7 +13,8 @@ namespace Scv.Api.Helpers.Exceptions
         /// Creates a new instance of a ConfigurationException class.
         /// </summary>
         /// <returns></returns>
-        public ConfigurationException() : base() { }
+        public ConfigurationException()
+        { }
 
         /// <summary>
         /// Creates a new instance of a ConfigurationException class, and initializes it with the specified arguments.

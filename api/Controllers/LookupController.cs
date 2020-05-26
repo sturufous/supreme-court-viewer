@@ -1,8 +1,5 @@
 ﻿using JCCommon.Clients.LookupServices;
-using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Scv.Api.Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -15,21 +12,15 @@ namespace Scv.Api.Controllers
     {
         #region Variables
 
-        private readonly IConfiguration _configuration;
-        private readonly ILogger<LookupController> _logger;
-        private readonly IMapper _mapper;
         private readonly LookupService _lookupService;
 
         #endregion Variables
 
         #region Constructor
 
-        public LookupController(IConfiguration configuration, ILogger<LookupController> logger, LookupService lookupService, IMapper mapper)
+        public LookupController(LookupService lookupService)
         {
-            _configuration = configuration;
-            _logger = logger;
             _lookupService = lookupService;
-            _mapper = mapper;
         }
 
         #endregion Constructor

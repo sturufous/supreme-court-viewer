@@ -13,7 +13,8 @@ namespace Scv.Api.Helpers.Exceptions
         /// Creates a new instance of a NotAuthorizedException class.
         /// </summary>
         /// <returns></returns>
-        public NotAuthorizedException() : base() { }
+        public NotAuthorizedException()
+        { }
 
         /// <summary>
         /// Creates a new instance of a NotAuthorizedException class, and initializes it with the specified arguments.

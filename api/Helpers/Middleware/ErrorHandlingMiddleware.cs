@@ -75,7 +75,6 @@ namespace Scv.Api.Helpers.Middleware
         {
             var code = HttpStatusCode.InternalServerError;
             var message = "An unhandled error has occurred.";
-            string details = null;
 
             switch (ex)
             {
@@ -138,7 +137,7 @@ namespace Scv.Api.Helpers.Middleware
 
             if (!context.Response.HasStarted)
             {
-                var result = JsonSerializer.Serialize(new Models.ErrorResponseModel(_env, ex, message, details), _options.JsonSerializerOptions);
+                var result = JsonSerializer.Serialize(new Models.ErrorResponseModel(_env, ex, message), _options.JsonSerializerOptions);
                 context.Response.ContentType = "application/json";
                 context.Response.StatusCode = (int)code;
                 await context.Response.WriteAsync(result);

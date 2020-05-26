@@ -76,18 +76,8 @@ namespace Scv.Api.Services
         {
             var civilFileDetailResponse = await _fileServicesClient.FilesCivilFileIdAsync(_requestAgencyIdentifierId, _requestPartId, fileId);
 
-            //Add in CSRs.
-            foreach (var appearance in civilFileDetailResponse.Appearance)
-            {
-                civilFileDetailResponse.Document.Add(new CvfcDocument3
-                {
-                    CivilDocumentId = appearance.AppearanceId,
-                    ImageId = appearance.AppearanceId,
-                    DocumentTypeCd = "CSR",
-                    LastAppearanceDt = appearance.AppearanceDate,
-                    FiledDt = appearance.AppearanceDate
-                });
-            }
+            foreach (var document in PopulateCivilDetailCsrsDocuments(civilFileDetailResponse.Appearance))
+                civilFileDetailResponse.Document.Add(document);
 
             var detail = _mapper.Map<RedactedCivilFileDetailResponse>(civilFileDetailResponse);
 
@@ -96,12 +86,9 @@ namespace Scv.Api.Services
             detail.Document = await PopulateCivilDetailDocuments(detail.Document);
 
             //TODO need permission for this filter.
-            var hearingRestrictionPermission = true;
             detail.HearingRestriction = detail.HearingRestriction.Where(hr =>
-                    hearingRestrictionPermission &&
                     hr.HearingRestrictionTypeCd != CvfcHearingRestriction2HearingRestrictionTypeCd.S)
                 .ToList();
-
             return detail;
         }
 
@@ -133,7 +120,6 @@ namespace Scv.Api.Services
                 document.Category = _lookupService.GetDocumentCategory(document.DocumentTypeCd);
                 document.DocumentTypeDescription = await _lookupService.GetDocumentDescriptionAsync(document.DocumentTypeCd);
             }
-
             return detailedAppearance;
         }
 
@@ -225,12 +211,10 @@ namespace Scv.Api.Services
                 JustinNo = fileId,
                 PartId = partId,
                 ProfSeqNo = profSeqNo,
-                JustinCounsel = accused != null ? _mapper.Map<JustinCounsel>(accused) : null
+                JustinCounsel = accused != null ? _mapper.Map<JustinCounsel>(accused) : null,
+                Charges = await PopulateCharges(appearanceCount.ApprCount),
+                AppearanceMethods = await PopulateAppearanceMethods(appearanceMethods.AppearanceMethod)
             };
-
-            appearanceDetail.Charges = await PopulateCharges(appearanceCount.ApprCount);
-            appearanceDetail.AppearanceMethods = await PopulateAppearanceMethods(appearanceMethods.AppearanceMethod);
-
             return appearanceDetail;
         }
 
@@ -330,7 +314,6 @@ namespace Scv.Api.Services
                     document.DocmId = string.IsNullOrEmpty(document.DocmId) ? null : document.DocmId;
                     document.ImageId = string.IsNullOrEmpty(document.ImageId) ? null : document.ImageId;
                 }
-
                 return criminalDocuments;
             }).ToList();
         }
@@ -410,6 +393,24 @@ namespace Scv.Api.Services
         #endregion Criminal Appearance Details
 
         #region Civil Details
+
+        private ICollection<CvfcDocument3> PopulateCivilDetailCsrsDocuments(ICollection<CvfcAppearance> appearances) 
+        {
+            var documents = new List<CvfcDocument3>();
+            //Add in CSRs.
+            foreach (var appearance in appearances)
+            {
+                documents.Add(new CvfcDocument3
+                {
+                    CivilDocumentId = appearance.AppearanceId,
+                    ImageId = appearance.AppearanceId,
+                    DocumentTypeCd = "CSR",
+                    LastAppearanceDt = appearance.AppearanceDate,
+                    FiledDt = appearance.AppearanceDate
+                });
+            }
+            return documents;
+        }
 
         private async Task<RedactedCivilFileDetailResponse> PopulateBaseCivilDetail(RedactedCivilFileDetailResponse detail)
         {

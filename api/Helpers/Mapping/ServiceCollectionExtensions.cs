@@ -11,7 +11,7 @@ namespace Scv.Api.Helpers.Mapping
         public static IServiceCollection AddMapster(this IServiceCollection services, Action<TypeAdapterConfig> options = null)
         {
             var config = TypeAdapterConfig.GlobalSettings;
-            config.Scan(Assembly.GetAssembly(typeof(Startup)));
+            config.Scan(Assembly.GetAssembly(typeof(Startup)) ?? throw new InvalidOperationException());
 
             options?.Invoke(config);
 
