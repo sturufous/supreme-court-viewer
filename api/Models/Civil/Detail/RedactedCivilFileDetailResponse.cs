@@ -38,8 +38,6 @@ namespace Scv.Api.Models.Civil.Detail
         /// Extended document object.
         /// </summary>
         public ICollection<CivilDocument> Document { get; set; }
-
         public ICollection<CvfcHearingRestriction2> HearingRestriction { get; set; }
-        public ICollection<CvfcAppearance> Appearance { get; set; }
     }
 }

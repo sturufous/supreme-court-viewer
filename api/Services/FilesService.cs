@@ -76,10 +76,10 @@ namespace Scv.Api.Services
         {
             var civilFileDetailResponse = await _fileServicesClient.FilesCivilFileIdAsync(_requestAgencyIdentifierId, _requestPartId, fileId);
 
-            foreach (var document in PopulateCivilDetailCsrsDocuments(civilFileDetailResponse.Appearance))
-                civilFileDetailResponse.Document.Add(document);
-
             var detail = _mapper.Map<RedactedCivilFileDetailResponse>(civilFileDetailResponse);
+
+            foreach (var document in PopulateCivilDetailCsrsDocuments(civilFileDetailResponse.Appearance))
+                detail.Document.Add(document);
 
             detail = await PopulateBaseCivilDetail(detail);
             detail.Party = await PopulateCivilDetailParty(detail.Party);
@@ -394,22 +394,19 @@ namespace Scv.Api.Services
 
         #region Civil Details
 
-        private ICollection<CvfcDocument3> PopulateCivilDetailCsrsDocuments(ICollection<CvfcAppearance> appearances) 
+        private IEnumerable<CivilDocument> PopulateCivilDetailCsrsDocuments(ICollection<CvfcAppearance> appearances)
         {
-            var documents = new List<CvfcDocument3>();
             //Add in CSRs.
-            foreach (var appearance in appearances)
+            return appearances.Select(appearance => new CivilDocument()
             {
-                documents.Add(new CvfcDocument3
-                {
-                    CivilDocumentId = appearance.AppearanceId,
-                    ImageId = appearance.AppearanceId,
-                    DocumentTypeCd = "CSR",
-                    LastAppearanceDt = appearance.AppearanceDate,
-                    FiledDt = appearance.AppearanceDate
-                });
-            }
-            return documents;
+                Category = "CSR",
+                DocumentTypeDescription = "Court Summary",
+                CivilDocumentId = appearance.AppearanceId,
+                ImageId = appearance.AppearanceId,
+                DocumentTypeCd = "CSR",
+                LastAppearanceDt = appearance.AppearanceDate,
+                FiledDt = appearance.AppearanceDate,
+            });
         }
 
         private async Task<RedactedCivilFileDetailResponse> PopulateBaseCivilDetail(RedactedCivilFileDetailResponse detail)
@@ -427,12 +424,14 @@ namespace Scv.Api.Services
 
         private async Task<ICollection<CivilDocument>> PopulateCivilDetailDocuments(ICollection<CivilDocument> documents)
         {
+            //TODO permission for documents.
             //Populate extra fields for document.
-            foreach (var document in documents)
+            foreach (var document in documents.Where(doc => doc.Category != "CSR"))
             {
                 document.Category = _lookupService.GetDocumentCategory(document.DocumentTypeCd);
                 document.DocumentTypeDescription = await _lookupService.GetDocumentDescriptionAsync(document.DocumentTypeCd);
-                document.ImageId = document.DocumentTypeCd != "CSR" && document.SealedYN != "N" ? null : document.ImageId;
+                document.ImageId = document.SealedYN != "N" ? null : document.ImageId;
+                document.Appearance = null;
             }
             return documents;
         }
