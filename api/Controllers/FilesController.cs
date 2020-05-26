@@ -65,22 +65,8 @@ namespace Scv.Api.Controllers
         public async Task<ActionResult<RedactedCivilFileDetailResponse>> GetCivilFileDetailByFileId(string fileId)
         {
             var civilFileDetailResponse = await _filesService.FilesCivilFileIdAsync(fileId);
+            civilFileDetailResponse.Appearances = await _filesService.FilesCivilFileIdAppearancesAsync(FutureYN2.Y, HistoryYN2.Y, fileId);
             return Ok(civilFileDetailResponse);
-        }
-
-        /// <summary>
-        /// Gets appearances for a given civil file id.
-        /// </summary>
-        /// <param name="fileId"></param>
-        /// <param name="future">Y to show future, N to hide future Y = 0, N = 1</param>
-        /// <param name="history">Y to show history, N to hide history Y = 0, N = 1</param>
-        /// <returns>CivilFileAppearancesResponse</returns>
-        [HttpGet]
-        [Route("civil/{fileId}/appearances")]
-        public async Task<ActionResult<CivilFileAppearancesResponse>> GetCivilAppearancesByFileId(string fileId, FutureYN2? future, HistoryYN2? history)
-        {
-            var civilFileAppearancesResponse = await _filesService.FilesCivilFileIdAppearancesAsync(future, history, fileId);
-            return Ok(civilFileAppearancesResponse);
         }
 
         /// <summary>
@@ -161,22 +147,8 @@ namespace Scv.Api.Controllers
             var redactedCriminalFileDetailResponse = await _filesService.FilesCriminalFileIdAsync(fileId);
             if (redactedCriminalFileDetailResponse?.JustinNo == null)
                 throw new NotFoundException("Couldn't find criminal file with this id.");
+            redactedCriminalFileDetailResponse.Appearances = await _filesService.FilesCriminalFileIdAppearancesAsync(fileId, FutureYN.Y, HistoryYN.Y);
             return Ok(redactedCriminalFileDetailResponse);
-        }
-
-        /// <summary>
-        /// Gets appearances for a given criminal file id.
-        /// </summary>
-        /// <param name="fileId">Target file id.</param>
-        /// <param name="future">Y to show future, N to hide future. Y = 0, N = 1</param>
-        /// <param name="history">Y to show history, N to hide history. Y = 0, N = 1</param>
-        /// <returns>CriminalFileAppearancesResponse</returns>
-        [HttpGet]
-        [Route("criminal/{fileId}/appearances")]
-        public async Task<ActionResult<CriminalFileAppearancesResponse>> GetCriminalAppearancesByFileId(string fileId, FutureYN? future = null, HistoryYN? history = null)
-        {
-            var criminalFileIdAppearances = await _filesService.FilesCriminalFileIdAppearancesAsync(fileId, future, history);
-            return Ok(criminalFileIdAppearances);
         }
 
         /// <summary>

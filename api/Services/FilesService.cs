@@ -77,7 +77,6 @@ namespace Scv.Api.Services
             var civilFileDetailResponse = await _fileServicesClient.FilesCivilFileIdAsync(_requestAgencyIdentifierId, _requestPartId, fileId);
 
             var detail = _mapper.Map<RedactedCivilFileDetailResponse>(civilFileDetailResponse);
-
             foreach (var document in PopulateCivilDetailCsrsDocuments(civilFileDetailResponse.Appearance))
                 detail.Document.Add(document);
 
@@ -118,7 +117,6 @@ namespace Scv.Api.Services
                 .ToList();
 
             detailedAppearance.AppearanceMethod = appearanceMethodsResponse.AppearanceMethod;
-
             detailedAppearance.Party = await PopulateCivilDetailedAppearanceParties(appearancePartyResponse.Party);
             detailedAppearance.Document = await PopulateCivilDetailedAppearanceDocuments(documentsWithSameAppearanceId);
 
@@ -167,7 +165,6 @@ namespace Scv.Api.Services
                 return null;
 
             var detail = _mapper.Map<RedactedCriminalFileDetailResponse>(criminalFileDetail);
-
             var documents = PopulateCriminalDetailDocuments(criminalFileContent);
             detail = await PopulateBaseCriminalDetail(detail);
             detail.Witness = await PopulateCriminalDetailWitnesses(detail);
@@ -205,7 +202,6 @@ namespace Scv.Api.Services
 
             var redactedDetail = _mapper.Map<RedactedCriminalFileDetailResponse>(detail);
             var accused = redactedDetail.Participant.FirstOrDefault(x => x.PartId == partId && x.ProfSeqNo == profSeqNo);
-
             var appearanceDetail = new CriminalAppearanceDetail
             {
                 JustinNo = fileId,
@@ -221,7 +217,6 @@ namespace Scv.Api.Services
         public async Task<CriminalFileContent> FilesCriminalFilecontentAsync(string agencyId, string roomCode, DateTime? proceeding, string appearanceId, string justinNumber)
         {
             var proceedingDateString = proceeding.HasValue ? proceeding.Value.ToString("yyyy-MM-dd") : "";
-
             return await _fileServicesClient.FilesCriminalFilecontentAsync(agencyId, roomCode,
                 proceedingDateString, appearanceId, justinNumber);
         }

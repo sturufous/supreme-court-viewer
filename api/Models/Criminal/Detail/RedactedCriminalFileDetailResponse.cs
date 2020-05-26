@@ -78,5 +78,6 @@ namespace Scv.Api.Models.Criminal.Detail
         /// Slimmed down version of CfcAppearanceCount.
         /// </summary>
         public List<CriminalCount> Count { get; set; }
+        public CriminalFileAppearancesResponse Appearances { get; set; }
     }
 }
