@@ -41,8 +41,8 @@ export default class CriminalCrownInformation extends Vue {
     public criminalFileInformation!: any
 
     fields =[
-        {key:"CrownInfoFieldName", label: "Crown Info Field Name"},
-        {key:"CrownInfoValue", label: "Crown Info Value"}
+        {key:"CrownInfoFieldName", tdClass: 'border-top',label: "Crown Info Field Name"},
+        {key:"CrownInfoValue", tdClass: 'border-top',label: "Crown Info Value"}
     ];
 
     public getCrownInfo(): void {

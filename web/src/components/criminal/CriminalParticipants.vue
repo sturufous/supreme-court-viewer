@@ -14,6 +14,7 @@
             :sort-desc.sync="sortDesc"
             :no-sort-reset="true"
             borderless
+            sort-icon-left
             responsive="sm"
             >   
                 <template v-for="(field,index) in fields" v-slot:[`head(${field.key})`]="data">
