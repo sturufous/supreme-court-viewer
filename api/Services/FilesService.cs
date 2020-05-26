@@ -6,6 +6,7 @@ using Newtonsoft.Json.Serialization;
 using Scv.Api.Helpers;
 using Scv.Api.Helpers.ContractResolver;
 using Scv.Api.Models.Civil.AppearanceDetail;
+using Scv.Api.Models.Civil.Appearances;
 using Scv.Api.Models.Civil.Detail;
 using Scv.Api.Models.Criminal.AppearanceDetail;
 using Scv.Api.Models.Criminal.Appearances;
@@ -14,7 +15,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Scv.Api.Models.Civil.Appearances;
 using CivilAppearanceDetail = Scv.Api.Models.Civil.AppearanceDetail.CivilAppearanceDetail;
 using CriminalAppearanceDetail = Scv.Api.Models.Criminal.AppearanceDetail.CriminalAppearanceDetail;
 using CriminalParticipant = Scv.Api.Models.Criminal.Detail.CriminalParticipant;
@@ -83,13 +83,9 @@ namespace Scv.Api.Services
                 detail.Document.Add(document);
 
             detail = await PopulateBaseCivilDetail(detail);
-            detail.Party = await PopulateCivilDetailParty(detail.Party);
+            detail.Party = await PopulateCivilDetailParties(detail.Party);
             detail.Document = await PopulateCivilDetailDocuments(detail.Document);
-
-            //TODO need permission for this filter.
-            detail.HearingRestriction = detail.HearingRestriction.Where(hr =>
-                    hr.HearingRestrictionTypeCd == CvfcHearingRestriction2HearingRestrictionTypeCd.S)
-                .ToList();
+            detail.HearingRestriction = await PopulateCivilDetailHearingRestrictions(civilFileDetailResponse.HearingRestriction);
             return detail;
         }
 
@@ -108,7 +104,6 @@ namespace Scv.Api.Services
                 appearance.CourtLocation = await _locationService.GetLocationName(appearance.CourtAgencyId);
                 appearance.DocumentTypeDsc = await _lookupService.GetDocumentDescriptionAsync(appearance.DocumentTypeCd);
             }
-
             return civilAppearances;
         }
 
@@ -453,12 +448,26 @@ namespace Scv.Api.Services
             return documents;
         }
 
-        private async Task<ICollection<CivilParty>> PopulateCivilDetailParty(ICollection<CivilParty> parties)
+        private async Task<ICollection<CivilParty>> PopulateCivilDetailParties(ICollection<CivilParty> parties)
         {
             //Populate extra fields for party.
             foreach (var party in parties)
                 party.RoleTypeDescription = await _lookupService.GetCivilRoleTypeDescription(party.RoleTypeCd);
             return parties;
+        }
+
+        private async Task<ICollection<CivilHearingRestriction>> PopulateCivilDetailHearingRestrictions(ICollection<CvfcHearingRestriction2> hearingRestrictions)
+        {
+            //TODO need permission for this filter.
+            var civilHearingRestrictions = _mapper.Map<ICollection<CivilHearingRestriction>>(hearingRestrictions.Where(hr =>
+                    hr.HearingRestrictionTypeCd == CvfcHearingRestriction2HearingRestrictionTypeCd.S)
+                .ToList());
+
+            foreach (var hearing in civilHearingRestrictions)
+            {
+                hearing.HearingRestrictionTypeDsc = await _lookupService.GetHearingRestrictionDescription(hearing.HearingRestrictionTypeCd.ToString());
+            }
+            return civilHearingRestrictions;
         }
 
         #endregion Civil Details
