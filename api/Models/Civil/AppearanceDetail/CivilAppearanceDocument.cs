@@ -27,5 +27,17 @@ namespace Scv.Api.Models.Civil.AppearanceDetail
         [JsonIgnore]
         [AdaptIgnore]
         public new ICollection<CvfcAppearance> Appearance { get; }
+
+        [JsonIgnore]
+        [AdaptIgnore]
+        public new string LastAppearanceId { get; }
+        
+        [JsonIgnore]
+        [AdaptIgnore]
+        public new string LastAppearanceDt { get; }
+
+        [JsonIgnore]
+        [AdaptIgnore]
+        public new string LastAppearanceTm { get; }
     }
 }
