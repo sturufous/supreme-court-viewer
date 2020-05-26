@@ -124,7 +124,11 @@ namespace Scv.Api.Services
                 .ToList();
 
             detailedAppearance.AppearanceMethod = appearanceMethodsResponse.AppearanceMethod;
-            detailedAppearance.Party = appearancePartyResponse.Party;
+
+            var parties = _mapper.Map<ICollection<CivilAppearanceDetailParty>>(appearancePartyResponse.Party);
+            foreach (var party in parties)
+                party.PartyRoleTypeDesc = await _lookupService.GetCivilRoleTypeDescription(party.PartyRoleTypeCd);
+            detailedAppearance.Party = parties;
 
             //CivilAppearanceDocument, doesn't include appearances.
             detailedAppearance.Document = _mapper.Map<ICollection<CivilAppearanceDocument>>(documentsWithSameAppearanceId);
