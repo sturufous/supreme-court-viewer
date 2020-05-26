@@ -87,7 +87,7 @@ namespace Scv.Api.Services
 
             //TODO need permission for this filter.
             detail.HearingRestriction = detail.HearingRestriction.Where(hr =>
-                    hr.HearingRestrictionTypeCd != CvfcHearingRestriction2HearingRestrictionTypeCd.S)
+                    hr.HearingRestrictionTypeCd == CvfcHearingRestriction2HearingRestrictionTypeCd.S)
                 .ToList();
             return detail;
         }
