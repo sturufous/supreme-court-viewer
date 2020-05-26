@@ -14,14 +14,17 @@
             :sort-desc.sync="sortDesc"
             :no-sort-reset="true"
             borderless
+            sort-icon-left
             responsive="sm"
             >   
                 <template v-for="(field,index) in fields" v-slot:[`head(${field.key})`]="data">
                     <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
-                </template>
+                </template>                
                 <template v-for="(field,index) in fields" v-slot:[`cell(${field.key})`]="data" >
                     <span v-bind:key="index" :class="field.cellStyle" v-if="data.field.key != 'Status' && data.field.key != 'Name'">  {{ data.value }} </span>
-                    <span v-bind:key="index" :class="data.item.Charges.length>0?field.cellStyle:''" v-if="data.field.key == 'Name'"> 
+                </template>                
+                <template v-slot:cell(Name)="data" >                   
+                    <span :class="data.item.Charges.length>0?data.field.cellStyle:''" > 
                          {{ data.value }}
                         <b-dropdown size="sm" variant="white text-info" v-if="data.item.Charges.length>0" >
                             <b-dropdown-text variant="white text-danger">Charges</b-dropdown-text>
@@ -34,7 +37,8 @@
                             </b-dropdown-item-button> 
                         </b-dropdown>                       
                     </span>
-                    <span v-bind:key="index" v-if="data.field.key == 'Status'">  
+                </template>
+                <template v-slot:cell(Status)="data" >
                         <b-badge  
                             v-for="(field,index) in data.value"
                             :key="index" 
@@ -43,7 +47,6 @@
                             :title='field.key' > 
                             {{ field.abbr }} 
                         </b-badge>
-                    </span>
                 </template>
             </b-table>
         </b-card>
