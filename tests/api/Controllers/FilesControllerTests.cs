@@ -275,7 +275,7 @@ namespace tests.api.Controllers
 
             var fileContentResult = actionResult as FileContentResult;
             Assert.NotNull(fileContentResult);
-            Assert.Equal(5139, fileContentResult.FileContents.Length);
+            Assert.True(fileContentResult.FileContents.Length > 5100);
         }
 
         [Fact]
