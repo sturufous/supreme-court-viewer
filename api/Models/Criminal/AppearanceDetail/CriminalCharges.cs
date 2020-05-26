@@ -1,7 +1,7 @@
 ﻿namespace Scv.Api.Models.Criminal.AppearanceDetail
 {
     /// <summary>
-    /// Adds extra fields to criminalAppearanceCount. 
+    /// Adds extra fields to criminalAppearanceCount.
     /// </summary>
     public class CriminalCharges : JCCommon.Clients.FileServices.CriminalAppearanceCount
     {

@@ -1,6 +1,3 @@
-using System;
-using System.IO;
-using System.Reflection;
 using JCCommon.Clients.FileServices;
 using JCCommon.Clients.LocationServices;
 using JCCommon.Clients.LookupServices;
@@ -19,6 +16,9 @@ using Scv.Api.Helpers.ContractResolver;
 using Scv.Api.Helpers.Mapping;
 using Scv.Api.Helpers.Middleware;
 using Scv.Api.Services;
+using System;
+using System.IO;
+using System.Reflection;
 
 namespace Scv.Api
 {
@@ -68,7 +68,6 @@ namespace Scv.Api
                     Configuration.GetNonEmptyValue("LocationServicesClient:Password"));
             });
 
-
             services.AddScoped<FilesService>();
             services.AddScoped<LookupService>();
             services.AddScoped<LocationService>();
@@ -102,9 +101,9 @@ namespace Scv.Api
                 app.UseDeveloperExceptionPage();
             }
 
- 	        app.UseCors();
+            app.UseCors();
 
-            app.UseSwagger(options => 
+            app.UseSwagger(options =>
             {
                 options.RouteTemplate = "api/swagger/{documentname}/swagger.json";
             });
@@ -122,7 +121,7 @@ namespace Scv.Api
             app.UseRouting();
 
             app.UseAuthorization();
-            
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

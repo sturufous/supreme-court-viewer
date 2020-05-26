@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using JCCommon.Clients.FileServices;
+﻿using JCCommon.Clients.FileServices;
 using JCCommon.Clients.LocationServices;
 using JCCommon.Clients.LookupServices;
 using JCCommon.Models;
@@ -12,25 +10,30 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Scv.Api.Controllers;
 using Scv.Api.Services;
+using System;
+using System.Linq;
 using tests.api.Helpers;
 using Xunit;
 
 namespace tests.api.Controllers
 {
     /// <summary>
-    /// These tests, ensure Api.FilesController and JC-Client-Interface.FileServicesClient work correctly. 
-    /// Credit to DARS for most of these tests. 
+    /// These tests, ensure Api.FilesController and JC-Client-Interface.FileServicesClient work correctly.
+    /// Credit to DARS for most of these tests.
     /// </summary>
     public class FilesControllerTests
     {
         #region Variables
+
         private readonly FilesController _controller;
-        #endregion
+
+        #endregion Variables
 
         #region Constructor
+
         public FilesControllerTests()
         {
-            var preTest = new EnvironmentBuilder("FileServicesClient:Username", "FileServicesClient:Password", typeof(FilesController));
+            var preTest = new EnvironmentBuilder("FileServicesClient:Username", "FileServicesClient:Password");
             var lookupServiceClient = new LookupServiceClient(preTest.HttpClient);
             var locationServiceClient = new LocationServicesClient(preTest.HttpClient);
             var fileServicesClient = new FileServicesClient(preTest.HttpClient);
@@ -40,9 +43,11 @@ namespace tests.api.Controllers
             _controller = new FilesController(preTest.Configuration, preTest.LogFactory.CreateLogger<FilesController>(), filesService);
             SetupMocks();
         }
-        #endregion
+
+        #endregion Constructor
 
         #region Tests
+
         [Fact]
         public async void Criminal_File_Search_By_LastName()
         {
@@ -241,7 +246,7 @@ namespace tests.api.Controllers
             var actionResult = await _controller.FilesCriminalSearchAsync(fcq);
 
             var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
-            Assert.Equal("3", fileSearchResponse.RecCount);
+            Assert.Equal("2", fileSearchResponse.RecCount);
         }
 
         [Fact]
@@ -270,7 +275,7 @@ namespace tests.api.Controllers
 
             var fileContentResult = actionResult as FileContentResult;
             Assert.NotNull(fileContentResult);
-            Assert.Equal(5139, fileContentResult.FileContents.Length);
+            Assert.True(fileContentResult.FileContents.Length > 5100);
         }
 
         [Fact]
@@ -282,7 +287,6 @@ namespace tests.api.Controllers
             Assert.NotNull(fileContentResult);
             Assert.True(fileContentResult.FileContents.Length > 79000);
         }
-
 
         [Fact]
         public async void Civil_File_Content_By_FileId()
@@ -329,10 +333,10 @@ namespace tests.api.Controllers
             Assert.Equal(1, criminalFileContent.AccusedFile.Count);
             Assert.Equal("3179", criminalFileContent.AccusedFile.First().MdocJustinNo);
         }
-        #endregion
+
+        #endregion Tests
 
         [Fact]
-
         public async void Criminal_File_Detail_Document_By_JustinNumber()
         {
             var actionResult = await _controller.GetCriminalFileDetailByFileId(fileId: "35840");
@@ -347,25 +351,25 @@ namespace tests.api.Controllers
         [Fact]
         public async void Civil_Appearance_Details()
         {
-            //Has party data. 
+            //Has party data.
             var actionResult = await _controller.GetCivilAppearanceDetails("2506", "11034");
 
             var civilAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Equal(3, civilAppearanceDetail.Party.Count);
             Assert.Contains(civilAppearanceDetail.Party, p => p.LastNm == "BYSTANDER");
 
-            //Has appearanceMethod data. 
+            //Has appearanceMethod data.
             actionResult = await _controller.GetCivilAppearanceDetails("3499", "13410");
 
             civilAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Equal(1, civilAppearanceDetail.AppearanceMethod.Count);
-            Assert.Equal("IP",civilAppearanceDetail.AppearanceMethod.First().AppearanceMethodCd);
+            Assert.Equal("IP", civilAppearanceDetail.AppearanceMethod.First().AppearanceMethodCd);
         }
 
         [Fact]
         public async void Criminal_Appearance_Details()
         {
-            //Unrelated fileID and appearance Id. 
+            //Unrelated fileID and appearance Id.
             var actionResult = await _controller.GetCriminalAppearanceDetails("2000", "36548.0734");
 
             var criminalAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
@@ -393,8 +397,8 @@ namespace tests.api.Controllers
             {
                 HttpContext = httpContext.Object
             };
-
         }
-        #endregion
+
+        #endregion Helpers
     }
 }
