@@ -41,6 +41,7 @@
                 @row-hovered="rowHover"
                 striped
                 borderless
+                sort-icon-left
                 responsive="sm"
                 >   
                     <template v-for="(field,index) in fields[fieldsTab]" v-slot:[`head(${field.key})`]="data">
@@ -67,7 +68,7 @@
                 </b-table>
             </b-card>
             <template v-slot:overlay>               
-               <div> 
+               <div style="text-align: center"> 
                     <loading-spinner/> 
                     <p id="Downloading-label">Downloading PDF file ...</p>
                </div>                

@@ -27,6 +27,7 @@
             <criminal-side-panel v-if="isDataReady"/> 
         </b-col>
         <b-col col md="10" cols="10" style="overflow: auto;">
+
             <criminal-header-top v-if="isDataReady"/> 
             <criminal-header v-if="isDataReady"/> 
 
@@ -37,8 +38,10 @@
             <criminal-participants v-if="showCaseDetails"/>            
             <adjudicator-restrictions v-if="showCaseDetails"/> 
             <criminal-crown-information v-if="showCaseDetails"/>
-            <past-appearances v-if="showPastAppearances" />               
-            <criminal-documents-view v-if="showDocuments"/>  
+            <criminal-crown-notes v-if="showCaseDetails"/>
+            <past-appearances v-if="showPastAppearances" />
+            <criminal-documents-view v-if="showDocuments"/>
+            <b-card><br></b-card>  
         </b-col>
     </b-row>
 </body>
@@ -55,6 +58,7 @@ import CriminalParticipants from '@components/criminal/CriminalParticipants.vue'
 import AdjudicatorRestrictions from '@components/criminal/AdjudicatorRestrictions.vue'
 import CriminalCrownInformation from '@components/criminal/CriminalCrownInformation.vue';
 import PastAppearances from '@components/criminal/PastAppearances.vue'
+import CriminalCrownNotes from '@components/criminal/CriminalCrownNotes.vue';
 import '@store/modules/CriminalFileInformation';
 const criminalState = namespace('CriminalFileInformation');
 
@@ -67,7 +71,8 @@ const criminalState = namespace('CriminalFileInformation');
         CriminalParticipants,
         AdjudicatorRestrictions,
         CriminalCrownInformation,
-        PastAppearances
+        PastAppearances,
+        CriminalCrownNotes
     }
 })
 export default class CriminalCaseDetails extends Vue {
@@ -168,8 +173,13 @@ export default class CriminalCaseDetails extends Vue {
 
     public navigateToLandingPage() {
         this.$router.push({name:'Home'})
-    }
-    
+    }    
     
 }
 </script>
+
+<style scoped>
+ .card {
+        border: white;
+    }
+</style>

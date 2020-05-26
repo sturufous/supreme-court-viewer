@@ -2,41 +2,82 @@
 <body>
     <b-card bg-variant="white">
         <div>
-            <h3 class="mx-2 font-weight-normal"> Last Three Past Appearances</h3>
+            <h3 class="mx-2 font-weight-normal" v-if="!showSections['Past Appearances']"> Last Three Past Appearances</h3>
             <hr class="mx-1 bg-light" style="height: 5px;"/> 
         </div>
 
-        <b-card bg-variant="white">           
+        <b-card bg-variant="light" v-if= "!isMounted && !isDataReady">
+            <b-overlay :show= "true"> 
+                <b-card  style="min-height: 100px;"/>                   
+                <template v-slot:overlay>               
+                <div> 
+                        <loading-spinner/> 
+                        <p id="loading-label">Loading ...</p>
+                </div>                
+                </template> 
+            </b-overlay> 
+        </b-card>
+
+        <b-card bg-variant="white" v-if="isDataReady">           
             <b-table
-            :items="pastAppearancesList"
+            :items="SortedPastAppearancess"
             :fields="fields"
             :sort-by.sync="sortBy"
             :sort-desc.sync="sortDesc"
             :no-sort-reset="true"
+            sort-icon-left
             borderless
             responsive="sm"
             >   
                 <template v-for="(field,index) in fields" v-slot:[`head(${field.key})`]="data">
                     <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
                 </template>
-                <template v-for="(field,index) in fields" v-slot:[`cell(${field.key})`]="data" >
-                    <span v-bind:key="index" :class="field.cellStyle" v-if="data.field.key != 'Status' && data.field.key != 'Name'">  {{ data.value }} </span>
-                    <span v-bind:key="index" :class="data.item.Charges.length>0?field.cellStyle:''" v-if="data.field.key == 'Name'"> 
-                         {{ data.value }}
-                       <b-button size="sm" @click="data.toggleDetails" class="mr-2">
-                         Details
-                        </b-button>                      
-                    </span>
-                  
-                </template>
 
+                <template v-slot:cell(Date)="data" >
+                    <span :class="data.field.cellStyle"> 
+                        <b-button size="xs" @click="data.toggleDetails" variant="outline-primary border-white">
+                            <b-icon-caret-right-fill  v-if="!data.item['_showDetails']"></b-icon-caret-right-fill>
+                            <b-icon-caret-down-fill v-if="data.item['_showDetails']"></b-icon-caret-down-fill>
+                        </b-button>
+                        {{data.value| beautify-date}}
+                    </span> 
+                </template>
                 <template v-slot:row-details>
                     <b-card> 
-                        <criminal-documents-view/>
+                        <past-appearances-details/>
                     </b-card>
                 </template>
+
+                <template  v-slot:cell(Reason)="data">
+                    <b-button 
+                            class ="font-weight-bold" 
+                            variant="outline-primary border-white"
+                            v-b-tooltip.hover                            
+                            :title="data.item['Reason Description']"> 
+                            {{data.value}}
+                    </b-button>
+                </template>
+
+                <template  v-slot:cell(Presider)="data">
+                    <b-button                              
+                            variant="outline-primary border-white"
+                            v-b-tooltip.hover                           
+                            :title="data.item['Judge Full Name']"> 
+                            {{data.value}}
+                    </b-button>
+                </template>
+
+                <template  v-slot:cell(Accused)="data">
+                    <b> {{data.value}} </b>
+                </template>
+
+                <template  v-slot:cell(Status)="data">
+                    <b :class = "getStatusStyle(data.value)"> {{data.value}} </b>
+                </template>
+                
             </b-table>
         </b-card>
+      
     </b-card> 
 
 </body>
@@ -46,14 +87,16 @@
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 
-import CriminalDocumentsView from '@components/criminal/CriminalDocumentsView.vue';
+import PastAppearancesDetails from '@components/criminal/PastAppearancesDetails.vue';
 
 import "@store/modules/CriminalFileInformation";
 const criminalState = namespace("CriminalFileInformation");
 
+enum appearanceStatus {UNCF='Unconfirmed', CNCL='Canceled', SCHD='Scheduled' }
+
 @Component({
     components: {
-        CriminalDocumentsView
+        PastAppearancesDetails
     }
 })
 export default class PastAppearances extends Vue {
@@ -61,44 +104,51 @@ export default class PastAppearances extends Vue {
     @criminalState.State
     public criminalFileInformation!: any;
 
+    @criminalState.State
+    public showSections 
+
     mounted() {
         this.getPastAppearances();
     }
 
     public getPastAppearances(): void {      
-        const data = this.criminalFileInformation.detailsData;    
-        this.pastAppearancesJson = data.participant 
-        this.ExtractPastAppearancesInfo();
-        this.isMounted = true;          
+    
+        this.$http.get('/api/files/criminal/'+ this.criminalFileInformation.fileNumber+'/appearances?future=1&history=0')
+            .then(Response => Response.json(), err => {console.log(err);}        
+            ).then(data => {
+                if(data){  
+                    this.pastAppearancesJson = data.apprDetail;              
+                    this.ExtractPastAppearancesInfo();
+                    if(this.pastAppearancesList.length)
+                    {                    
+                        this.isDataReady = true;
+                    }
+                }
+                this.isMounted = true;
+                       
+            }); 
     } 
   
     isMounted = false;
+    isDataReady = false;
     pastAppearancesJson;
     
     sortBy = 'Date';
-    sortDesc = false;
+    sortDesc = true;
     pastAppearancesList: any[] = [];
 
     fields =  
     [
         {key:'Date',       sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'text-info'},
-        {key:'Reason',     sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'text'},
+        {key:'Reason',     sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'font-weight-bold'},
         {key:'Time',       sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:'text'},
         {key:'Duration',   sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:'text'},
         {key:'Location',   sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'text'},
         {key:'Room',       sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:'text'},
         {key:'Presider',   sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'text'},
         {key:'Accused',    sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'text'},
-        {key:'Status',     sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'text-white bg-secondary'},
-    ];
-
-    statusFields = 
-    [
-        {key:'Warrant Issued',      abbr:'W',   code:'warrantYN'},
-        {key:'In Custody',          abbr:'IC',  code:'inCustodyYN'},
-        {key:'Detention Order',     abbr:'DO',  code:'detainedYN'} , 
-        {key:'Interpreter Required',abbr:'INT', code:'interpreterYN'}
-    ];
+        {key:'Status',     sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'badge'},
+    ];    
   
     public ExtractPastAppearancesInfo(): void {
         
@@ -107,39 +157,87 @@ export default class PastAppearances extends Vue {
             const jFile = this.pastAppearancesJson[fileIndex];
 
             fileInfo["Index"] = fileIndex;
+            fileInfo["Date"] = jFile.appearanceDt.split(' ')[0]
+            fileInfo["Time"] = this.getTime(jFile.appearanceTm.split(' ')[1].substr(0,5));
+            fileInfo["Reason"] = jFile.appearanceReasonCd;
+            fileInfo["Reason Description"] = jFile.appearanceReasonDsc? jFile.appearanceReasonDsc: console.log(fileInfo["Date"]);
+          
+            fileInfo["Duration"] = this.getDuration(jFile.estimatedTimeHour, jFile.estimatedTimeMin)           
+            fileInfo["Location"] = jFile.courtLocation;
+            fileInfo["Room"] =jFile.courtRoomCd
+
             fileInfo["First Name"] = jFile.givenNm ? jFile.givenNm : "";
             fileInfo["Last Name"] = jFile.lastNm ? jFile.lastNm : jFile.orgNm;
-            fileInfo["Name"] = this.getNameOfParticipant(fileInfo["Last Name"], fileInfo["First Name"]);            
-            fileInfo["D.O.B."] = jFile.birthDt? (new Date(jFile.birthDt.split(' ')[0])).toUTCString().substr(4,12) : '';
+            fileInfo["Accused"] = this.getNameOfParticipant(fileInfo["Last Name"], fileInfo["First Name"]);  
+            fileInfo["Status"] = jFile.appearanceStatusCd ? appearanceStatus[jFile.appearanceStatusCd] :''
 
-            fileInfo["Charges"] = [];         
-            const charges: any[] = [];         
-            for(const charge of jFile.charge)
-            {              
-                    const docInfo = {};                   
-                    docInfo["Description"]= charge.sectionDscTxt
-                    docInfo["Code"]= charge.sectionTxt
-                    charges.push(docInfo);
-            }
-            fileInfo["Charges"] = charges;
-
-            fileInfo["Status"] = [];
-            for (const status of this.statusFields)
-            {
-                if(jFile[status.code] =='Y')
-                    fileInfo["Status"].push(status);
-            }
-   
-            fileInfo['Counsel'] = jFile.counselLastNm? 'JUSTIN: '+ jFile.counselGivenNm +' '+ jFile.counselLastNm : ''
-            fileInfo['Counsel Designation Filed'] = jFile.designatedCounselYN           
+            fileInfo["Presider"] =  jFile.judgeInitials ? jFile.judgeInitials :''
+            fileInfo["Judge Full Name"] =  jFile.judgeInitials ? jFile.judgeFullNm : ''
+                       
             this.pastAppearancesList.push(fileInfo); 
         }
+    }
+
+    public getStatusStyle(status)
+    {
+        if(status == appearanceStatus.UNCF) return "badge badge-danger";
+        else if(status == appearanceStatus.CNCL) return "badge badge-warning";
+        else if(status == appearanceStatus.SCHD) return "badge badge-primary";
     }
 
     public getNameOfParticipant(lastName, givenName) {
         return ( lastName + ", " + givenName );
     }
 
+    public getTime(time)
+    {
+        const time12 = (Number(time.substr(0,2)) % 12 || 12 ) + time.substr(2,3)
+       
+        if(Number(time.substr(0,2))<12) return time12 +' AM'; 
+            else  return time12 +' PM';       
+    }
+
+    public getDuration(hr, min)
+    {        
+        let duration = '';
+        if(hr)
+        {
+            if(Number(hr)==1)            
+                duration += '1 Hr ';
+            else if(Number(hr)>1)
+                duration += Number(hr)+' Hrs ';
+        }
+
+        if(min)
+        {
+            if(Number(min)==1)            
+                duration += '1 Min ';
+            else if(Number(min)>1)
+                duration += Number(min)+' Mins ';
+        }
+
+        return duration
+    }
+
+    get SortedPastAppearancess()
+    {           
+        if(this.showSections['Past Appearances'])
+        {
+            return this.pastAppearancesList;
+        }
+        else
+        {
+            return  this.pastAppearancesList
+            .sort((a, b): any =>
+            {   console.log(a)         
+                if(a["Date"] > b["Date"]) return -1;
+                else if(a["Date"] < b["Date"]) return 1;
+                else return 0;
+            })
+            .slice(0, 3);
+           
+        }        
+    }
 }
 </script>
 
