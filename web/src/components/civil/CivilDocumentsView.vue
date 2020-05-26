@@ -57,10 +57,19 @@
                     <template v-for="(field,index) in fields[fieldsTab]" v-slot:[`cell(${field.key})`]="data" >
                         <span 
                             v-bind:key= "index" 
-                            v-b-hover= "colHover"                            
+                            v-b-hover= "colHover" 
+                            v-if="field.key.includes('Date')"                           
                             v-on:click= "cellClick(index, data)"
                             :class= "cellClass(field, index, data)"    
-                            style= "white-space: pre-line"> {{ data.value }}
+                            style= "white-space: pre-line"> {{data.value|beautify-date}}
+                        </span>
+                         <span 
+                            v-bind:key= "index" 
+                            v-b-hover= "colHover" 
+                            v-else                           
+                            v-on:click= "cellClick(index, data)"
+                            :class= "cellClass(field, index, data)"    
+                            style= "white-space: pre-line"> {{data.value}}
                         </span>
                     </template>
                 </b-table>
@@ -199,23 +208,23 @@ export default class CivilDocumentsView extends Vue {
                 docInfo["Document Type"] = jDoc.documentTypeDescription;
                 docInfo["Concluded"] = jDoc.concludedYn;
                 if((this.categories.indexOf("CONCLUDED") < 0) && docInfo["Concluded"].toUpperCase() =="Y") this.categories.push("CONCLUDED")        
-                docInfo["Appearance Date"] = jDoc.lastAppearanceDt? (new Date(jDoc.lastAppearanceDt.split(' ')[0])).toUTCString().substr(4,12) : ''; 
+                docInfo["Appearance Date"] = jDoc.lastAppearanceDt? jDoc.lastAppearanceDt.split(' ')[0] : ''; 
                 if(new Date(docInfo["Appearance Date"]) > new Date() && this.categories.indexOf("SCHEDULED") < 0) this.categories.push("SCHEDULED")   
 
-                docInfo["Category"] = jDoc.category;
+                docInfo["Category"] = jDoc.category? jDoc.category : '';
                 if((this.categories.indexOf(docInfo["Category"]) < 0) && docInfo["Category"].length > 0) this.categories.push(docInfo["Category"])
                 // ensure all documentSupport elements only have one row
                 const docSupport: any = jDoc.documentSupport.length? jDoc.documentSupport[0]:'{}';
                 docInfo["Act"] = (docSupport==={})? '': docSupport.actCd;
                 docInfo["Document ID"] = jDoc.civilDocumentId;            
                 docInfo["PdfAvail"] = jDoc.imageId? true : false 
-                docInfo["Date Filed"] = jDoc.filedDt? (new Date(jDoc.filedDt.split(' ')[0])).toUTCString().substr(4,12) : '';
+                docInfo["Date Filed"] = jDoc.filedDt? jDoc.filedDt.split(' ')[0] : '';
                 docInfo["Issues"] = jDoc.issue.length? this.ExtractIssues(jDoc.issue) : ' ';
                 this.documents.push(docInfo);
 
             } else {                
                 docInfo["Document Type"] = 'CourtSummary';
-                docInfo["Appearance Date"] = (new Date(jDoc.lastAppearanceDt.split(' ')[0])).toUTCString().substr(4,12);
+                docInfo["Appearance Date"] = jDoc.lastAppearanceDt.split(' ')[0];
                 docInfo["Appearance ID"] = jDoc.imageId;
                 docInfo["PdfAvail"] = jDoc.imageId? true : false
                 this.summaryDocuments.push(docInfo);
@@ -293,8 +302,7 @@ export default class CivilDocumentsView extends Vue {
 
     public rowHover(row) {
         this.hoverRow = row.Index;
-    }
-    
+    }    
 }
 </script>
 

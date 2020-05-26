@@ -2,7 +2,8 @@
 <body>
     <b-card bg-variant="white">
         <div>
-            <b> Participants ({{numberOfParticipants}}) </b>
+            <h3 class="mx-2 font-weight-normal"> Participants ({{numberOfParticipants}}) </h3>
+            <hr class="mx-1 bg-light" style="height: 5px;"/> 
         </div>
 
         <b-card bg-variant="white">           
@@ -12,6 +13,7 @@
             :sort-by.sync="sortBy"
             :sort-desc.sync="sortDesc"
             :no-sort-reset="true"
+            borderless
             responsive="sm"
             >   
                 <template v-for="(field,index) in fields" v-slot:[`head(${field.key})`]="data">
@@ -45,8 +47,7 @@
                 </template>
             </b-table>
         </b-card>
-    </b-card>
-    <hr class="mx-3" style="height: 2px;"/>  
+    </b-card> 
 
 </body>
 </template>
@@ -64,31 +65,30 @@ export default class CriminalParticipants extends Vue {
     public criminalFileInformation!: any;
 
     mounted() {
-        this.getDocuments();
+        this.getParticipants();
     }
 
-    public getDocuments(): void {      
+    public getParticipants(): void {      
         const data = this.criminalFileInformation.detailsData;    
         this.participantJson = data.participant 
-        this.ExtractDocumentInfo();
+        this.ExtractParticipantInfo();
         this.isMounted = true;          
     } 
   
     isMounted = false;
     participantJson;
     numberOfParticipants = 0;
-
     sortBy = 'Name';
     sortDesc = false;
     participantList: any[] = [];
 
     fields =  
     [
-        {key:'Name',                    sortable:true,  headerStyle:'text-primary',   cellStyle:'text-info'},
-        {key:'D.O.B.',                  sortable:false,  headerStyle:'text',         cellStyle:'text'},
-        {key:'Status',                  sortable:false, headerStyle:'text',         cellStyle:'text-white bg-secondary'},
-        {key:'Counsel',                 sortable:false, headerStyle:'text',         cellStyle:'text'},
-        {key:'Counsel Designation Filed',sortable:false, headerStyle:'text',        cellStyle:'text'},
+        {key:'Name',                    sortable:true,  tdClass: 'border-top',  headerStyle:'text-primary',   cellStyle:'text-info'},
+        {key:'D.O.B.',                  sortable:false, tdClass: 'border-top',  headerStyle:'text',         cellStyle:'text'},
+        {key:'Status',                  sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:'text-white bg-secondary'},
+        {key:'Counsel',                 sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:'text'},
+        {key:'Counsel Designation Filed',sortable:false, tdClass: 'border-top', headerStyle:'text',        cellStyle:'text'},
     ];
 
     statusFields = 
@@ -99,7 +99,7 @@ export default class CriminalParticipants extends Vue {
         {key:'Interpreter Required',abbr:'INT', code:'interpreterYN'}
     ];
   
-    public ExtractDocumentInfo(): void {
+    public ExtractParticipantInfo(): void {
         
         for (const fileIndex in this.participantJson) {
             const fileInfo = {};
@@ -129,7 +129,7 @@ export default class CriminalParticipants extends Vue {
                     fileInfo["Status"].push(status);
             }
    
-            fileInfo['Counsel'] = ''
+            fileInfo['Counsel'] = jFile.counselLastNm? 'JUSTIN: '+ jFile.counselGivenNm +' '+ jFile.counselLastNm : ''
             fileInfo['Counsel Designation Filed'] = jFile.designatedCounselYN           
             this.participantList.push(fileInfo); 
         }
