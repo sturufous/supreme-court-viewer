@@ -19,7 +19,8 @@ namespace Scv.Api.Models.Criminal.Detail
         /// <summary>
         /// Can only be set to true, cannot be set to false and have the fields reappear.
         /// </summary>
-        public bool? HideJustinCounsel {
+        public bool? HideJustinCounsel
+        {
             get => _hideJustinCounsel;
             set
             {
@@ -33,8 +34,9 @@ namespace Scv.Api.Models.Criminal.Detail
                     CounselRelatedRepTypeCd = null;
                     CounselRrepId = null;
                 }
-            } 
+            }
         }
-        bool? _hideJustinCounsel;
+
+        private bool? _hideJustinCounsel;
     }
 }
