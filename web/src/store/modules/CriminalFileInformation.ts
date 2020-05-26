@@ -6,13 +6,14 @@ import { VuexModule, Module, Mutation, Action } from 'vuex-module-decorators'
 class CriminalFileInformation extends VuexModule {
   public criminalFileInformation = { }
   public criminalFileInfoLoaded = false
+  public activeCriminalParticipantIndex = 0
 
   public showSections = {
     'Case Details': true,
     'Future Appearance': false,
     'Past Appearance': false, 
     'Witnesses': false,
-    'Documents': false,
+    'Criminal Documents': false,
     'Sentence/Order Details': false
   }
 
@@ -34,6 +35,16 @@ class CriminalFileInformation extends VuexModule {
   @Action
   public UpdateCriminalFileInfoLoaded(newCriminalFileInfoLoaded): void {
     this.context.commit('setCriminalFileInfoLoaded', newCriminalFileInfoLoaded)
+  }
+
+  @Mutation
+  public setActiveCriminalParticipantIndex(activeCriminalParticipantIndex): void {
+    this.activeCriminalParticipantIndex = activeCriminalParticipantIndex
+  }
+
+  @Action
+  public UpdateActiveCriminalParticipantIndex(newActiveCriminalParticipantIndex): void {
+    this.context.commit('setActiveCriminalParticipantIndex', newActiveCriminalParticipantIndex)
   }
 
   @Mutation

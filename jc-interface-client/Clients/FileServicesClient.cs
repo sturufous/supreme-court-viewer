@@ -4366,21 +4366,21 @@ namespace JCCommon.Clients.FileServices
         [Newtonsoft.Json.JsonProperty("orgNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string OrgNm { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("warrantYN", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonProperty("warrantYN", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
-        public CriminalParticipantWarrantYN WarrantYN { get; set; }
+        public CriminalParticipantWarrantYN? WarrantYN { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("inCustodyYN", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonProperty("inCustodyYN", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
-        public CriminalParticipantInCustodyYN InCustodyYN { get; set; }
+        public CriminalParticipantInCustodyYN? InCustodyYN { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("interpreterYN", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonProperty("interpreterYN", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
-        public CriminalParticipantInterpreterYN InterpreterYN { get; set; }
+        public CriminalParticipantInterpreterYN? InterpreterYN { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("detainedYN", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonProperty("detainedYN", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
-        public CriminalParticipantDetainedYN DetainedYN { get; set; }
+        public CriminalParticipantDetainedYN? DetainedYN { get; set; }
 
         [Newtonsoft.Json.JsonProperty("birthDt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string BirthDt { get; set; }
@@ -4403,9 +4403,9 @@ namespace JCCommon.Clients.FileServices
         [Newtonsoft.Json.JsonProperty("counselEnteredDt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CounselEnteredDt { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("designatedCounselYN", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonProperty("designatedCounselYN", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
-        public CriminalParticipantDesignatedCounselYN DesignatedCounselYN { get; set; }
+        public CriminalParticipantDesignatedCounselYN? DesignatedCounselYN { get; set; }
 
         [Newtonsoft.Json.JsonProperty("charge", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<Charge> Charge { get; set; }
@@ -4501,9 +4501,9 @@ namespace JCCommon.Clients.FileServices
         [Newtonsoft.Json.JsonProperty("crownEstimateLenQty", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CrownEstimateLenQty { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("crownEstimateLenUnit", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonProperty("crownEstimateLenUnit", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
-        public CriminalFileDetailResponseCrownEstimateLenUnit CrownEstimateLenUnit { get; set; }
+        public CriminalFileDetailResponseCrownEstimateLenUnit? CrownEstimateLenUnit { get; set; }
 
         [Newtonsoft.Json.JsonProperty("caseAgeDays", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CaseAgeDays { get; set; }
@@ -4512,9 +4512,9 @@ namespace JCCommon.Clients.FileServices
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public CriminalFileDetailResponseIndictableYN IndictableYN { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("complexityTypeCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonProperty("complexityTypeCd", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
-        public CriminalFileDetailResponseComplexityTypeCd ComplexityTypeCd { get; set; }
+        public CriminalFileDetailResponseComplexityTypeCd? ComplexityTypeCd { get; set; }
 
         [Newtonsoft.Json.JsonProperty("personnelWitnessRecCount", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PersonnelWitnessRecCount { get; set; }

@@ -3,13 +3,13 @@ using JCCommon.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Threading.Tasks;
 using Scv.Api.Constants;
 using Scv.Api.Helpers.Exceptions;
 using Scv.Api.Models.Civil.Detail;
 using Scv.Api.Models.Criminal.Detail;
 using Scv.Api.Services;
+using System;
+using System.Threading.Tasks;
 using CivilAppearanceDetail = Scv.Api.Models.Civil.AppearanceDetail.CivilAppearanceDetail;
 using CriminalAppearanceDetail = Scv.Api.Models.Criminal.AppearanceDetail.CriminalAppearanceDetail;
 
@@ -20,26 +20,30 @@ namespace Scv.Api.Controllers
     public class FilesController : ControllerBase
     {
         #region Variables
+
         private readonly IConfiguration _configuration;
         private readonly ILogger<FilesController> _logger;
         private readonly FilesService _filesService;
 
-        #endregion
+        #endregion Variables
 
         #region Constructor
+
         public FilesController(IConfiguration configuration, ILogger<FilesController> logger, FilesService filesService)
         {
             _configuration = configuration;
             _logger = logger;
             _filesService = filesService;
         }
-        #endregion
+
+        #endregion Constructor
 
         #region Actions
 
         #region Civil Only
+
         /// <summary>
-        /// Provides facilities for performing a civil file search. 
+        /// Provides facilities for performing a civil file search.
         /// </summary>
         /// <param name="fcq">FileCivilQuery object with many parameters</param>
         /// <returns>FileSearchResponse</returns>
@@ -52,7 +56,7 @@ namespace Scv.Api.Controllers
         }
 
         /// <summary>
-        /// Gets the details for a given civil file id. 
+        /// Gets the details for a given civil file id.
         /// </summary>
         /// <param name="fileId"></param>
         /// <returns>RedactedCivilFileDetailResponse</returns>
@@ -127,11 +131,13 @@ namespace Scv.Api.Controllers
             var civilFileContent = await _filesService.FilesCivilFilecontentAsync(agencyId, roomCode, proceeding, appearanceId, physicalFileId);
             return Ok(civilFileContent);
         }
-        #endregion
+
+        #endregion Civil Only
 
         #region Criminal Only
+
         /// <summary>
-        /// Provides facilities for performing a criminal file search.  
+        /// Provides facilities for performing a criminal file search.
         /// </summary>
         /// <param name="fcq">FileCriminalQuery, composed of parameters for search. </param>
         /// <returns>FileSearchResponse</returns>
@@ -153,7 +159,9 @@ namespace Scv.Api.Controllers
         public async Task<ActionResult<RedactedCriminalFileDetailResponse>> GetCriminalFileDetailByFileId(string fileId)
         {
             var redactedCriminalFileDetailResponse = await _filesService.FilesCriminalFileIdAsync(fileId);
-            return Ok(redactedCriminalFileDetailResponse ?? throw new NotFoundException("Couldn't find criminal file with this id."));
+            if (redactedCriminalFileDetailResponse?.JustinNo == null)
+                throw new NotFoundException("Couldn't find criminal file with this id.");
+            return Ok(redactedCriminalFileDetailResponse);
         }
 
         /// <summary>
@@ -162,7 +170,7 @@ namespace Scv.Api.Controllers
         /// <param name="fileId">Target file id.</param>
         /// <param name="future">Y to show future, N to hide future. Y = 0, N = 1</param>
         /// <param name="history">Y to show history, N to hide history. Y = 0, N = 1</param>
-        /// <returns></returns>
+        /// <returns>CriminalFileAppearancesResponse</returns>
         [HttpGet]
         [Route("criminal/{fileId}/appearances")]
         public async Task<ActionResult<CriminalFileAppearancesResponse>> GetCriminalAppearancesByFileId(string fileId, FutureYN? future = null, HistoryYN? history = null)
@@ -170,8 +178,6 @@ namespace Scv.Api.Controllers
             var criminalFileIdAppearances = await _filesService.FilesCriminalFileIdAppearancesAsync(fileId, future, history);
             return Ok(criminalFileIdAppearances);
         }
-
-
 
         /// <summary>
         /// Gets detailed information regarding an appearance given criminal file id and appearance id.
@@ -214,7 +220,7 @@ namespace Scv.Api.Controllers
         /// <param name="profSequenceNumber"></param>
         /// <param name="courtLevelCode">The associated court level code. P = 0, S = 1, A = 2: Provincial, Supreme, All</param>
         /// <param name="courtClassCode">The associated court class code. A = 0, Y = 1, T = 2, F = 3, C = 4, M = 5, L = 6, R = 7, B = 8, D = 9, E = 10, G = 11, H = 12, N = 13, O = 14, P = 15, S = 16, V = 17</param>
-        /// <returns></returns>
+        /// <returns>FileContentResult</returns>
         [HttpGet]
         [Route("criminal/record-of-proceedings/{partId}/{fileNameAndExtension}")]
         public async Task<IActionResult> GetRecordsOfProceeding(string partId, string fileNameAndExtension, string profSequenceNumber, CourtLevelCd courtLevelCode, CourtClassCd courtClassCode)
@@ -226,7 +232,8 @@ namespace Scv.Api.Controllers
 
             return BuildFileResponse(fileNameAndExtension, recordsOfProceeding.B64Content);
         }
-        #endregion
+
+        #endregion Criminal Only
 
         /// <summary>
         /// Gets a court list.
@@ -265,15 +272,16 @@ namespace Scv.Api.Controllers
             return BuildFileResponse(fileNameAndExtension, documentResponse.B64Content);
         }
 
-
         #region Helpers
+
         private FileContentResult BuildFileResponse(string fileNameAndExtension, string content)
         {
             Response.Headers.Add("X-Content-Type-Options", "nosniff");
             return File(Convert.FromBase64String(content), "application/pdf");
         }
-        #endregion
 
-        #endregion
+        #endregion Helpers
+
+        #endregion Actions
     }
 }

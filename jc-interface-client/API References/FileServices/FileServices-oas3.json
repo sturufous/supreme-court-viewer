@@ -3638,28 +3638,32 @@
           "warrantYN": {
             "enum": [
               "Y",
-              "N"
+              "N",
+              null
             ],
             "type": "string"
           },
           "inCustodyYN": {
             "enum": [
               "Y",
-              "N"
+              "N",
+              null
             ],
             "type": "string"
           },
           "interpreterYN": {
             "enum": [
               "Y",
-              "N"
+              "N",
+              null
             ],
             "type": "string"
           },
           "detainedYN": {
             "enum": [
               "Y",
-              "N"
+              "N",
+              null
             ],
             "type": "string"
           },
@@ -3687,7 +3691,8 @@
           "designatedCounselYN": {
             "enum": [
               "Y",
-              "N"
+              "N",
+              null
             ],
             "type": "string"
           },
@@ -3818,7 +3823,8 @@
               "YRS",
               "MIN",
               "WKS",
-              "HR"
+              "HR",
+              null
             ],
             "type": "string"
           },
@@ -3838,7 +3844,8 @@
               "GA",
               "SA",
               "ALL",
-              "SG"
+              "SG",
+              null
             ],
             "type": "string"
           },

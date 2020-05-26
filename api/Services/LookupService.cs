@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using JCCommon.Clients.LookupServices;
 using LazyCache;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Serialization;
 using Scv.Api.Helpers;
 using Scv.Api.Helpers.ContractResolver;
 using Scv.Api.Helpers.Exceptions;
@@ -38,8 +39,11 @@ namespace Scv.Api.Services
         #endregion
 
         #region Collection methods
+        public async Task<CodeLookup> GetAgencyLocations() => await GetDataFromCache("AgencyLocations", async () => await _lookupClient.CodesAgencyLocationsAsync());
         public async Task<CodeLookup> GetCriminalAppearanceReasons() => await GetDataFromCache("CriminalAppearanceReasons", async () => await _lookupClient.CodesCriminalAppearanceReasonsAsync());
         public async Task<CodeLookup> GetCriminalAppearanceResults() => await GetDataFromCache("CriminalAppearanceResults", async () => await _lookupClient.CodesCriminalAppearanceResultsAsync());
+        public async Task<CodeLookup> GetCriminalAppearanceStatuses() => await GetDataFromCache("CriminalAppearanceStatuses", async () => await _lookupClient.CodesCriminalAppearanceStatusesAsync());
+        public async Task<CodeLookup> GetAppearanceDurations() => await GetDataFromCache("AppearanceDurations", async () => await _lookupClient.CodesCriminalAppearanceDurationAsync());
         public async Task<CodeLookup> GetFindings() => await GetDataFromCache("Findings", async() => await _lookupClient.CodesFindingsAsync());
         public async Task<CodeLookup> GetCourtClass() => await GetDataFromCache("CourtClasses", async () => await _lookupClient.CodesCourtClassesAsync());
         public async Task<CodeLookup> GetCourtLevel() => await GetDataFromCache("CourtLevels", async () => await _lookupClient.CodesCourtLevelsAsync());
@@ -47,12 +51,18 @@ namespace Scv.Api.Services
         public async Task<CodeLookup> GetDocuments() => await GetDataFromCache("Documents", async () => await _lookupClient.CodesDocumentsAsync());
         public async Task<CodeLookup> GetRoles() => await GetDataFromCache("Roles", async () => await _lookupClient.CodesRolesAsync());
         public async Task<CodeLookup> GetParticipantRoles() => await GetDataFromCache("ParticipantRoles", async () => await _lookupClient.CodesParticipantRolesAsync());
+        public async Task<CodeLookup> GetWitnessRoles() => await GetDataFromCache("WitnessRoles", async () => await _lookupClient.CodesWitnessRolesAsync());
+        public async Task<CodeLookup> GetHearingRestrictions() => await GetDataFromCache("HearingRestrictions", async() => await _lookupClient.CodesHearingRestrictionsAsync());
         #endregion
 
         #region Lookup Methods
+        public async Task<string> GetAgencyLocationDescription(string code) => FindLongDescriptionFromCode(await GetAgencyLocations(), code);
+        public async Task<string> GetAgencyLocationCode(string code) => FindShortDescriptionFromCode(await GetAgencyLocations(), code);
         public async Task<string> GetCriminalAssetsDescriptions(string code) => FindLongDescriptionFromCode(await GetCriminalAssets(), code);
+        public async Task<string> GetCriminalAppearanceStatusDescription(string code) => FindShortDescriptionFromCode(await GetCriminalAppearanceStatuses(), code);
         public async Task<string> GetCriminalAppearanceReasonsDescription(string code) => FindShortDescriptionFromCode(await GetCriminalAppearanceReasons(), code);
         public async Task<string> GetCriminalAppearanceResultsDescription(string code) => FindShortDescriptionFromCode(await GetCriminalAppearanceResults(), code);
+        public async Task<string> GetAppearanceDuration(string code) => FindLongDescriptionFromCode(await GetAppearanceDurations(), code);
         public async Task<string> GetFindingDescription(string code) => FindShortDescriptionFromCode(await GetFindings(), code);
         public async Task<string> GetActivityClassCd(string code) => FindLongDescriptionFromCode(await GetCourtClass(), code);
         public async Task<string> GetCourtClassDescription(string code) => FindShortDescriptionFromCode(await GetCourtClass(), code);
@@ -60,6 +70,9 @@ namespace Scv.Api.Services
         public async Task<string> GetCivilRoleTypeDescription(string code) => FindShortDescriptionFromCode(await GetRoles(), code);
         public async Task<string> GetCriminalParticipantRoleDescription(string code) => FindLongDescriptionFromCode(await GetParticipantRoles(), code);
         public async Task<string> GetDocumentDescriptionAsync(string code) => FindShortDescriptionFromCode(await GetDocuments(), code);
+        public async Task<string> GetWitnessRoleTypeDescription(string code) => FindShortDescriptionFromCode(await GetWitnessRoles(), code);
+        public async Task<string> GetHearingRestrictionDescription(string code) => FindLongDescriptionFromCode(await GetHearingRestrictions(), code);
+
 
         /// <summary>
         /// Reads from the configuration for the document category.
@@ -71,7 +84,7 @@ namespace Scv.Api.Services
             var configurationSections =
                 _configuration.GetSection("DocumentCategories").Get<Dictionary<string, string>>() ??
                 throw new ConfigurationException("Couldn't not build dictionary based on DocumentCategories");
-            return configurationSections.FirstOrDefault(cs => cs.Value.Split(",").Contains(documentCode)).Key ?? "";
+            return configurationSections.FirstOrDefault(cs => cs.Value.Split(",").Contains(documentCode)).Key ?? null;
         }
         #endregion
 
@@ -82,12 +95,12 @@ namespace Scv.Api.Services
                 async () => await fetchFunction.Invoke(), CacheExpiry);
         }
 
-        private string FindShortDescriptionFromCode(CodeLookup lookupCodes, string code) => lookupCodes.FirstOrDefault(lookupCode => lookupCode.Code == code)?.ShortDesc ?? "";
-        private string FindLongDescriptionFromCode(CodeLookup lookupCodes, string code) => lookupCodes.FirstOrDefault(lookupCode => lookupCode.Code == code)?.LongDesc ?? "";
+        private string FindShortDescriptionFromCode(CodeLookup lookupCodes, string code) => lookupCodes.FirstOrDefault(lookupCode => lookupCode.Code == code)?.ShortDesc;
+        private string FindLongDescriptionFromCode(CodeLookup lookupCodes, string code) => lookupCodes.FirstOrDefault(lookupCode => lookupCode.Code == code)?.LongDesc;
 
         private void SetupLookupServicesClient()
         {
-            _lookupClient.JsonSerializerSettings.ContractResolver = new SafeContractResolver();
+            _lookupClient.JsonSerializerSettings.ContractResolver = new SafeContractResolver { NamingStrategy = new CamelCaseNamingStrategy() };
             _lookupClient.BaseUrl = _configuration.GetNonEmptyValue("LookupServicesClient:Url");
         }
         #endregion

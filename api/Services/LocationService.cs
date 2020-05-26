@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using JCCommon.Clients.LocationServices;
 using LazyCache;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Serialization;
 using Scv.Api.Helpers;
 using Scv.Api.Helpers.ContractResolver;
-using Scv.Api.Helpers.Exceptions;
 using CodeValue = System.Collections.Generic.ICollection<JCCommon.Clients.LocationServices.CodeValue>;
 
 namespace Scv.Api.Services
@@ -41,15 +41,16 @@ namespace Scv.Api.Services
         #region Lookup Methods
         public async Task<string> GetLocationName(string code) => FindLongDescriptionFromCode(await GetLocationsFromLazyCache(), code);
         public async Task<string> GetLocationAgencyIdentifier(string code) => FindShortDescriptionFromCode(await GetLocationsFromLazyCache(), code);
+        public async Task<string> GetRegionName(string code) => string.IsNullOrEmpty(code) ? null : (await _locationClient.LocationsLocationIdRegionAsync(code))?.RegionName;
         #endregion
 
         #region Helpers
-        private string FindLongDescriptionFromCode(CodeValue lookupCodes, string code) => lookupCodes.FirstOrDefault(lookupCode => lookupCode.Code == code)?.LongDesc ?? "";
-        private string FindShortDescriptionFromCode(CodeValue lookupCodes, string code) => lookupCodes.FirstOrDefault(lookupCode => lookupCode.Code == code)?.ShortDesc ?? "";
+        private string FindLongDescriptionFromCode(CodeValue lookupCodes, string code) => lookupCodes.FirstOrDefault(lookupCode => lookupCode.Code == code)?.LongDesc;
+        private string FindShortDescriptionFromCode(CodeValue lookupCodes, string code) => lookupCodes.FirstOrDefault(lookupCode => lookupCode.Code == code)?.ShortDesc;
 
         private void SetupLocationServicesClient()
         {
-            _locationClient.JsonSerializerSettings.ContractResolver = new SafeContractResolver();
+            _locationClient.JsonSerializerSettings.ContractResolver = new SafeContractResolver { NamingStrategy = new CamelCaseNamingStrategy() };
             _locationClient.BaseUrl = _configuration.GetNonEmptyValue("LocationServicesClient:Url");
         }
         #endregion
