@@ -6,6 +6,10 @@
             <hr class="mx-1 bg-light" style="height: 5px;"/> 
         </div>
 
+        <b-card v-if="!isDataReady && isMounted">
+            <span class="text-muted"> No past appearances. </span>
+        </b-card>
+
         <b-card bg-variant="light" v-if= "!isMounted && !isDataReady">
             <b-overlay :show= "true"> 
                 <b-card  style="min-height: 100px;"/>                   
@@ -20,7 +24,7 @@
 
         <b-card bg-variant="white" v-if="isDataReady">           
             <b-table
-            :items="SortedPastAppearancess"
+            :items="SortedPastAppearances"
             :fields="fields"
             :sort-by.sync="sortBy"
             :sort-desc.sync="sortDesc"
@@ -219,7 +223,7 @@ export default class PastAppearances extends Vue {
         return duration
     }
 
-    get SortedPastAppearancess()
+    get SortedPastAppearances()
     {           
         if(this.showSections['Past Appearances'])
         {
@@ -229,7 +233,7 @@ export default class PastAppearances extends Vue {
         {
             return  this.pastAppearancesList
             .sort((a, b): any =>
-            {   console.log(a)         
+            {            
                 if(a["Date"] > b["Date"]) return -1;
                 else if(a["Date"] < b["Date"]) return 1;
                 else return 0;

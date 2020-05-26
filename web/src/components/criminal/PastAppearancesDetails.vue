@@ -1,7 +1,7 @@
 <template>
 <body>
     <b-card bg-variant="white">
-        
+        <b> Under construction. </b>
     </b-card> 
 
 </body>
