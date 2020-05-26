@@ -27,6 +27,7 @@
             <criminal-side-panel v-if="isDataReady"/> 
         </b-col>
         <b-col col md="10" cols="10" style="overflow: auto;">
+
             <criminal-header-top v-if="isDataReady"/> 
             <criminal-header v-if="isDataReady"/> 
 
@@ -37,11 +38,10 @@
             <criminal-participants v-if="showCaseDetails"/>            
             <adjudicator-restrictions v-if="showCaseDetails"/> 
             <criminal-crown-information v-if="showCaseDetails"/>
-            <criminal-crown-notes v-if="showCaseDetails"/>             
+            <criminal-crown-notes v-if="showCaseDetails"/>
+            <past-appearances v-if="showPastAppearances" />
             <criminal-documents-view v-if="showDocuments"/>
-            <b-card>
-            <br>
-            </b-card>  
+            <b-card><br></b-card>  
         </b-col>
     </b-row>
 </body>
@@ -57,6 +57,7 @@ import CriminalSidePanel from '@components/criminal/CriminalSidePanel.vue';
 import CriminalParticipants from '@components/criminal/CriminalParticipants.vue';
 import AdjudicatorRestrictions from '@components/criminal/AdjudicatorRestrictions.vue'
 import CriminalCrownInformation from '@components/criminal/CriminalCrownInformation.vue';
+import PastAppearances from '@components/criminal/PastAppearances.vue'
 import CriminalCrownNotes from '@components/criminal/CriminalCrownNotes.vue';
 import '@store/modules/CriminalFileInformation';
 const criminalState = namespace('CriminalFileInformation');
@@ -70,6 +71,7 @@ const criminalState = namespace('CriminalFileInformation');
         CriminalParticipants,
         AdjudicatorRestrictions,
         CriminalCrownInformation,
+        PastAppearances,
         CriminalCrownNotes
     }
 })
@@ -115,7 +117,7 @@ export default class CriminalCaseDetails extends Vue {
     participantJson;
     participantFiles: any[] = [];
     sidePanelTitles = [ 
-       'Case Details', 'Future Appearance', 'Past Appearance', 'Witnesses', 'Criminal Documents', 'Sentence/Order Details'    
+       'Case Details', 'Future Appearances', 'Past Appearances', 'Witnesses', 'Criminal Documents', 'Sentence/Order Details'    
     ];
     
     get selectedSideBar()
@@ -137,14 +139,14 @@ export default class CriminalCaseDetails extends Vue {
         return ((this.showSections['Case Details'] || this.showSections['Criminal Documents'] ) && this.isDataReady)
     }
 
-    get showFutureAppearance()
+    get showFutureAppearances()
     {        
-        return ((this.showSections['Case Details'] || this.showSections['Future Appearance'] ) && this.isDataReady)
+        return ((this.showSections['Case Details'] || this.showSections['Future Appearances'] ) && this.isDataReady)
     }
 
-    get showPastAppearance()
+    get showPastAppearances()
     {        
-        return ((this.showSections['Case Details'] || this.showSections['Past Appearance'] ) && this.isDataReady)
+        return ((this.showSections['Case Details'] || this.showSections['Past Appearances'] ) && this.isDataReady)
     }
 
     get showWitnesses()
