@@ -64,13 +64,12 @@ namespace Scv.Api.Services
         {
             fcq.FilePermissions =
                 "[\"A\", \"Y\", \"T\", \"F\", \"C\", \"M\", \"L\", \"R\", \"B\", \"D\", \"E\", \"G\", \"H\", \"N\", \"O\", \"P\", \"S\", \"V\"]"; // for now, use all types - TODO: determine proper list of types?
-            var fileSearchResponse = await _fileServicesClient.FilesCivilAsync(_requestAgencyIdentifierId, _requestPartId,
+            return await _fileServicesClient.FilesCivilAsync(_requestAgencyIdentifierId, _requestPartId,
                 _requestApplicationCode, fcq.SearchMode, fcq.FileHomeAgencyId, fcq.FileNumber, fcq.FilePrefix,
                 fcq.FilePermissions, fcq.FileSuffixNumber, fcq.MDocReferenceTypeCode, fcq.CourtClass, fcq.CourtLevel,
                 fcq.NameSearchType, fcq.LastName, fcq.OrgName, fcq.GivenName, fcq.Birth?.ToString("yyyy-MM-dd"),
                 fcq.SearchByCrownPartId, fcq.SearchByCrownActiveOnly, fcq.SearchByCrownFileDesignation,
                 fcq.MdocJustinNumberSet, fcq.PhysicalFileIdSet);
-            return fileSearchResponse;
         }
 
         public async Task<RedactedCivilFileDetailResponse> FilesCivilFileIdAsync(string fileId)
@@ -120,18 +119,9 @@ namespace Scv.Api.Services
 
             detailedAppearance.AppearanceMethod = appearanceMethodsResponse.AppearanceMethod;
 
-            var parties = _mapper.Map<ICollection<CivilAppearanceDetailParty>>(appearancePartyResponse.Party);
-            foreach (var party in parties)
-                party.PartyRoleTypeDesc = await _lookupService.GetCivilRoleTypeDescription(party.PartyRoleTypeCd);
-            detailedAppearance.Party = parties;
+            detailedAppearance.Party = await PopulateCivilDetailedAppearanceParties(appearancePartyResponse.Party);
+            detailedAppearance.Document = await PopulateCivilDetailedAppearanceDocuments(documentsWithSameAppearanceId);
 
-            //CivilAppearanceDocument, doesn't include appearances.
-            detailedAppearance.Document = _mapper.Map<ICollection<CivilAppearanceDocument>>(documentsWithSameAppearanceId);
-            foreach (var document in detailedAppearance.Document)
-            {
-                document.Category = _lookupService.GetDocumentCategory(document.DocumentTypeCd);
-                document.DocumentTypeDescription = await _lookupService.GetDocumentDescriptionAsync(document.DocumentTypeCd);
-            }
             return detailedAppearance;
         }
 
@@ -142,12 +132,11 @@ namespace Scv.Api.Services
             return justinReportResponse;
         }
 
-        public async Task<object> FilesCivilFilecontentAsync(string agencyId, string roomCode, DateTime? proceeding, string appearanceId, string physicalFileId)
+        public async Task<CivilFileContent> FilesCivilFilecontentAsync(string agencyId, string roomCode, DateTime? proceeding, string appearanceId, string physicalFileId)
         {
             var proceedingDateString = proceeding.HasValue ? proceeding.Value.ToString("yyyy-MM-dd") : "";
-            var civilFileContent = await _fileServicesClient.FilesCivilFilecontentAsync(agencyId, roomCode, proceedingDateString,
+            return await _fileServicesClient.FilesCivilFilecontentAsync(agencyId, roomCode, proceedingDateString,
                 appearanceId, physicalFileId);
-            return civilFileContent;
         }
 
         #endregion Civil Only
@@ -160,13 +149,12 @@ namespace Scv.Api.Services
                 "[\"A\", \"Y\", \"T\", \"F\", \"C\", \"M\", \"L\", \"R\", \"B\", \"D\", \"E\", \"G\", \"H\", \"N\", \"O\", \"P\", \"S\", \"V\"]"; // for now, use all types - TODO: determine proper list of types?
 
             //CourtLevel = "S"  Supreme court data, CourtLevel = "P" - Province.
-            var fileSearchResponse = await _fileServicesClient.FilesCriminalAsync(_requestAgencyIdentifierId,
+            return await _fileServicesClient.FilesCriminalAsync(_requestAgencyIdentifierId,
                 _requestPartId, _requestApplicationCode, fcq.SearchMode, fcq.FileHomeAgencyId, fcq.FileNumberTxt,
                 fcq.FilePrefixTxt, fcq.FilePermissions, fcq.FileSuffixNo, fcq.MdocRefTypeCode, fcq.CourtClass,
                 fcq.CourtLevel, fcq.NameSearchTypeCd, fcq.LastName, fcq.OrgName, fcq.GivenName,
                 fcq.Birth?.ToString("yyyy-MM-dd"), fcq.SearchByCrownPartId, fcq.SearchByCrownActiveOnly,
                 fcq.SearchByCrownFileDesignation, fcq.MdocJustinNoSet, fcq.PhysicalFileIdSet);
-            return fileSearchResponse;
         }
 
         public async Task<RedactedCriminalFileDetailResponse> FilesCriminalFileIdAsync(string fileId)
@@ -234,16 +222,13 @@ namespace Scv.Api.Services
         {
             var proceedingDateString = proceeding.HasValue ? proceeding.Value.ToString("yyyy-MM-dd") : "";
 
-            var criminalFileContent = await _fileServicesClient.FilesCriminalFilecontentAsync(agencyId, roomCode,
+            return await _fileServicesClient.FilesCriminalFilecontentAsync(agencyId, roomCode,
                 proceedingDateString, appearanceId, justinNumber);
-
-            return criminalFileContent;
         }
 
         public async Task<RopResponse> FilesRecordOfProceedingsAsync(string partId, string profSequenceNumber, CourtLevelCd courtLevelCode, CourtClassCd courtClassCode)
         {
-            var recordsOfProceeding = await _fileServicesClient.FilesRecordOfProceedingsAsync(partId, profSequenceNumber, courtLevelCode, courtClassCode);
-            return recordsOfProceeding;
+            return await _fileServicesClient.FilesRecordOfProceedingsAsync(partId, profSequenceNumber, courtLevelCode, courtClassCode);
         }
 
         #endregion Criminal Only
@@ -253,15 +238,13 @@ namespace Scv.Api.Services
         public async Task<CourtList> FilesCourtlistAsync(string agencyId, string roomCode, DateTime? proceeding, string divisionCode, string fileNumber)
         {
             var proceedingDateString = proceeding.HasValue ? proceeding.Value.ToString("yyyy-MM-dd") : "";
-            var courtList = await _fileServicesClient.FilesCourtlistAsync(agencyId, roomCode, proceedingDateString, divisionCode,
+            return await _fileServicesClient.FilesCourtlistAsync(agencyId, roomCode, proceedingDateString, divisionCode,
                 fileNumber);
-            return courtList;
         }
 
         public async Task<DocumentResponse> FilesDocumentAsync(string documentId, bool isCriminal)
         {
-            var documentResponse = await _fileServicesClient.FilesDocumentAsync(documentId, isCriminal ? "R" : "I");
-            return documentResponse;
+            return await _fileServicesClient.FilesDocumentAsync(documentId, isCriminal ? "R" : "I");
         }
 
         #endregion Courtlist & Document
@@ -471,6 +454,30 @@ namespace Scv.Api.Services
         }
 
         #endregion Civil Details
+
+        #region Civil Appearance Details
+
+        private async Task<ICollection<CivilAppearanceDetailParty>> PopulateCivilDetailedAppearanceParties(ICollection<CivilAppearanceParty> parties)
+        {
+            var civilAppearanceDetailParties = _mapper.Map<ICollection<CivilAppearanceDetailParty>>(parties);
+            foreach (var party in civilAppearanceDetailParties)
+                party.PartyRoleTypeDesc = await _lookupService.GetCivilRoleTypeDescription(party.PartyRoleTypeCd);
+            return civilAppearanceDetailParties;
+        }
+
+        private async Task<ICollection<CivilAppearanceDocument>> PopulateCivilDetailedAppearanceDocuments(List<CvfcDocument3> documentsWithSameAppearanceId)
+        {
+            //CivilAppearanceDocument, doesn't include appearances.
+            var documents = _mapper.Map<ICollection<CivilAppearanceDocument>>(documentsWithSameAppearanceId);
+            foreach (var document in documents)
+            {
+                document.Category = _lookupService.GetDocumentCategory(document.DocumentTypeCd);
+                document.DocumentTypeDescription = await _lookupService.GetDocumentDescriptionAsync(document.DocumentTypeCd);
+            }
+            return documents;
+        }
+
+        #endregion Civil Appearance Details
 
         #endregion Helpers
     }
