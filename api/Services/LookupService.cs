@@ -104,7 +104,7 @@ namespace Scv.Api.Services
 
         public async Task<string> GetAppearanceDuration(string code) => FindLongDescriptionFromCode(await GetAppearanceDurations(), code);
 
-        public async Task<string> GetFindingDescription(string code) => FindShortDescriptionFromCode(await GetFindings(), code);
+        public async Task<string> GetFindingDescription(string code) => FindLongDescriptionFromCode(await GetFindings(), code);
 
         public async Task<string> GetActivityClassCd(string code) => FindLongDescriptionFromCode(await GetCourtClass(), code);
 
