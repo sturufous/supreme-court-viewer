@@ -3,6 +3,7 @@ using Mapster;
 using Newtonsoft.Json;
 using Scv.Api.Models.Civil.Detail;
 using System.Collections.Generic;
+// ReSharper disable UnassignedGetOnlyAutoProperty
 
 namespace Scv.Api.Models.Civil.AppearanceDetail
 {

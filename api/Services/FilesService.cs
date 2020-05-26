@@ -410,6 +410,7 @@ namespace Scv.Api.Services
         #endregion Criminal Appearance Details
 
         #region Civil Details
+
         private async Task<RedactedCivilFileDetailResponse> PopulateBaseCivilDetail(RedactedCivilFileDetailResponse detail)
         {
             //Populate location information.
@@ -442,7 +443,9 @@ namespace Scv.Api.Services
                 party.RoleTypeDescription = await _lookupService.GetCivilRoleTypeDescription(party.RoleTypeCd);
             return parties;
         }
+
         #endregion Civil Details
+
         #endregion Helpers
     }
 }

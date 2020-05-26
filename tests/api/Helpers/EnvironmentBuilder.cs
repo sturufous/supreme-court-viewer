@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Scv.Api.Helpers.Exceptions;
-using System;
 using System.Net.Http;
 using tests.api.Controllers;
 
@@ -17,7 +16,7 @@ namespace tests.api.Helpers
         public HttpClient HttpClient;
         public IConfiguration Configuration;
 
-        public EnvironmentBuilder(string usernameKey, string passwordKey, Type type)
+        public EnvironmentBuilder(string usernameKey, string passwordKey)
         {
             //Load in secrets, this uses the secrets file as the API.
             var builder = new ConfigurationBuilder();

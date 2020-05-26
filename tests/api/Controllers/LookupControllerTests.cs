@@ -1,7 +1,5 @@
 ﻿using JCCommon.Clients.LookupServices;
 using LazyCache;
-using MapsterMapper;
-using Microsoft.Extensions.Logging;
 using Scv.Api.Controllers;
 using Scv.Api.Services;
 using tests.api.Helpers;
@@ -25,9 +23,9 @@ namespace tests.api.Controllers
 
         public LookupControllerTests()
         {
-            var preTest = new EnvironmentBuilder("LookupServicesClient:Username", "LookupServicesClient:Password", typeof(FilesController));
+            var preTest = new EnvironmentBuilder("LookupServicesClient:Username", "LookupServicesClient:Password");
             var lookupService = new LookupService(preTest.Configuration, new LookupServiceClient(preTest.HttpClient), new CachingService());
-            _controller = new LookupController(preTest.Configuration, preTest.LogFactory.CreateLogger<LookupController>(), lookupService, new Mapper());
+            _controller = new LookupController(lookupService);
         }
 
         #endregion Constructor
