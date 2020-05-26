@@ -7,6 +7,9 @@ namespace Scv.Api.Models.Civil.Detail
     /// </summary>
     public class CivilParty : CvfcParty3
     {
+        public string FullName => GivenNm != null && LastNm != null
+            ? $"{GivenNm?.Trim()} {LastNm?.Trim()}"
+            : OrgNm;
         public string RoleTypeDescription { get; set; }
     }
 }

@@ -3,7 +3,7 @@
 namespace Scv.Api.Models.Civil.Detail
 {
     /// <summary>
-    /// This includes extra fields that our API doesn't give us. 
+    /// This includes extra fields that our API doesn't give us.
     /// </summary>
     public class CivilDocument : CvfcDocument3
     {
