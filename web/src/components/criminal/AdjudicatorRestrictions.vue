@@ -76,7 +76,7 @@ export default class  AdjudicatorRestrictions extends Vue {
     for (const jRestriction of this.adjudicatorRestrictionsJson) {
       const restrictionInfo = {};     
       restrictionInfo["Adjudicator"] =   jRestriction.adjInitialsTxt?jRestriction.adjInitialsTxt +" - " + jRestriction.adjFullNm: jRestriction.adjFullNm;
-      restrictionInfo["Status"] = ' ' +jRestriction.hearingRestrictionTypeDsc + ' ';
+      restrictionInfo["Status"] = jRestriction.hearingRestrictionTypeDsc + ' ';
       restrictionInfo["Applies to"] = jRestriction.partNm ? jRestriction.partNm: 'All participants on file' 
       this.adjudicatorRestrictions.push(restrictionInfo);      
     }

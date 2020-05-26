@@ -34,9 +34,14 @@
                 {{selectedSideBar}}
             </h2>
 
-            <criminal-participants v-if="showCaseDetails"/>
-            <adjudicator-restrictions v-if="showCaseDetails"/>            
-            <criminal-documents-view v-if="showDocuments"/>  
+            <criminal-participants v-if="showCaseDetails"/>            
+            <adjudicator-restrictions v-if="showCaseDetails"/> 
+            <criminal-crown-information v-if="showCaseDetails"/>
+            <criminal-crown-notes v-if="showCaseDetails"/>             
+            <criminal-documents-view v-if="showDocuments"/>
+            <b-card>
+            <br>
+            </b-card>  
         </b-col>
     </b-row>
 </body>
@@ -46,12 +51,13 @@
 import { Component, Vue } from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
 import CriminalDocumentsView from '@components/criminal/CriminalDocumentsView.vue';
-import CriminalHeaderTop from './CriminalHeaderTop.vue';
-import CriminalHeader from './CriminalHeader.vue';
-import CriminalSidePanel from './CriminalSidePanel.vue';
-import CriminalParticipants from './CriminalParticipants.vue'
-import AdjudicatorRestrictions from './AdjudicatorRestrictions.vue'
-
+import CriminalHeaderTop from '@components/criminal/CriminalHeaderTop.vue';
+import CriminalHeader from '@components/criminal/CriminalHeader.vue';
+import CriminalSidePanel from '@components/criminal/CriminalSidePanel.vue';
+import CriminalParticipants from '@components/criminal/CriminalParticipants.vue';
+import AdjudicatorRestrictions from '@components/criminal/AdjudicatorRestrictions.vue'
+import CriminalCrownInformation from '@components/criminal/CriminalCrownInformation.vue';
+import CriminalCrownNotes from '@components/criminal/CriminalCrownNotes.vue';
 import '@store/modules/CriminalFileInformation';
 const criminalState = namespace('CriminalFileInformation');
 
@@ -62,7 +68,9 @@ const criminalState = namespace('CriminalFileInformation');
         CriminalHeaderTop,
         CriminalHeader,
         CriminalParticipants,
-        AdjudicatorRestrictions
+        AdjudicatorRestrictions,
+        CriminalCrownInformation,
+        CriminalCrownNotes
     }
 })
 export default class CriminalCaseDetails extends Vue {
@@ -163,8 +171,13 @@ export default class CriminalCaseDetails extends Vue {
 
     public navigateToLandingPage() {
         this.$router.push({name:'Home'})
-    }
-    
+    }    
     
 }
 </script>
+
+<style scoped>
+ .card {
+        border: white;
+    }
+</style>
