@@ -13,7 +13,7 @@ class CriminalFileInformation extends VuexModule {
     'Future Appearance': false,
     'Past Appearance': false, 
     'Witnesses': false,
-    'Documents': false,
+    'Criminal Documents': false,
     'Sentence/Order Details': false
   }
 

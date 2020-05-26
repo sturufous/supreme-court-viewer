@@ -34,7 +34,7 @@ export default class CriminalSidePanel extends Vue {
     public UpdateShowSections!: (newShowSections: any) => void
 
     panelItems = [ 
-       'Case Details', 'Future Appearance', 'Past Appearance', 'Witnesses', 'Documents', 'Sentence/Order Details'    
+       'Case Details', 'Future Appearance', 'Past Appearance', 'Witnesses', 'Criminal Documents', 'Sentence/Order Details'    
     ];
 
     public SelectPanelItem(panelItem) {
