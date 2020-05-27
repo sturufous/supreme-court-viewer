@@ -39,7 +39,7 @@ namespace tests.api.Controllers
             var fileServicesClient = new FileServicesClient(preTest.HttpClient);
             var lookupService = new LookupService(preTest.Configuration, lookupServiceClient, new CachingService());
             var locationService = new LocationService(preTest.Configuration, locationServiceClient, new CachingService());
-            var filesService = new FilesService(preTest.Configuration, fileServicesClient, new Mapper(), lookupService, locationService);
+            var filesService = new FilesService(preTest.Configuration, fileServicesClient, new Mapper(), lookupService, locationService, new CachingService());
             _controller = new FilesController(preTest.Configuration, preTest.LogFactory.CreateLogger<FilesController>(), filesService);
             SetupMocks();
         }
@@ -140,31 +140,21 @@ namespace tests.api.Controllers
         [Fact]
         public async void Criminal_Appearances_by_JustinNo()
         {
-            var actionResult = await _controller.GetCriminalAppearancesByFileId("35674");
+            var actionResult = await _controller.GetCriminalFileDetailByFileId("35674");
 
             var criminalFileAppearancesResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
-            Assert.Contains(criminalFileAppearancesResponse.ApprDetail,
+            Assert.Contains(criminalFileAppearancesResponse.Appearances.ApprDetail,
                 f => f.LastNm == "Young" && f.GivenNm == "Johnny");
         }
 
         [Fact]
         public async void Civil_Appearances_by_PhysicalFileId()
         {
-            var actionResult = await _controller.GetCivilAppearancesByFileId("2506", FutureYN2.Y, HistoryYN2.Y);
+            var actionResult = await _controller.GetCivilFileDetailByFileId("2506");
 
-            var civilFileAppearancesByFileId = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
-            Assert.Equal("0", civilFileAppearancesByFileId.FutureRecCount);
-            Assert.Equal("20", civilFileAppearancesByFileId.HistoryRecCount);
-        }
-
-        [Fact]
-        public async void Criminal_Appearances_by_JustinNo_0()
-        {
-            var actionResult = await _controller.GetCriminalAppearancesByFileId("0");
-
-            var criminalFileAppearancesResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
-            Assert.Equal("0", criminalFileAppearancesResponse.FutureRecCount);
-            Assert.Equal("0", criminalFileAppearancesResponse.HistoryRecCount);
+            var civilFile = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+            Assert.Equal("0", civilFile.Appearances.FutureRecCount);
+            Assert.Equal("20", civilFile.Appearances.HistoryRecCount);
         }
 
         [Fact]

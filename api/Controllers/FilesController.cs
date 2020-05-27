@@ -69,21 +69,6 @@ namespace Scv.Api.Controllers
         }
 
         /// <summary>
-        /// Gets appearances for a given civil file id.
-        /// </summary>
-        /// <param name="fileId"></param>
-        /// <param name="future">Y to show future, N to hide future Y = 0, N = 1</param>
-        /// <param name="history">Y to show history, N to hide history Y = 0, N = 1</param>
-        /// <returns>CivilFileAppearancesResponse</returns>
-        [HttpGet]
-        [Route("civil/{fileId}/appearances")]
-        public async Task<ActionResult<CivilFileAppearancesResponse>> GetCivilAppearancesByFileId(string fileId, FutureYN2? future, HistoryYN2? history)
-        {
-            var civilFileAppearancesResponse = await _filesService.FilesCivilFileIdAppearancesAsync(future, history, fileId);
-            return Ok(civilFileAppearancesResponse);
-        }
-
-        /// <summary>
         /// Gets detailed information regarding an appearance given civil file id and appearance id.
         /// </summary>
         /// <param name="fileId"></param>
@@ -162,21 +147,6 @@ namespace Scv.Api.Controllers
             if (redactedCriminalFileDetailResponse?.JustinNo == null)
                 throw new NotFoundException("Couldn't find criminal file with this id.");
             return Ok(redactedCriminalFileDetailResponse);
-        }
-
-        /// <summary>
-        /// Gets appearances for a given criminal file id.
-        /// </summary>
-        /// <param name="fileId">Target file id.</param>
-        /// <param name="future">Y to show future, N to hide future. Y = 0, N = 1</param>
-        /// <param name="history">Y to show history, N to hide history. Y = 0, N = 1</param>
-        /// <returns>CriminalFileAppearancesResponse</returns>
-        [HttpGet]
-        [Route("criminal/{fileId}/appearances")]
-        public async Task<ActionResult<CriminalFileAppearancesResponse>> GetCriminalAppearancesByFileId(string fileId, FutureYN? future = null, HistoryYN? history = null)
-        {
-            var criminalFileIdAppearances = await _filesService.FilesCriminalFileIdAppearancesAsync(fileId, future, history);
-            return Ok(criminalFileIdAppearances);
         }
 
         /// <summary>

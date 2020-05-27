@@ -28,8 +28,6 @@ namespace Scv.Api.Services
 
         #region Properties
 
-        private DateTimeOffset CacheExpiry => DateTimeOffset.Now.AddHours(1);
-
         #endregion Properties
 
         #region Constructor
@@ -39,6 +37,7 @@ namespace Scv.Api.Services
             _configuration = configuration;
             _lookupClient = lookupClient;
             _cache = cache;
+            _cache.DefaultCachePolicy.DefaultCacheDurationSeconds = int.Parse(configuration.GetNonEmptyValue("Caching:LookupExpiryMinutes")) * 60;
             SetupLookupServicesClient();
         }
 
@@ -100,11 +99,11 @@ namespace Scv.Api.Services
 
         public async Task<string> GetCriminalAppearanceReasonsDescription(string code) => FindShortDescriptionFromCode(await GetCriminalAppearanceReasons(), code);
 
-        public async Task<string> GetCriminalAppearanceResultsDescription(string code) => FindShortDescriptionFromCode(await GetCriminalAppearanceResults(), code);
+        public async Task<string> GetCriminalAppearanceResultsDescription(string code) => FindLongDescriptionFromCode(await GetCriminalAppearanceResults(), code);
 
         public async Task<string> GetAppearanceDuration(string code) => FindLongDescriptionFromCode(await GetAppearanceDurations(), code);
 
-        public async Task<string> GetFindingDescription(string code) => FindShortDescriptionFromCode(await GetFindings(), code);
+        public async Task<string> GetFindingDescription(string code) => FindLongDescriptionFromCode(await GetFindings(), code);
 
         public async Task<string> GetActivityClassCd(string code) => FindLongDescriptionFromCode(await GetCourtClass(), code);
 
@@ -141,8 +140,7 @@ namespace Scv.Api.Services
 
         private async Task<T> GetDataFromCache<T>(string key, Func<Task<T>> fetchFunction)
         {
-            return await _cache.GetOrAddAsync(key,
-                async () => await fetchFunction.Invoke(), CacheExpiry);
+            return await _cache.GetOrAddAsync(key, async () => await fetchFunction.Invoke());
         }
 
         private string FindShortDescriptionFromCode(CodeLookup lookupCodes, string code) => lookupCodes.FirstOrDefault(lookupCode => lookupCode.Code == code)?.ShortDesc;

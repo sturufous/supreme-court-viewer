@@ -27,6 +27,7 @@
             <criminal-side-panel v-if="isDataReady"/> 
         </b-col>
         <b-col col md="10" cols="10" style="overflow: auto;">
+
             <criminal-header-top v-if="isDataReady"/> 
             <criminal-header v-if="isDataReady"/> 
 
@@ -34,9 +35,13 @@
                 {{selectedSideBar}}
             </h2>
 
-            <criminal-participants v-if="showCaseDetails"/>
-            <adjudicator-restrictions v-if="showCaseDetails"/>            
-            <criminal-documents-view v-if="showDocuments"/>  
+            <criminal-participants v-if="showCaseDetails"/>            
+            <adjudicator-restrictions v-if="showCaseDetails"/> 
+            <criminal-crown-information v-if="showCaseDetails"/>
+            <criminal-crown-notes v-if="showCaseDetails"/>
+            <past-appearances v-if="showPastAppearances" />
+            <criminal-documents-view v-if="showDocuments"/>
+            <b-card><br></b-card>  
         </b-col>
     </b-row>
 </body>
@@ -46,12 +51,14 @@
 import { Component, Vue } from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
 import CriminalDocumentsView from '@components/criminal/CriminalDocumentsView.vue';
-import CriminalHeaderTop from './CriminalHeaderTop.vue';
-import CriminalHeader from './CriminalHeader.vue';
-import CriminalSidePanel from './CriminalSidePanel.vue';
-import CriminalParticipants from './CriminalParticipants.vue'
-import AdjudicatorRestrictions from './AdjudicatorRestrictions.vue'
-
+import CriminalHeaderTop from '@components/criminal/CriminalHeaderTop.vue';
+import CriminalHeader from '@components/criminal/CriminalHeader.vue';
+import CriminalSidePanel from '@components/criminal/CriminalSidePanel.vue';
+import CriminalParticipants from '@components/criminal/CriminalParticipants.vue';
+import AdjudicatorRestrictions from '@components/criminal/AdjudicatorRestrictions.vue'
+import CriminalCrownInformation from '@components/criminal/CriminalCrownInformation.vue';
+import PastAppearances from '@components/criminal/PastAppearances.vue'
+import CriminalCrownNotes from '@components/criminal/CriminalCrownNotes.vue';
 import '@store/modules/CriminalFileInformation';
 const criminalState = namespace('CriminalFileInformation');
 
@@ -62,7 +69,10 @@ const criminalState = namespace('CriminalFileInformation');
         CriminalHeaderTop,
         CriminalHeader,
         CriminalParticipants,
-        AdjudicatorRestrictions
+        AdjudicatorRestrictions,
+        CriminalCrownInformation,
+        PastAppearances,
+        CriminalCrownNotes
     }
 })
 export default class CriminalCaseDetails extends Vue {
@@ -107,7 +117,7 @@ export default class CriminalCaseDetails extends Vue {
     participantJson;
     participantFiles: any[] = [];
     sidePanelTitles = [ 
-       'Case Details', 'Future Appearance', 'Past Appearance', 'Witnesses', 'Criminal Documents', 'Sentence/Order Details'    
+       'Case Details', 'Future Appearances', 'Past Appearances', 'Witnesses', 'Criminal Documents', 'Sentence/Order Details'    
     ];
     
     get selectedSideBar()
@@ -129,14 +139,14 @@ export default class CriminalCaseDetails extends Vue {
         return ((this.showSections['Case Details'] || this.showSections['Criminal Documents'] ) && this.isDataReady)
     }
 
-    get showFutureAppearance()
+    get showFutureAppearances()
     {        
-        return ((this.showSections['Case Details'] || this.showSections['Future Appearance'] ) && this.isDataReady)
+        return ((this.showSections['Case Details'] || this.showSections['Future Appearances'] ) && this.isDataReady)
     }
 
-    get showPastAppearance()
+    get showPastAppearances()
     {        
-        return ((this.showSections['Case Details'] || this.showSections['Past Appearance'] ) && this.isDataReady)
+        return ((this.showSections['Case Details'] || this.showSections['Past Appearances'] ) && this.isDataReady)
     }
 
     get showWitnesses()
@@ -163,8 +173,13 @@ export default class CriminalCaseDetails extends Vue {
 
     public navigateToLandingPage() {
         this.$router.push({name:'Home'})
-    }
-    
+    }    
     
 }
 </script>
+
+<style scoped>
+ .card {
+        border: white;
+    }
+</style>
