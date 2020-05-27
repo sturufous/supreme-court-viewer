@@ -110,7 +110,7 @@ export default class CriminalParticipants extends Vue {
             const jFile = this.participantJson[fileIndex];
 
             fileInfo["Index"] = fileIndex;
-            fileInfo["First Name"] = jFile.givenNm ? jFile.givenNm : "";
+            fileInfo["First Name"] = jFile.givenNm.trim().length>0 ? jFile.givenNm : "";
             fileInfo["Last Name"] = jFile.lastNm ? jFile.lastNm : jFile.orgNm;
             fileInfo["Name"] = this.getNameOfParticipant(fileInfo["Last Name"], fileInfo["First Name"]);            
             fileInfo["D.O.B."] = jFile.birthDt? (new Date(jFile.birthDt.split(' ')[0])).toUTCString().substr(4,12) : '';
@@ -133,15 +133,35 @@ export default class CriminalParticipants extends Vue {
                     fileInfo["Status"].push(status);
             }
    
-            fileInfo['Counsel'] = jFile.counselLastNm? 'JUSTIN: '+ jFile.counselGivenNm +' '+ jFile.counselLastNm : ''
+            fileInfo['Counsel'] = this.getNameOfJustin(jFile.counselLastNm, jFile.counselGivenNm)
             fileInfo['Counsel Designation Filed'] = jFile.designatedCounselYN           
             this.participantList.push(fileInfo); 
         }
         this.numberOfParticipants = this.participantList.length;
     }
 
-    public getNameOfParticipant(lastName, givenName) {
-        return ( lastName + ", " + givenName );
+    public getNameOfParticipant(lastName, givenName) {      
+
+        if(lastName.length==0)        
+            return givenName;       
+        else if(givenName.length==0)       
+            return lastName;      
+         else if(givenName.length==0 && lastName.length==0)       
+            return '';    
+        else         
+            return ( lastName + ", " + givenName );        
+    }
+
+    public getNameOfJustin(lastName, givenName) {      
+
+        if(!lastName && !givenName)        
+            return
+        if(!lastName)        
+            return 'JUSTIN: '+givenName;       
+        else if(!givenName)       
+            return 'JUSTIN: '+lastName;      
+        else         
+            return ('JUSTIN: '+givenName +' ' + lastName );        
     }
 
 }
