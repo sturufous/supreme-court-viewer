@@ -43,6 +43,7 @@
                             v-for="(field,index) in data.value"
                             :key="index" 
                             class="mr-1"
+                            style="font-weight: normal; font-size: 16px;"
                             v-b-tooltip.hover 
                             :title='field.key' > 
                             {{ field.abbr }} 

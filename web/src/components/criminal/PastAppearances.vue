@@ -31,15 +31,25 @@
             :no-sort-reset="true"
             sort-icon-left
             borderless
+            small
             responsive="sm"
             >   
                 <template v-for="(field,index) in fields" v-slot:[`head(${field.key})`]="data">
                     <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
                 </template>
 
+                <template  v-slot:cell()="data">
+                    <b-badge  
+                        variant="white" 
+                        style="font-weight: normal; font-size: 16px;" 
+                        class = "mt-2"> 
+                            {{data.value}} 
+                    </b-badge>
+                </template>
+
                 <template v-slot:cell(Date)="data" >
                     <span :class="data.field.cellStyle"> 
-                        <b-button size="xs" @click="data.toggleDetails" variant="outline-primary border-white">
+                        <b-button size="xs" @click="OpenDetails(data);data.toggleDetails();" variant="outline-primary border-white">
                             <b-icon-caret-right-fill  v-if="!data.item['_showDetails']"></b-icon-caret-right-fill>
                             <b-icon-caret-down-fill v-if="data.item['_showDetails']"></b-icon-caret-down-fill>
                         </b-button>
@@ -48,7 +58,7 @@
                 </template>
                 <template v-slot:row-details>
                     <b-card> 
-                        <past-appearances-details/>
+                        <past-appearance-details/>
                     </b-card>
                 </template>
 
@@ -65,6 +75,7 @@
                 <template  v-slot:cell(Presider)="data">
                     <b-button                              
                             variant="outline-primary border-white"
+                            v-if="data.value"
                             v-b-tooltip.hover                           
                             :title="data.item['Judge Full Name']"> 
                             {{data.value}}
@@ -72,11 +83,11 @@
                 </template>
 
                 <template  v-slot:cell(Accused)="data">
-                    <b> {{data.value}} </b>
+                     <b-badge  variant="white" style=" font-size: 16px;" class = "mt-1"> {{data.value}} </b-badge>
                 </template>
 
                 <template  v-slot:cell(Status)="data">
-                    <b :class = "getStatusStyle(data.value)"> {{data.value}} </b>
+                    <b :class = "getStatusStyle(data.value)" style="font-weight: normal; font-size: 14px;"> {{data.value}} </b>
                 </template>
                 
             </b-table>
@@ -91,7 +102,7 @@
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 
-import PastAppearancesDetails from '@components/criminal/PastAppearancesDetails.vue';
+import PastAppearanceDetails from '@components/criminal/PastAppearanceDetails.vue';
 
 import "@store/modules/CriminalFileInformation";
 const criminalState = namespace("CriminalFileInformation");
@@ -100,7 +111,7 @@ enum appearanceStatus {UNCF='Unconfirmed', CNCL='Canceled', SCHD='Scheduled' }
 
 @Component({
     components: {
-        PastAppearancesDetails
+        PastAppearanceDetails
     }
 })
 export default class PastAppearances extends Vue {
@@ -109,7 +120,13 @@ export default class PastAppearances extends Vue {
     public criminalFileInformation!: any;
 
     @criminalState.State
-    public showSections 
+    public showSections
+    
+    @criminalState.State
+    public pastAppearanceInfo!: any;
+
+    @criminalState.Action
+    public UpdatePastAppearanceInfo!: (newPastAppearanceInfo: any) => void
 
     mounted() {
         this.getPastAppearances();
@@ -177,6 +194,11 @@ export default class PastAppearances extends Vue {
 
             fileInfo["Presider"] =  jFile.judgeInitials ? jFile.judgeInitials :''
             fileInfo["Judge Full Name"] =  jFile.judgeInitials ? jFile.judgeFullNm : ''
+
+            fileInfo["Appearance ID"] = jFile.appearanceId
+            fileInfo["Supplemental Equipment"] = jFile.supplementalEquipmentTxt
+            fileInfo["Security Restriction"] = jFile.securityRestrictionTxt
+            fileInfo["OutOfTown Judge"] = jFile.outOfTownJudgeTxt
                        
             this.pastAppearancesList.push(fileInfo); 
         }
@@ -184,9 +206,9 @@ export default class PastAppearances extends Vue {
 
     public getStatusStyle(status)
     {
-        if(status == appearanceStatus.UNCF) return "badge badge-danger";
-        else if(status == appearanceStatus.CNCL) return "badge badge-warning";
-        else if(status == appearanceStatus.SCHD) return "badge badge-primary";
+        if(status == appearanceStatus.UNCF) return "badge badge-danger mt-2";
+        else if(status == appearanceStatus.CNCL) return "badge badge-warning mt-2";
+        else if(status == appearanceStatus.SCHD) return "badge badge-primary mt-2";
     }
 
     public getNameOfParticipant(lastName, givenName) {
@@ -221,6 +243,22 @@ export default class PastAppearances extends Vue {
         }
 
         return duration
+    }
+
+    public OpenDetails(data)
+    {
+        if(!data.detailsShowing)
+        {
+            this.pastAppearanceInfo.fileNo = this.criminalFileInformation.fileNumber; 
+            
+            this.pastAppearanceInfo.appearanceId = data.item["Appearance ID"]
+            this.pastAppearanceInfo.supplementalEquipmentTxt = data.item["Supplemental Equipment"]
+            this.pastAppearanceInfo.securityRestrictionTxt = data.item["Security Restriction"]
+            this.pastAppearanceInfo.outOfTownJudgeTxt = data.item["OutOfTown Judge"]
+
+            this.UpdatePastAppearanceInfo(this.pastAppearanceInfo);
+        }
+        
     }
 
     get SortedPastAppearances()

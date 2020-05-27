@@ -23,8 +23,12 @@
                 <template v-for="(field,index) in fields" v-slot:[`head(${field.key})`]="data">
                     <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
                 </template>
-                <template v-for="(field,index) in fields" v-slot:[`cell(${field.key})`]="data" >                   
-                    <span v-bind:key="index" :class="field.cellStyle" style= "white-space: pre" > {{ data.value }}</span>
+                <template v-slot:cell(Status)="data" >                   
+                    <b-badge 
+                        variant="primary" 
+                        style="font-weight: normal; font-size: 16px;"> 
+                        {{ data.value }}
+                    </b-badge>
                 </template>
             </b-table>
         </b-card>
@@ -65,9 +69,9 @@ export default class  AdjudicatorRestrictions extends Vue {
 
   fields =  
   [
-      {key:'Adjudicator', sortable:true, tdClass: 'border-top',  headerStyle:'table-borderless text-primary',   cellStyle:'text'},       
-      {key:'Status',      sortable:true, tdClass: 'border-top',  headerStyle:'text-primary',                    cellStyle:'text-white bg-primary'},
-      {key:'Applies to',  sortable:true, tdClass: 'border-top',  headerStyle:'text-primary',                    cellStyle:'text'},
+      {key:'Adjudicator', sortable:true, tdClass: 'border-top',  headerStyle:'table-borderless text-primary'},       
+      {key:'Status',      sortable:true, tdClass: 'border-top',  headerStyle:'text-primary'},
+      {key:'Applies to',  sortable:true, tdClass: 'border-top',  headerStyle:'text-primary'},
            
   ];
 
