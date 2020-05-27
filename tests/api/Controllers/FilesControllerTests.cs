@@ -39,7 +39,7 @@ namespace tests.api.Controllers
             var fileServicesClient = new FileServicesClient(preTest.HttpClient);
             var lookupService = new LookupService(preTest.Configuration, lookupServiceClient, new CachingService());
             var locationService = new LocationService(preTest.Configuration, locationServiceClient, new CachingService());
-            var filesService = new FilesService(preTest.Configuration, fileServicesClient, new Mapper(), lookupService, locationService);
+            var filesService = new FilesService(preTest.Configuration, fileServicesClient, new Mapper(), lookupService, locationService, new CachingService());
             _controller = new FilesController(preTest.Configuration, preTest.LogFactory.CreateLogger<FilesController>(), filesService);
             SetupMocks();
         }

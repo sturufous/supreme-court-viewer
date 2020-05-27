@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using LazyCache;
 using CivilAppearanceDetail = Scv.Api.Models.Civil.AppearanceDetail.CivilAppearanceDetail;
 using CriminalAppearanceDetail = Scv.Api.Models.Criminal.AppearanceDetail.CriminalAppearanceDetail;
 using CriminalParticipant = Scv.Api.Models.Criminal.Detail.CriminalParticipant;
@@ -29,6 +30,7 @@ namespace Scv.Api.Services
     {
         #region Variables
 
+        private readonly IAppCache _cache;
         private readonly FileServicesClient _fileServicesClient;
         private readonly IMapper _mapper;
         private readonly LookupService _lookupService;
@@ -41,7 +43,7 @@ namespace Scv.Api.Services
 
         #region Constructor
 
-        public FilesService(IConfiguration configuration, FileServicesClient fileServicesClient, IMapper mapper, LookupService lookupService, LocationService locationService)
+        public FilesService(IConfiguration configuration, FileServicesClient fileServicesClient, IMapper mapper, LookupService lookupService, LocationService locationService, IAppCache cache)
         {
             _fileServicesClient = fileServicesClient;
             _fileServicesClient.JsonSerializerSettings.ContractResolver = new SafeContractResolver { NamingStrategy = new CamelCaseNamingStrategy() };
@@ -52,6 +54,8 @@ namespace Scv.Api.Services
             _requestApplicationCode = configuration.GetNonEmptyValue("Request:ApplicationCd");
             _requestAgencyIdentifierId = configuration.GetNonEmptyValue("Request:AgencyIdentifierId");
             _requestPartId = configuration.GetNonEmptyValue("Request:PartId");
+            _cache = cache;
+            _cache.DefaultCachePolicy.DefaultCacheDurationSeconds = int.Parse(configuration.GetNonEmptyValue("Caching:FileExpiryMinutes")) * 60;
         }
 
         #endregion Constructor
@@ -74,7 +78,8 @@ namespace Scv.Api.Services
 
         public async Task<RedactedCivilFileDetailResponse> FilesCivilFileIdAsync(string fileId)
         {
-            var civilFileDetailResponse = await _fileServicesClient.FilesCivilFileIdAsync(_requestAgencyIdentifierId, _requestPartId, fileId);
+            var civilFileDetailResponse = await _cache.GetOrAddAsync($"CivilFileDetail-{fileId}",
+                async () => await _fileServicesClient.FilesCivilFileIdAsync(_requestAgencyIdentifierId, _requestPartId, fileId));
 
             var detail = _mapper.Map<RedactedCivilFileDetailResponse>(civilFileDetailResponse);
             foreach (var document in PopulateCivilDetailCsrsDocuments(civilFileDetailResponse.Appearance))
@@ -108,7 +113,8 @@ namespace Scv.Api.Services
         public async Task<CivilAppearanceDetail> FilesCivilDetailedAppearanceAsync(string fileId, string appearanceId)
         {
             var detailedAppearance = new CivilAppearanceDetail { PhysicalFileId = fileId };
-            var fileDetailResponse = await _fileServicesClient.FilesCivilFileIdAsync(_requestAgencyIdentifierId, _requestPartId, fileId);
+            var fileDetailResponse = await _cache.GetOrAddAsync($"CivilFileDetail-{fileId}",
+                async () => await _fileServicesClient.FilesCivilFileIdAsync(_requestAgencyIdentifierId, _requestPartId, fileId));
             var appearancePartyResponse = await _fileServicesClient.FilesCivilAppearanceAppearanceIdPartiesAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
             var appearanceMethodsResponse = await _fileServicesClient.FilesCivilAppearanceAppearanceIdAppearancemethodsAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
 
@@ -157,8 +163,10 @@ namespace Scv.Api.Services
 
         public async Task<RedactedCriminalFileDetailResponse> FilesCriminalFileIdAsync(string fileId)
         {
-            var criminalFileDetail = await _fileServicesClient.FilesCriminalFileIdAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode, fileId);
-            var criminalFileContent = await _fileServicesClient.FilesCriminalFilecontentAsync(null, null, null, null, fileId);
+            var criminalFileDetail = await _cache.GetOrAddAsync($"CriminalFileDetail-{fileId}", 
+                async() => await _fileServicesClient.FilesCriminalFileIdAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode, fileId));
+            var criminalFileContent = await _cache.GetOrAddAsync($"CriminalFileContent-{fileId}", 
+                async() => await _fileServicesClient.FilesCriminalFilecontentAsync(null, null, null, null, fileId));
 
             //CriminalFileContent can return null when an invalid fileId is inserted.
             if (criminalFileDetail == null || criminalFileContent == null)
@@ -196,7 +204,9 @@ namespace Scv.Api.Services
 
         public async Task<CriminalAppearanceDetail> FilesCriminalAppearanceDetailAsync(string fileId, string appearanceId, string partId = null, string profSeqNo = null)
         {
-            var detail = await _fileServicesClient.FilesCriminalFileIdAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode, fileId);
+            var detail = await _cache.GetOrAddAsync($"CriminalFileDetail-{fileId}",
+                async () => await _fileServicesClient.FilesCriminalFileIdAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode, fileId));
+
             var appearanceCount = await _fileServicesClient.FilesCriminalAppearanceAppearanceIdCountsAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
             var appearanceMethods = await _fileServicesClient.FilesCriminalAppearanceAppearanceIdAppearancemethodsAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
 
