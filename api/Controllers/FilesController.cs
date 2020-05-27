@@ -65,7 +65,6 @@ namespace Scv.Api.Controllers
         public async Task<ActionResult<RedactedCivilFileDetailResponse>> GetCivilFileDetailByFileId(string fileId)
         {
             var civilFileDetailResponse = await _filesService.FilesCivilFileIdAsync(fileId);
-            civilFileDetailResponse.Appearances = await _filesService.FilesCivilFileIdAppearancesAsync(FutureYN2.Y, HistoryYN2.Y, fileId);
             return Ok(civilFileDetailResponse);
         }
 
@@ -147,7 +146,6 @@ namespace Scv.Api.Controllers
             var redactedCriminalFileDetailResponse = await _filesService.FilesCriminalFileIdAsync(fileId);
             if (redactedCriminalFileDetailResponse?.JustinNo == null)
                 throw new NotFoundException("Couldn't find criminal file with this id.");
-            redactedCriminalFileDetailResponse.Appearances = await _filesService.FilesCriminalFileIdAppearancesAsync(fileId, FutureYN.Y, HistoryYN.Y);
             return Ok(redactedCriminalFileDetailResponse);
         }
 
