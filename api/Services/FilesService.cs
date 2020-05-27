@@ -1,5 +1,6 @@
 ﻿using JCCommon.Clients.FileServices;
 using JCCommon.Models;
+using LazyCache;
 using MapsterMapper;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Serialization;
@@ -15,7 +16,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using LazyCache;
 using CivilAppearanceDetail = Scv.Api.Models.Civil.AppearanceDetail.CivilAppearanceDetail;
 using CriminalAppearanceDetail = Scv.Api.Models.Criminal.AppearanceDetail.CriminalAppearanceDetail;
 using CriminalParticipant = Scv.Api.Models.Criminal.Detail.CriminalParticipant;
@@ -80,7 +80,7 @@ namespace Scv.Api.Services
         {
             var civilFileDetailResponse = await _cache.GetOrAddAsync($"CivilFileDetail-{fileId}",
                 async () => await _fileServicesClient.FilesCivilFileIdAsync(_requestAgencyIdentifierId, _requestPartId, fileId));
-            var civilAppearances = await _cache.GetOrAddAsync($"CivilAppearancesFull-{fileId}", 
+            var civilAppearances = await _cache.GetOrAddAsync($"CivilAppearancesFull-{fileId}",
                 async () => await PopulateCivilDetailAppearancesAsync(FutureYN2.Y, HistoryYN2.Y, fileId));
 
             var detail = _mapper.Map<RedactedCivilFileDetailResponse>(civilFileDetailResponse);
@@ -95,11 +95,8 @@ namespace Scv.Api.Services
             return detail;
         }
 
-
-
         public async Task<CivilAppearanceDetail> FilesCivilDetailedAppearanceAsync(string fileId, string appearanceId)
         {
-            
             var fileDetailResponse = await _cache.GetOrAddAsync($"CivilFileDetail-{fileId}",
                 async () => await _fileServicesClient.FilesCivilFileIdAsync(_requestAgencyIdentifierId, _requestPartId, fileId));
             var appearancePartyResponse = await _fileServicesClient.FilesCivilAppearanceAppearanceIdPartiesAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
@@ -154,12 +151,12 @@ namespace Scv.Api.Services
 
         public async Task<RedactedCriminalFileDetailResponse> FilesCriminalFileIdAsync(string fileId)
         {
-            var criminalFileDetail = await _cache.GetOrAddAsync($"CriminalFileDetail-{fileId}", 
-                async() => await _fileServicesClient.FilesCriminalFileIdAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode, fileId));
-            var criminalFileContent = await _cache.GetOrAddAsync($"CriminalFileContent-{fileId}", 
-                async() => await _fileServicesClient.FilesCriminalFilecontentAsync(null, null, null, null, fileId));
-            var criminalAppearances = await _cache.GetOrAddAsync($"CriminalAppearancesFull-{fileId}", 
-                async() => await PopulateCriminalDetailsAppearancesAsync(fileId, FutureYN.Y, HistoryYN.Y));
+            var criminalFileDetail = await _cache.GetOrAddAsync($"CriminalFileDetail-{fileId}",
+                async () => await _fileServicesClient.FilesCriminalFileIdAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode, fileId));
+            var criminalFileContent = await _cache.GetOrAddAsync($"CriminalFileContent-{fileId}",
+                async () => await _fileServicesClient.FilesCriminalFilecontentAsync(null, null, null, null, fileId));
+            var criminalAppearances = await _cache.GetOrAddAsync($"CriminalAppearancesFull-{fileId}",
+                async () => await PopulateCriminalDetailsAppearancesAsync(fileId, FutureYN.Y, HistoryYN.Y));
 
             //CriminalFileContent can return null when an invalid fileId is inserted.
             if (criminalFileDetail == null || criminalFileContent == null)
@@ -178,11 +175,9 @@ namespace Scv.Api.Services
                 detail.Count.AddRange(PopulateCounts(accusedFile, detail));
                 detail.Ban.AddRange(PopulateBans(accusedFile));
             }
-            
+
             return detail;
         }
-
-
 
         public async Task<CriminalAppearanceDetail> FilesCriminalAppearanceDetailAsync(string fileId, string appearanceId, string partId = null, string profSeqNo = null)
         {
@@ -276,6 +271,8 @@ namespace Scv.Api.Services
                     count.PartId = GetParticipantIdFromDetail(accusedFile.PartId, detail);
                     count.AppearanceDate = appearance.AppearanceDate;
                     count.Sentence = count.Sentence.Where(s => s != null).ToList();
+                    foreach (var criminalSentence in count.Sentence)
+                        criminalSentence.JudgesRecommendation = appearance.JudgesRecommendation;
                     criminalCount.Add(count);
                 }
             }
