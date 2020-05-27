@@ -10,8 +10,8 @@ class CriminalFileInformation extends VuexModule {
 
   public showSections = {
     'Case Details': true,
-    'Future Appearance': false,
-    'Past Appearance': false, 
+    'Future Appearances': false,
+    'Past Appearances': false, 
     'Witnesses': false,
     'Criminal Documents': false,
     'Sentence/Order Details': false
