@@ -43,6 +43,8 @@ namespace Scv.Api.Models.Criminal.Detail
         public string CrownEstimateLenQty { get; set; }
         public string CrownEstimateLenDsc { get; set; }
         public CriminalFileDetailResponseCrownEstimateLenUnit? CrownEstimateLenUnit { get; set; }
+        public CriminalFileDetailResponseComplexityTypeCd? ComplexityTypeCd { get; set; }
+        public string AssignmentTypeDsc { get; set; }
 
         /// <summary>
         /// Custom class to extend.
