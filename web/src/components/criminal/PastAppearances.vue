@@ -39,10 +39,9 @@
                 </template>
 
                 <template  v-slot:cell()="data">
-                    <b-badge  
-                        variant="white" 
-                        style="font-weight: normal; font-size: 16px;" 
-                        class = "mt-2"> 
+                    <b-badge                        
+                        style="font-weight: normal; font-size: 16px; padding-top:10px" 
+                        variant="white" > 
                             {{data.value}} 
                     </b-badge>
                 </template>
