@@ -26,8 +26,6 @@ namespace Scv.Api.Services
 
         #region Properties
 
-        private DateTimeOffset CacheExpiry => DateTimeOffset.Now.AddHours(1);
-
         #endregion Properties
 
         #region Constructor
@@ -38,6 +36,7 @@ namespace Scv.Api.Services
             _configuration = configuration;
             _locationClient = locationServicesClient;
             _cache = cache;
+            _cache.DefaultCachePolicy.DefaultCacheDurationSeconds = int.Parse(configuration.GetNonEmptyValue("Caching:LocationExpiryMinutes")) * 60;
             SetupLocationServicesClient();
         }
 
@@ -64,7 +63,7 @@ namespace Scv.Api.Services
         private async Task<T> GetDataFromCache<T>(string key, Func<Task<T>> fetchFunction)
         {
             return await _cache.GetOrAddAsync(key,
-                async () => await fetchFunction.Invoke(), CacheExpiry);
+                async () => await fetchFunction.Invoke());
         }
 
         private string FindLongDescriptionFromCode(CodeValue lookupCodes, string code) => lookupCodes.FirstOrDefault(lookupCode => lookupCode.Code == code)?.LongDesc;

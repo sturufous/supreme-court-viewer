@@ -42,5 +42,6 @@ namespace Scv.Api.Models.Civil.Detail
         /// Extended hearing restriction object. 
         /// </summary>
         public ICollection<CivilHearingRestriction> HearingRestriction { get; set; }
+        public CivilFileAppearancesResponse Appearances { get; set; }
     }
 }
