@@ -33,14 +33,16 @@ namespace tests.api.Controllers
 
         public FilesControllerTests()
         {
-            var preTest = new EnvironmentBuilder("FileServicesClient:Username", "FileServicesClient:Password");
-            var lookupServiceClient = new LookupServiceClient(preTest.HttpClient);
-            var locationServiceClient = new LocationServicesClient(preTest.HttpClient);
-            var fileServicesClient = new FileServicesClient(preTest.HttpClient);
-            var lookupService = new LookupService(preTest.Configuration, lookupServiceClient, new CachingService());
-            var locationService = new LocationService(preTest.Configuration, locationServiceClient, new CachingService());
-            var filesService = new FilesService(preTest.Configuration, fileServicesClient, new Mapper(), lookupService, locationService, new CachingService());
-            _controller = new FilesController(preTest.Configuration, preTest.LogFactory.CreateLogger<FilesController>(), filesService);
+            var fileServices = new EnvironmentBuilder("FileServicesClient:Username", "FileServicesClient:Password", "FileServicesClient:Url");
+            var lookupServices = new EnvironmentBuilder("LookupServicesClient:Username", "LookupServicesClient:Password", "LookupServicesClient:Url");
+            var locationServices = new EnvironmentBuilder("LocationServicesClient:Username", "LocationServicesClient:Password", "LocationServicesClient:Url");
+            var lookupServiceClient = new LookupServiceClient(lookupServices.HttpClient);
+            var locationServiceClient = new LocationServicesClient(locationServices.HttpClient);
+            var fileServicesClient = new FileServicesClient(fileServices.HttpClient);
+            var lookupService = new LookupService(lookupServices.Configuration, lookupServiceClient, new CachingService());
+            var locationService = new LocationService(locationServices.Configuration, locationServiceClient, new CachingService());
+            var filesService = new FilesService(fileServices.Configuration, fileServicesClient, new Mapper(), lookupService, locationService, new CachingService());
+            _controller = new FilesController(fileServices.Configuration, fileServices.LogFactory.CreateLogger<FilesController>(), filesService);
             SetupMocks();
         }
 
