@@ -40,7 +40,7 @@
 
                 <template  v-slot:cell()="data">
                     <b-badge                        
-                        style="font-weight: normal; font-size: 16px; padding-top:10px" 
+                        style="font-weight: normal; font-size: 16px; padding-top:12px" 
                         variant="white" > 
                             {{data.value}} 
                     </b-badge>

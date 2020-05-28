@@ -143,7 +143,7 @@ export default class PastAppearanceDetails extends Vue {
         
         this.accusedPersonInfo["Supplemental Equipment"] = this.pastAppearanceInfo.supplementalEquipmentTxt;
         this.accusedPersonInfo["Security Restriction"] = this.pastAppearanceInfo.securityRestrictionTxt;
-        this.accusedPersonInfo["OutOfTown Judge"] =  this.pastAppearanceInfo.outOfTownJudgeTxt;
+        this.accusedPersonInfo["Out-Of-Town Judge"] =  this.pastAppearanceInfo.outOfTownJudgeTxt;
 
         for(const info in this.accusedPersonInfo)
             this.pastAppearanceAdditionalInfo.push({'key':info,'value':this.accusedPersonInfo[info]});
