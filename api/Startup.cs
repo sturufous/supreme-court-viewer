@@ -52,6 +52,7 @@ namespace Scv.Api
                 client.DefaultRequestHeaders.Authorization = new BasicAuthenticationHeaderValue(
                     Configuration.GetNonEmptyValue("FileServicesClient:Username"),
                     Configuration.GetNonEmptyValue("FileServicesClient:Password"));
+                client.BaseAddress = new Uri(Configuration.GetNonEmptyValue("FileServicesClient:Url").EnsureLeadingForwardSlash());
             });
 
             services.AddHttpClient<LookupServiceClient>(client =>
@@ -59,6 +60,7 @@ namespace Scv.Api
                 client.DefaultRequestHeaders.Authorization = new BasicAuthenticationHeaderValue(
                     Configuration.GetNonEmptyValue("LookupServicesClient:Username"),
                     Configuration.GetNonEmptyValue("LookupServicesClient:Password"));
+                client.BaseAddress = new Uri(Configuration.GetNonEmptyValue("LookupServicesClient:Url").EnsureLeadingForwardSlash());
             });
 
             services.AddHttpClient<LocationServicesClient>(client =>
@@ -66,6 +68,7 @@ namespace Scv.Api
                 client.DefaultRequestHeaders.Authorization = new BasicAuthenticationHeaderValue(
                     Configuration.GetNonEmptyValue("LocationServicesClient:Username"),
                     Configuration.GetNonEmptyValue("LocationServicesClient:Password"));
+                client.BaseAddress = new Uri(Configuration.GetNonEmptyValue("LocationServicesClient:Url").EnsureLeadingForwardSlash());
             });
 
             services.AddScoped<FilesService>();

@@ -73,7 +73,6 @@ namespace Scv.Api.Services
         private void SetupLocationServicesClient()
         {
             _locationClient.JsonSerializerSettings.ContractResolver = new SafeContractResolver { NamingStrategy = new CamelCaseNamingStrategy() };
-            _locationClient.BaseUrl = _configuration.GetNonEmptyValue("LocationServicesClient:Url");
         }
 
         #endregion Helpers

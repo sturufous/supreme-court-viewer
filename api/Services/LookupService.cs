@@ -154,7 +154,6 @@ namespace Scv.Api.Services
         private void SetupLookupServicesClient()
         {
             _lookupClient.JsonSerializerSettings.ContractResolver = new SafeContractResolver { NamingStrategy = new CamelCaseNamingStrategy() };
-            _lookupClient.BaseUrl = _configuration.GetNonEmptyValue("LookupServicesClient:Url");
         }
 
         #endregion Helpers

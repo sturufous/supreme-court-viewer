@@ -1,8 +1,9 @@
-﻿using JCCommon.Framework;
+﻿using System;
+using JCCommon.Framework;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Scv.Api.Helpers.Exceptions;
 using System.Net.Http;
+using Scv.Api.Helpers;
 using tests.api.Controllers;
 
 namespace tests.api.Helpers
@@ -16,7 +17,7 @@ namespace tests.api.Helpers
         public HttpClient HttpClient;
         public IConfiguration Configuration;
 
-        public EnvironmentBuilder(string usernameKey, string passwordKey)
+        public EnvironmentBuilder(string usernameKey, string passwordKey, string urlKey)
         {
             //Load in secrets, this uses the secrets file as the API.
             var builder = new ConfigurationBuilder();
@@ -28,11 +29,10 @@ namespace tests.api.Helpers
             HttpClient = new HttpClient();
 
             HttpClient.DefaultRequestHeaders.Authorization = new BasicAuthenticationHeaderValue(
-                Configuration.GetValue<string>(usernameKey) ??
-                throw new ConfigurationException($"{usernameKey} was not found in secrets."),
-                Configuration.GetValue<string>(passwordKey) ??
-                throw new ConfigurationException($"{passwordKey} was not found in secrets."));
+                Configuration.GetNonEmptyValue(usernameKey),
+                Configuration.GetNonEmptyValue(passwordKey));
 
+            HttpClient.BaseAddress = new Uri(Configuration.GetNonEmptyValue(urlKey).EnsureLeadingForwardSlash());
             //Create logger.
             LogFactory = LoggerFactory.Create(loggingBuilder =>
             {

@@ -47,7 +47,6 @@ namespace Scv.Api.Services
         {
             _fileServicesClient = fileServicesClient;
             _fileServicesClient.JsonSerializerSettings.ContractResolver = new SafeContractResolver { NamingStrategy = new CamelCaseNamingStrategy() };
-            _fileServicesClient.BaseUrl = configuration.GetNonEmptyValue("FileServicesClient:Url");
             _lookupService = lookupService;
             _locationService = locationService;
             _mapper = mapper;
