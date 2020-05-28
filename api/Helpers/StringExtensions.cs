@@ -2,6 +2,6 @@
 {
     public static class StringExtensions
     {
-        public static string EnsureLeadingForwardSlash(this string target) => target.EndsWith("/") ? target : $"{target}/";
+        public static string EnsureEndingForwardSlash(this string target) => target.EndsWith("/") ? target : $"{target}/";
     }
 }
