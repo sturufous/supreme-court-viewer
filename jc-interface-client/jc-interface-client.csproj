@@ -6,8 +6,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="NSwag\**" />
+    <EmbeddedResource Remove="NSwag\**" />
+    <None Remove="NSwag\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Models\" />
     <Folder Include="Framework\" />
+    <Folder Include="NSwagConfig\" />
   </ItemGroup>
 
   <ItemGroup>
