@@ -54,7 +54,7 @@ namespace Scv.Api.Services
 
         public async Task<string> GetLocationAgencyIdentifier(string code) => FindShortDescriptionFromCode(await GetLocationsFromLazyCache(), code);
 
-        public async Task<string> GetRegionName(string code) => string.IsNullOrEmpty(code) ? null : (await _locationClient.LocationsLocationIdRegionAsync(code))?.RegionName;
+        public async Task<string> GetRegionName(string code) => string.IsNullOrEmpty(code) ? null : await GetDataFromCache($"RegionNameByLocation-{code}", async () => (await _locationClient.LocationsLocationIdRegionAsync(code))?.RegionName);
 
         #endregion Lookup Methods
 
