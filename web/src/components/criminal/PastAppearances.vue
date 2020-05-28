@@ -48,7 +48,7 @@
 
                 <template v-slot:cell(Date)="data" >
                     <span :class="data.field.cellStyle"> 
-                        <b-button size="xs" @click="OpenDetails(data);data.toggleDetails();" variant="outline-primary border-white">
+                        <b-button style="transform: translate(0,-7px)" size="xs" @click="OpenDetails(data);data.toggleDetails();" variant="outline-primary border-white">
                             <b-icon-caret-right-fill  v-if="!data.item['_showDetails']"></b-icon-caret-right-fill>
                             <b-icon-caret-down-fill v-if="data.item['_showDetails']"></b-icon-caret-down-fill>
                         </b-button>
@@ -63,10 +63,11 @@
 
                 <template  v-slot:cell(Reason)="data">
                     <b-button 
-                            class ="font-weight-bold" 
+                            :class="data.field.cellStyle"
                             variant="outline-primary border-white"
                             v-b-tooltip.hover                            
-                            :title="data.item['Reason Description']"> 
+                            :title="data.item['Reason Description']"
+                            style="margin-top: 1px;"> 
                             {{data.value}}
                     </b-button>
                 </template>
@@ -82,11 +83,11 @@
                 </template>
 
                 <template  v-slot:cell(Accused)="data">
-                     <b-badge  variant="white" style=" font-size: 16px; padding-top:10px" > {{data.value}} </b-badge>
+                     <b-badge  variant="white" style=" font-size: 16px;" class = "mt-2"> {{data.value}} </b-badge>
                 </template>
 
                 <template  v-slot:cell(Status)="data">
-                    <b :class = "getStatusStyle(data.value)" style="font-weight: normal; font-size: 14px;"> {{data.value}} </b>
+                    <b :class = "getStatusStyle(data.value)" style="font-weight: normal; font-size: 16px;"> {{data.value}} </b>
                 </template>
                 
             </b-table>
@@ -159,7 +160,7 @@ export default class PastAppearances extends Vue {
 
     fields =  
     [
-        {key:'Date',       sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'text-info'},
+        {key:'Date',       sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'text-info mt-2 d-inline-flex'},
         {key:'Reason',     sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'font-weight-bold'},
         {key:'Time',       sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:'text'},
         {key:'Duration',   sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:'text'},
