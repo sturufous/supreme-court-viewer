@@ -12,6 +12,6 @@ Download the latest NSwagStudio: https://github.com/RicoSuter/NSwag/wiki/NSwagSt
 6. Paste in the updated OpenAPI (OAS3.0) specification JSON from step 2
 7. Press Generate Outputs
 8. Goto CSharp Client tab
-9. Copy output into .cs files under Clients/
+9. Copy output into appropriate .cs file under Clients/
 10. Repeat for each client
 11. Run tests

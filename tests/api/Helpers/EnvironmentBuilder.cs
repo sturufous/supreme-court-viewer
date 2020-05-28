@@ -32,7 +32,7 @@ namespace tests.api.Helpers
                 Configuration.GetNonEmptyValue(usernameKey),
                 Configuration.GetNonEmptyValue(passwordKey));
 
-            HttpClient.BaseAddress = new Uri(Configuration.GetNonEmptyValue(urlKey).EnsureLeadingForwardSlash());
+            HttpClient.BaseAddress = new Uri(Configuration.GetNonEmptyValue(urlKey).EnsureEndingForwardSlash());
             //Create logger.
             LogFactory = LoggerFactory.Create(loggingBuilder =>
             {
