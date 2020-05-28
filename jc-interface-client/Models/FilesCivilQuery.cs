@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using JCCommon.Clients.FileServices;
+﻿using JCCommon.Clients.FileServices;
+using System;
 
 namespace JCCommon.Models
 {

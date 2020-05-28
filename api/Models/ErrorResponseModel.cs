@@ -1,7 +1,7 @@
-﻿using System;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Scv.Api.Helpers.Extensions;
+using System;
 
 namespace Scv.Api.Models
 {
@@ -11,6 +11,7 @@ namespace Scv.Api.Models
     public class ErrorResponseModel
     {
         #region Properties
+
         /// <summary>
         /// get/set - The error message.
         /// </summary>
@@ -34,9 +35,11 @@ namespace Scv.Api.Models
         /// </summary>
         /// <value></value>
         public string StackTrace { get; set; }
-        #endregion
+
+        #endregion Properties
 
         #region Constructors
+
         /// <summary>
         /// Creates a new instance of an ErrorResponseModel object.
         /// </summary>
@@ -68,6 +71,7 @@ namespace Scv.Api.Models
             this.Error = message;
             this.Details = details;
         }
-        #endregion
+
+        #endregion Constructors
     }
 }

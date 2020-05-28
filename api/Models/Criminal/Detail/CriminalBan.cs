@@ -1,13 +1,9 @@
 ﻿using JCCommon.Clients.FileServices;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Scv.Api.Models.Criminal.Detail
 {
     /// <summary>
-    /// Extends CfcBan. 
+    /// Extends CfcBan.
     /// </summary>
     public class CriminalBan : CfcBan
     {

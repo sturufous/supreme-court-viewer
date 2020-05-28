@@ -1,6 +1,7 @@
 ﻿using JCCommon.Clients.FileServices;
 using Mapster;
 using Newtonsoft.Json;
+// ReSharper disable UnassignedGetOnlyAutoProperty
 
 namespace Scv.Api.Models.Civil.Detail
 {
@@ -12,7 +13,7 @@ namespace Scv.Api.Models.Civil.Detail
         [JsonIgnore]
         [AdaptIgnore]
         public new string IssueResultCd { get; }
-        
+
         [JsonIgnore]
         [AdaptIgnore]
         public new string IssueResultDsc { get; }

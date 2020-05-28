@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using JCCommon.Clients.FileServices;
+﻿using JCCommon.Clients.FileServices;
+using System.Collections.Generic;
 
 namespace Scv.Api.Models.Civil.Detail
 {
     /// <summary>
-    /// This is used to refine information from CivilFileDetailResponse. 
+    /// This is used to refine information from CivilFileDetailResponse.
     /// </summary>
     public class RedactedCivilFileDetailResponse
     {
@@ -30,15 +30,17 @@ namespace Scv.Api.Models.Civil.Detail
         public string SealedYN { get; set; }
 
         /// <summary>
-        /// Extended party object. Hides fields. 
+        /// Extended party object. Hides fields.
         /// </summary>
         public ICollection<CivilParty> Party { get; set; }
-        
+
         /// <summary>
-        /// Extended document object. 
+        /// Extended document object.
         /// </summary>
         public ICollection<CivilDocument> Document { get; set; }
-        public ICollection<CvfcHearingRestriction2> HearingRestriction { get; set; }
-        public ICollection<CvfcAppearance> Appearance { get; set; }
+        /// <summary>
+        /// Extended hearing restriction object. 
+        /// </summary>
+        public ICollection<CivilHearingRestriction> HearingRestriction { get; set; }
     }
 }

@@ -1,11 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using JCCommon.Clients.LookupServices;
-using MapsterMapper;
+﻿using JCCommon.Clients.LookupServices;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Scv.Api.Services;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Scv.Api.Controllers
 {
@@ -14,23 +11,22 @@ namespace Scv.Api.Controllers
     public class LookupController : ControllerBase
     {
         #region Variables
-        private readonly IConfiguration _configuration;
-        private readonly ILogger<LookupController> _logger;
-        private readonly IMapper _mapper;
+
         private readonly LookupService _lookupService;
-        #endregion
+
+        #endregion Variables
 
         #region Constructor
-        public LookupController(IConfiguration configuration, ILogger<LookupController> logger, LookupService lookupService, IMapper mapper)
+
+        public LookupController(LookupService lookupService)
         {
-            _configuration = configuration;
-            _logger = logger;
             _lookupService = lookupService;
-            _mapper = mapper;
         }
-        #endregion
+
+        #endregion Constructor
 
         #region Actions
+
         [HttpGet]
         [Route("codes/documents")]
         public async Task<ActionResult<ICollection<LookupCode>>> GetDocumentCodes()
@@ -38,6 +34,7 @@ namespace Scv.Api.Controllers
             var lookupCodes = await _lookupService.GetDocuments();
             return Ok(lookupCodes);
         }
-        #endregion
+
+        #endregion Actions
     }
 }
