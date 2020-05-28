@@ -17,6 +17,8 @@ class CriminalFileInformation extends VuexModule {
     'Sentence/Order Details': false
   }
 
+  public pastAppearanceInfo = {}
+
   @Mutation
   public setCriminalFile(criminalFileInformation): void {
     this.criminalFileInformation = criminalFileInformation
@@ -55,6 +57,16 @@ class CriminalFileInformation extends VuexModule {
   @Action
   public UpdateShowSections(newShowSections): void {
     this.context.commit('setShowSections', newShowSections)
+  }
+
+  @Mutation
+  public setPastAppearanceInfo(pastAppearanceInfo): void {
+    this.pastAppearanceInfo = pastAppearanceInfo
+  }
+
+  @Action
+  public UpdatePastAppearanceInfo(newPastAppearanceInfo): void {
+    this.context.commit('setPastAppearanceInfo', newPastAppearanceInfo)
   }
 
 

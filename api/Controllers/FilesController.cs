@@ -112,7 +112,7 @@ namespace Scv.Api.Controllers
             if (justinReportResponse.ReportContent == null || justinReportResponse.ReportContent.Length <= 0)
                 throw new NotFoundException("Couldn't find CSR with this appearance id.");
 
-            return BuildFileResponse(fileNameAndExtension, justinReportResponse.ReportContent);
+            return BuildFileResponse(justinReportResponse.ReportContent);
         }
 
         /// <summary>
@@ -230,7 +230,7 @@ namespace Scv.Api.Controllers
             if (recordsOfProceeding.B64Content == null || recordsOfProceeding.B64Content.Length <= 0)
                 throw new NotFoundException("Couldn't find ROP with this part id.");
 
-            return BuildFileResponse(fileNameAndExtension, recordsOfProceeding.B64Content);
+            return BuildFileResponse(recordsOfProceeding.B64Content);
         }
 
         #endregion Criminal Only
@@ -269,12 +269,12 @@ namespace Scv.Api.Controllers
             if (documentResponse.B64Content == null || documentResponse.B64Content.Length <= 0)
                 throw new NotFoundException("Couldn't find document with this id.");
 
-            return BuildFileResponse(fileNameAndExtension, documentResponse.B64Content);
+            return BuildFileResponse(documentResponse.B64Content);
         }
 
         #region Helpers
 
-        private FileContentResult BuildFileResponse(string fileNameAndExtension, string content)
+        private FileContentResult BuildFileResponse(string content)
         {
             Response.Headers.Add("X-Content-Type-Options", "nosniff");
             return File(Convert.FromBase64String(content), "application/pdf");

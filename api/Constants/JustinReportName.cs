@@ -1,4 +1,5 @@
-﻿namespace Scv.Api.Constants
+﻿// ReSharper disable InconsistentNaming
+namespace Scv.Api.Constants
 {
     public class JustinReportName
     {

@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
-using Mapster;
+﻿using Mapster;
 using MapsterMapper;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Reflection;
 
 namespace Scv.Api.Helpers.Mapping
 {
@@ -14,7 +11,7 @@ namespace Scv.Api.Helpers.Mapping
         public static IServiceCollection AddMapster(this IServiceCollection services, Action<TypeAdapterConfig> options = null)
         {
             var config = TypeAdapterConfig.GlobalSettings;
-            config.Scan(Assembly.GetAssembly(typeof(Startup)));
+            config.Scan(Assembly.GetAssembly(typeof(Startup)) ?? throw new InvalidOperationException());
 
             options?.Invoke(config);
 
