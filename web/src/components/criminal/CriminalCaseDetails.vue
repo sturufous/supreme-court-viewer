@@ -40,6 +40,7 @@
             <criminal-crown-notes v-if="showCaseDetails"/>
             <adjudicator-restrictions v-if="showCaseDetails"/>
             <past-appearances v-if="showPastAppearances" />
+            <future-appearances v-if="showFutureAppearances" />
             <criminal-documents-view v-if="showDocuments"/>
             <criminal-witnesses v-if="showWitnesses" />
             <b-card><br></b-card>  
@@ -59,6 +60,7 @@ import CriminalParticipants from '@components/criminal/CriminalParticipants.vue'
 import AdjudicatorRestrictions from '@components/criminal/AdjudicatorRestrictions.vue'
 import CriminalCrownInformation from '@components/criminal/CriminalCrownInformation.vue';
 import PastAppearances from '@components/criminal/PastAppearances.vue'
+import FutureAppearances from '@components/criminal/FutureAppearances.vue'
 import CriminalCrownNotes from '@components/criminal/CriminalCrownNotes.vue';
 import CriminalWitnesses from '@components/criminal/CriminalWitnesses.vue';
 import '@store/modules/CriminalFileInformation';
@@ -74,6 +76,7 @@ const criminalState = namespace('CriminalFileInformation');
         AdjudicatorRestrictions,
         CriminalCrownInformation,
         PastAppearances,
+        FutureAppearances,
         CriminalCrownNotes,
         CriminalWitnesses
     }

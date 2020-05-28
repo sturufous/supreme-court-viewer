@@ -2,12 +2,12 @@
 <body>
     <b-card bg-variant="white">
         <div>
-            <h3 class="mx-2 font-weight-normal" v-if="!showSections['Past Appearances']"> Last Three Past Appearances</h3>
+            <h3 class="mx-2 font-weight-normal" v-if="!showSections['Future Appearances']"> Last Three Future Appearances</h3>
             <hr class="mx-1 bg-light" style="height: 5px;"/> 
         </div>
 
         <b-card v-if="!isDataReady && isMounted">
-            <span class="text-muted"> No past appearances. </span>
+            <span class="text-muted"> No future appearances. </span>
         </b-card>
 
         <b-card bg-variant="light" v-if= "!isMounted && !isDataReady">
@@ -24,7 +24,7 @@
 
         <b-card bg-variant="white" v-if="isDataReady">           
             <b-table
-            :items="SortedPastAppearances"
+            :items="SortedFutureAppearances"
             :fields="fields"
             :sort-by.sync="sortBy"
             :sort-desc.sync="sortDesc"
@@ -47,9 +47,9 @@
                 </template>
 
                 <template v-slot:cell(Date)="data" >
-                    <span :class="data.field.cellStyle" style="display: inline-flex;"> 
-                        <b-button style="transform: translate(0,-7px);" @click="OpenDetails(data);data.toggleDetails();" variant="outline-primary border-white" class="mr-2">
-                            <b-icon-caret-right-fill  v-if="!data.item['_showDetails']"></b-icon-caret-right-fill>
+                    <span :class="data.field.cellStyle"> 
+                        <b-button style="transform: translate(0,-7px)" @click="OpenDetails(data);data.toggleDetails();" variant="outline-primary border-white" class="mr-2">
+                            <b-icon-caret-right-fill v-if="!data.item['_showDetails']"></b-icon-caret-right-fill>
                             <b-icon-caret-down-fill v-if="data.item['_showDetails']"></b-icon-caret-down-fill>
                         </b-button>
                         {{data.value| beautify-date}}
@@ -114,7 +114,7 @@ enum appearanceStatus {UNCF='Unconfirmed', CNCL='Canceled', SCHD='Scheduled' }
         AppearanceDetails
     }
 })
-export default class PastAppearances extends Vue {
+export default class FutureAppearances extends Vue {
 
     @criminalState.State
     public criminalFileInformation!: any;
@@ -129,15 +129,15 @@ export default class PastAppearances extends Vue {
     public UpdatePastAppearanceInfo!: (newPastAppearanceInfo: any) => void
 
     mounted() {
-        this.getPastAppearances();
+        this.getFutureAppearances();
     }
 
-    public getPastAppearances(): void {      
+    public getFutureAppearances(): void {      
     
         const data = this.criminalFileInformation.detailsData;
-        this.pastAppearancesJson = data.appearances.apprDetail;              
-        this.ExtractPastAppearancesInfo();
-        if(this.pastAppearancesList.length)
+        this.futureAppearancesJson = data.appearances.apprDetail;              
+        this.ExtractFutureAppearancesInfo();
+        if(this.futureAppearancesList.length)
         {                    
             this.isDataReady = true;
         }
@@ -149,11 +149,11 @@ export default class PastAppearances extends Vue {
   
     isMounted = false;
     isDataReady = false;
-    pastAppearancesJson;
+    futureAppearancesJson;
     
     sortBy = 'Date';
     sortDesc = true;
-    pastAppearancesList: any[] = [];
+    futureAppearancesList: any[] = [];
 
     fields =  
     [
@@ -163,21 +163,20 @@ export default class PastAppearances extends Vue {
         {key:'Duration',   sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:'text'},
         {key:'Location',   sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'text'},
         {key:'Room',       sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:'text'},
-        {key:'Presider',   sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'text'},
         {key:'Accused',    sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'text'},
         {key:'Status',     sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'badge'},
     ];    
   
-    public ExtractPastAppearancesInfo(): void {
+    public ExtractFutureAppearancesInfo(): void {
         const currentDate = new Date();
-        for (const fileIndex in this.pastAppearancesJson) {
+
+        for (const fileIndex in this.futureAppearancesJson) {
             const fileInfo = {};
-            const jFile = this.pastAppearancesJson[fileIndex];
+            const jFile = this.futureAppearancesJson[fileIndex];
 
             fileInfo["Index"] = fileIndex;
             fileInfo["Date"] = jFile.appearanceDt.split(' ')[0]
-            if(new Date(fileInfo["Date"]) >= currentDate) continue;
-
+            if(new Date(fileInfo["Date"]) < currentDate) continue;
             fileInfo["Time"] = this.getTime(jFile.appearanceTm.split(' ')[1].substr(0,5));
             fileInfo["Reason"] = jFile.appearanceReasonCd;
             fileInfo["Reason Description"] = jFile.appearanceReasonDsc? jFile.appearanceReasonDsc: console.log(fileInfo["Date"]);
@@ -199,7 +198,7 @@ export default class PastAppearances extends Vue {
             fileInfo["Security Restriction"] = jFile.securityRestrictionTxt
             fileInfo["OutOfTown Judge"] = jFile.outOfTownJudgeTxt
                        
-            this.pastAppearancesList.push(fileInfo); 
+            this.futureAppearancesList.push(fileInfo); 
         }
     }
 
@@ -260,15 +259,15 @@ export default class PastAppearances extends Vue {
         
     }
 
-    get SortedPastAppearances()
+    get SortedFutureAppearances()
     {           
-        if(this.showSections['Past Appearances'])
+        if(this.showSections['Future Appearances'])
         {
-            return this.pastAppearancesList;
+            return this.futureAppearancesList;
         }
         else
         {
-            return  this.pastAppearancesList
+            return  this.futureAppearancesList
             .sort((a, b): any =>
             {            
                 if(a["Date"] > b["Date"]) return -1;
