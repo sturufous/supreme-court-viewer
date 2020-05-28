@@ -39,10 +39,9 @@
                 </template>
 
                 <template  v-slot:cell()="data">
-                    <b-badge  
-                        variant="white" 
-                        style="font-weight: normal; font-size: 16px;" 
-                        class = "mt-2"> 
+                    <b-badge                        
+                        style="font-weight: normal; font-size: 16px; padding-top:10px" 
+                        variant="white" > 
                             {{data.value}} 
                     </b-badge>
                 </template>
@@ -83,7 +82,7 @@
                 </template>
 
                 <template  v-slot:cell(Accused)="data">
-                     <b-badge  variant="white" style=" font-size: 16px;" class = "mt-1"> {{data.value}} </b-badge>
+                     <b-badge  variant="white" style=" font-size: 16px; padding-top:10px" > {{data.value}} </b-badge>
                 </template>
 
                 <template  v-slot:cell(Status)="data">
