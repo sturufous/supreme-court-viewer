@@ -8,6 +8,7 @@ namespace Scv.Api.Helpers.Exceptions
     public class BadRequestException : Exception
     {
         #region Constructors
+
         /// <summary>
         /// Creates a new instance of a BadRequestException object, initializes it with the specified arguments.
         /// </summary>
@@ -22,6 +23,7 @@ namespace Scv.Api.Helpers.Exceptions
         /// <param name="innerException"></param>
         /// <returns></returns>
         public BadRequestException(string message, Exception innerException) : base(message, innerException) { }
-        #endregion
+
+        #endregion Constructors
     }
 }

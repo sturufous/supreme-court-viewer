@@ -8,11 +8,13 @@ namespace Scv.Api.Helpers.Exceptions
     public class ConfigurationException : Exception
     {
         #region Constructors
+
         /// <summary>
         /// Creates a new instance of a ConfigurationException class.
         /// </summary>
         /// <returns></returns>
-        public ConfigurationException() : base() { }
+        public ConfigurationException()
+        { }
 
         /// <summary>
         /// Creates a new instance of a ConfigurationException class, and initializes it with the specified arguments.
@@ -28,6 +30,7 @@ namespace Scv.Api.Helpers.Exceptions
         /// <param name="innerException"></param>
         /// <returns></returns>
         public ConfigurationException(string message, Exception innerException) : base(message, innerException) { }
-        #endregion
+
+        #endregion Constructors
     }
 }

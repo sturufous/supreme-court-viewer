@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using JCCommon.Clients.FileServices;
+﻿using JCCommon.Clients.FileServices;
+using System.Collections.Generic;
 
 namespace Scv.Api.Models.Criminal.Detail
 {
@@ -43,31 +43,34 @@ namespace Scv.Api.Models.Criminal.Detail
         public string CrownEstimateLenQty { get; set; }
         public string CrownEstimateLenDsc { get; set; }
         public CriminalFileDetailResponseCrownEstimateLenUnit? CrownEstimateLenUnit { get; set; }
+
         /// <summary>
-        /// Custom class to extend. 
+        /// Custom class to extend.
         /// </summary>
         public ICollection<CriminalParticipant> Participant { get; set; }
 
         /// <summary>
-        /// We need this for our witness page. 
+        /// We need this for our witness page.
         /// </summary>
         public ICollection<CriminalWitness> Witness { get; set; }
+
         /// <summary>
         /// Extended.
         /// </summary>
         public ICollection<CrownWitness> Crown { get; set; }
+
         /// <summary>
         /// Extended.
         /// </summary>
         public ICollection<CriminalHearingRestriction> HearingRestriction { get; set; }
 
         /// <summary>
-        /// Used for Crown Notes to JCM. 
+        /// Used for Crown Notes to JCM.
         /// </summary>
         public ICollection<TrialRemark> TrialRemark { get; set; }
 
         /// <summary>
-        /// Extended, with PartId. 
+        /// Extended, with PartId.
         /// </summary>
         public List<CriminalBan> Ban { get; set; }
 
