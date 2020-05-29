@@ -178,32 +178,30 @@ namespace Scv.Api.Services
             detail = await PopulateBaseCriminalDetail(detail);
             detail.Appearances = criminalAppearances;
             detail.Witness = await PopulateCriminalDetailWitnesses(detail);
-            detail.Participant = PopulateCriminalDetailParticipants(detail, documents);
+            detail.Participant = PopulateCriminalDetailParticipants(detail, documents, criminalFileContent.AccusedFile);
             detail.HearingRestriction = await PopulateCriminalDetailHearingRestrictions(detail);
             detail.Crown = PopulateCriminalDetailCrown(detail);
-            foreach (var accusedFile in (criminalFileContent).AccusedFile)
-            {
-                detail.Count.AddRange(PopulateCounts(accusedFile, detail));
-                detail.Ban.AddRange(PopulateBans(accusedFile));
-            }
-
             return detail;
         }
 
         public async Task<CriminalAppearanceDetail> FilesCriminalAppearanceDetailAsync(string fileId, string appearanceId, string partId = null, string profSeqNo = null)
         {
-            var detailTask = _cache.GetOrAddAsync($"CriminalFileDetail-{fileId}",
+            var fileDetailTask = _cache.GetOrAddAsync($"CriminalFileDetail-{fileId}",
                 async () => await _fileServicesClient.FilesCriminalFileIdAsync(_requestAgencyIdentifierId,
                     _requestPartId, _requestApplicationCode, fileId));
             var appearanceCountTask = _fileServicesClient.FilesCriminalAppearanceAppearanceIdCountsAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
             var appearanceMethodsTask = _fileServicesClient.FilesCriminalAppearanceAppearanceIdAppearancemethodsAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
+            var fileContentTask = _cache.GetOrAddAsync($"CriminalFileContent-{fileId}",
+                async () => await _fileServicesClient.FilesCriminalFilecontentAsync(null, null, null, null, fileId));
 
-            var detail = await detailTask;
+            var fileDetail = await fileDetailTask;
             var appearanceCount = await appearanceCountTask;
             var appearanceMethods = await appearanceMethodsTask;
+            var fileContent = await fileContentTask;
 
-            var redactedDetail = _mapper.Map<RedactedCriminalFileDetailResponse>(detail);
+            var redactedDetail = _mapper.Map<RedactedCriminalFileDetailResponse>(fileDetail);
             var accused = redactedDetail.Participant.FirstOrDefault(x => x.PartId == partId && x.ProfSeqNo == profSeqNo);
+            var accusedFile = fileContent.AccusedFile.FirstOrDefault(af => af.MdocJustinNo == fileId);
             var appearanceDetail = new CriminalAppearanceDetail
             {
                 JustinNo = fileId,
@@ -211,8 +209,10 @@ namespace Scv.Api.Services
                 ProfSeqNo = profSeqNo,
                 JustinCounsel = accused != null ? _mapper.Map<JustinCounsel>(accused) : null,
                 Charges = await PopulateCharges(appearanceCount.ApprCount),
-                AppearanceMethods = await PopulateAppearanceMethods(appearanceMethods.AppearanceMethod)
+                AppearanceMethods = await PopulateAppearanceMethods(appearanceMethods.AppearanceMethod),
+                AppearanceNote = accusedFile?.Appearance.FirstOrDefault(a=> a.AppearanceId == appearanceId)?.AppearanceNote,
             };
+
             return appearanceDetail;
         }
 
@@ -338,13 +338,18 @@ namespace Scv.Api.Services
             return detail.Witness;
         }
 
-        private ICollection<CriminalParticipant> PopulateCriminalDetailParticipants(RedactedCriminalFileDetailResponse detail, ICollection<CriminalDocument> documents)
+        private ICollection<CriminalParticipant> PopulateCriminalDetailParticipants(RedactedCriminalFileDetailResponse detail, ICollection<CriminalDocument> documents, ICollection<CfcAccusedFile> accusedFiles)
         {
             foreach (var participant in detail.Participant)
             {
                 participant.Document = documents.Where(doc => doc.PartId == participant.PartId).ToList();
                 participant.HideJustinCounsel = false;   //TODO tie this to a permission. View Witness List permission
                 //TODO COUNSEL? Not sure where  to get this data from
+                foreach (var accusedFile in accusedFiles.Where(af => af?.PartId == participant.PartId))
+                {
+                    participant.Count.AddRange(PopulateCounts(accusedFile, detail));
+                    participant.Ban.AddRange(PopulateBans(accusedFile));
+                }
             }
             return detail.Participant;
         }
@@ -395,7 +400,7 @@ namespace Scv.Api.Services
             foreach (var appearanceMethod in criminalAppearanceMethods)
             {
                 appearanceMethod.AppearanceMethodDesc = await _lookupService.GetCriminalAssetsDescriptions(appearanceMethod.AppearanceMethodCd);
-                appearanceMethod.RoleTypeDsc = await _lookupService.GetCriminalParticipantRoleDescription(appearanceMethod.RoleTypeCd);
+                appearanceMethod.RoleTypeDsc = await _lookupService.GetCriminalParticipantRoleDescription(appearanceMethod.RoleTypeCd); // double check this one. 
             }
             return criminalAppearanceMethods;
         }
