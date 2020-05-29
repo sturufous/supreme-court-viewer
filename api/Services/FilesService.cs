@@ -209,7 +209,7 @@ namespace Scv.Api.Services
                 JustinCounsel = accused != null ? _mapper.Map<JustinCounsel>(accused) : null,
                 Charges = await PopulateCharges(appearanceCount.ApprCount),
                 AppearanceMethods = await PopulateAppearanceMethods(appearanceMethods.AppearanceMethod),
-                AppearanceNote = accusedFile?.Appearance.FirstOrDefault(a=> a.AppearanceId == appearanceId)?.AppearanceNote,
+                AppearanceNote = accusedFile?.Appearance.FirstOrDefault(a=> a?.AppearanceId == appearanceId)?.AppearanceNote,
             };
             return appearanceDetail;
         }
