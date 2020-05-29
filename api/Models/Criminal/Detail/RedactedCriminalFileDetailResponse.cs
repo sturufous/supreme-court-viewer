@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Scv.Api.Models.Criminal.Detail
 {
     /// <summary>
-    /// This is used to narrow down the amount of information from CriminalFileDetailResponse.
+    /// This is used to narrow down the amount of information from <see cref="CriminalFileDetailResponse"/> CriminalFileDetailResponse. 
     /// </summary>
     public class RedactedCriminalFileDetailResponse
     {
