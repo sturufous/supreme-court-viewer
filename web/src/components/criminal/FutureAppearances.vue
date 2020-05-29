@@ -2,8 +2,8 @@
 <body>
     <b-card bg-variant="white">
         <div>
-            <h3 class="mx-2 font-weight-normal" v-if="!showSections['Future Appearances']"> Last Three Future Appearances</h3>
-            <hr class="mx-1 bg-light" style="height: 5px;"/> 
+            <h3 class="mx-2 font-weight-normal" v-if="!showSections['Future Appearances']"> Next Three Future Appearances</h3>
+            <hr class="mb-0 bg-light" style="height: 5px;"/> 
         </div>
 
         <b-card v-if="!isDataReady && isMounted">
