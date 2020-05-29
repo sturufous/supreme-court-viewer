@@ -31,7 +31,7 @@ namespace Scv.Api.Services
         #region Variables
 
         private readonly IAppCache _cache;
-        private readonly FileServicesClient _fileServicesClient;
+        private readonly FileServicesClient _filesClient;
         private readonly IMapper _mapper;
         private readonly LookupService _lookupService;
         private readonly LocationService _locationService;
@@ -43,10 +43,10 @@ namespace Scv.Api.Services
 
         #region Constructor
 
-        public FilesService(IConfiguration configuration, FileServicesClient fileServicesClient, IMapper mapper, LookupService lookupService, LocationService locationService, IAppCache cache)
+        public FilesService(IConfiguration configuration, FileServicesClient filesClient, IMapper mapper, LookupService lookupService, LocationService locationService, IAppCache cache)
         {
-            _fileServicesClient = fileServicesClient;
-            _fileServicesClient.JsonSerializerSettings.ContractResolver = new SafeContractResolver { NamingStrategy = new CamelCaseNamingStrategy() };
+            _filesClient = filesClient;
+            _filesClient.JsonSerializerSettings.ContractResolver = new SafeContractResolver { NamingStrategy = new CamelCaseNamingStrategy() };
             _lookupService = lookupService;
             _locationService = locationService;
             _mapper = mapper;
@@ -63,11 +63,11 @@ namespace Scv.Api.Services
 
         #region Civil Only
 
-        public async Task<FileSearchResponse> FilesCivilAsync(FilesCivilQuery fcq)
+        public async Task<FileSearchResponse> CivilSearchAsync(FilesCivilQuery fcq)
         {
             fcq.FilePermissions =
                 "[\"A\", \"Y\", \"T\", \"F\", \"C\", \"M\", \"L\", \"R\", \"B\", \"D\", \"E\", \"G\", \"H\", \"N\", \"O\", \"P\", \"S\", \"V\"]"; // for now, use all types - TODO: determine proper list of types?
-            return await _fileServicesClient.FilesCivilAsync(_requestAgencyIdentifierId, _requestPartId,
+            return await _filesClient.FilesCivilAsync(_requestAgencyIdentifierId, _requestPartId,
                 _requestApplicationCode, fcq.SearchMode, fcq.FileHomeAgencyId, fcq.FileNumber, fcq.FilePrefix,
                 fcq.FilePermissions, fcq.FileSuffixNumber, fcq.MDocReferenceTypeCode, fcq.CourtClass, fcq.CourtLevel,
                 fcq.NameSearchType, fcq.LastName, fcq.OrgName, fcq.GivenName, fcq.Birth?.ToString("yyyy-MM-dd"),
@@ -75,34 +75,36 @@ namespace Scv.Api.Services
                 fcq.MdocJustinNumberSet, fcq.PhysicalFileIdSet);
         }
 
-        public async Task<RedactedCivilFileDetailResponse> FilesCivilFileIdAsync(string fileId)
+        public async Task<RedactedCivilFileDetailResponse> CivilFileIdAsync(string fileId)
         {
-            var civilFileDetailResponseTask = _cache.GetOrAddAsync($"CivilFileDetail-{fileId}",
-                async () => await _fileServicesClient.FilesCivilFileIdAsync(_requestAgencyIdentifierId, _requestPartId, fileId));
-            var civilAppearancesTask = _cache.GetOrAddAsync($"CivilAppearancesFull-{fileId}",
-                async () => await PopulateCivilDetailAppearancesAsync(FutureYN2.Y, HistoryYN2.Y, fileId));
+            async Task<CivilFileDetailResponse> FileDetails() => await _filesClient.FilesCivilFileIdAsync(_requestAgencyIdentifierId, _requestPartId, fileId);
+            async Task<CivilFileAppearancesResponse> Appearances() => await PopulateCivilDetailAppearancesAsync(FutureYN2.Y, HistoryYN2.Y, fileId);
 
-            var civilFileDetailResponse = await civilFileDetailResponseTask;
-            var civilAppearances = await civilAppearancesTask;
+            var fileDetailResponseTask = _cache.GetOrAddAsync($"CivilFileDetail-{fileId}", FileDetails);
+            var appearancesTask = _cache.GetOrAddAsync($"CivilAppearancesFull-{fileId}", Appearances);
 
-            var detail = _mapper.Map<RedactedCivilFileDetailResponse>(civilFileDetailResponse);
-            foreach (var document in PopulateCivilDetailCsrsDocuments(civilFileDetailResponse.Appearance))
+            var fileDetailResponse = await fileDetailResponseTask;
+            var appearances = await appearancesTask;
+
+            var detail = _mapper.Map<RedactedCivilFileDetailResponse>(fileDetailResponse);
+            foreach (var document in PopulateCivilDetailCsrsDocuments(fileDetailResponse.Appearance)) 
                 detail.Document.Add(document);
 
             detail = await PopulateBaseCivilDetail(detail);
-            detail.Appearances = civilAppearances;
+            detail.Appearances = appearances;
             detail.Party = await PopulateCivilDetailParties(detail.Party);
             detail.Document = await PopulateCivilDetailDocuments(detail.Document);
-            detail.HearingRestriction = await PopulateCivilDetailHearingRestrictions(civilFileDetailResponse.HearingRestriction);
+            detail.HearingRestriction = await PopulateCivilDetailHearingRestrictions(fileDetailResponse.HearingRestriction);
             return detail;
         }
 
-        public async Task<CivilAppearanceDetail> FilesCivilDetailedAppearanceAsync(string fileId, string appearanceId)
+        public async Task<CivilAppearanceDetail> CivilDetailedAppearanceAsync(string fileId, string appearanceId)
         {
-            var fileDetailResponseTask = _cache.GetOrAddAsync($"CivilFileDetail-{fileId}",
-                async () => await _fileServicesClient.FilesCivilFileIdAsync(_requestAgencyIdentifierId, _requestPartId, fileId));
-            var appearancePartyResponseTask = _fileServicesClient.FilesCivilAppearanceAppearanceIdPartiesAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
-            var appearanceMethodsResponseTask = _fileServicesClient.FilesCivilAppearanceAppearanceIdAppearancemethodsAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
+            async Task<CivilFileDetailResponse> FileDetails() => await _filesClient.FilesCivilFileIdAsync(_requestAgencyIdentifierId, _requestPartId, fileId);
+
+            var fileDetailResponseTask = _cache.GetOrAddAsync($"CivilFileDetail-{fileId}", FileDetails);
+            var appearancePartyResponseTask = _filesClient.FilesCivilAppearanceAppearanceIdPartiesAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
+            var appearanceMethodsResponseTask = _filesClient.FilesCivilAppearanceAppearanceIdAppearancemethodsAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
 
             var fileDetailResponse = await fileDetailResponseTask;
             var appearancePartyResponse = await appearancePartyResponseTask;
@@ -122,17 +124,17 @@ namespace Scv.Api.Services
             return detailedAppearance;
         }
 
-        public async Task<JustinReportResponse> FilesCivilCourtsummaryreportAsync(string appearanceId, string reportName)
+        public async Task<JustinReportResponse> CivilCourtSummaryReportAsync(string appearanceId, string reportName)
         {
-            var justinReportResponse = await _fileServicesClient.FilesCivilCourtsummaryreportAsync(_requestAgencyIdentifierId,
+            var justinReportResponse = await _filesClient.FilesCivilCourtsummaryreportAsync(_requestAgencyIdentifierId,
                 _requestPartId, appearanceId, reportName);
             return justinReportResponse;
         }
 
-        public async Task<CivilFileContent> FilesCivilFilecontentAsync(string agencyId, string roomCode, DateTime? proceeding, string appearanceId, string physicalFileId)
+        public async Task<CivilFileContent> CivilFileContentAsync(string agencyId, string roomCode, DateTime? proceeding, string appearanceId, string physicalFileId)
         {
             var proceedingDateString = proceeding.HasValue ? proceeding.Value.ToString("yyyy-MM-dd") : "";
-            return await _fileServicesClient.FilesCivilFilecontentAsync(agencyId, roomCode, proceedingDateString,
+            return await _filesClient.FilesCivilFilecontentAsync(agencyId, roomCode, proceedingDateString,
                 appearanceId, physicalFileId);
         }
 
@@ -140,13 +142,13 @@ namespace Scv.Api.Services
 
         #region Criminal Only
 
-        public async Task<FileSearchResponse> FilesCriminalAsync(FilesCriminalQuery fcq)
+        public async Task<FileSearchResponse> CriminalSearchAsync(FilesCriminalQuery fcq)
         {
             fcq.FilePermissions =
                 "[\"A\", \"Y\", \"T\", \"F\", \"C\", \"M\", \"L\", \"R\", \"B\", \"D\", \"E\", \"G\", \"H\", \"N\", \"O\", \"P\", \"S\", \"V\"]"; // for now, use all types - TODO: determine proper list of types?
 
             //CourtLevel = "S"  Supreme court data, CourtLevel = "P" - Province.
-            return await _fileServicesClient.FilesCriminalAsync(_requestAgencyIdentifierId,
+            return await _filesClient.FilesCriminalAsync(_requestAgencyIdentifierId,
                 _requestPartId, _requestApplicationCode, fcq.SearchMode, fcq.FileHomeAgencyId, fcq.FileNumberTxt,
                 fcq.FilePrefixTxt, fcq.FilePermissions, fcq.FileSuffixNo, fcq.MdocRefTypeCode, fcq.CourtClass,
                 fcq.CourtLevel, fcq.NameSearchTypeCd, fcq.LastName, fcq.OrgName, fcq.GivenName,
@@ -154,53 +156,68 @@ namespace Scv.Api.Services
                 fcq.SearchByCrownFileDesignation, fcq.MdocJustinNoSet, fcq.PhysicalFileIdSet);
         }
 
-        public async Task<RedactedCriminalFileDetailResponse> FilesCriminalFileIdAsync(string fileId)
+        public async Task<RedactedCriminalFileDetailResponse> CriminalFileIdAsync(string fileId)
         {
-            var criminalFileDetailTask = _cache.GetOrAddAsync($"CriminalFileDetail-{fileId}",
-                async () => await _fileServicesClient.FilesCriminalFileIdAsync(_requestAgencyIdentifierId,
-                    _requestPartId, _requestApplicationCode, fileId));
-            var criminalFileContentTask = _cache.GetOrAddAsync($"CriminalFileContent-{fileId}",
-                async () => await _fileServicesClient.FilesCriminalFilecontentAsync(null, null, null, null, fileId));
-            var criminalAppearancesTask = _cache.GetOrAddAsync($"CriminalAppearancesFull-{fileId}",
-                async () => await PopulateCriminalDetailsAppearancesAsync(fileId, FutureYN.Y, HistoryYN.Y));
+            async Task<CriminalFileDetailResponse> FileDetails() => await _filesClient.FilesCriminalFileIdAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode, fileId);
+            async Task<CriminalFileContent> FileContent() => await _filesClient.FilesCriminalFilecontentAsync(null, null, null, null, fileId);
+            async Task<CriminalFileAppearances> FileAppearances() => await PopulateCriminalDetailsAppearancesAsync(fileId, FutureYN.Y, HistoryYN.Y);
 
-            var criminalFileDetail = await criminalFileDetailTask;
-            var criminalFileContent = await criminalFileContentTask;
-            var criminalAppearances = await criminalAppearancesTask;
+            var fileDetailTask = _cache.GetOrAddAsync($"CriminalFileDetail-{fileId}", FileDetails);
+            var fileContentTask = _cache.GetOrAddAsync($"CriminalFileContent-{fileId}", FileContent);
+            var appearancesTask = _cache.GetOrAddAsync($"CriminalAppearancesFull-{fileId}", FileAppearances);
+
+            var fileDetail = await fileDetailTask;
+            var fileContent = await fileContentTask;
+            var appearances = await appearancesTask;
 
             //CriminalFileContent can return null when an invalid fileId is inserted.
-            if (criminalFileDetail == null || criminalFileContent == null)
+            if (fileDetail == null || fileContent == null)
                 return null;
 
-            var detail = _mapper.Map<RedactedCriminalFileDetailResponse>(criminalFileDetail);
-            var documents = PopulateCriminalDetailDocuments(criminalFileContent);
+            var detail = _mapper.Map<RedactedCriminalFileDetailResponse>(fileDetail);
+            var documents = PopulateCriminalDetailDocuments(fileContent);
             detail = await PopulateBaseCriminalDetail(detail);
-            detail.Appearances = criminalAppearances;
+            detail.Appearances = appearances;
             detail.Witness = await PopulateCriminalDetailWitnesses(detail);
-            detail.Participant = await PopulateCriminalDetailParticipants(detail, documents, criminalFileContent.AccusedFile);
+            detail.Participant = await PopulateCriminalDetailParticipants(detail, documents, fileContent.AccusedFile);
             detail.HearingRestriction = await PopulateCriminalDetailHearingRestrictions(detail);
             detail.Crown = PopulateCriminalDetailCrown(detail);
             return detail;
         }
 
-        public async Task<CriminalAppearanceDetail> FilesCriminalAppearanceDetailAsync(string fileId, string appearanceId, string partId = null, string profSeqNo = null)
+        public async Task<CriminalAppearanceDetail> CriminalAppearanceDetailAsync(string fileId, string appearanceId, string partId = null, string profSeqNo = null)
         {
-            var fileDetailTask = _cache.GetOrAddAsync($"CriminalFileDetail-{fileId}",
-                async () => await _fileServicesClient.FilesCriminalFileIdAsync(_requestAgencyIdentifierId,
-                    _requestPartId, _requestApplicationCode, fileId));
-            var appearanceCountTask = _fileServicesClient.FilesCriminalAppearanceAppearanceIdCountsAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
-            var appearanceMethodsTask = _fileServicesClient.FilesCriminalAppearanceAppearanceIdAppearancemethodsAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
-            var fileContentTask = _cache.GetOrAddAsync($"CriminalFileContent-{fileId}",
-                async () => await _fileServicesClient.FilesCriminalFilecontentAsync(null, null, null, null, fileId));
+            async Task<CriminalFileDetailResponse> FileDetails() => await _filesClient.FilesCriminalFileIdAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode, fileId);
+            async Task<CriminalFileContent> FileContent() => await _filesClient.FilesCriminalFilecontentAsync(null, null, null, null, fileId);
+            async Task<CriminalFileAppearances> Appearances() => await PopulateCriminalDetailsAppearancesAsync(fileId, FutureYN.Y, HistoryYN.Y);
+            async Task<CriminalFileAppearanceCountResponse> AppearanceCounts() => await _filesClient.FilesCriminalAppearanceAppearanceIdCountsAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
+            async Task<CriminalFileAppearanceApprMethodResponse> AppearanceMethods() => await _filesClient.FilesCriminalAppearanceAppearanceIdAppearancemethodsAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
+        
+            //These will be probably cached, because the user goes FileDetails -> Appearances -> AppearanceDetails.  
+            var appearances = await _cache.GetOrAddAsync($"CriminalAppearancesFull-{fileId}", Appearances);
+            var fileDetail = await _cache.GetOrAddAsync($"CriminalFileDetail-{fileId}", FileDetails);
 
-            var fileDetail = await fileDetailTask;
+            var targetAppearance = appearances?.ApprDetail?.FirstOrDefault(app => app.AppearanceId == appearanceId);
+            var agencyId = await _locationService.GetLocationAgencyIdentifier(targetAppearance?.CourtAgencyId);
+
+            if (new List<string> {agencyId, targetAppearance?.CourtRoomCd, targetAppearance?.AppearanceDt, fileDetail?.FileNumberTxt}.Any(string.IsNullOrEmpty))
+                throw new InvalidOperationException("Missing parameters for CourtList");
+  
+            async Task<CourtList> CourtList() => await _filesClient.FilesCourtlistAsync(agencyId, targetAppearance.CourtRoomCd, targetAppearance.AppearanceDt, "CR", fileDetail.FileNumberTxt);
+            var fileContentTask = _cache.GetOrAddAsync($"CriminalFileContent-{fileId}", FileContent);
+            var appearanceCountTask = _cache.GetOrAddAsync($"CriminalAppearanceCounts-{fileId}", AppearanceCounts );
+            var appearanceMethodsTask = _cache.GetOrAddAsync($"CriminalAppearanceMethods-{fileId}", AppearanceMethods);
+            var courtListTask = _cache.GetOrAddAsync($"CriminalCourtList-{agencyId}-{targetAppearance.CourtRoomCd}-{targetAppearance.AppearanceDt}-{fileDetail.FileNumberTxt}", CourtList);
+
+            var fileContent = await fileContentTask;
             var appearanceCount = await appearanceCountTask;
             var appearanceMethods = await appearanceMethodsTask;
-            var fileContent = await fileContentTask;
+            var courtList = await courtListTask;
 
+            var criminalCourtList = courtList.CriminalCourtList.FirstOrDefault(cl => cl.CriminalAppearanceID == targetAppearance.AppearanceId);
             var redactedDetail = _mapper.Map<RedactedCriminalFileDetailResponse>(fileDetail);
             var accused = redactedDetail.Participant.FirstOrDefault(x => x.PartId == partId && x.ProfSeqNo == profSeqNo);
-            var accusedFile = fileContent.AccusedFile.FirstOrDefault(af => af.MdocJustinNo == fileId);
+            var accusedFile = fileContent?.AccusedFile.FirstOrDefault(af => af.MdocJustinNo == fileId);
             var appearanceDetail = new CriminalAppearanceDetail
             {
                 JustinNo = fileId,
@@ -210,36 +227,37 @@ namespace Scv.Api.Services
                 Charges = await PopulateCharges(appearanceCount.ApprCount),
                 AppearanceMethods = await PopulateAppearanceMethods(appearanceMethods.AppearanceMethod),
                 AppearanceNote = accusedFile?.Appearance.FirstOrDefault(a=> a?.AppearanceId == appearanceId)?.AppearanceNote,
+                CourtList = criminalCourtList
             };
             return appearanceDetail;
         }
 
-        public async Task<CriminalFileContent> FilesCriminalFilecontentAsync(string agencyId, string roomCode, DateTime? proceeding, string appearanceId, string justinNumber)
+        public async Task<CriminalFileContent> CriminalFileContentAsync(string agencyId, string roomCode, DateTime? proceeding, string appearanceId, string justinNumber)
         {
             var proceedingDateString = proceeding.HasValue ? proceeding.Value.ToString("yyyy-MM-dd") : "";
-            return await _fileServicesClient.FilesCriminalFilecontentAsync(agencyId, roomCode,
+            return await _filesClient.FilesCriminalFilecontentAsync(agencyId, roomCode,
                 proceedingDateString, appearanceId, justinNumber);
         }
 
-        public async Task<RopResponse> FilesRecordOfProceedingsAsync(string partId, string profSequenceNumber, CourtLevelCd courtLevelCode, CourtClassCd courtClassCode)
+        public async Task<RopResponse> RecordOfProceedingsAsync(string partId, string profSequenceNumber, CourtLevelCd courtLevelCode, CourtClassCd courtClassCode)
         {
-            return await _fileServicesClient.FilesRecordOfProceedingsAsync(partId, profSequenceNumber, courtLevelCode, courtClassCode);
+            return await _filesClient.FilesRecordOfProceedingsAsync(partId, profSequenceNumber, courtLevelCode, courtClassCode);
         }
 
         #endregion Criminal Only
 
         #region Courtlist & Document
 
-        public async Task<CourtList> FilesCourtlistAsync(string agencyId, string roomCode, DateTime? proceeding, string divisionCode, string fileNumber)
+        public async Task<CourtList> CourtListAsync(string agencyId, string roomCode, DateTime? proceeding, string divisionCode, string fileNumber)
         {
             var proceedingDateString = proceeding.HasValue ? proceeding.Value.ToString("yyyy-MM-dd") : "";
-            return await _fileServicesClient.FilesCourtlistAsync(agencyId, roomCode, proceedingDateString, divisionCode,
+            return await _filesClient.FilesCourtlistAsync(agencyId, roomCode, proceedingDateString, divisionCode,
                 fileNumber);
         }
 
-        public async Task<DocumentResponse> FilesDocumentAsync(string documentId, bool isCriminal)
+        public async Task<DocumentResponse> DocumentAsync(string documentId, bool isCriminal)
         {
-            return await _fileServicesClient.FilesDocumentAsync(documentId, isCriminal ? "R" : "I");
+            return await _filesClient.FilesDocumentAsync(documentId, isCriminal ? "R" : "I");
         }
 
         #endregion Courtlist & Document
@@ -252,7 +270,7 @@ namespace Scv.Api.Services
 
         private async Task<CriminalFileAppearances> PopulateCriminalDetailsAppearancesAsync(string fileId, FutureYN? future, HistoryYN? history)
         {
-            var criminalFileIdAppearances = await _fileServicesClient.FilesCriminalFileIdAppearancesAsync(_requestAgencyIdentifierId, _requestPartId, future, history, fileId);
+            var criminalFileIdAppearances = await _filesClient.FilesCriminalFileIdAppearancesAsync(_requestAgencyIdentifierId, _requestPartId, future, history, fileId);
             var criminalAppearances = _mapper.Map<CriminalFileAppearances>(criminalFileIdAppearances);
             foreach (var appearance in criminalAppearances.ApprDetail)
             {
@@ -413,7 +431,7 @@ namespace Scv.Api.Services
 
         private async Task<CivilFileAppearancesResponse> PopulateCivilDetailAppearancesAsync(FutureYN2? future, HistoryYN2? history, string fileId)
         {
-            var civilFileAppearancesResponse = await _fileServicesClient.FilesCivilFileIdAppearancesAsync(_requestAgencyIdentifierId, _requestPartId, future, history,
+            var civilFileAppearancesResponse = await _filesClient.FilesCivilFileIdAppearancesAsync(_requestAgencyIdentifierId, _requestPartId, future, history,
                 fileId);
 
             var civilAppearances = _mapper.Map<CivilFileAppearances>(civilFileAppearancesResponse);

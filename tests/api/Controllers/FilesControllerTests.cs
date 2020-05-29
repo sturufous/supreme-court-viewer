@@ -361,12 +361,32 @@ namespace tests.api.Controllers
         [Fact]
         public async void Criminal_Appearance_Details()
         {
-            //Unrelated fileID and appearance Id.
-            var actionResult = await _controller.GetCriminalAppearanceDetails("2000", "36548.0734");
+            var actionResult = await _controller.GetCriminalAppearanceDetails("2934", "36548.0734");
 
             var criminalAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Equal(1, criminalAppearanceDetail.Charges.Count);
-            Assert.Equal("2000", criminalAppearanceDetail.JustinNo);
+            Assert.Equal("2934", criminalAppearanceDetail.JustinNo);
+            Assert.Contains(criminalAppearanceDetail.Charges, p => p.AppearanceReasonDsc == "First Appearance");
+            Assert.Contains(criminalAppearanceDetail.Charges, p => p.StatuteDsc == "offer bribe to justice/pol comm/peac off");
+            Assert.Contains(criminalAppearanceDetail.Charges, p => p.StatuteSectionDsc == "CCC - 120(b)");
+            Assert.Equal(1, criminalAppearanceDetail.AppearanceMethods.Count);
+            Assert.Equal("TC", criminalAppearanceDetail.AppearanceMethods.First().AppearanceMethodCd);
+        }
+
+
+        [Fact(Skip= "Adhoc test.")]
+        public async void Criminal_Appearance_Details_CacheTest()
+        {
+            //This fetches the FileDetail plus the appearances. So these should be cached after this call. 
+            var actionResult = await _controller.GetCriminalFileDetailByFileId("2934");
+            var fileDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+
+            //Now call criminalAppearanceDetails. 
+            var actionResult2 = await _controller.GetCriminalAppearanceDetails("2934", "36548.0734");
+
+            var criminalAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult2);
+            Assert.Equal(1, criminalAppearanceDetail.Charges.Count);
+            Assert.Equal("2934", criminalAppearanceDetail.JustinNo);
             Assert.Contains(criminalAppearanceDetail.Charges, p => p.AppearanceReasonDsc == "First Appearance");
             Assert.Contains(criminalAppearanceDetail.Charges, p => p.StatuteDsc == "offer bribe to justice/pol comm/peac off");
             Assert.Contains(criminalAppearanceDetail.Charges, p => p.StatuteSectionDsc == "CCC - 120(b)");

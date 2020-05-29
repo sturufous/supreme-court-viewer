@@ -21,5 +21,8 @@ namespace Scv.Api.Models.Criminal.AppearanceDetail
         public ICollection<CriminalAppearanceMethod> AppearanceMethods { get; set; }
 
         public JustinCounsel JustinCounsel { get; set; }
+
+        //Temp.
+        public ClCriminalCourtList CourtList { get; set; }
     }
 }
