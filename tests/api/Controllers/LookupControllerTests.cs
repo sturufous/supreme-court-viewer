@@ -23,7 +23,7 @@ namespace tests.api.Controllers
 
         public LookupControllerTests()
         {
-            var preTest = new EnvironmentBuilder("LookupServicesClient:Username", "LookupServicesClient:Password");
+            var preTest = new EnvironmentBuilder("LookupServicesClient:Username", "LookupServicesClient:Password", "LookupServicesClient:Url");
             var lookupService = new LookupService(preTest.Configuration, new LookupServiceClient(preTest.HttpClient), new CachingService());
             _controller = new LookupController(lookupService);
         }
