@@ -119,7 +119,6 @@ namespace Scv.Api.Services
                 Party = await PopulateCivilDetailedAppearanceParties(appearancePartyResponse.Party),
                 Document = await PopulateCivilDetailedAppearanceDocuments(documentsWithSameAppearanceId)
             };
-
             return detailedAppearance;
         }
 
@@ -178,7 +177,7 @@ namespace Scv.Api.Services
             detail = await PopulateBaseCriminalDetail(detail);
             detail.Appearances = criminalAppearances;
             detail.Witness = await PopulateCriminalDetailWitnesses(detail);
-            detail.Participant = PopulateCriminalDetailParticipants(detail, documents, criminalFileContent.AccusedFile);
+            detail.Participant = await PopulateCriminalDetailParticipants(detail, documents, criminalFileContent.AccusedFile);
             detail.HearingRestriction = await PopulateCriminalDetailHearingRestrictions(detail);
             detail.Crown = PopulateCriminalDetailCrown(detail);
             return detail;
@@ -212,7 +211,6 @@ namespace Scv.Api.Services
                 AppearanceMethods = await PopulateAppearanceMethods(appearanceMethods.AppearanceMethod),
                 AppearanceNote = accusedFile?.Appearance.FirstOrDefault(a=> a.AppearanceId == appearanceId)?.AppearanceNote,
             };
-
             return appearanceDetail;
         }
 
@@ -276,7 +274,7 @@ namespace Scv.Api.Services
             return bans;
         }
 
-        private List<CriminalCount> PopulateCounts(CfcAccusedFile accusedFile, RedactedCriminalFileDetailResponse detail)
+        private async Task<List<CriminalCount>> PopulateCounts(CfcAccusedFile accusedFile, RedactedCriminalFileDetailResponse detail)
         {
             var criminalCount = new List<CriminalCount>();
             foreach (var appearance in accusedFile.Appearance.Where(a => a != null))
@@ -287,7 +285,10 @@ namespace Scv.Api.Services
                     count.AppearanceDate = appearance.AppearanceDate;
                     count.Sentence = count.Sentence.Where(s => s != null).ToList();
                     foreach (var criminalSentence in count.Sentence)
+                    {
                         criminalSentence.JudgesRecommendation = appearance.JudgesRecommendation;
+                    }
+                    count.FindingDsc = await _lookupService.GetFindingDescription(count.Finding);
                     criminalCount.Add(count);
                 }
             }
@@ -338,7 +339,7 @@ namespace Scv.Api.Services
             return detail.Witness;
         }
 
-        private ICollection<CriminalParticipant> PopulateCriminalDetailParticipants(RedactedCriminalFileDetailResponse detail, ICollection<CriminalDocument> documents, ICollection<CfcAccusedFile> accusedFiles)
+        private async Task<ICollection<CriminalParticipant>> PopulateCriminalDetailParticipants(RedactedCriminalFileDetailResponse detail, ICollection<CriminalDocument> documents, ICollection<CfcAccusedFile> accusedFiles)
         {
             foreach (var participant in detail.Participant)
             {
@@ -347,7 +348,7 @@ namespace Scv.Api.Services
                 //TODO COUNSEL? Not sure where  to get this data from
                 foreach (var accusedFile in accusedFiles.Where(af => af?.PartId == participant.PartId))
                 {
-                    participant.Count.AddRange(PopulateCounts(accusedFile, detail));
+                    participant.Count.AddRange(await PopulateCounts(accusedFile, detail));
                     participant.Ban.AddRange(PopulateBans(accusedFile));
                 }
             }
