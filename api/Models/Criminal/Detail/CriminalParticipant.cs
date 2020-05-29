@@ -7,6 +7,12 @@ namespace Scv.Api.Models.Criminal.Detail
     /// </summary>
     public class CriminalParticipant : JCCommon.Clients.FileServices.CriminalParticipant
     {
+        public CriminalParticipant()
+        {
+            Count = new List<CriminalCount>();
+            Ban = new List<CriminalBan>();
+        }
+
         public string FullName => GivenNm != null && LastNm != null
             ? $"{GivenNm?.Trim()} {LastNm?.Trim()}"
             : OrgNm;
@@ -36,6 +42,16 @@ namespace Scv.Api.Models.Criminal.Detail
                 }
             }
         }
+
+        /// <summary>
+        /// Slimmed down version of CfcAppearanceCount.
+        /// </summary>
+        public List<CriminalCount> Count { get; set; }
+
+        /// <summary>
+        /// Extended, with PartId.
+        /// </summary>
+        public List<CriminalBan> Ban { get; set; }
 
         private bool? _hideJustinCounsel;
     }
