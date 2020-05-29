@@ -4,7 +4,7 @@
     <b-card bg-variant="white">
         <div>
             <h3 class="mx-2 font-weight-normal"> Adjudicator Restrictions </h3>
-            <hr class="mx-1 bg-light" style="height: 5px;"/> 
+            <hr class="mb-0 bg-light" style="height: 5px;"/> 
         </div>
 
         <b-card v-if="!(adjudicatorRestrictions.length>0)">
@@ -18,13 +18,18 @@
             :fields="fields"
             :sort-by.sync="sortBy"
             :sort-desc.sync="sortDesc"
+            sort-icon-left
             responsive="sm"
             >   
                 <template v-for="(field,index) in fields" v-slot:[`head(${field.key})`]="data">
                     <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
                 </template>
-                <template v-for="(field,index) in fields" v-slot:[`cell(${field.key})`]="data" >                   
-                    <span v-bind:key="index" :class="field.cellStyle" style= "white-space: pre" > {{ data.value }}</span>
+                <template v-slot:cell(Status)="data" >                   
+                    <b-badge 
+                        variant="primary" 
+                        style="font-weight: normal; font-size: 16px;"> 
+                        {{ data.value }}
+                    </b-badge>
                 </template>
             </b-table>
         </b-card>
@@ -65,9 +70,9 @@ export default class  AdjudicatorRestrictions extends Vue {
 
   fields =  
   [
-      {key:'Adjudicator', sortable:true, tdClass: 'border-top',  headerStyle:'table-borderless text-primary',   cellStyle:'text'},       
-      {key:'Status',      sortable:true, tdClass: 'border-top',  headerStyle:'text-primary',                    cellStyle:'text-white bg-primary'},
-      {key:'Applies to',  sortable:true, tdClass: 'border-top',  headerStyle:'text-primary',                    cellStyle:'text'},
+      {key:'Adjudicator', sortable:true, tdClass: 'border-top',  headerStyle:'table-borderless text-primary'},       
+      {key:'Status',      sortable:true, tdClass: 'border-top',  headerStyle:'text-primary'},
+      {key:'Applies to',  sortable:true, tdClass: 'border-top',  headerStyle:'text-primary'},
            
   ];
 

@@ -35,12 +35,14 @@
                 {{selectedSideBar}}
             </h2>
 
-            <criminal-participants v-if="showCaseDetails"/>            
-            <adjudicator-restrictions v-if="showCaseDetails"/> 
+            <criminal-participants v-if="showCaseDetails"/>
             <criminal-crown-information v-if="showCaseDetails"/>
             <criminal-crown-notes v-if="showCaseDetails"/>
+            <adjudicator-restrictions v-if="showCaseDetails"/>
             <past-appearances v-if="showPastAppearances" />
+            <future-appearances v-if="showFutureAppearances" />
             <criminal-documents-view v-if="showDocuments"/>
+            <criminal-witnesses v-if="showWitnesses" />
             <b-card><br></b-card>  
         </b-col>
     </b-row>
@@ -58,7 +60,9 @@ import CriminalParticipants from '@components/criminal/CriminalParticipants.vue'
 import AdjudicatorRestrictions from '@components/criminal/AdjudicatorRestrictions.vue'
 import CriminalCrownInformation from '@components/criminal/CriminalCrownInformation.vue';
 import PastAppearances from '@components/criminal/PastAppearances.vue'
+import FutureAppearances from '@components/criminal/FutureAppearances.vue'
 import CriminalCrownNotes from '@components/criminal/CriminalCrownNotes.vue';
+import CriminalWitnesses from '@components/criminal/CriminalWitnesses.vue';
 import '@store/modules/CriminalFileInformation';
 const criminalState = namespace('CriminalFileInformation');
 
@@ -72,7 +76,9 @@ const criminalState = namespace('CriminalFileInformation');
         AdjudicatorRestrictions,
         CriminalCrownInformation,
         PastAppearances,
-        CriminalCrownNotes
+        FutureAppearances,
+        CriminalCrownNotes,
+        CriminalWitnesses
     }
 })
 export default class CriminalCaseDetails extends Vue {
@@ -151,7 +157,7 @@ export default class CriminalCaseDetails extends Vue {
 
     get showWitnesses()
     {        
-        return ((this.showSections['Case Details'] || this.showSections['Witnesses'] ) && this.isDataReady)
+        return (this.showSections['Witnesses'] && this.isDataReady)
     }
 
     get showSentenceOrderDetails()
