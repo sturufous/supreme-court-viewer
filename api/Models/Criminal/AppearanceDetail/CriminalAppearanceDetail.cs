@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
+using JCCommon.Clients.FileServices;
 
 namespace Scv.Api.Models.Criminal.AppearanceDetail
 {
     public class CriminalAppearanceDetail
     {
+        public string AppearanceNote { get; set; }
         public string JustinNo { get; set; }
         public string PartId { get; set; }
         public string ProfSeqNo { get; set; }
