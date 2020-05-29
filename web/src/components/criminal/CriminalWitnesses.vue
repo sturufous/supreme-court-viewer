@@ -2,7 +2,7 @@
 <body>
     <b-card bg-variant="white">
         <b-card style="height: 50px; background-color:#f0f0f0">
-            <b-dropdown variant="light"    :text="selectedType" style="position: absolute; top: 6px; bottom: 6px; left: 6px;" >    
+            <b-dropdown variant="light" :text="selectedType" style="position: absolute; top: 6px; bottom: 6px; left: 6px;" >    
                 <b-dropdown-item-button  
                     v-for="(witnessType,index) in witnessDropDownFields" 
                     :key="index"
@@ -12,10 +12,11 @@
             </b-dropdown>                       
         </b-card>
         <b-row cols="2" >
-            <b-col class="mt-4" md="8" cols="8" style="overflow: auto;" v-if="!(witnessList.length>0)">
-                <span class="text-muted"> No witnesses. </span>
+            <b-col class="mt-4" md="8" cols="8" style="overflow: auto;" v-if="!(filteredWitnessList.length>0)">
+                <span class="text-muted" v-if="!(witnessList.length>0)"> No witnesses. </span>
+                <span class="text-muted" v-if="(witnessList.length>0) && !(filteredWitnessList.length>0)"> No witnesses in this category. </span>
             </b-col>            
-            <b-col class="mt-4" md="8" cols="8" style="overflow: auto;" v-if="(witnessList.length>0)">
+            <b-col class="mt-4" md="8" cols="8" style="overflow: auto;" v-if="(filteredWitnessList.length>0)">
                 <b-table
                 :items="filteredWitnessList"
                 :fields="witnessFields"
@@ -99,7 +100,7 @@ export default class CriminalWitnesses extends Vue {
     sortDesc = false;
     witnessList: any[] = [];
     witnessCounts: any[] = [];
-    selectedType = 'All Witnesses';
+    selectedType = 'Required Only';
 
     witnessFields = [
         {key:'Name',         sortable:true, tdClass: 'border-top',  headerStyle:'text-primary',   cellStyle:'text-danger'},

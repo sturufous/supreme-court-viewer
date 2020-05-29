@@ -12,22 +12,22 @@ namespace Scv.Api.Models.Civil.Detail
         public string ResponseMessageTxt { get; set; }
         public string PhysicalFileId { get; set; }
         public string FileNumberTxt { get; set; }
+        public string SocTxt { get; set; }
+        public CivilFileDetailResponseCourtClassCd CourtClassCd { get; set; }
+        public string CourtClassDescription { get; set; }
+        public CivilFileDetailResponseCourtLevelCd CourtLevelCd { get; set; }
+        public string CourtLevelDescription { get; set; }
+        public string ActivityClassCd { get; set; }
+        public string SealedYN { get; set; }
+        public string LeftRoleDsc { get; set; }
+        public string RightRoleDsc { get; set; }
         public string HomeLocationAgenId { get; set; }
         public string HomeLocationAgencyName { get; set; }
         public string HomeLocationAgencyCode { get; set; }
         public string HomeLocationRegionName { get; set; }
-        public string ActivityClassCd { get; set; }
-        public CivilFileDetailResponseCourtLevelCd CourtLevelCd { get; set; }
-        public string CourtLevelDescription { get; set; }
-        public CivilFileDetailResponseCourtClassCd CourtClassCd { get; set; }
-        public string CourtClassDescription { get; set; }
-        public string SocTxt { get; set; }
-        public string LeftRoleDsc { get; set; }
-        public string RightRoleDsc { get; set; }
         public string TrialRemarkTxt { get; set; }
         public string CommentToJudgeTxt { get; set; }
         public string SheriffCommentText { get; set; }
-        public string SealedYN { get; set; }
 
         /// <summary>
         /// Extended party object. Hides fields.
@@ -42,5 +42,6 @@ namespace Scv.Api.Models.Civil.Detail
         /// Extended hearing restriction object. 
         /// </summary>
         public ICollection<CivilHearingRestriction> HearingRestriction { get; set; }
+        public CivilFileAppearancesResponse Appearances { get; set; }
     }
 }

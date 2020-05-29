@@ -17,10 +17,10 @@
             <b-col md="8" cols="8" style="overflow: auto;">
                 <div>
                     <h3 class="mx-2 font-weight-normal"> Charges</h3>
-                    <hr class="mx-1 bg-light" style="height: 5px;"/> 
+                    <hr class="mb-0 bg-light" style="height: 5px;"/> 
                 </div>                           
                 <b-table
-                :items="pastAppearanceCharges"
+                :items="appearanceCharges"
                 :fields="chargesFields"               
                 borderless
                 striped               
@@ -56,11 +56,11 @@
             <b-col col md="4" cols="4" style="overflow: auto;">
                  <div>
                     <h3 class="mx-2 font-weight-normal"> Additional Info</h3>
-                    <hr class="mx-1 bg-light" style="height: 5px;"/> 
+                    <hr class="mb-0 bg-light" style="height: 5px;"/> 
                 </div>
                            
                 <b-table
-                :items="pastAppearanceAdditionalInfo"
+                :items="appearanceAdditionalInfo"
                 :fields="addInfoFields"
                 thead-class="d-none"               
                 borderless                                  
@@ -85,7 +85,7 @@ const criminalState = namespace("CriminalFileInformation");
 
 
 @Component
-export default class PastAppearanceDetails extends Vue {
+export default class AppearanceDetails extends Vue {
 
     @criminalState.State
     public criminalFileInformation!: any;
@@ -95,17 +95,17 @@ export default class PastAppearanceDetails extends Vue {
 
     mounted() {
         this.getAccusedPersonInfo();
-        this.getPastAppearanceDetails();
+        this.getAppearanceDetails();
     }
 
-    public getPastAppearanceDetails(): void {      
+    public getAppearanceDetails(): void {      
     
         this.$http.get('/api/files/criminal/'+ this.accusedPersonInfo["File Number"]+'/appearance-detail/'+this.accusedPersonInfo["Appearance ID"])
             .then(Response => Response.json(), err => {console.log(err);} )        
             .then(data => {
                 if(data){  
-                    this.pastAppearanceDetailsJson = data;              
-                    this.ExtractPastAppearanceDetailsInfo();
+                    this.appearanceDetailsJson = data;              
+                    this.ExtractAppearanceDetailsInfo();
                 }
                 this.isMounted = true;                       
             }); 
@@ -113,14 +113,14 @@ export default class PastAppearanceDetails extends Vue {
   
     isMounted = false;
     isDataReady = false;
-    pastAppearanceDetailsJson;
+    appearanceDetailsJson;
     
     sortBy = 'Date';
     sortDesc = true;
-    pastAppearanceCharges: any[] = [];
+    appearanceCharges: any[] = [];
     accusedPersonInfo = {};
 
-    pastAppearanceAdditionalInfo: any[] = [];
+    appearanceAdditionalInfo: any[] = [];
 
     addInfoFields =  
     [
@@ -146,15 +146,15 @@ export default class PastAppearanceDetails extends Vue {
         this.accusedPersonInfo["Out-Of-Town Judge"] =  this.pastAppearanceInfo.outOfTownJudgeTxt;
 
         for(const info in this.accusedPersonInfo)
-            this.pastAppearanceAdditionalInfo.push({'key':info,'value':this.accusedPersonInfo[info]});
+            this.appearanceAdditionalInfo.push({'key':info,'value':this.accusedPersonInfo[info]});
 
         this.accusedPersonInfo["File Number"] = this.pastAppearanceInfo.fileNo; 
         this.accusedPersonInfo["Appearance ID"] = this.pastAppearanceInfo.appearanceId;    
     }
 
-    public ExtractPastAppearanceDetailsInfo()
+    public ExtractAppearanceDetailsInfo()
     {               
-        for(const charge of this.pastAppearanceDetailsJson.charges)
+        for(const charge of this.appearanceDetailsJson.charges)
         {              
             const docInfo = {};             
             docInfo["Count"] = charge.printSeqNo;
@@ -168,7 +168,7 @@ export default class PastAppearanceDetails extends Vue {
             docInfo["Finding"]= charge.findingCd
             docInfo["Finding Description"]= charge.findingDsc
 
-            this.pastAppearanceCharges.push(docInfo);
+            this.appearanceCharges.push(docInfo);
         }
     }
 

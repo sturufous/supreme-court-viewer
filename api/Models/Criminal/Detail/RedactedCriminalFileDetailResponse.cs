@@ -22,27 +22,44 @@ namespace Scv.Api.Models.Criminal.Detail
         public string HomeLocationAgencyName { get; set; }
         public string HomeLocationAgencyCode { get; set; }
         public string HomeLocationRegionName { get; set; }
-        public string ActivityClassCd { get; set; }
         public CriminalFileDetailResponseCourtLevelCd CourtLevelCd { get; set; }
         public string CourtLevelDescription { get; set; }
         public CriminalFileDetailResponseCourtClassCd CourtClassCd { get; set; }
         public string CourtClassDescription { get; set; }
+        public string ActivityClassCd { get; set; }
         public string CurrentEstimateLenQty { get; set; }
         public CriminalFileDetailResponseCurrentEstimateLenUnit CurrentEstimateLenUnit { get; set; }
         public string InitialEstimateLenQty { get; set; }
         public CriminalFileDetailResponseInitialEstimateLenUnit InitialEstimateLenUnit { get; set; }
         public string TrialStartDt { get; set; }
         public string MdocSubCategoryDsc { get; set; }
-        public CriminalFileDetailResponseIndictableYN IndictableYN { get; set; }
         public string MdocCcn { get; set; }
         public string AssignedPartNm { get; set; }
         public string ApprovedByAgencyCd { get; set; }
         public string ApprovedByPartNm { get; set; }
         public string ApprovalCrownAgencyTypeCd { get; set; }
-        public string CaseAgeDays { get; set; }
         public string CrownEstimateLenQty { get; set; }
         public string CrownEstimateLenDsc { get; set; }
         public CriminalFileDetailResponseCrownEstimateLenUnit? CrownEstimateLenUnit { get; set; }
+        public string CaseAgeDays { get; set; }
+        public CriminalFileDetailResponseIndictableYN IndictableYN { get; set; }
+        public CriminalFileDetailResponseComplexityTypeCd? ComplexityTypeCd { get; set; }
+        public string AssignmentTypeDsc { get; set; }
+
+        /// <summary>
+        /// Extended, with PartId.
+        /// </summary>
+        public List<CriminalBan> Ban { get; set; }
+
+        /// <summary>
+        /// Slimmed down version of CfcAppearanceCount.
+        /// </summary>
+        public List<CriminalCount> Count { get; set; }
+
+        /// <summary>
+        /// Used for Crown Notes to JCM.
+        /// </summary>
+        public ICollection<TrialRemark> TrialRemark { get; set; }
 
         /// <summary>
         /// Custom class to extend.
@@ -64,19 +81,6 @@ namespace Scv.Api.Models.Criminal.Detail
         /// </summary>
         public ICollection<CriminalHearingRestriction> HearingRestriction { get; set; }
 
-        /// <summary>
-        /// Used for Crown Notes to JCM.
-        /// </summary>
-        public ICollection<TrialRemark> TrialRemark { get; set; }
-
-        /// <summary>
-        /// Extended, with PartId.
-        /// </summary>
-        public List<CriminalBan> Ban { get; set; }
-
-        /// <summary>
-        /// Slimmed down version of CfcAppearanceCount.
-        /// </summary>
-        public List<CriminalCount> Count { get; set; }
+        public CriminalFileAppearancesResponse Appearances { get; set; }
     }
 }

@@ -19,5 +19,7 @@ namespace Scv.Api.Models.Criminal.Detail
         [AdaptIgnore]
         [JsonIgnore]
         public new string AppearanceReason { get; set; }
+
+        public new System.Collections.Generic.ICollection<CriminalSentence> Sentence { get; set; }
     }
 }
