@@ -11,6 +11,7 @@ namespace Scv.Api.Models.Criminal.Detail
     {
         public string PartId { get; set; }
         public string AppearanceDate { get; set; }
+        public string FindingDsc { get; set; }
 
         [AdaptIgnore]
         [JsonIgnore]
