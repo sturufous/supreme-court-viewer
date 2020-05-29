@@ -178,15 +178,9 @@ namespace Scv.Api.Services
             detail = await PopulateBaseCriminalDetail(detail);
             detail.Appearances = criminalAppearances;
             detail.Witness = await PopulateCriminalDetailWitnesses(detail);
-            detail.Participant = PopulateCriminalDetailParticipants(detail, documents);
+            detail.Participant = PopulateCriminalDetailParticipants(detail, documents, criminalFileContent.AccusedFile);
             detail.HearingRestriction = await PopulateCriminalDetailHearingRestrictions(detail);
             detail.Crown = PopulateCriminalDetailCrown(detail);
-            foreach (var accusedFile in criminalFileContent.AccusedFile)
-            {
-                detail.Count.AddRange(PopulateCounts(accusedFile, detail));
-                detail.Ban.AddRange(PopulateBans(accusedFile));
-            }
-
             return detail;
         }
 
@@ -344,13 +338,18 @@ namespace Scv.Api.Services
             return detail.Witness;
         }
 
-        private ICollection<CriminalParticipant> PopulateCriminalDetailParticipants(RedactedCriminalFileDetailResponse detail, ICollection<CriminalDocument> documents)
+        private ICollection<CriminalParticipant> PopulateCriminalDetailParticipants(RedactedCriminalFileDetailResponse detail, ICollection<CriminalDocument> documents, ICollection<CfcAccusedFile> accusedFiles)
         {
             foreach (var participant in detail.Participant)
             {
                 participant.Document = documents.Where(doc => doc.PartId == participant.PartId).ToList();
                 participant.HideJustinCounsel = false;   //TODO tie this to a permission. View Witness List permission
                 //TODO COUNSEL? Not sure where  to get this data from
+                foreach (var accusedFile in accusedFiles.Where(af => af?.PartId == participant.PartId))
+                {
+                    participant.Count.AddRange(PopulateCounts(accusedFile, detail));
+                    participant.Ban.AddRange(PopulateBans(accusedFile));
+                }
             }
             return detail.Participant;
         }
