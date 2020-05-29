@@ -3,7 +3,7 @@
    <b-card bg-variant="white">
         <div>
             <h3 class="mx-2 font-weight-normal"> Crown Notes to JCM </h3>
-            <hr class="mx-1 bg-light" style="height: 5px;"/> 
+            <hr class="mb-0 bg-light" style="height: 5px;"/> 
         </div>
         <b-card v-if="!(crownNotes.length>0)">
             <span class="text-muted"> No crown notes to JCM. </span>
