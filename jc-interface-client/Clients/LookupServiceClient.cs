@@ -17,7 +17,6 @@ namespace JCCommon.Clients.LookupServices
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.5.0.0 (NJsonSchema v10.1.15.0 (Newtonsoft.Json v12.0.0.0))")]
     public partial class LookupServiceClient
     {
-        private string _baseUrl = "";
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<Newtonsoft.Json.JsonSerializerSettings> _settings;
 
@@ -32,12 +31,6 @@ namespace JCCommon.Clients.LookupServices
             var settings = new Newtonsoft.Json.JsonSerializerSettings();
             UpdateJsonSerializerSettings(settings);
             return settings;
-        }
-
-        public string BaseUrl
-        {
-            get { return _baseUrl; }
-            set { _baseUrl = value; }
         }
 
 
@@ -59,7 +52,7 @@ namespace JCCommon.Clients.LookupServices
         public async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<LookupCode>> CodesAdjudicatorsAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/adjudicators");
+            urlBuilder_.Append("codes/adjudicators");
 
             var client_ = _httpClient;
             try
@@ -133,7 +126,7 @@ namespace JCCommon.Clients.LookupServices
                 throw new System.ArgumentNullException("adjudicatorId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/adjudicators/{adjudicatorId}");
+            urlBuilder_.Append("codes/adjudicators/{adjudicatorId}");
             urlBuilder_.Replace("{adjudicatorId}", System.Uri.EscapeDataString(ConvertToString(adjudicatorId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -205,7 +198,7 @@ namespace JCCommon.Clients.LookupServices
         public async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<LookupCode>> CodesAgencyLocationsAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/agencyLocations");
+            urlBuilder_.Append("codes/agencyLocations");
 
             var client_ = _httpClient;
             try
@@ -276,7 +269,7 @@ namespace JCCommon.Clients.LookupServices
         public async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<LookupCode>> CodesAssetRoleCombosAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/asset/roleCombos");
+            urlBuilder_.Append("codes/asset/roleCombos");
 
             var client_ = _httpClient;
             try
@@ -350,7 +343,7 @@ namespace JCCommon.Clients.LookupServices
                 throw new System.ArgumentNullException("roleComboId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/asset/roleCombos/{roleComboId}?");
+            urlBuilder_.Append("codes/asset/roleCombos/{roleComboId}?");
             urlBuilder_.Replace("{roleComboId}", System.Uri.EscapeDataString(ConvertToString(roleComboId, System.Globalization.CultureInfo.InvariantCulture)));
             if (flexFilter != null)
             {
@@ -427,7 +420,7 @@ namespace JCCommon.Clients.LookupServices
         public async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<LookupCode>> CodesAssetUsageRulesAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/asset/usageRules");
+            urlBuilder_.Append("codes/asset/usageRules");
 
             var client_ = _httpClient;
             try
@@ -501,7 +494,7 @@ namespace JCCommon.Clients.LookupServices
                 throw new System.ArgumentNullException("assetUsageRuleId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/asset/usageRules/{assetUsageRuleId}");
+            urlBuilder_.Append("codes/asset/usageRules/{assetUsageRuleId}");
             urlBuilder_.Replace("{assetUsageRuleId}", System.Uri.EscapeDataString(ConvertToString(assetUsageRuleId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -573,7 +566,7 @@ namespace JCCommon.Clients.LookupServices
         public async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<LookupCode>> CodesCrownAssignmentsAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/crown/assignments");
+            urlBuilder_.Append("codes/crown/assignments");
 
             var client_ = _httpClient;
             try
@@ -647,7 +640,7 @@ namespace JCCommon.Clients.LookupServices
                 throw new System.ArgumentNullException("assignmentId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/crown/assignments/{assignmentId}");
+            urlBuilder_.Append("codes/crown/assignments/{assignmentId}");
             urlBuilder_.Replace("{assignmentId}", System.Uri.EscapeDataString(ConvertToString(assignmentId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -719,7 +712,7 @@ namespace JCCommon.Clients.LookupServices
         public async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<LookupCode>> CodesCrownFederalCourtsAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/crown/federal/courts");
+            urlBuilder_.Append("codes/crown/federal/courts");
 
             var client_ = _httpClient;
             try
@@ -793,7 +786,7 @@ namespace JCCommon.Clients.LookupServices
                 throw new System.ArgumentNullException("courtId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/crown/federal/courts/{courtId}");
+            urlBuilder_.Append("codes/crown/federal/courts/{courtId}");
             urlBuilder_.Replace("{courtId}", System.Uri.EscapeDataString(ConvertToString(courtId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -865,7 +858,7 @@ namespace JCCommon.Clients.LookupServices
         public async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<LookupCode>> CodesCrownProvincialCourtsAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/crown/provincial/courts");
+            urlBuilder_.Append("codes/crown/provincial/courts");
 
             var client_ = _httpClient;
             try
@@ -939,7 +932,7 @@ namespace JCCommon.Clients.LookupServices
                 throw new System.ArgumentNullException("courtId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/crown/provincial/courts/{courtId}");
+            urlBuilder_.Append("codes/crown/provincial/courts/{courtId}");
             urlBuilder_.Replace("{courtId}", System.Uri.EscapeDataString(ConvertToString(courtId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -1011,7 +1004,7 @@ namespace JCCommon.Clients.LookupServices
         public async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<LookupCode>> CodesCourtClassesAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/court/classes");
+            urlBuilder_.Append("codes/court/classes");
 
             var client_ = _httpClient;
             try
@@ -1085,7 +1078,7 @@ namespace JCCommon.Clients.LookupServices
                 throw new System.ArgumentNullException("classeId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/court/classes/{classeId}");
+            urlBuilder_.Append("codes/court/classes/{classeId}");
             urlBuilder_.Replace("{classeId}", System.Uri.EscapeDataString(ConvertToString(classeId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -1157,7 +1150,7 @@ namespace JCCommon.Clients.LookupServices
         public async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<LookupCode>> CodesCourtDivisionsAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/court/divisions");
+            urlBuilder_.Append("codes/court/divisions");
 
             var client_ = _httpClient;
             try
@@ -1231,7 +1224,7 @@ namespace JCCommon.Clients.LookupServices
                 throw new System.ArgumentNullException("divisionId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/court/divisions/{divisionId}");
+            urlBuilder_.Append("codes/court/divisions/{divisionId}");
             urlBuilder_.Replace("{divisionId}", System.Uri.EscapeDataString(ConvertToString(divisionId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -1303,7 +1296,7 @@ namespace JCCommon.Clients.LookupServices
         public async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<LookupCode>> CodesCourtLevelsAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/court/levels");
+            urlBuilder_.Append("codes/court/levels");
 
             var client_ = _httpClient;
             try
@@ -1377,7 +1370,7 @@ namespace JCCommon.Clients.LookupServices
                 throw new System.ArgumentNullException("levelId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/court/levels/{levelId}");
+            urlBuilder_.Append("codes/court/levels/{levelId}");
             urlBuilder_.Replace("{levelId}", System.Uri.EscapeDataString(ConvertToString(levelId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -1449,7 +1442,7 @@ namespace JCCommon.Clients.LookupServices
         public async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<LookupCode>> CodesDevicesAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/devices");
+            urlBuilder_.Append("codes/devices");
 
             var client_ = _httpClient;
             try
@@ -1523,7 +1516,7 @@ namespace JCCommon.Clients.LookupServices
                 throw new System.ArgumentNullException("deviceId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/devices/{deviceId}");
+            urlBuilder_.Append("codes/devices/{deviceId}");
             urlBuilder_.Replace("{deviceId}", System.Uri.EscapeDataString(ConvertToString(deviceId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -1595,7 +1588,7 @@ namespace JCCommon.Clients.LookupServices
         public async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<LookupCode>> CodesDocumentsAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/documents");
+            urlBuilder_.Append("codes/documents");
 
             var client_ = _httpClient;
             try
@@ -1669,7 +1662,7 @@ namespace JCCommon.Clients.LookupServices
                 throw new System.ArgumentNullException("documentId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/documents/{documentId}");
+            urlBuilder_.Append("codes/documents/{documentId}");
             urlBuilder_.Replace("{documentId}", System.Uri.EscapeDataString(ConvertToString(documentId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -1741,7 +1734,7 @@ namespace JCCommon.Clients.LookupServices
         public async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<LookupCode>> CodesFileComplexitiesAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/file/complexities");
+            urlBuilder_.Append("codes/file/complexities");
 
             var client_ = _httpClient;
             try
@@ -1815,7 +1808,7 @@ namespace JCCommon.Clients.LookupServices
                 throw new System.ArgumentNullException("complexityId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/file/complexities/{complexityId}");
+            urlBuilder_.Append("codes/file/complexities/{complexityId}");
             urlBuilder_.Replace("{complexityId}", System.Uri.EscapeDataString(ConvertToString(complexityId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -1887,7 +1880,7 @@ namespace JCCommon.Clients.LookupServices
         public async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<LookupCode>> CodesFindingsAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/findings");
+            urlBuilder_.Append("codes/findings");
 
             var client_ = _httpClient;
             try
@@ -1961,7 +1954,7 @@ namespace JCCommon.Clients.LookupServices
                 throw new System.ArgumentNullException("findingId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/findings/{findingId}");
+            urlBuilder_.Append("codes/findings/{findingId}");
             urlBuilder_.Replace("{findingId}", System.Uri.EscapeDataString(ConvertToString(findingId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -2033,7 +2026,7 @@ namespace JCCommon.Clients.LookupServices
         public async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<LookupCode>> CodesHearingRestrictionsAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/hearing/restrictions");
+            urlBuilder_.Append("codes/hearing/restrictions");
 
             var client_ = _httpClient;
             try
@@ -2107,7 +2100,7 @@ namespace JCCommon.Clients.LookupServices
                 throw new System.ArgumentNullException("restrictionId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/hearing/restrictions/{restrictionId}");
+            urlBuilder_.Append("codes/hearing/restrictions/{restrictionId}");
             urlBuilder_.Replace("{restrictionId}", System.Uri.EscapeDataString(ConvertToString(restrictionId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -2179,7 +2172,7 @@ namespace JCCommon.Clients.LookupServices
         public async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<LookupCode>> CodesRolesAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/roles");
+            urlBuilder_.Append("codes/roles");
 
             var client_ = _httpClient;
             try
@@ -2253,7 +2246,7 @@ namespace JCCommon.Clients.LookupServices
                 throw new System.ArgumentNullException("roleId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/roles/{roleId}");
+            urlBuilder_.Append("codes/roles/{roleId}");
             urlBuilder_.Replace("{roleId}", System.Uri.EscapeDataString(ConvertToString(roleId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -2325,7 +2318,7 @@ namespace JCCommon.Clients.LookupServices
         public async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<LookupCode>> CodesParticipantRolesAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/participant/roles");
+            urlBuilder_.Append("codes/participant/roles");
 
             var client_ = _httpClient;
             try
@@ -2399,7 +2392,7 @@ namespace JCCommon.Clients.LookupServices
                 throw new System.ArgumentNullException("roleId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/participant/roles/{roleId}");
+            urlBuilder_.Append("codes/participant/roles/{roleId}");
             urlBuilder_.Replace("{roleId}", System.Uri.EscapeDataString(ConvertToString(roleId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -2471,7 +2464,7 @@ namespace JCCommon.Clients.LookupServices
         public async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<LookupCode>> CodesTrialCollapseReasonsAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/trial/collapse/reasons");
+            urlBuilder_.Append("codes/trial/collapse/reasons");
 
             var client_ = _httpClient;
             try
@@ -2545,7 +2538,7 @@ namespace JCCommon.Clients.LookupServices
                 throw new System.ArgumentNullException("reasonId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/trial/collapse/reasons/{reasonId}?");
+            urlBuilder_.Append("codes/trial/collapse/reasons/{reasonId}?");
             urlBuilder_.Replace("{reasonId}", System.Uri.EscapeDataString(ConvertToString(reasonId, System.Globalization.CultureInfo.InvariantCulture)));
             if (flexFilter != null)
             {
@@ -2622,7 +2615,7 @@ namespace JCCommon.Clients.LookupServices
         public async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<LookupCode>> CodesTrialProceededCodesAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/trial/proceeded/codes");
+            urlBuilder_.Append("codes/trial/proceeded/codes");
 
             var client_ = _httpClient;
             try
@@ -2696,7 +2689,7 @@ namespace JCCommon.Clients.LookupServices
                 throw new System.ArgumentNullException("codeId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/trial/proceeded/codes/{codeId}");
+            urlBuilder_.Append("codes/trial/proceeded/codes/{codeId}");
             urlBuilder_.Replace("{codeId}", System.Uri.EscapeDataString(ConvertToString(codeId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -2768,7 +2761,7 @@ namespace JCCommon.Clients.LookupServices
         public async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<LookupCode>> CodesWitnessRolesAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/witness/roles");
+            urlBuilder_.Append("codes/witness/roles");
 
             var client_ = _httpClient;
             try
@@ -2842,7 +2835,7 @@ namespace JCCommon.Clients.LookupServices
                 throw new System.ArgumentNullException("roleId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/witness/roles/{roleId}");
+            urlBuilder_.Append("codes/witness/roles/{roleId}");
             urlBuilder_.Replace("{roleId}", System.Uri.EscapeDataString(ConvertToString(roleId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -2914,7 +2907,7 @@ namespace JCCommon.Clients.LookupServices
         public async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<LookupCode>> CodesCivilAssetsAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/civil/assets");
+            urlBuilder_.Append("codes/civil/assets");
 
             var client_ = _httpClient;
             try
@@ -2988,7 +2981,7 @@ namespace JCCommon.Clients.LookupServices
                 throw new System.ArgumentNullException("assetId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/civil/assets/{assetId}");
+            urlBuilder_.Append("codes/civil/assets/{assetId}");
             urlBuilder_.Replace("{assetId}", System.Uri.EscapeDataString(ConvertToString(assetId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -3060,7 +3053,7 @@ namespace JCCommon.Clients.LookupServices
         public async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<LookupCode>> CodesCivilAppearanceDurationAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/civil/appearance/duration");
+            urlBuilder_.Append("codes/civil/appearance/duration");
 
             var client_ = _httpClient;
             try
@@ -3134,7 +3127,7 @@ namespace JCCommon.Clients.LookupServices
                 throw new System.ArgumentNullException("durationId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/civil/appearance/duration/{durationId}");
+            urlBuilder_.Append("codes/civil/appearance/duration/{durationId}");
             urlBuilder_.Replace("{durationId}", System.Uri.EscapeDataString(ConvertToString(durationId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -3206,7 +3199,7 @@ namespace JCCommon.Clients.LookupServices
         public async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<LookupCode>> CodesCivilAppearanceReasonsAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/civil/appearance/reasons");
+            urlBuilder_.Append("codes/civil/appearance/reasons");
 
             var client_ = _httpClient;
             try
@@ -3280,7 +3273,7 @@ namespace JCCommon.Clients.LookupServices
                 throw new System.ArgumentNullException("reasonId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/civil/appearance/reasons/{reasonId}");
+            urlBuilder_.Append("codes/civil/appearance/reasons/{reasonId}");
             urlBuilder_.Replace("{reasonId}", System.Uri.EscapeDataString(ConvertToString(reasonId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -3352,7 +3345,7 @@ namespace JCCommon.Clients.LookupServices
         public async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<LookupCode>> CodesCivilAppearanceResultsAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/civil/appearance/results");
+            urlBuilder_.Append("codes/civil/appearance/results");
 
             var client_ = _httpClient;
             try
@@ -3426,7 +3419,7 @@ namespace JCCommon.Clients.LookupServices
                 throw new System.ArgumentNullException("resultId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/civil/appearance/results/{resultId}");
+            urlBuilder_.Append("codes/civil/appearance/results/{resultId}");
             urlBuilder_.Replace("{resultId}", System.Uri.EscapeDataString(ConvertToString(resultId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -3498,7 +3491,7 @@ namespace JCCommon.Clients.LookupServices
         public async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<LookupCode>> CodesCivilAppearanceStatusesAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/civil/appearance/statuses");
+            urlBuilder_.Append("codes/civil/appearance/statuses");
 
             var client_ = _httpClient;
             try
@@ -3572,7 +3565,7 @@ namespace JCCommon.Clients.LookupServices
                 throw new System.ArgumentNullException("statusId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/civil/appearance/statuses/{statusId}");
+            urlBuilder_.Append("codes/civil/appearance/statuses/{statusId}");
             urlBuilder_.Replace("{statusId}", System.Uri.EscapeDataString(ConvertToString(statusId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -3644,7 +3637,7 @@ namespace JCCommon.Clients.LookupServices
         public async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<LookupCode>> CodesCivilDateDeclinedByAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/civil/dateDeclinedBy");
+            urlBuilder_.Append("codes/civil/dateDeclinedBy");
 
             var client_ = _httpClient;
             try
@@ -3718,7 +3711,7 @@ namespace JCCommon.Clients.LookupServices
                 throw new System.ArgumentNullException("dateDeclinedById");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/civil/dateDeclinedBy/{dateDeclinedById}");
+            urlBuilder_.Append("codes/civil/dateDeclinedBy/{dateDeclinedById}");
             urlBuilder_.Replace("{dateDeclinedById}", System.Uri.EscapeDataString(ConvertToString(dateDeclinedById, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -3790,7 +3783,7 @@ namespace JCCommon.Clients.LookupServices
         public async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<LookupCode>> CodesCivilPriorityMarkersAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/civil/priority/markers");
+            urlBuilder_.Append("codes/civil/priority/markers");
 
             var client_ = _httpClient;
             try
@@ -3864,7 +3857,7 @@ namespace JCCommon.Clients.LookupServices
                 throw new System.ArgumentNullException("markerId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/civil/priority/markers/{markerId}");
+            urlBuilder_.Append("codes/civil/priority/markers/{markerId}");
             urlBuilder_.Replace("{markerId}", System.Uri.EscapeDataString(ConvertToString(markerId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -3936,7 +3929,7 @@ namespace JCCommon.Clients.LookupServices
         public async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<LookupCode>> CodesCriminalAssetsAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/criminal/assets");
+            urlBuilder_.Append("codes/criminal/assets");
 
             var client_ = _httpClient;
             try
@@ -4010,7 +4003,7 @@ namespace JCCommon.Clients.LookupServices
                 throw new System.ArgumentNullException("assetId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/criminal/assets/{assetId}");
+            urlBuilder_.Append("codes/criminal/assets/{assetId}");
             urlBuilder_.Replace("{assetId}", System.Uri.EscapeDataString(ConvertToString(assetId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -4082,7 +4075,7 @@ namespace JCCommon.Clients.LookupServices
         public async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<LookupCode>> CodesCriminalSentencesAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/criminal/sentences");
+            urlBuilder_.Append("codes/criminal/sentences");
 
             var client_ = _httpClient;
             try
@@ -4156,7 +4149,7 @@ namespace JCCommon.Clients.LookupServices
                 throw new System.ArgumentNullException("sentenceId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/criminal/sentences/{sentenceId}");
+            urlBuilder_.Append("codes/criminal/sentences/{sentenceId}");
             urlBuilder_.Replace("{sentenceId}", System.Uri.EscapeDataString(ConvertToString(sentenceId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -4228,7 +4221,7 @@ namespace JCCommon.Clients.LookupServices
         public async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<LookupCode>> CodesCriminalBanStatutesAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/criminal/banStatutes");
+            urlBuilder_.Append("codes/criminal/banStatutes");
 
             var client_ = _httpClient;
             try
@@ -4302,7 +4295,7 @@ namespace JCCommon.Clients.LookupServices
                 throw new System.ArgumentNullException("banStatuteId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/criminal/banStatutes/{banStatuteId}");
+            urlBuilder_.Append("codes/criminal/banStatutes/{banStatuteId}");
             urlBuilder_.Replace("{banStatuteId}", System.Uri.EscapeDataString(ConvertToString(banStatuteId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -4374,7 +4367,7 @@ namespace JCCommon.Clients.LookupServices
         public async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<LookupCode>> CodesCriminalAppearanceDurationAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/criminal/appearance/duration");
+            urlBuilder_.Append("codes/criminal/appearance/duration");
 
             var client_ = _httpClient;
             try
@@ -4448,7 +4441,7 @@ namespace JCCommon.Clients.LookupServices
                 throw new System.ArgumentNullException("durationId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/criminal/appearance/duration/{durationId}");
+            urlBuilder_.Append("codes/criminal/appearance/duration/{durationId}");
             urlBuilder_.Replace("{durationId}", System.Uri.EscapeDataString(ConvertToString(durationId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -4520,7 +4513,7 @@ namespace JCCommon.Clients.LookupServices
         public async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<LookupCode>> CodesCriminalAppearanceReasonsAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/criminal/appearance/reasons");
+            urlBuilder_.Append("codes/criminal/appearance/reasons");
 
             var client_ = _httpClient;
             try
@@ -4594,7 +4587,7 @@ namespace JCCommon.Clients.LookupServices
                 throw new System.ArgumentNullException("reasonId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/criminal/appearance/reasons/{reasonId}");
+            urlBuilder_.Append("codes/criminal/appearance/reasons/{reasonId}");
             urlBuilder_.Replace("{reasonId}", System.Uri.EscapeDataString(ConvertToString(reasonId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -4666,7 +4659,7 @@ namespace JCCommon.Clients.LookupServices
         public async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<LookupCode>> CodesCriminalAppearanceResultsAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/criminal/appearance/results");
+            urlBuilder_.Append("codes/criminal/appearance/results");
 
             var client_ = _httpClient;
             try
@@ -4740,7 +4733,7 @@ namespace JCCommon.Clients.LookupServices
                 throw new System.ArgumentNullException("resultId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/criminal/appearance/results/{resultId}");
+            urlBuilder_.Append("codes/criminal/appearance/results/{resultId}");
             urlBuilder_.Replace("{resultId}", System.Uri.EscapeDataString(ConvertToString(resultId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -4812,7 +4805,7 @@ namespace JCCommon.Clients.LookupServices
         public async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<LookupCode>> CodesCriminalAppearanceStatusesAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/criminal/appearance/statuses");
+            urlBuilder_.Append("codes/criminal/appearance/statuses");
 
             var client_ = _httpClient;
             try
@@ -4886,7 +4879,7 @@ namespace JCCommon.Clients.LookupServices
                 throw new System.ArgumentNullException("statusId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/criminal/appearance/statuses/{statusId}");
+            urlBuilder_.Append("codes/criminal/appearance/statuses/{statusId}");
             urlBuilder_.Replace("{statusId}", System.Uri.EscapeDataString(ConvertToString(statusId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -4958,7 +4951,7 @@ namespace JCCommon.Clients.LookupServices
         public async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<LookupCode>> CodesCriminalDateDeclinedByAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/criminal/dateDeclinedBy");
+            urlBuilder_.Append("codes/criminal/dateDeclinedBy");
 
             var client_ = _httpClient;
             try
@@ -5032,7 +5025,7 @@ namespace JCCommon.Clients.LookupServices
                 throw new System.ArgumentNullException("dateDeclinedById");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/criminal/dateDeclinedBy/{dateDeclinedById}");
+            urlBuilder_.Append("codes/criminal/dateDeclinedBy/{dateDeclinedById}");
             urlBuilder_.Replace("{dateDeclinedById}", System.Uri.EscapeDataString(ConvertToString(dateDeclinedById, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -5104,7 +5097,7 @@ namespace JCCommon.Clients.LookupServices
         public async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<LookupCode>> CodesCriminalPriorityMarkersAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/criminal/priority/markers");
+            urlBuilder_.Append("codes/criminal/priority/markers");
 
             var client_ = _httpClient;
             try
@@ -5178,7 +5171,7 @@ namespace JCCommon.Clients.LookupServices
                 throw new System.ArgumentNullException("markerId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/codes/criminal/priority/markers/{markerId}");
+            urlBuilder_.Append("codes/criminal/priority/markers/{markerId}");
             urlBuilder_.Replace("{markerId}", System.Uri.EscapeDataString(ConvertToString(markerId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
