@@ -1,27 +1,10 @@
 <template>
 <body>
-     <b-card bg-variant="light" v-if= "!isMounted && !isDataValid">
-        <b-overlay :show= "true"> 
-            <b-card style="min-height: 100px;"/>                   
-            <template v-slot:overlay>               
-               <div> 
-                    <loading-spinner/> 
-                    <p id="loading-label">Loading ...</p>
-               </div>                
-            </template> 
-      </b-overlay> 
-    </b-card>
-
-    <b-card bg-variant="light" v-if= "isMounted && !isDataValid">
-        <b-card  style="min-height: 100px;">
-            <span>This <b>File-Number '{{this.civilFileInformation.fileNumber}}'</b> doesn't exist in the <b>civil</b> records. </span>
-        </b-card>
-        <b-card>    
-            <b-button variant="info" @click="navigateToLandingPage">Back to the Landing Page</b-button>
-        </b-card>
-    </b-card>
-
-   <b-card  v-if= "isMounted && isDataValid">  
+   <b-card  v-if= "isMounted">
+       <div>         
+            <h3 class="mx-2 font-weight-normal"> Documents () </h3>
+            <hr class="mb-0 bg-light" style="height: 5px;"/>         
+        </div>  
        
         <b-card bg-variant="white">
             <b-tabs  nav-wrapper-class = "bg-light text-dark"
@@ -104,21 +87,14 @@ export default class CivilDocumentsView extends Vue {
     public UpdateCivilFile!: (newCivilFileInformation: any) => void
 
     public getDocuments(): void {
+
+        const data = this.civilFileInformation.detailsData;
+        this.documentsDetailsJson = data.document;     
+
+        this.ExtractDocumentInfo()          
+        this.isMounted = true;
         
-        this.$http.get('/api/files/civil/'+ this.civilFileInformation.fileNumber)
-            .then(Response => Response.json(), err => {console.log(err);}        
-            ).then(data => {
-                if(data)
-                {
-                    this.documentsDetailsJson = data.document
-                    this.ExtractDocumentInfo()
-                    if(this.documents.length)
-                    {                   
-                        this.isDataValid = true;
-                    }
-                }
-                this.isMounted = true;                
-            });
+       
     }
 
     @Watch('$route', { immediate: false, deep: true })
@@ -137,7 +113,6 @@ export default class CivilDocumentsView extends Vue {
     documentsDetailsJson;
     loadingPdf = false;
     isMounted = false;
-    isDataValid = false
 
     activetab = 'ALL';            
     sortBy = 'Seq.';
