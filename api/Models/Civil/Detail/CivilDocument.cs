@@ -9,5 +9,10 @@ namespace Scv.Api.Models.Civil.Detail
     {
         public string Category { get; set; }
         public string DocumentTypeDescription { get; set; }
+
+        /// <summary>
+        /// Hides fields for issue. 
+        /// </summary>
+        public new System.Collections.Generic.ICollection<CivilIssue> Issue { get; set; }
     }
 }

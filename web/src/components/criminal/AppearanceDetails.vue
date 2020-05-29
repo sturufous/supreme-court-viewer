@@ -17,7 +17,7 @@
             <b-col md="8" cols="8" style="overflow: auto;">
                 <div>
                     <h3 class="mx-2 font-weight-normal"> Charges</h3>
-                    <hr class="mx-1 bg-light" style="height: 5px;"/> 
+                    <hr class="mb-0 bg-light" style="height: 5px;"/> 
                 </div>                           
                 <b-table
                 :items="appearanceCharges"
@@ -56,7 +56,7 @@
             <b-col col md="4" cols="4" style="overflow: auto;">
                  <div>
                     <h3 class="mx-2 font-weight-normal"> Additional Info</h3>
-                    <hr class="mx-1 bg-light" style="height: 5px;"/> 
+                    <hr class="mb-0 bg-light" style="height: 5px;"/> 
                 </div>
                            
                 <b-table
