@@ -36,6 +36,7 @@
             </h2>
 
             <civil-parties v-if="showCaseDetails"/>
+            <civil-adjudicator-restrictions v-if="showCaseDetails"/>
             <civil-documents-view v-if="showCaseDetails"/>
             <b-card><br></b-card>  
         </b-col>
@@ -47,6 +48,7 @@
 import { Component, Vue } from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
 import CivilDocumentsView from '@components/civil/CivilDocumentsView.vue';
+import CivilAdjudicatorRestrictions from '@components/civil/CivilAdjudicatorRestrictions.vue';
 import CivilParties from '@components/civil/CivilParties.vue';
 import CivilHeaderTop from '@components/civil/CivilHeaderTop.vue';
 import CivilHeader from '@components/civil/CivilHeader.vue';
@@ -56,6 +58,7 @@ const civilState = namespace('CivilFileInformation');
 
 @Component({
     components: {
+        CivilAdjudicatorRestrictions,
         CivilDocumentsView,
         CivilParties,
         CivilSidePanel,
@@ -171,7 +174,7 @@ export default class CivilCaseDetails extends Vue {
             restrictionInfo["Adjudicator"] =   jRestriction.adjInitialsTxt?jRestriction.adjInitialsTxt +" - " + jRestriction.adjFullNm: jRestriction.adjFullNm;
             restrictionInfo["Full Name"] = jRestriction.adjFullNm;
             restrictionInfo["Status"] = jRestriction.hearingRestrictionTypeDsc + ' ';
-            restrictionInfo["Applies to"] = jRestriction.partNm ? jRestriction.partNm: 'All participants on file' 
+            restrictionInfo["Applies to"] = jRestriction.partNm ? jRestriction.partNm: 'All Documents' 
                     
             this.adjudicatorRestrictionsInfo.push(restrictionInfo);      
         }
