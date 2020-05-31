@@ -81,6 +81,8 @@ namespace Scv.Api.Services
 
         public async Task<CodeLookup> GetHearingRestrictions() => await GetDataFromCache("HearingRestrictions", async () => await _lookupClient.CodesHearingRestrictionsAsync());
 
+        public async Task<CodeLookup> GetCriminalSentences() => await GetDataFromCache("CriminalSentences", async () => await _lookupClient.CodesCriminalSentencesAsync());
+
         #endregion Collection Methods
 
         #region Lookup Methods
@@ -104,6 +106,8 @@ namespace Scv.Api.Services
         public async Task<string> GetCriminalAppearanceReasonsDescription(string code) => FindShortDescriptionFromCode(await GetCriminalAppearanceReasons(), code);
 
         public async Task<string> GetCriminalAppearanceResultsDescription(string code) => FindLongDescriptionFromCode(await GetCriminalAppearanceResults(), code);
+
+        public async Task<string> GetCriminalSentenceDescription(string code) => FindShortDescriptionFromCode(await GetCriminalSentences(), code);
 
         public async Task<string> GetAppearanceDuration(string code) => FindLongDescriptionFromCode(await GetAppearanceDurations(), code);
 

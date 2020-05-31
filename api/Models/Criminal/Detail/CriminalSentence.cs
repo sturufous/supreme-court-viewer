@@ -11,5 +11,6 @@ namespace Scv.Api.Models.Criminal.Detail
     public class CriminalSentence : JCCommon.Clients.FileServices.CfcSentence
     {
         public string JudgesRecommendation { get; set; }
+        public string SentenceTypeDesc { get; set; }
     }
 }
