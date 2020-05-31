@@ -23,10 +23,14 @@
 
         <b-nav-text class="mr-2">
             <b-icon icon="person-fill"></b-icon>
-        </b-nav-text>        
+            <span   variant="text-info"
+                    v-b-tooltip.hover.bottomleft 
+                    :title='partyDisplayedTxt'>
+                    {{getNameOfPartyTrunc()}}
+            </span>
+        </b-nav-text>
 
-        <b-dropdown>
-            <b-dropdown-text variant="text-info">{{getNameOfPartyTrunc()}}</b-dropdown-text>
+        <b-dropdown class="mr-4" right variant="white">            
             <b-dropdown-item-button
                 disabled
                 v-for="(party, index) in leftPartiesInfo"
@@ -40,19 +44,7 @@
                 :key="index"
                 v-on:click="activeparty = index"
             >{{party["Name"]}}</b-dropdown-item-button>
-        </b-dropdown>
-
-        <!-- <b-nav-text class="text-info">
-            <b>{{getNameOfPartyTrunc()}}</b>            
-        </b-nav-text>
-
-        <b-nav-item-dropdown class="mr-3" text right>
-            <b-dropdown-item-button
-                v-for="(party, index) in SortedParties"
-                :key="index"
-                v-on:click="activeparty = index"
-            >{{getNameOfParty(index)}}</b-dropdown-item-button>
-        </b-nav-item-dropdown> -->
+        </b-dropdown>     
 
         <b-nav-text style="font-size: 14px;" variant="white">
             <b-badge pill variant="danger">{{adjudicatorRestrictionsInfo.length}}</b-badge> Adjudicator Restrictions
@@ -107,7 +99,7 @@ export default class CriminalHeader extends Vue {
       this.isMounted = true;          
   } 
 
-  maximumFullNameLength = 30;
+  maximumFullNameLength = 47;
   activeParty = 0;
   fileNumberText;
   agencyLocation = {Name:'', Code:0, Region:'' };

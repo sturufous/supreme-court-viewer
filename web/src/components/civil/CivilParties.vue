@@ -2,13 +2,13 @@
 <body>
     <b-card bg-variant="white">
         <b-row cols="2" >
-            <b-col class="mt-4" md="6" cols="6" style="overflow: auto;">
+            <b-col class="mt-2" md="6" cols="6">
                 <div>
                     <h3 class="mx-2 font-weight-normal"> {{leftRole}} ({{numberOfLeftParties}}) </h3>
                     <hr class="mb-0 bg-light" style="height: 5px;"/> 
                 </div>
 
-                <b-card bg-variant="white">           
+                <b-card bg-variant="white" style="height: 400px; overflow-y: auto;">           
                     <b-table
                     :items="leftPartiesInfo"
                     :fields="fields"
@@ -16,6 +16,8 @@
                     :sort-desc.sync="sortDesc"
                     :no-sort-reset="true"
                     borderless
+                    striped
+                    small
                     sort-icon-left
                     responsive="sm"
                     >   
@@ -30,13 +32,13 @@
                     </b-table>
                 </b-card>
             </b-col>
-            <b-col col md="6" cols="6" style="overflow: auto;">
+            <b-col class="mt-2" md="6" cols="6" >
                 <div>
                     <h3 class="mx-2 font-weight-normal"> {{rightRole}} ({{numberOfRightParties}}) </h3>
                     <hr class="mb-0 bg-light" style="height: 5px;"/> 
                 </div>
 
-                <b-card bg-variant="white">           
+                <b-card bg-variant="white" style="height: 400px; overflow-y: auto;">           
                     <b-table
                     :items="rightPartiesInfo"
                     :fields="fields"
@@ -44,6 +46,8 @@
                     :sort-desc.sync="sortDesc"
                     :no-sort-reset="true"
                     borderless
+                    striped
+                    small
                     sort-icon-left
                     responsive="sm"
                     >   
@@ -105,9 +109,9 @@ export default class CivilParties extends Vue {
 
     fields =  
     [
-        {key:'Name',                  sortable:true,  tdClass: 'border-top',  headerStyle:'text-primary',   cellStyle:'font-weight: bold'},
-        {key:'Role',                  sortable:false, tdClass: 'border-top',  headerStyle:'text',         cellStyle:'text'},
-        {key:'Counsel',               sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:'text'}
+        {key:'Name',                  sortable:true,  tdClass: 'border-top',  headerStyle:'text-primary',   cellStyle:'font-weight: bold; font-size: 14px;'},
+        {key:'Role',                  sortable:false, tdClass: 'border-top',  headerStyle:'text',         cellStyle:'font-size: 14px;'},
+        {key:'Counsel',               sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:'font-size: 14px;'}
     ]; 
 
     public getNameOfJustin(lastName, givenName) {      
