@@ -35,8 +35,8 @@
                 {{selectedSideBar}}
             </h2>
 
-
-            <civil-documents-view v-if="showDocuments"/>
+            <civil-parties v-if="showCaseDetails"/>
+            <civil-documents-view v-if="showCaseDetails"/>
             <b-card><br></b-card>  
         </b-col>
     </b-row>
@@ -47,6 +47,7 @@
 import { Component, Vue } from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
 import CivilDocumentsView from '@components/civil/CivilDocumentsView.vue';
+import CivilParties from '@components/civil/CivilParties.vue';
 import CivilHeaderTop from '@components/civil/CivilHeaderTop.vue';
 import CivilHeader from '@components/civil/CivilHeader.vue';
 import CivilSidePanel from '@components/civil/CivilSidePanel.vue';
@@ -56,6 +57,7 @@ const civilState = namespace('CivilFileInformation');
 @Component({
     components: {
         CivilDocumentsView,
+        CivilParties,
         CivilSidePanel,
         CivilHeaderTop,
         CivilHeader
@@ -85,12 +87,15 @@ export default class CivilCaseDetails extends Vue {
             ).then(data => {
                 if(data){
                     this.civilFileInformation.detailsData = data;
-                    console.log(data) 
-                    this.partiesJson = data.party                
-                    this.UpdateCivilFile(this.civilFileInformation);               
-                    this.ExtractPartiesInfo()
-                    if(this.partiesInfo.length)
-                    {                    
+                    this.partiesJson = data.party
+                    this.adjudicatorRestrictionsJson = data.hearingRestriction; 
+                    this.ExtractCaseInfo()
+                    if((this.leftPartiesInfo.length> 0)  && (this.rightPartiesInfo.length > 0))
+                    {
+                        this.civilFileInformation.leftPartiesInfo = this.leftPartiesInfo
+                        this.civilFileInformation.rightPartiesInfo = this.rightPartiesInfo
+                        this.civilFileInformation.adjudicatorRestrictionsInfo = this.adjudicatorRestrictionsInfo;
+                        this.UpdateCivilFile(this.civilFileInformation);                    
                         this.isDataReady = true;
                     }
                 }
@@ -102,7 +107,10 @@ export default class CivilCaseDetails extends Vue {
     isDataReady = false
     isMounted = false
     partiesJson;
-    partiesInfo: any[] = [];
+    leftPartiesInfo: any[] = [];
+    rightPartiesInfo: any[] = [];
+    adjudicatorRestrictionsJson;
+    adjudicatorRestrictionsInfo: any[] = [];
     sidePanelTitles = [ 
        'Case Details', 'Future Appearances', 'Past Appearances'    
     ];
@@ -120,11 +128,6 @@ export default class CivilCaseDetails extends Vue {
     {        
         return (this.showSections['Case Details'] && this.isDataReady)
     }
-    
-    get showDocuments()
-    {        
-        return ((this.showSections['Case Details'] || this.showSections['Civil Documents'] ) && this.isDataReady)
-    }
 
     get showFutureAppearances()
     {        
@@ -136,17 +139,64 @@ export default class CivilCaseDetails extends Vue {
         return ((this.showSections['Case Details'] || this.showSections['Past Appearances'] ) && this.isDataReady)
     }    
 
-    public ExtractPartiesInfo(): void {
-        console.log(this.partiesJson)
-        for(const jFile of this.partiesJson)
-        {            
-            const fileInfo = {};            
-            fileInfo["Part ID"] = jFile.partId;
-            fileInfo["Prof Seq No"] = jFile.profSeqNo;
-            fileInfo["First Name"] = jFile.givenNm? jFile.givenNm: '_noGivenname';
-            fileInfo["Last Name"] =  jFile.lastNm? jFile.lastNm: '_noLastname' ; 
-            this.partiesInfo.push(fileInfo);
+    public ExtractCaseInfo(): void {        
+        for(const jParty of this.partiesJson) {            
+            const partyInfo = {};            
+            partyInfo["Party ID"] = jParty.partyId;
+            partyInfo["Role"] = jParty.roleTypeDescription;
+            if (jParty.counsel.length > 0) {
+                partyInfo["Counsel"] = []
+                for (const couns of jParty.counsel) {                    
+                    partyInfo["Counsel"].push(couns.fullNm);
+                }
+            } else {
+                partyInfo["Counsel"] = []
+            }             
+            partyInfo["Left/Right"] = jParty.leftRightCd;
+            partyInfo["First Name"] = jParty.givenNm? jParty.givenNm: '';
+            partyInfo["Last Name"] =  jParty.lastNm? jParty.lastNm: jParty.orgNm ;
+            partyInfo["Name"] = this.getNameOfParty(partyInfo["Last Name"], partyInfo["First Name"])            
+            if (partyInfo["Left/Right"] == "R") {
+                this.rightPartiesInfo.push(partyInfo);
+            } else {
+                this.leftPartiesInfo.push(partyInfo);
+            }            
         }
+        this.leftPartiesInfo = this.SortParties(this.leftPartiesInfo);
+        this.rightPartiesInfo = this.SortParties(this.rightPartiesInfo);
+
+        for (const jRestriction of this.adjudicatorRestrictionsJson) {
+            const restrictionInfo = {};     
+            restrictionInfo["Adj Restriction"] = jRestriction.adjInitialsTxt?jRestriction.hearingRestrictionTypeDsc+ ": " + jRestriction.adjInitialsTxt:jRestriction.hearingRestrictionTypeDsc;     
+            restrictionInfo["Adjudicator"] =   jRestriction.adjInitialsTxt?jRestriction.adjInitialsTxt +" - " + jRestriction.adjFullNm: jRestriction.adjFullNm;
+            restrictionInfo["Full Name"] = jRestriction.adjFullNm;
+            restrictionInfo["Status"] = jRestriction.hearingRestrictionTypeDsc + ' ';
+            restrictionInfo["Applies to"] = jRestriction.partNm ? jRestriction.partNm: 'All participants on file' 
+                    
+            this.adjudicatorRestrictionsInfo.push(restrictionInfo);      
+        }
+    }
+
+    public getNameOfParty(lastName, givenName) {      
+
+        if(lastName.length==0)        
+            return givenName;       
+        else if(givenName.length==0)       
+            return lastName;      
+         else if(givenName.length==0 && lastName.length==0)       
+            return '';    
+        else         
+            return ( lastName + ", " + givenName );        
+    }
+
+    public SortParties(partiesList) {
+        return partiesList.sort((a, b): any => {
+        const LastName1 = a["Last Name"] ? a["Last Name"].toUpperCase() : "";
+        const LastName2 = b["Last Name"] ? b["Last Name"].toUpperCase() : "";
+        if (LastName1 > LastName2) return 1;
+        if (LastName1 < LastName2) return -1;
+        return 0;
+        });
     }
 
     public navigateToLandingPage() {

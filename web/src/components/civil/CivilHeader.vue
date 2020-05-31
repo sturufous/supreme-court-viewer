@@ -3,9 +3,9 @@
     <b-navbar type="white" variant="white" v-if="isMounted">
       <b-navbar-nav>
 
-        <b-nav-text class="text-info mt-1 mr-2" style="font-size: 12px;">
+        <b-nav-text class="mt-1 mr-2" style="font-size: 14px;">
             <b-icon icon="file-earmark-text"></b-icon>
-            {{fileNumberText}}
+            <span style="color: #32CD32; font-weight: bold;">   {{fileNumberText}}</span>
         </b-nav-text>
 
         <b-nav-text
@@ -23,11 +23,27 @@
 
         <b-nav-text class="mr-2">
             <b-icon icon="person-fill"></b-icon>
-        </b-nav-text>
+        </b-nav-text>        
 
-        <b-nav-text class="text-info">
-            <b>{{getNameOfPartyTrunc()}}</b>
-            and {{(partiesList.length-1)}} other(s)
+        <b-dropdown>
+            <b-dropdown-text variant="text-info">{{getNameOfPartyTrunc()}}</b-dropdown-text>
+            <b-dropdown-item-button
+                disabled
+                v-for="(party, index) in leftPartiesInfo"
+                :key="index"
+                v-on:click="activeparty = index"
+            >{{party["Name"]}}</b-dropdown-item-button>
+            <b-dropdown-divider></b-dropdown-divider>
+            <b-dropdown-item-button 
+                disabled
+                v-for="(party, index) in rightPartiesInfo"
+                :key="index"
+                v-on:click="activeparty = index"
+            >{{party["Name"]}}</b-dropdown-item-button>
+        </b-dropdown>
+
+        <!-- <b-nav-text class="text-info">
+            <b>{{getNameOfPartyTrunc()}}</b>            
         </b-nav-text>
 
         <b-nav-item-dropdown class="mr-3" text right>
@@ -36,15 +52,15 @@
                 :key="index"
                 v-on:click="activeparty = index"
             >{{getNameOfParty(index)}}</b-dropdown-item-button>
-        </b-nav-item-dropdown>
+        </b-nav-item-dropdown> -->
 
         <b-nav-text style="font-size: 14px;" variant="white">
-            <b-badge pill variant="danger">{{adjudicatorRestrictions.length}}</b-badge> Adjudicator Restrictions
+            <b-badge pill variant="danger">{{adjudicatorRestrictionsInfo.length}}</b-badge> Adjudicator Restrictions
         </b-nav-text>
 
-        <b-nav-item-dropdown right  v-if="(adjudicatorRestrictions.length>0)">            
+        <b-nav-item-dropdown right  v-if="(adjudicatorRestrictionsInfo.length>0)">            
             <b-dropdown-item-button        
-            v-for="(restriction, index) in adjudicatorRestrictions"
+            v-for="(restriction, index) in adjudicatorRestrictionsInfo"
             :key="index">
                 <b-button style="font-size: 12px; padding: 0px 2px;" 
                           variant="primary" 
@@ -84,71 +100,30 @@ export default class CriminalHeader extends Vue {
       this.agencyLocation.Name = data.homeLocationAgencyName;
       this.agencyLocation.Code = data.homeLocationAgencyCode;
       this.agencyLocation.Region = data.homeLocationRegionName;
-      this.adjudicatorRestrictionsJson = data.hearingRestriction;
-      this.partiesJson = data.party 
-      this.ExtractPartiesInfo();
+      this.partyDisplayedTxt = data.socTxt;
+      this.leftPartiesInfo = this.civilFileInformation.leftPartiesInfo;
+      this.rightPartiesInfo = this.civilFileInformation.rightPartiesInfo; 
+      this.adjudicatorRestrictionsInfo = this.civilFileInformation.adjudicatorRestrictionsInfo;
       this.isMounted = true;          
   } 
 
-  maximumFullNameLength = 17;
+  maximumFullNameLength = 30;
   activeParty = 0;
-  numberOfParties = 0;
   fileNumberText;
   agencyLocation = {Name:'', Code:0, Region:'' };
   adjudicatorRestrictionsJson;
   isMounted = false;
-  partiesJson;
-
-  partiesList: any[] = [];
-  adjudicatorRestrictions: any[] = [];
- 
-
-  public ExtractPartiesInfo(): void {
-    for (const fileIndex in this.partiesJson) {
-      const fileInfo = {};
-      const jFile = this.partiesJson[fileIndex];
-      fileInfo["Index"] = fileIndex;
-      fileInfo["First Name"] = jFile.givenNm ? jFile.givenNm : "";
-      fileInfo["Last Name"] = jFile.lastNm ? jFile.lastNm : jFile.orgNm;
-      this.partiesList.push(fileInfo);
-    }
-    this.numberOfParties = this.partiesList.length - 1;
-
-    for (const jRestriction of this.adjudicatorRestrictionsJson) {
-      const restrictionInfo = {};     
-      restrictionInfo["Adj Restriction"] = jRestriction.adjInitialsTxt?jRestriction.hearingRestrictionTypeDsc+ ": " + jRestriction.adjInitialsTxt:jRestriction.hearingRestrictionTypeDsc;
-      restrictionInfo["Full Name"] = jRestriction.adjFullNm;      
-      this.adjudicatorRestrictions.push(restrictionInfo);      
-    }
-  }
-
-  public getNameOfParty(num) {
-    return (
-      this.partiesList[num]["Last Name"] +
-      ", " +
-      this.partiesList[num]["First Name"]
-    );
-  }
+  partyDisplayedTxt;
+  leftPartiesInfo;
+  rightPartiesInfo; 
+  adjudicatorRestrictionsInfo;
 
   public getNameOfPartyTrunc() {
-
-    const nameOfParty = this.getNameOfParty(this.activeParty);
-
-    if(nameOfParty.length > this.maximumFullNameLength)   
-        return nameOfParty.substr(0, this.maximumFullNameLength) +'. ';    
+    if(this.partyDisplayedTxt.length > this.maximumFullNameLength)   
+        return this.partyDisplayedTxt.substr(0, this.maximumFullNameLength) +',...';    
     else 
-        return  nameOfParty;
-     
+        return  this.partyDisplayedTxt;
   }
-
-  get SortedParties() {
-    return this.partiesList.sort((a, b): any => {
-      const LastName1 = a["Last Name"] ? a["Last Name"].toUpperCase() : "";
-      const LastName2 = b["Last Name"] ? b["Last Name"].toUpperCase() : "";
-      if (LastName1 > LastName2) return 1;
-      if (LastName1 < LastName2) return -1;
-      return 0;
-    });
-  }
+  
 }
 </script>

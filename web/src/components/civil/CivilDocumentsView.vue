@@ -2,7 +2,7 @@
 <body>
    <b-card  v-if= "isMounted">
        <div>         
-            <h3 class="mx-2 font-weight-normal"> Documents () </h3>
+            <h3 class="mx-2 font-weight-normal"> Documents ({{NumberOfDocuments}}) </h3>
             <hr class="mb-0 bg-light" style="height: 5px;"/>         
         </div>  
        
@@ -89,12 +89,9 @@ export default class CivilDocumentsView extends Vue {
     public getDocuments(): void {
 
         const data = this.civilFileInformation.detailsData;
-        this.documentsDetailsJson = data.document;     
-
+        this.documentsDetailsJson = data.document; 
         this.ExtractDocumentInfo()          
         this.isMounted = true;
-        
-       
     }
 
     @Watch('$route', { immediate: false, deep: true })
@@ -122,7 +119,7 @@ export default class CivilDocumentsView extends Vue {
 
     documents: any[] = [];
     summaryDocuments: any[] = [];
-    categories: any=[]; 
+    categories: string[] = []; 
 
     fieldsTab = fieldTab.Categories;
 
@@ -278,7 +275,17 @@ export default class CivilDocumentsView extends Vue {
 
     public rowHover(row) {
         this.hoverRow = row.Index;
-    }    
+    }
+    
+    get NumberOfDocuments() {       
+        if(this.activetab == 'COURT SUMMARY')
+        {           
+            return(this.summaryDocuments.length)
+        }
+        else{  
+            return(this.documents.length)            
+        }    
+    }
 }
 </script>
 
