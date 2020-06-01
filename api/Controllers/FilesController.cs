@@ -150,7 +150,7 @@ namespace Scv.Api.Controllers
         }
 
         /// <summary>
-        /// Gets detailed information regarding an appearance given criminal file id and appearance id.
+        /// Gets detailed information regarding an appearance given criminal file id, appearance id, participant id and sequence number.
         /// </summary>
         /// <param name="fileId"></param>
         /// <param name="appearanceId"></param>
@@ -158,12 +158,12 @@ namespace Scv.Api.Controllers
         /// <param name="profSeqNo"></param>
         /// <returns>CriminalAppearanceDetail</returns>
         [HttpGet]
-        [Route("criminal/{fileId}/appearance-detail/{appearanceId}")]
-        public async Task<ActionResult<CriminalAppearanceDetail>> GetCriminalAppearanceDetails(string fileId, string appearanceId, string partId = null, string profSeqNo = null)
+        [Route("criminal/{fileId}/appearance-detail/{appearanceId}/{partId}/{profSeqNo}")]
+        public async Task<ActionResult<CriminalAppearanceDetail>> GetCriminalAppearanceDetails(string fileId, string appearanceId, string partId, string profSeqNo)
         {
             var appearanceDetail = await _filesService.CriminalAppearanceDetailAsync(fileId, appearanceId, partId, profSeqNo);
             if (appearanceDetail == null)
-                throw new NotFoundException("Couldn't find appearance details with this id.");
+                throw new NotFoundException("Couldn't find appearance details with the provided parameters.");
             return Ok(appearanceDetail);
         }
 

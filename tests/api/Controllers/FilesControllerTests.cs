@@ -361,7 +361,7 @@ namespace tests.api.Controllers
         [Fact]
         public async void Criminal_Appearance_Details()
         {
-            var actionResult = await _controller.GetCriminalAppearanceDetails("2934", "36548.0734");
+            var actionResult = await _controller.GetCriminalAppearanceDetails("2934", "36548.0734", "19498.0042", "1");
 
             var criminalAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Equal(1, criminalAppearanceDetail.Charges.Count);
@@ -369,12 +369,12 @@ namespace tests.api.Controllers
             Assert.Contains(criminalAppearanceDetail.Charges, p => p.AppearanceReasonDsc == "First Appearance");
             Assert.Contains(criminalAppearanceDetail.Charges, p => p.StatuteDsc == "offer bribe to justice/pol comm/peac off");
             Assert.Contains(criminalAppearanceDetail.Charges, p => p.StatuteSectionDsc == "CCC - 120(b)");
-            Assert.Equal(1, criminalAppearanceDetail.AppearanceMethods.Count);
-            Assert.Equal("TC", criminalAppearanceDetail.AppearanceMethods.First().AppearanceMethodCd);
+            Assert.Equal(1, criminalAppearanceDetail.Accused.AppearanceMethods.Count);
+            Assert.Equal("TC", criminalAppearanceDetail.Accused.AppearanceMethods.First().AppearanceMethodCd);
         }
 
 
-        [Fact(Skip= "Adhoc test.")]
+        [Fact(Skip= "Adhoc Test")]
         public async void Criminal_Appearance_Details_CacheTest()
         {
             //This fetches the FileDetail plus the appearances. So these should be cached after this call. 
@@ -382,7 +382,7 @@ namespace tests.api.Controllers
             var fileDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
 
             //Now call criminalAppearanceDetails. 
-            var actionResult2 = await _controller.GetCriminalAppearanceDetails("2934", "36548.0734");
+            var actionResult2 = await _controller.GetCriminalAppearanceDetails("2934", "36548.0734", "19498.0042", "1");
 
             var criminalAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult2);
             Assert.Equal(1, criminalAppearanceDetail.Charges.Count);
@@ -390,8 +390,8 @@ namespace tests.api.Controllers
             Assert.Contains(criminalAppearanceDetail.Charges, p => p.AppearanceReasonDsc == "First Appearance");
             Assert.Contains(criminalAppearanceDetail.Charges, p => p.StatuteDsc == "offer bribe to justice/pol comm/peac off");
             Assert.Contains(criminalAppearanceDetail.Charges, p => p.StatuteSectionDsc == "CCC - 120(b)");
-            Assert.Equal(1, criminalAppearanceDetail.AppearanceMethods.Count);
-            Assert.Equal("TC", criminalAppearanceDetail.AppearanceMethods.First().AppearanceMethodCd);
+            Assert.Equal(1, criminalAppearanceDetail.Accused.AppearanceMethods.Count);
+            Assert.Equal("TC", criminalAppearanceDetail.Accused.AppearanceMethods.First().AppearanceMethodCd);
         }
 
         #region Helpers
