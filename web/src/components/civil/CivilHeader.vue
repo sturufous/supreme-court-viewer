@@ -21,7 +21,7 @@
             {{agencyLocation.Region}}
         </b-nav-text>
 
-        <b-nav-text class="mr-2">
+        <b-nav-text class="mt-1 mr-2">
             <b-icon icon="person-fill"></b-icon>
             <span   variant="text-info"
                     v-b-tooltip.hover.bottomleft 
@@ -44,7 +44,7 @@
             >{{rightParty.Name}}</b-dropdown-item-button>
         </b-dropdown>     
 
-        <b-nav-text style="font-size: 14px;" variant="white">
+        <b-nav-text class="mt-1" style="font-size: 14px;" variant="white">
             <b-badge pill variant="danger">{{adjudicatorRestrictionsInfo.length}}</b-badge> Adjudicator Restrictions
         </b-nav-text>
 
