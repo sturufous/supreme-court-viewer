@@ -90,7 +90,7 @@ export default class CivilCaseDetails extends Vue {
                     this.partiesJson = data.party
                     this.adjudicatorRestrictionsJson = data.hearingRestriction; 
                     this.ExtractCaseInfo()
-                    if((this.leftPartiesInfo.length> 0)  && (this.rightPartiesInfo.length > 0))
+                    if((this.leftPartiesInfo.length> 0)  || (this.rightPartiesInfo.length > 0))
                     {
                         this.civilFileInformation.leftPartiesInfo = this.leftPartiesInfo
                         this.civilFileInformation.rightPartiesInfo = this.rightPartiesInfo
