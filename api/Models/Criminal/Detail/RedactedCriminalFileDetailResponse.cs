@@ -4,16 +4,10 @@ using System.Collections.Generic;
 namespace Scv.Api.Models.Criminal.Detail
 {
     /// <summary>
-    /// This is used to narrow down the amount of information from CriminalFileDetailResponse.
+    /// This is used to narrow down the amount of information from <see cref="CriminalFileDetailResponse"/> CriminalFileDetailResponse. 
     /// </summary>
     public class RedactedCriminalFileDetailResponse
     {
-        public RedactedCriminalFileDetailResponse()
-        {
-            Ban = new List<CriminalBan>();
-            Count = new List<CriminalCount>();
-        }
-
         public string ResponseCd { get; set; }
         public string ResponseMessageTxt { get; set; }
         public string JustinNo { get; set; }
@@ -45,16 +39,6 @@ namespace Scv.Api.Models.Criminal.Detail
         public CriminalFileDetailResponseIndictableYN IndictableYN { get; set; }
         public CriminalFileDetailResponseComplexityTypeCd? ComplexityTypeCd { get; set; }
         public string AssignmentTypeDsc { get; set; }
-
-        /// <summary>
-        /// Extended, with PartId.
-        /// </summary>
-        public List<CriminalBan> Ban { get; set; }
-
-        /// <summary>
-        /// Slimmed down version of CfcAppearanceCount.
-        /// </summary>
-        public List<CriminalCount> Count { get; set; }
 
         /// <summary>
         /// Used for Crown Notes to JCM.
