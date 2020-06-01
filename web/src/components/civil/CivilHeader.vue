@@ -5,7 +5,7 @@
 
         <b-nav-text class="mt-1 mr-2" style="font-size: 14px;">
             <b-icon icon="file-earmark-text"></b-icon>
-            <span style="color: #32CD32; font-weight: bold;">   {{fileNumberText}}</span>
+            <span :style="getActivityClass()" class="file-number-txt">   {{fileNumberText}}</span>
         </b-nav-text>
 
         <b-nav-text
@@ -21,7 +21,7 @@
             {{agencyLocation.Region}}
         </b-nav-text>
 
-        <b-nav-text class="mr-2">
+        <b-nav-text class="mt-1 mr-2">
             <b-icon icon="person-fill"></b-icon>
             <span   variant="text-info"
                     v-b-tooltip.hover.bottomleft 
@@ -33,20 +33,18 @@
         <b-dropdown class="mr-4" right variant="white">            
             <b-dropdown-item-button
                 disabled
-                v-for="(party, index) in leftPartiesInfo"
-                :key="index"
-                v-on:click="activeparty = index"
-            >{{party["Name"]}}</b-dropdown-item-button>
+                v-for="leftParty in leftPartiesInfo"
+                v-bind:key="leftParty.Name"
+            >{{leftParty.Name}}</b-dropdown-item-button>
             <b-dropdown-divider></b-dropdown-divider>
             <b-dropdown-item-button 
                 disabled
-                v-for="(party, index) in rightPartiesInfo"
-                :key="index"
-                v-on:click="activeparty = index"
-            >{{party["Name"]}}</b-dropdown-item-button>
+                v-for="rightParty in rightPartiesInfo"
+                v-bind:key="rightParty.Name"
+            >{{rightParty.Name}}</b-dropdown-item-button>
         </b-dropdown>     
 
-        <b-nav-text style="font-size: 14px;" variant="white">
+        <b-nav-text class="mt-1" style="font-size: 14px;" variant="white">
             <b-badge pill variant="danger">{{adjudicatorRestrictionsInfo.length}}</b-badge> Adjudicator Restrictions
         </b-nav-text>
 
@@ -77,7 +75,7 @@ import "@store/modules/CivilFileInformation";
 const civilState = namespace("CivilFileInformation");
 
 @Component
-export default class CriminalHeader extends Vue {
+export default class CivilHeader extends Vue {
 
   @civilState.State
   public civilFileInformation!: any;
@@ -88,7 +86,8 @@ export default class CriminalHeader extends Vue {
 
   public getHeaderInfo(): void {      
       const data = this.civilFileInformation.detailsData;
-      this.fileNumberText = data.fileNumberTxt;      
+      this.fileNumberText = data.fileNumberTxt;
+      this.activityClassCode = data.activityClassCd;      
       this.agencyLocation.Name = data.homeLocationAgencyName;
       this.agencyLocation.Code = data.homeLocationAgencyCode;
       this.agencyLocation.Region = data.homeLocationRegionName;
@@ -102,20 +101,47 @@ export default class CriminalHeader extends Vue {
   maximumFullNameLength = 47;
   activeParty = 0;
   fileNumberText;
+  activityClassCode;
   agencyLocation = {Name:'', Code:0, Region:'' };
-  adjudicatorRestrictionsJson;
   isMounted = false;
   partyDisplayedTxt;
   leftPartiesInfo;
   rightPartiesInfo; 
   adjudicatorRestrictionsInfo;
+  activityClassCodeMapping = {
+      S: 'color: #21B851;',
+      R: 'color: #17A5E7;',
+      M: 'color: #DF882A;',
+      I: 'color: #A22BB9;',
+      F: 'color: #21B851;',
+      SIT: 'color: #d33;',
+      NS: 'color: #999;'
+  }
 
   public getNameOfPartyTrunc() {
-    if(this.partyDisplayedTxt.length > this.maximumFullNameLength)   
-        return this.partyDisplayedTxt.substr(0, this.maximumFullNameLength) +',...';    
-    else 
-        return  this.partyDisplayedTxt;
+      if (this.partyDisplayedTxt) {          
+          if(this.partyDisplayedTxt.length > this.maximumFullNameLength)   
+            return this.partyDisplayedTxt.substr(0, this.maximumFullNameLength) +',...';    
+          else 
+            return  this.partyDisplayedTxt;
+      } else {
+          return "";
+      }
+    
+  }
+
+  public getActivityClass() {
+      return this.activityClassCodeMapping[this.activityClassCode];
+
   }
   
 }
 </script>
+
+<style scoped>
+
+    .file-number-txt {
+        font-weight: bold;
+    }
+
+</style>

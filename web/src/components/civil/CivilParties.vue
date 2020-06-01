@@ -8,7 +8,7 @@
                     <hr class="mb-0 bg-light" style="height: 5px;"/> 
                 </div>
 
-                <b-card bg-variant="white" style="height: 400px; overflow-y: auto;">           
+                <b-card bg-variant="white" style="max-height: 400px; overflow-y: auto;">           
                     <b-table
                     :items="leftPartiesInfo"
                     :fields="fields"
@@ -38,7 +38,7 @@
                     <hr class="mb-0 bg-light" style="height: 5px;"/> 
                 </div>
 
-                <b-card bg-variant="white" style="height: 400px; overflow-y: auto;">           
+                <b-card bg-variant="white" style="max-height: 400px; overflow-y: auto;">           
                     <b-table
                     :items="rightPartiesInfo"
                     :fields="fields"
