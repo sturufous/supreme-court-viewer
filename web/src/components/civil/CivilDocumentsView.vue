@@ -1,7 +1,7 @@
 <template>
-<body>
+<div>
    <b-card  v-if= "isMounted">
-       <div>         
+        <div>         
             <h3 class="mx-2 font-weight-normal"> Documents ({{NumberOfDocuments}}) </h3>
             <hr class="mb-0 bg-light" style="height: 5px;"/>         
         </div>  
@@ -66,7 +66,7 @@
             </template> 
         </b-overlay>
    </b-card> 
-</body>
+</div>
 </template>
 
 <script lang="ts">
