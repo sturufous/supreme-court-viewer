@@ -23,7 +23,7 @@
         <b-card/>
  
         <b-overlay :show="loadingPdf" rounded="sm">  
-            <b-card bg-variant="light">           
+            <b-card bg-variant="light" style="max-height: 400px; overflow-y: auto;">           
                 <b-table
                 :items="FilteredDocuments"
                 :fields="fields[fieldsTab]"

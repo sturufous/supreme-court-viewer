@@ -37,7 +37,8 @@
 
             <civil-parties v-if="showCaseDetails"/>
             <civil-adjudicator-restrictions v-if="showCaseDetails"/>
-            <civil-documents-view v-if="showCaseDetails"/>
+            <civil-documents-view v-if="showCaseDetails"/>            
+            <civil-past-appearances v-if="showPastAppearances" />
             <b-card><br></b-card>  
         </b-col>
     </b-row>
@@ -48,6 +49,7 @@
 import { Component, Vue } from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
 import CivilDocumentsView from '@components/civil/CivilDocumentsView.vue';
+import CivilPastAppearances from '@components/civil/CivilPastAppearances.vue';
 import CivilAdjudicatorRestrictions from '@components/civil/CivilAdjudicatorRestrictions.vue';
 import CivilParties from '@components/civil/CivilParties.vue';
 import CivilHeaderTop from '@components/civil/CivilHeaderTop.vue';
@@ -60,6 +62,7 @@ const civilState = namespace('CivilFileInformation');
     components: {
         CivilAdjudicatorRestrictions,
         CivilDocumentsView,
+        CivilPastAppearances,
         CivilParties,
         CivilSidePanel,
         CivilHeaderTop,

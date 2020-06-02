@@ -22,7 +22,7 @@
             </b-overlay> 
         </b-card>
 
-        <b-card bg-variant="white" v-if="isDataReady">           
+        <b-card bg-variant="white" v-if="isDataReady" style="overflow: auto;">           
             <b-table
             :items="SortedPastAppearances"
             :fields="fields"
@@ -40,14 +40,14 @@
 
                 <template  v-slot:cell()="data">
                     <b-badge                        
-                        style="font-weight: normal; font-size: 16px; padding-top:12px" 
+                        :style="data.field.cellStyle" 
                         variant="white" > 
                             {{data.value}} 
                     </b-badge>
                 </template>
 
                 <template v-slot:cell(Date)="data" >
-                    <span :class="data.field.cellStyle" style="display: inline-flex;"> 
+                    <span :class="data.field.cellClass" :style="data.field.cellStyle"> 
                         <b-button style="transform: translate(0,-7px);" @click="OpenDetails(data);data.toggleDetails();" variant="outline-primary border-white" class="mr-2">
                             <b-icon-caret-right-fill  v-if="!data.item['_showDetails']"></b-icon-caret-right-fill>
                             <b-icon-caret-down-fill v-if="data.item['_showDetails']"></b-icon-caret-down-fill>
@@ -57,37 +57,47 @@
                 </template>
                 <template v-slot:row-details>
                     <b-card> 
-                        <appearance-details/>
+                        <civil-appearance-details/>
                     </b-card>
                 </template>
 
                 <template  v-slot:cell(Reason)="data">
                     <b-button 
-                            :class="data.field.cellStyle"
+                            :class="data.field.cellClass"
                             variant="outline-primary border-white"
                             v-b-tooltip.hover                            
                             :title="data.item['Reason Description']"
-                            style="margin-top: 1px;"> 
+                            :style="data.field.cellStyle">  
                             {{data.value}}
                     </b-button>
+                </template>
+
+                <template  v-slot:cell(Result)="data" >
+                    <span
+                            v-if="data.value"
+                            :class="data.field.cellClass"
+                            variant="outline-primary border-white"
+                            v-b-tooltip.hover                            
+                            :title="data.item['Result Description']"
+                            :style="data.field.cellStyle"> 
+                            {{data.value}}
+                    </span>
                 </template>
 
                 <template  v-slot:cell(Presider)="data">
                     <b-button                              
                             variant="outline-primary border-white"
                             v-if="data.value"
+                            :class="data.field.cellClass"
+                            :style="data.field.cellStyle"
                             v-b-tooltip.hover                           
                             :title="data.item['Judge Full Name']"> 
                             {{data.value}}
                     </b-button>
-                </template>
-
-                <template  v-slot:cell(Accused)="data">
-                     <b-badge  variant="white" style=" font-size: 16px;" class = "mt-2"> {{data.value}} </b-badge>
-                </template>
+                </template>                
 
                 <template  v-slot:cell(Status)="data">
-                    <b :class = "getStatusStyle(data.value)" style="font-weight: normal; font-size: 16px;"> {{data.value}} </b>
+                    <b :class = "getStatusStyle(data.value)" :style="data.field.cellStyle"> {{data.value}} </b>
                 </template>
                 
             </b-table>
@@ -102,30 +112,30 @@
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 
-import AppearanceDetails from '@components/criminal/AppearanceDetails.vue';
+import CivilAppearanceDetails from '@components/civil/CivilAppearanceDetails.vue';
 
-import "@store/modules/CriminalFileInformation";
-const criminalState = namespace("CriminalFileInformation");
+import "@store/modules/CivilFileInformation";
+const civilState = namespace("CivilFileInformation");
 
 enum appearanceStatus {UNCF='Unconfirmed', CNCL='Canceled', SCHD='Scheduled' }
 
 @Component({
     components: {
-        AppearanceDetails
+        CivilAppearanceDetails
     }
 })
-export default class PastAppearances extends Vue {
+export default class CivilPastAppearances extends Vue {
 
-    @criminalState.State
-    public criminalFileInformation!: any;
+    @civilState.State
+    public civilFileInformation!: any;
 
-    @criminalState.State
+    @civilState.State
     public showSections
     
-    @criminalState.State
+    @civilState.State
     public pastAppearanceInfo!: any;
 
-    @criminalState.Action
+    @civilState.Action
     public UpdatePastAppearanceInfo!: (newPastAppearanceInfo: any) => void
 
     mounted() {
@@ -134,17 +144,14 @@ export default class PastAppearances extends Vue {
 
     public getPastAppearances(): void {      
     
-        const data = this.criminalFileInformation.detailsData;
+        const data = this.civilFileInformation.detailsData;
         this.pastAppearancesJson = data.appearances.apprDetail;              
         this.ExtractPastAppearancesInfo();
-        if(this.pastAppearancesList.length)
-        {                    
+        if(this.pastAppearancesList.length) {                    
             this.isDataReady = true;
         }
     
-    this.isMounted = true;
-                       
-           
+        this.isMounted = true;           
     } 
   
     isMounted = false;
@@ -157,49 +164,47 @@ export default class PastAppearances extends Vue {
 
     fields =  
     [
-        {key:'Date',       sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'text-info mt-2 d-inline-flex'},
-        {key:'Reason',     sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'font-weight-bold'},
-        {key:'Time',       sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:'text'},
-        {key:'Duration',   sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:'text'},
-        {key:'Location',   sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'text'},
-        {key:'Room',       sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:'text'},
-        {key:'Presider',   sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'text'},
-        {key:'Accused',    sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'text'},
-        {key:'Status',     sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'badge'},
+        {key:'Date',            sortable:true,  tdClass: 'border-top', headerStyle:'text-primary',  cellClass:'text-info mt-2 d-inline-flex', cellStyle: 'display: inline-flex; font-size: 14px;'},
+        {key:'Reason',          sortable:true,  tdClass: 'border-top', headerStyle:'text-primary',  cellClass:'font-weight-bold',             cellStyle: 'margin-top: 1px; font-size: 14px;'},
+        {key:'Document Type',   sortable:false, tdClass: 'border-top', headerStyle:'text',          cellClass:'text',                         cellStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
+        {key:'Result',          sortable:true,  tdClass: 'border-top', headerStyle:'text-primary',  cellClass:'badge badge-dark mt-2',        cellStyle: 'margin-top: 1px; font-size: 14px;'},
+        {key:'Time',            sortable:false, tdClass: 'border-top', headerStyle:'text',          cellClass:'text',                         cellStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
+        {key:'Duration',        sortable:false, tdClass: 'border-top', headerStyle:'text',          cellClass:'text',                         cellStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
+        {key:'Location',        sortable:true,  tdClass: 'border-top', headerStyle:'text-primary',  cellClass:'text',                         cellStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
+        {key:'Room',            sortable:false, tdClass: 'border-top', headerStyle:'text',          cellClass:'text',                         cellStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
+        {key:'Presider',        sortable:true,  tdClass: 'border-top', headerStyle:'text-primary',  cellClass:'text',                         cellStyle: 'font-size: 14px;'},        
+        {key:'Status',          sortable:true,  tdClass: 'border-top', headerStyle:'text-primary',  cellClass:'badge',                        cellStyle: 'font-size: 14px;'}
     ];    
   
     public ExtractPastAppearancesInfo(): void {
         const currentDate = new Date();
-        for (const fileIndex in this.pastAppearancesJson) {
-            const fileInfo = {};
-            const jFile = this.pastAppearancesJson[fileIndex];
+        for (const appIndex in this.pastAppearancesJson) {
+            const appInfo = {};
+            const jApp = this.pastAppearancesJson[appIndex];
 
-            fileInfo["Index"] = fileIndex;
-            fileInfo["Date"] = jFile.appearanceDt.split(' ')[0]
-            if(new Date(fileInfo["Date"]) >= currentDate) continue;
+            appInfo["Index"] = appIndex;
+            appInfo["Date"] = jApp.appearanceDt.split(' ')[0]
+            if(new Date(appInfo["Date"]) >= currentDate) continue;
+            appInfo["Document Type"] = jApp.documentTypeDsc;
+            appInfo["Result"] = jApp.appearanceResultCd;
+            appInfo["Result Description"] = jApp.appearanceResultDsc? jApp.appearanceResultDsc: '';
+            appInfo["Time"] = this.getTime(jApp.appearanceTm.split(' ')[1].substr(0,5));
+            appInfo["Reason"] = jApp.appearanceReasonCd;
+            appInfo["Reason Description"] = jApp.appearanceReasonDsc? jApp.appearanceReasonDsc: '';
+            appInfo["Duration"] = this.getDuration(jApp.estimatedTimeHour, jApp.estimatedTimeMin)           
+            appInfo["Location"] = jApp.courtLocation;
+            appInfo["Room"] =jApp.courtRoomCd              
+            appInfo["Status"] = jApp.appearanceStatusCd ? appearanceStatus[jApp.appearanceStatusCd] :''
 
-            fileInfo["Time"] = this.getTime(jFile.appearanceTm.split(' ')[1].substr(0,5));
-            fileInfo["Reason"] = jFile.appearanceReasonCd;
-            fileInfo["Reason Description"] = jFile.appearanceReasonDsc? jFile.appearanceReasonDsc: '';
-          
-            fileInfo["Duration"] = this.getDuration(jFile.estimatedTimeHour, jFile.estimatedTimeMin)           
-            fileInfo["Location"] = jFile.courtLocation;
-            fileInfo["Room"] =jFile.courtRoomCd
+            appInfo["Presider"] =  jApp.judgeInitials ? jApp.judgeInitials :''
+            appInfo["Judge Full Name"] =  jApp.judgeInitials ? jApp.judgeFullNm : ''
 
-            fileInfo["First Name"] = jFile.givenNm ? jFile.givenNm : "";
-            fileInfo["Last Name"] = jFile.lastNm ? jFile.lastNm : jFile.orgNm;
-            fileInfo["Accused"] = this.getNameOfParticipant(fileInfo["Last Name"], fileInfo["First Name"]);  
-            fileInfo["Status"] = jFile.appearanceStatusCd ? appearanceStatus[jFile.appearanceStatusCd] :''
-
-            fileInfo["Presider"] =  jFile.judgeInitials ? jFile.judgeInitials :''
-            fileInfo["Judge Full Name"] =  jFile.judgeInitials ? jFile.judgeFullNm : ''
-
-            fileInfo["Appearance ID"] = jFile.appearanceId
-            fileInfo["Supplemental Equipment"] = jFile.supplementalEquipmentTxt
-            fileInfo["Security Restriction"] = jFile.securityRestrictionTxt
-            fileInfo["OutOfTown Judge"] = jFile.outOfTownJudgeTxt
+            appInfo["Appearance ID"] = jApp.appearanceId
+            appInfo["Supplemental Equipment"] = jApp.supplementalEquipmentTxt
+            appInfo["Security Restriction"] = jApp.securityRestrictionTxt
+            appInfo["OutOfTown Judge"] = jApp.outOfTownJudgeTxt
                        
-            this.pastAppearancesList.push(fileInfo); 
+            this.pastAppearancesList.push(appInfo); 
         }
     }
 
@@ -208,10 +213,6 @@ export default class PastAppearances extends Vue {
         if(status == appearanceStatus.UNCF) return "badge badge-danger mt-2";
         else if(status == appearanceStatus.CNCL) return "badge badge-warning mt-2";
         else if(status == appearanceStatus.SCHD) return "badge badge-primary mt-2";
-    }
-
-    public getNameOfParticipant(lastName, givenName) {
-        return ( lastName + ", " + givenName );
     }
 
     public getTime(time)
@@ -248,7 +249,7 @@ export default class PastAppearances extends Vue {
     {
         if(!data.detailsShowing)
         {
-            this.pastAppearanceInfo.fileNo = this.criminalFileInformation.fileNumber; 
+            this.pastAppearanceInfo.fileNo = this.civilFileInformation.fileNumber; 
             
             this.pastAppearanceInfo.appearanceId = data.item["Appearance ID"]
             this.pastAppearanceInfo.supplementalEquipmentTxt = data.item["Supplemental Equipment"]
