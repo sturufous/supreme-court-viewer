@@ -1,5 +1,5 @@
 <template>
-<body> 
+<div> 
 
     <b-card bg-variant="light" v-if= "!isMounted && !isDataReady">
         <b-overlay :show= "true"> 
@@ -41,7 +41,7 @@
             <b-card><br></b-card>  
         </b-col>
     </b-row>
-</body>
+</div>
 </template>
 
 <script lang="ts">
@@ -158,7 +158,8 @@ export default class CivilCaseDetails extends Vue {
             partyInfo["Left/Right"] = jParty.leftRightCd;
             partyInfo["First Name"] = jParty.givenNm? jParty.givenNm: '';
             partyInfo["Last Name"] =  jParty.lastNm? jParty.lastNm: jParty.orgNm ;
-            partyInfo["Name"] = this.getNameOfParty(partyInfo["Last Name"], partyInfo["First Name"])            
+            partyInfo["Name"] = this.getNameOfParty(partyInfo["Last Name"], partyInfo["First Name"])
+            partyInfo["ID"] = jParty.partyId            
             if (partyInfo["Left/Right"] == "R") {
                 this.rightPartiesInfo.push(partyInfo);
             } else {
@@ -174,7 +175,7 @@ export default class CivilCaseDetails extends Vue {
             restrictionInfo["Adjudicator"] =   jRestriction.adjInitialsTxt?jRestriction.adjInitialsTxt +" - " + jRestriction.adjFullNm: jRestriction.adjFullNm;
             restrictionInfo["Full Name"] = jRestriction.adjFullNm;
             restrictionInfo["Status"] = jRestriction.hearingRestrictionTypeDsc + ' ';
-            restrictionInfo["Applies to"] = jRestriction.partNm ? jRestriction.partNm: 'All Documents' 
+            restrictionInfo["Applies to"] = jRestriction.applyToNm ? jRestriction.applyToNm: 'All Documents' 
                     
             this.adjudicatorRestrictionsInfo.push(restrictionInfo);      
         }

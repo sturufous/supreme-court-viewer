@@ -1,5 +1,5 @@
 <template>
-<body>
+<div>
     <b-card bg-variant="white">
         <div>
             <h3 class="mx-2 font-weight-normal"> Adjudicator Restrictions </h3>
@@ -34,7 +34,7 @@
         </b-card>
     </b-card>
     
-</body>
+</div>
 </template>
 
 <script lang="ts">
