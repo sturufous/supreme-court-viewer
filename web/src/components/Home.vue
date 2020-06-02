@@ -55,7 +55,7 @@
 
             if(this.selected == 'civil') {
                 this.UpdateCivilFile(fileInformation)
-                this.$router.push({name:'CivilDocumentsView', params: {fileNumber: fileInformation.fileNumber}})
+                this.$router.push({name:'CivilCaseDetails', params: {fileNumber: fileInformation.fileNumber}})
             } else if(this.selected == 'criminal') {
                 this.UpdateCriminalFile(fileInformation)
                 this.$router.push({name:'CriminalCaseDetails', params: {fileNumber: fileInformation.fileNumber}})
