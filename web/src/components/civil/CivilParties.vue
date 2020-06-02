@@ -1,5 +1,5 @@
 <template>
-<body>
+<div>
     <b-card bg-variant="white">
         <b-row cols="2" >
             <b-col class="mt-2" md="6" cols="6">
@@ -67,7 +67,7 @@
         </b-row>
     </b-card> 
 
-</body>
+</div>
 </template>
 
 <script lang="ts">
