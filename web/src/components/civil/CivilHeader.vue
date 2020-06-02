@@ -1,5 +1,5 @@
 <template>
-<body>
+<div>
     <b-navbar type="white" variant="white" v-if="isMounted">
       <b-navbar-nav>
 
@@ -34,13 +34,13 @@
             <b-dropdown-item-button
                 disabled
                 v-for="leftParty in leftPartiesInfo"
-                v-bind:key="leftParty.Name"
+                v-bind:key="leftParty.ID"
             >{{leftParty.Name}}</b-dropdown-item-button>
             <b-dropdown-divider></b-dropdown-divider>
             <b-dropdown-item-button 
                 disabled
                 v-for="rightParty in rightPartiesInfo"
-                v-bind:key="rightParty.Name"
+                v-bind:key="rightParty.ID"
             >{{rightParty.Name}}</b-dropdown-item-button>
         </b-dropdown>     
 
@@ -60,12 +60,11 @@
                 </b-button>
             </b-dropdown-item-button>
         </b-nav-item-dropdown>
+
       </b-navbar-nav>
     </b-navbar>
-
-    <hr class="mx-3  bg-info" style="height: 2px;"/>  
-      
-</body>
+    <hr class="mx-3 bg-warning" style="border-top: 2px double #FCBA19"/>      
+</div>
 </template>
 
 <script lang="ts">
@@ -126,13 +125,11 @@ export default class CivilHeader extends Vue {
             return  this.partyDisplayedTxt;
       } else {
           return "";
-      }
-    
+      }    
   }
 
   public getActivityClass() {
       return this.activityClassCodeMapping[this.activityClassCode];
-
   }
   
 }
