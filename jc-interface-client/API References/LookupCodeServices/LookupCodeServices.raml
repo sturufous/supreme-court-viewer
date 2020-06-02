@@ -346,6 +346,25 @@ resourceTypes:
         /{statusId}:
           type:
             readOnlyCollectionItem:
+      /partyAppearanceMethods:
+        /crown:
+          type:
+            readOnlyCollection:
+          /{methodId}:
+            type:
+              readOnlyCollectionItem:
+        /accusedCounsel:
+          type:
+            readOnlyCollection:
+          /{methodId}:
+            type:
+              readOnlyCollectionItem:
+        /accused:
+          type:
+            readOnlyCollection:
+          /{methodId}:
+            type:
+              readOnlyCollectionItem:
     /dateDeclinedBy:
       type:
         readOnlyCollection:

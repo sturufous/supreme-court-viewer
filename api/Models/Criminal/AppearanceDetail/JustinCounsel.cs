@@ -12,6 +12,7 @@
         public string CounselPartId { get; set; }
         public string CounselRelatedRepTypeCd { get; set; }
         public string CounselRrepId { get; set; }
-        public string AppearanceMethod { get; set; }
+        public string PartyAppearanceMethod { get; set; }
+        public string PartyAppearanceMethodDesc { get; set; }
     }
 }

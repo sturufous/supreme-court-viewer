@@ -25,7 +25,7 @@ namespace Scv.Api.Models.Criminal.AppearanceDetail
         /// <summary>
         /// Extended CriminalAppearanceMethod object.
         /// </summary>
-        public ICollection<CfcPartyAppearanceMethod> PartyAppearanceMethods { get; set; }
+        public ICollection<CriminalAppearanceMethod> AppearanceMethods { get; set; }
         public string EstimatedTimeHour { get; set; }
         public string EstimatedTimeMin { get; set; }
     }

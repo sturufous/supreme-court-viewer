@@ -2364,6 +2364,216 @@
         }
       ]
     },
+    "/codes/criminal/appearance/partyAppearanceMethods/crown": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/lookupCodes"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "No items matching the given criteria were found."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Get a list of available crown.\n",
+        "operationId": "GET_codes-criminal-appearance-partyAppearanceMethods-crown"
+      }
+    },
+    "/codes/criminal/appearance/partyAppearanceMethods/crown/{methodId}": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/lookupCode"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "No items matching the given criteria were found."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Get the specific crown.\n",
+        "operationId": "GET_codes-criminal-appearance-partyAppearanceMethods-crown-methodId"
+      },
+      "parameters": [
+        {
+          "name": "methodId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/codes/criminal/appearance/partyAppearanceMethods/accusedCounsel": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/lookupCodes"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "No items matching the given criteria were found."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Get a list of available accusedCounsel.\n",
+        "operationId": "GET_codes-criminal-appearance-partyAppearanceMethods-accusedCounsel"
+      }
+    },
+    "/codes/criminal/appearance/partyAppearanceMethods/accusedCounsel/{methodId}": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/lookupCode"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "No items matching the given criteria were found."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Get the specific accusedCounsel.\n",
+        "operationId": "GET_codes-criminal-appearance-partyAppearanceMethods-accusedCounsel-methodId"
+      },
+      "parameters": [
+        {
+          "name": "methodId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/codes/criminal/appearance/partyAppearanceMethods/accused": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/lookupCodes"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "No items matching the given criteria were found."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Get a list of available accused.\n",
+        "operationId": "GET_codes-criminal-appearance-partyAppearanceMethods-accused"
+      }
+    },
+    "/codes/criminal/appearance/partyAppearanceMethods/accused/{methodId}": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/lookupCode"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "No items matching the given criteria were found."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Get the specific accused.\n",
+        "operationId": "GET_codes-criminal-appearance-partyAppearanceMethods-accused-methodId"
+      },
+      "parameters": [
+        {
+          "name": "methodId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
     "/codes/criminal/dateDeclinedBy": {
       "get": {
         "responses": {

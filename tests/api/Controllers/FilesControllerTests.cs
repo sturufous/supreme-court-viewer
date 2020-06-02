@@ -369,8 +369,8 @@ namespace tests.api.Controllers
             Assert.Contains(criminalAppearanceDetail.Charges, p => p.AppearanceReasonDsc == "First Appearance");
             Assert.Contains(criminalAppearanceDetail.Charges, p => p.StatuteDsc == "offer bribe to justice/pol comm/peac off");
             Assert.Contains(criminalAppearanceDetail.Charges, p => p.StatuteSectionDsc == "CCC - 120(b)");
-            Assert.Equal(1, criminalAppearanceDetail.Accused.AppearanceMethods.Count);
-            Assert.Equal("TC", criminalAppearanceDetail.Accused.AppearanceMethods.First().AppearanceMethodCd);
+            Assert.Equal(1, criminalAppearanceDetail.AppearanceMethods.Count);
+            Assert.Equal("TC", criminalAppearanceDetail.AppearanceMethods.First().AppearanceMethodCd);
         }
 
 
@@ -390,8 +390,8 @@ namespace tests.api.Controllers
             Assert.Contains(criminalAppearanceDetail.Charges, p => p.AppearanceReasonDsc == "First Appearance");
             Assert.Contains(criminalAppearanceDetail.Charges, p => p.StatuteDsc == "offer bribe to justice/pol comm/peac off");
             Assert.Contains(criminalAppearanceDetail.Charges, p => p.StatuteSectionDsc == "CCC - 120(b)");
-            Assert.Equal(1, criminalAppearanceDetail.Accused.AppearanceMethods.Count);
-            Assert.Equal("TC", criminalAppearanceDetail.Accused.AppearanceMethods.First().AppearanceMethodCd);
+            Assert.Equal(1, criminalAppearanceDetail.AppearanceMethods.Count);
+            Assert.Equal("TC", criminalAppearanceDetail.AppearanceMethods.First().AppearanceMethodCd);
         }
 
         #region Helpers

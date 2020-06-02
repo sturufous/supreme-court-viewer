@@ -8,6 +8,8 @@ namespace Scv.Api.Models.Criminal.AppearanceDetail
     public class Prosecutor
     {
         public string Name { get; set; }
+        public string PartId { get; set; }
         public string PartyAppearanceMethod { get; set; }
+        public string PartyAppearanceMethodDesc { get; set; }
     }
 }
