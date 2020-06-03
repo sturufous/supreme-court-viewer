@@ -1,5 +1,5 @@
 <template>
-<body>
+
     <b-card bg-variant="white">
         <b-card style="height: 50px; background-color:#f0f0f0">
             <b-dropdown variant="light" :text="selectedType" style="position: absolute; top: 6px; bottom: 6px; left: 6px;" >    
@@ -64,7 +64,6 @@
         </b-row>       
     </b-card> 
 
-</body>
 </template>
 
 <script lang="ts">

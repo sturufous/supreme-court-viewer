@@ -1,5 +1,5 @@
 <template>
-<body>
+
     <b-card bg-variant="white">
         <div>
             <h3 class="mx-2 font-weight-normal" v-if="!showSections['Future Appearances']"> Next Three Future Appearances</h3>
@@ -95,7 +95,6 @@
       
     </b-card> 
 
-</body>
 </template>
 
 <script lang="ts">

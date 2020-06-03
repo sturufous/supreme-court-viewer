@@ -1,6 +1,5 @@
 <template>
-<body>
-  
+
     <b-navbar type="white" variant="white" v-if="isMounted">
       <b-navbar-nav>
             <b-nav-text style="font-size: 14px;" variant="white">
@@ -13,7 +12,6 @@
       </b-navbar-nav>
     </b-navbar>
 
-</body>
 </template>
 
 <script lang="ts">

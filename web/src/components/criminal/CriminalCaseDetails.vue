@@ -128,12 +128,15 @@ export default class CriminalCaseDetails extends Vue {
     sidePanelTitles = [ 
        'Case Details', 'Future Appearances', 'Past Appearances', 'Witnesses', 'Criminal Documents', 'Sentence/Order Details'    
     ];
+    topTitles = [ 
+       'Case Details', 'Future Appearances', 'Past Appearances', 'Witnesses', 'Criminal Documents', 'Criminal Sentences'    
+    ];
     
     get selectedSideBar()
     {
-        for(const title of this.sidePanelTitles)
+        for(const titleInx in this.sidePanelTitles)
         {
-          if (this.showSections[title] == true ) return '   '+ title
+          if (this.showSections[this.sidePanelTitles[titleInx]] == true ) return '   '+ this.topTitles[titleInx]
         }
         return ''
     }
