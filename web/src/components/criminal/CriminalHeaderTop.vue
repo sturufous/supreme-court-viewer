@@ -21,7 +21,7 @@ import "@store/modules/CriminalFileInformation";
 const criminalState = namespace("CriminalFileInformation");
 
 @Component
-export default class CriminalHeader extends Vue {
+export default class CriminalHeaderTop extends Vue {
   
   @criminalState.State
   public criminalFileInformation!: any;
