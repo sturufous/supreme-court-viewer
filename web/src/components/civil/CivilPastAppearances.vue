@@ -1,5 +1,5 @@
 <template>
-<body>
+<div>
     <b-card bg-variant="white">
         <div>
             <h3 class="mx-2 font-weight-normal" v-if="!showSections['Past Appearances']"> Last Three Past Appearances</h3>
@@ -105,7 +105,7 @@
       
     </b-card> 
 
-</body>
+</div>
 </template>
 
 <script lang="ts">
@@ -133,10 +133,10 @@ export default class CivilPastAppearances extends Vue {
     public showSections
     
     @civilState.State
-    public pastAppearanceInfo!: any;
+    public appearanceInfo!: any;
 
     @civilState.Action
-    public UpdatePastAppearanceInfo!: (newPastAppearanceInfo: any) => void
+    public UpdateAppearanceInfo!: (newAppearanceInfo: any) => void
 
     mounted() {
         this.getPastAppearances();
@@ -249,14 +249,14 @@ export default class CivilPastAppearances extends Vue {
     {
         if(!data.detailsShowing)
         {
-            this.pastAppearanceInfo.fileNo = this.civilFileInformation.fileNumber; 
+            this.appearanceInfo.fileNo = this.civilFileInformation.fileNumber; 
             
-            this.pastAppearanceInfo.appearanceId = data.item["Appearance ID"]
-            this.pastAppearanceInfo.supplementalEquipmentTxt = data.item["Supplemental Equipment"]
-            this.pastAppearanceInfo.securityRestrictionTxt = data.item["Security Restriction"]
-            this.pastAppearanceInfo.outOfTownJudgeTxt = data.item["OutOfTown Judge"]
+            this.appearanceInfo.appearanceId = data.item["Appearance ID"]
+            this.appearanceInfo.supplementalEquipmentTxt = data.item["Supplemental Equipment"]
+            this.appearanceInfo.securityRestrictionTxt = data.item["Security Restriction"]
+            this.appearanceInfo.outOfTownJudgeTxt = data.item["OutOfTown Judge"]
 
-            this.UpdatePastAppearanceInfo(this.pastAppearanceInfo);
+            this.UpdateAppearanceInfo(this.appearanceInfo);
         }
         
     }

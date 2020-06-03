@@ -41,15 +41,21 @@
                     <template v-for="(field,index) in fields[fieldsTab]" v-slot:[`cell(${field.key})`]="data" >
                         <span 
                             v-bind:key= "index" 
-                            v-b-hover= "colHover" 
                             v-if="field.key.includes('Date')"                           
                             v-on:click= "cellClick(index, data)"
                             :class= "cellClass(field, index, data)"    
                             style= "white-space: pre-line"> {{data.value|beautify-date}}
                         </span>
-                         <span 
+                        <span 
                             v-bind:key= "index" 
                             v-b-hover= "colHover" 
+                            v-else-if="field.key.includes('Document')"                           
+                            v-on:click= "cellClick(index, data)"
+                            :class= "cellClass(field, index, data)"    
+                            style= "white-space: pre-line"> {{data.value}}
+                        </span>
+                         <span 
+                            v-bind:key= "index" 
                             v-else                           
                             v-on:click= "cellClick(index, data)"
                             :class= "cellClass(field, index, data)"    

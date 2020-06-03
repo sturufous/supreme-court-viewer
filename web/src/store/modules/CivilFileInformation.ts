@@ -13,7 +13,7 @@ class CivilFileInformation extends VuexModule {
     'Past Appearances': false
   }
 
-  public pastAppearanceInfo = {}
+  public appearanceInfo = {}
 
   @Mutation
   public setCivilFile(civilFileInformation): void {
@@ -46,13 +46,13 @@ class CivilFileInformation extends VuexModule {
   }
 
   @Mutation
-  public setPastAppearanceInfo(pastAppearanceInfo): void {
-    this.pastAppearanceInfo = pastAppearanceInfo
+  public setAppearanceInfo(appearanceInfo): void {
+    this.appearanceInfo = appearanceInfo
   }
 
   @Action
-  public UpdatePastAppearanceInfo(newPastAppearanceInfo): void {
-    this.context.commit('setPastAppearanceInfo', newPastAppearanceInfo)
+  public UpdateAppearanceInfo(newAppearanceInfo): void {
+    this.context.commit('setAppearanceInfo', newAppearanceInfo)
   }
 
 }
