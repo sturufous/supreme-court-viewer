@@ -45,25 +45,9 @@ namespace Scv.Api.Services
 
         #region Collection Methods
 
-        public async Task<CodeLookup> GetCriminalAppearanceMethodsAccused()
+        public async Task<CodeLookup> GetCriminalPartyAttendanceTypes()
         {
-            return await GetDataFromCache(
-                "CriminalAppearanceMethodsAccused",
-                async () => await _lookupClient.CodesCriminalAppearancePartyAppearanceMethodsAccusedAsync());
-        }
-
-        public async Task<CodeLookup> GetCriminalAppearancesMethodsAccusedCounsel()
-        {
-            return await GetDataFromCache(
-                "CriminalAppearancesMethodsAccusedCounsel",
-                async () => await _lookupClient.CodesCriminalAppearancePartyAppearanceMethodsAccusedCounselAsync());
-        }
-
-        public async Task<CodeLookup> GetCriminalAppearanceMethodsCrown()
-        {
-            return await GetDataFromCache(
-                "CriminalAppearanceMethodsCrown",
-                async () => await _lookupClient.CodesCriminalAppearancePartyAppearanceMethodsCrownAsync());
+            return await GetDataFromCache("CriminalPartyAttendanceTypes",async () => await _lookupClient.CodesCriminalAppearancePartyAttendanceTypesAsync());
         }
 
         public async Task<CodeLookup> GetAgencyLocations()
@@ -176,12 +160,21 @@ namespace Scv.Api.Services
         #endregion Collection Methods
 
         #region Lookup Methods
-        
-        public async Task<string> GetCriminalAppearanceMethodCrown(string code) => FindShortDescriptionFromCode(await GetCriminalAppearanceMethodsCrown(), code);
+   
+        public async Task<string> GetPartyAttendanceType(string targetCode)
+        {
+            if (targetCode == null)
+                return null;
+            var codes = await GetCriminalPartyAttendanceTypes();
+            if (targetCode == "RA") return FindShortDescriptionFromCode(codes, targetCode);
 
-        public async Task<string> GetCriminalAppearanceMethodAccused(string code) => FindShortDescriptionFromCode(await GetCriminalAppearanceMethodsAccused(), code);
-
-        public async Task<string> GetCriminalAppearanceMethodAccusedCounsel(string code) => FindShortDescriptionFromCode(await GetCriminalAppearancesMethodsAccusedCounsel(), code);
+            var result = "";
+            foreach (var character in targetCode.Select(b => b))
+            {
+                result += $"{FindShortDescriptionFromCode(codes, character.ToString())} ";
+            }
+            return result.Trim();
+        }
 
         public async Task<string> GetAgencyLocationDescription(string code) => FindLongDescriptionFromCode(await GetAgencyLocations(), code);
 

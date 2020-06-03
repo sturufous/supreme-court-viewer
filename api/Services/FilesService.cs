@@ -102,16 +102,25 @@ namespace Scv.Api.Services
         public async Task<CivilAppearanceDetail> CivilDetailedAppearanceAsync(string fileId, string appearanceId)
         {
             async Task<CivilFileDetailResponse> FileDetails() => await _filesClient.FilesCivilFileIdAsync(_requestAgencyIdentifierId, _requestPartId, fileId);
+            async Task<CivilFileAppearancePartyResponse> AppearanceParty() => await _filesClient.FilesCivilAppearanceAppearanceIdPartiesAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
+            async Task<CivilFileAppearanceApprMethodResponse> AppearanceMethods() => await _filesClient.FilesCivilAppearanceAppearanceIdAppearancemethodsAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
+            async Task<CivilFileAppearancesResponse> Appearances() => await PopulateCivilDetailAppearancesAsync(FutureYN2.Y, HistoryYN2.Y, fileId);
 
             var fileDetailResponseTask = _cache.GetOrAddAsync($"CivilFileDetail-{fileId}", FileDetails);
-            var appearancePartyResponseTask = _filesClient.FilesCivilAppearanceAppearanceIdPartiesAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
-            var appearanceMethodsResponseTask = _filesClient.FilesCivilAppearanceAppearanceIdAppearancemethodsAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
+            var appearancePartyTask = _cache.GetOrAddAsync($"CivilAppearanceParty-{fileId}", AppearanceParty);
+            var appearanceMethodsTask = _cache.GetOrAddAsync($"CivilAppearanceMethods-{fileId}", AppearanceMethods);
+            var appearancesTask = _cache.GetOrAddAsync($"CivilAppearancesFull-{fileId}", Appearances);
 
             var fileDetailResponse = await fileDetailResponseTask;
-            var appearancePartyResponse = await appearancePartyResponseTask;
-            var appearanceMethodsResponse = await appearanceMethodsResponseTask;
+            var appearancePartyResponse = await appearancePartyTask;
+            var appearanceMethodsResponse = await appearanceMethodsTask;
+            var appearances = await appearancesTask;
 
-            var documentsWithSameAppearanceId = fileDetailResponse.Document.Where(doc =>
+            if (appearances == null  || appearances.ApprDetail?.Count == 0 || fileDetailResponse == null)
+                return null;
+
+            var appearanceDetail = appearances.ApprDetail?.FirstOrDefault(app => app.AppearanceId == appearanceId);
+            var fileDetailDocuments = fileDetailResponse.Document.Where(doc =>
                     doc.Appearance != null && doc.Appearance.Any(app => app.AppearanceId == appearanceId))
                 .ToList();
 
@@ -120,7 +129,7 @@ namespace Scv.Api.Services
                 PhysicalFileId = fileId,
                 AppearanceMethod = appearanceMethodsResponse.AppearanceMethod,
                 Party = await PopulateCivilDetailedAppearanceParties(appearancePartyResponse.Party),
-                Document = await PopulateCivilDetailedAppearanceDocuments(documentsWithSameAppearanceId)
+                Document = await PopulateCivilDetailedAppearanceDocuments(fileDetailDocuments, appearanceDetail)
             };
             return detailedAppearance;
         }
@@ -186,52 +195,66 @@ namespace Scv.Api.Services
             return detail;
         }
 
-        public async Task<CriminalAppearanceDetail> CriminalAppearanceDetailAsync(string fileId, string appearanceId, string partId, string profSeqNo)
+        public async Task<CriminalAppearanceDetail> CriminalAppearanceDetailAsync(string fileId, string appearanceId, string partId)
         {
             async Task<CriminalFileDetailResponse> FileDetails() => await _filesClient.FilesCriminalFileIdAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode, fileId);
             async Task<CriminalFileContent> FileContent() => await _filesClient.FilesCriminalFilecontentAsync(null, null, null, null, fileId);
             async Task<CriminalFileAppearances> Appearances() => await PopulateCriminalDetailsAppearancesAsync(fileId, FutureYN.Y, HistoryYN.Y);
             async Task<CriminalFileAppearanceCountResponse> AppearanceCounts() => await _filesClient.FilesCriminalAppearanceAppearanceIdCountsAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
             async Task<CriminalFileAppearanceApprMethodResponse> AppearanceMethods() => await _filesClient.FilesCriminalAppearanceAppearanceIdAppearancemethodsAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
-
-            //Probably cached, user has the path: FileDetails -> Appearances -> AppearanceDetails.  
+   
             var appearancesTask = _cache.GetOrAddAsync($"CriminalAppearancesFull-{fileId}", Appearances);
             var fileDetailTask = _cache.GetOrAddAsync($"CriminalFileDetail-{fileId}", FileDetails);
             var fileContentTask = _cache.GetOrAddAsync($"CriminalFileContent-{fileId}", FileContent);
             var appearanceCountTask = _cache.GetOrAddAsync($"CriminalAppearanceCounts-{fileId}", AppearanceCounts);
             var appearanceMethodsTask = _cache.GetOrAddAsync($"CriminalAppearanceMethods-{fileId}", AppearanceMethods);
 
+            //Probably cached, user has the path: FileDetails -> Appearances -> AppearanceDetails. 
+            var appearances = await appearancesTask;
+            var detail = _mapper.Map<RedactedCriminalFileDetailResponse>(await fileDetailTask);
+            var agencyId = await _locationService.GetLocationAgencyIdentifier(detail.HomeLocationAgenId);
+            detail.Witness = await PopulateCriminalDetailWitnesses(detail);
+
+            var targetAppearance = appearances?.ApprDetail?.FirstOrDefault(app => app.AppearanceId == appearanceId && app.PartId == partId);
+            if (targetAppearance == null || agencyId == null)
+                return null;
+
+            async Task<CourtList> CourtList() => await _filesClient.FilesCourtlistAsync(agencyId, targetAppearance.CourtRoomCd, targetAppearance.AppearanceDt, "CR", detail.FileNumberTxt);
+            var courtList = await _cache.GetOrAddAsync($"CriminalCourtList-{agencyId}-{targetAppearance.CourtRoomCd}-{targetAppearance.AppearanceDt}-{detail.FileNumberTxt}", CourtList);
             var fileContent = await fileContentTask;
             var appearanceCount = await appearanceCountTask;
             var appearanceMethods = await appearanceMethodsTask;
-            var appearances = await appearancesTask;
-            var detail = _mapper.Map<RedactedCriminalFileDetailResponse>(await fileDetailTask);
 
-            var targetAppearance = appearances?.ApprDetail?.FirstOrDefault(app => app.AppearanceId == appearanceId && app.PartId == partId && app.ProfSeqNo == profSeqNo);
+            var accusedFile = fileContent?.AccusedFile.FirstOrDefault(af => af.MdocJustinNo == fileId && af.PartId == partId);
             var criminalParticipant = detail?.Participant.FirstOrDefault(x => x.PartId == partId);
-            var accusedFile = fileContent?.AccusedFile.FirstOrDefault(af => af.MdocJustinNo == fileId && af.PartId == partId && af.ProfSeqNo == profSeqNo);
             var appearanceFromAccused = accusedFile?.Appearance.FirstOrDefault(a => a?.AppearanceId == appearanceId);
+            var targetCourtList = courtList.CriminalCourtList.FirstOrDefault(cl => cl.CriminalAppearanceID == appearanceId);
+            var attendanceMethods = targetCourtList?.AttendanceMethod;
+      
 
-            if (targetAppearance == null || criminalParticipant == null || accusedFile == null || appearanceFromAccused == null)
+            if (criminalParticipant == null || accusedFile == null || appearanceFromAccused == null)
                 return null;
 
+            //TODO: Need attendanceMethods for Witness and Respondent Not sure how to tie these back. 
             var appearanceDetail = new CriminalAppearanceDetail
             {
                 JustinNo = fileId,
+                AgencyId = await _locationService.GetLocationAgencyIdentifier(detail.HomeLocationAgenId),
+                AppearanceId = appearanceId,
                 PartId = targetAppearance.PartId,
                 ProfSeqNo = targetAppearance.ProfSeqNo,
                 CourtRoomCd = targetAppearance.CourtRoomCd,
                 FileNumberTxt = detail.FileNumberTxt,
                 AppearanceMethods = await PopulateAppearanceMethods(appearanceMethods.AppearanceMethod),
                 AppearanceDt = targetAppearance.AppearanceDt,
-                AppearanceNote = appearanceFromAccused.AppearanceNote,
+                AppearanceNote = appearanceFromAccused.AppearanceNote?.ReturnNullIfEmpty(),
                 JudgesRecommendation = appearanceFromAccused.JudgesRecommendation,
-                EstimatedTimeHour = StringExtensions.ReturnNullIfNullOrEmpty(appearanceFromAccused.EstimatedTimeHour),
-                EstimatedTimeMin = StringExtensions.ReturnNullIfNullOrEmpty(appearanceFromAccused.EstimatedTimeMin),
-                Accused = await PopulateCriminalAppearanceCriminalAccused(criminalParticipant.FullName, appearanceFromAccused),
-                Prosecutor = await PopulateCriminalAppearanceDetailProsecutor(appearanceFromAccused),
-                Adjudicator = PopulateCriminalAppearanceDetailAdjudicator(appearanceFromAccused),
-                JustinCounsel = await PopulateCriminalAppearanceDetailJustinCounsel(criminalParticipant, appearanceFromAccused),
+                EstimatedTimeHour = appearanceFromAccused.EstimatedTimeHour?.ReturnNullIfEmpty(),
+                EstimatedTimeMin = appearanceFromAccused.EstimatedTimeMin?.ReturnNullIfEmpty(),
+                Accused = await PopulateCriminalAppearanceCriminalAccused(criminalParticipant.FullName, appearanceFromAccused, attendanceMethods),
+                Prosecutor = await PopulateCriminalAppearanceDetailProsecutor(appearanceFromAccused, attendanceMethods),
+                Adjudicator = await PopulateCriminalAppearanceDetailAdjudicator(appearanceFromAccused, attendanceMethods),
+                JustinCounsel = await PopulateCriminalAppearanceDetailJustinCounsel(criminalParticipant, appearanceFromAccused, attendanceMethods),
                 Charges = await PopulateCharges(appearanceCount.ApprCount)
             };
             return appearanceDetail;
@@ -393,56 +416,73 @@ namespace Scv.Api.Services
 
         #region Criminal Appearance Details
 
-        private async Task<CriminalAccused> PopulateCriminalAppearanceCriminalAccused(string fullName, CfcAppearance appearanceFromAccused)
+        private async Task<CriminalAccused> PopulateCriminalAppearanceCriminalAccused(string fullName, CfcAppearance appearanceFromAccused, ICollection<ClAttendanceMethod> attendanceMethods)
         {
             var partyAppearanceMethod = appearanceFromAccused?.PartyAppearanceMethod.FirstOrDefault(pam => pam.PartyRole == "ACC");
+            var attendanceMethod = attendanceMethods?.FirstOrDefault(am => am.RoleType == "ACC");
             return new CriminalAccused
             {
                 FullName = fullName,
                 PartId = partyAppearanceMethod?.PartId,
                 PartyAppearanceMethod = partyAppearanceMethod?.PartyAppearanceMethod,
-                PartyAppearanceMethodDesc = await _lookupService.GetCriminalAppearanceMethodAccused(partyAppearanceMethod?.PartyAppearanceMethod)
+                PartyAppearanceMethodDesc = await _lookupService.GetPartyAttendanceType(partyAppearanceMethod?.PartyAppearanceMethod),
+                AttendanceMethodCd = attendanceMethod?.AttendanceMethodCd,
+                AttendanceMethodDesc = await _lookupService.GetCriminalAssetsDescriptions(attendanceMethod?.AttendanceMethodCd)
             };
         }
 
-        private Adjudicator PopulateCriminalAppearanceDetailAdjudicator(CfcAppearance appearanceFromAccused)
+        private async Task<Adjudicator> PopulateCriminalAppearanceDetailAdjudicator(CfcAppearance appearanceFromAccused, ICollection<ClAttendanceMethod> attendanceMethods)
         {
             var partyAppearanceMethod = appearanceFromAccused?.PartyAppearanceMethod.FirstOrDefault(pam => pam.PartyRole == "ADJ");
+            var attendanceMethod = attendanceMethods?.FirstOrDefault(am => am.RoleType == "ADJ");
             if (partyAppearanceMethod == null)
                 return null;
 
             return new Adjudicator
             {
-                Name = partyAppearanceMethod.PartyName,
+                FullName = partyAppearanceMethod.PartyName.ConvertNameLastCommaFirstToFirstLast(),
                 PartId = partyAppearanceMethod.PartId,
-                PartyAppearanceMethod = partyAppearanceMethod.PartyAppearanceMethod 
+                PartyAppearanceMethod = partyAppearanceMethod.PartyAppearanceMethod,
+                PartyAppearanceMethodDesc = await _lookupService.GetPartyAttendanceType(partyAppearanceMethod?.PartyAppearanceMethod),
+                AttendanceMethodCd = attendanceMethod?.AttendanceMethodCd,
+                AttendanceMethodDesc = await _lookupService.GetCriminalAssetsDescriptions(attendanceMethod?.AttendanceMethodCd)
             };
         }
 
-        private async Task<Prosecutor> PopulateCriminalAppearanceDetailProsecutor(CfcAppearance appearanceFromAccused)
+        private async Task<Prosecutor> PopulateCriminalAppearanceDetailProsecutor(CfcAppearance appearanceFromAccused, ICollection<ClAttendanceMethod> attendanceMethods)
         {
             var partyAppearanceMethod = appearanceFromAccused?.PartyAppearanceMethod.FirstOrDefault(pam => pam.PartyRole == "PRO");
+            var attendanceMethod = attendanceMethods?.FirstOrDefault(am => am.RoleType == "PRO");
             if (partyAppearanceMethod == null)
                 return null;
 
             return new Prosecutor
             {
-                Name = partyAppearanceMethod.PartyName,
+                FullName = partyAppearanceMethod.PartyName.ConvertNameLastCommaFirstToFirstLast(),
                 PartId = partyAppearanceMethod.PartId,
                 PartyAppearanceMethod = partyAppearanceMethod.PartyAppearanceMethod,
-                PartyAppearanceMethodDesc = await _lookupService.GetCriminalAppearanceMethodCrown(partyAppearanceMethod.PartyAppearanceMethod)
+                PartyAppearanceMethodDesc = await _lookupService.GetPartyAttendanceType(partyAppearanceMethod?.PartyAppearanceMethod),
+                AttendanceMethodCd = attendanceMethod?.AttendanceMethodCd,
+                AttendanceMethodDesc = await _lookupService.GetCriminalAssetsDescriptions(attendanceMethod?.AttendanceMethodCd)
             };
         }
 
-        private async Task<JustinCounsel> PopulateCriminalAppearanceDetailJustinCounsel(CriminalParticipant criminalParticipant, CfcAppearance appearanceFromAccused)
+        private async Task<JustinCounsel> PopulateCriminalAppearanceDetailJustinCounsel(CriminalParticipant criminalParticipant, CfcAppearance appearanceFromAccused, ICollection<ClAttendanceMethod> attendanceMethods)
         {
             if (criminalParticipant == null)
                 return null;
 
             var justinCounsel = _mapper.Map<JustinCounsel>(criminalParticipant);
-            var partyAppearanceMethod = appearanceFromAccused?.PartyAppearanceMethod.FirstOrDefault(pam => pam.PartyRole == "COU");
+            var partyAppearanceMethod = appearanceFromAccused?.PartyAppearanceMethod.FirstOrDefault(pam => pam.PartyRole == "CON");
+            var attendanceMethod = attendanceMethods?.FirstOrDefault(am => am.RoleType == "CON");
             justinCounsel.PartyAppearanceMethod = partyAppearanceMethod?.PartyAppearanceMethod;
-            justinCounsel.PartyAppearanceMethodDesc = await _lookupService.GetCriminalAppearanceMethodAccusedCounsel(partyAppearanceMethod?.PartyAppearanceMethod);
+            justinCounsel.PartyAppearanceMethodDesc = await _lookupService.GetPartyAttendanceType(partyAppearanceMethod?.PartyAppearanceMethod);
+            justinCounsel.AttendanceMethodCd = attendanceMethod?.AttendanceMethodCd;
+            justinCounsel.AttendanceMethodDesc = await _lookupService.GetCriminalAssetsDescriptions(attendanceMethod?.AttendanceMethodCd);
+            //justinCounsel.PartyAppearanceMethodDesc = await _lookupService.GetCriminalAppearanceMethodAccusedCounsel(partyAppearanceMethod?.PartyAppearanceMethod);
+            //We could assign name here from the PartyAppearance, but that doesn't appear to be correct. 
+            //While testing I found data inside of PartyAppearances, but used CourtList and saw there was no assigned counsel. 
+            //FileId 1180, AppearanceId 1528.0026, PartId 15911.0026 is an example of this on the Development Environment. 
             return justinCounsel;
         }
 
@@ -579,14 +619,16 @@ namespace Scv.Api.Services
             return civilAppearanceDetailParties;
         }
 
-        private async Task<ICollection<CivilAppearanceDocument>> PopulateCivilDetailedAppearanceDocuments(List<CvfcDocument3> documentsWithSameAppearanceId)
+        private async Task<ICollection<CivilAppearanceDocument>> PopulateCivilDetailedAppearanceDocuments(List<CvfcDocument3> fileDetailDocuments, JCCommon.Clients.FileServices.CivilAppearanceDetail appearance)
         {
             //CivilAppearanceDocument, doesn't include appearances.
-            var documents = _mapper.Map<ICollection<CivilAppearanceDocument>>(documentsWithSameAppearanceId);
+            var documents = _mapper.Map<ICollection<CivilAppearanceDocument>>(fileDetailDocuments);
             foreach (var document in documents)
             {
                 document.Category = _lookupService.GetDocumentCategory(document.DocumentTypeCd);
                 document.DocumentTypeDescription = await _lookupService.GetDocumentDescriptionAsync(document.DocumentTypeCd);
+                document.AppearanceResultCd = appearance?.AppearanceResultCd;
+                document.AppearanceResultDesc = await _lookupService.GetCriminalAppearanceResultsDescription(appearance?.AppearanceResultCd);
             }
             return documents;
         }

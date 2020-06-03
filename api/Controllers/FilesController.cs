@@ -45,7 +45,8 @@ namespace Scv.Api.Controllers
         /// <summary>
         /// Provides facilities for performing a civil file search.
         /// </summary>
-        /// <param name="fcq">FileCivilQuery object with many parameters</param>
+        /// <param name="fcq">FileCivilQuery object with many parameters - Search Modes: FILENO = 0, PARTNAME = 1, CROWN = 2, JUSTINNO = 3, PHYSID = 4</param>
+        /// 
         /// <returns>FileSearchResponse</returns>
         [HttpPost]
         [Route("civil/search")]
@@ -65,6 +66,8 @@ namespace Scv.Api.Controllers
         public async Task<ActionResult<RedactedCivilFileDetailResponse>> GetCivilFileDetailByFileId(string fileId)
         {
             var civilFileDetailResponse = await _filesService.CivilFileIdAsync(fileId);
+            if (civilFileDetailResponse?.PhysicalFileId == null)
+                throw new NotFoundException("Couldn't find civil file with this id.");
             return Ok(civilFileDetailResponse);
         }
 
@@ -78,8 +81,10 @@ namespace Scv.Api.Controllers
         [Route("civil/{fileId}/appearance-detail/{appearanceId}")]
         public async Task<ActionResult<CivilAppearanceDetail>> GetCivilAppearanceDetails(string fileId, string appearanceId)
         {
-            var res = await _filesService.CivilDetailedAppearanceAsync(fileId, appearanceId);
-            return Ok(res);
+            var civilAppearanceDetail = await _filesService.CivilDetailedAppearanceAsync(fileId, appearanceId);
+            if (civilAppearanceDetail == null)
+                throw new NotFoundException("Couldn't find appearance detail with the provided file id and appearance id.");
+            return Ok(civilAppearanceDetail);
         }
 
         /// <summary>
@@ -150,18 +155,17 @@ namespace Scv.Api.Controllers
         }
 
         /// <summary>
-        /// Gets detailed information regarding an appearance given criminal file id, appearance id, participant id and sequence number.
+        /// Gets detailed information regarding an appearance given criminal file id, appearance id, participant id.
         /// </summary>
         /// <param name="fileId"></param>
         /// <param name="appearanceId"></param>
         /// <param name="partId"></param>
-        /// <param name="profSeqNo"></param>
         /// <returns>CriminalAppearanceDetail</returns>
         [HttpGet]
-        [Route("criminal/{fileId}/appearance-detail/{appearanceId}/{partId}/{profSeqNo}")]
-        public async Task<ActionResult<CriminalAppearanceDetail>> GetCriminalAppearanceDetails(string fileId, string appearanceId, string partId, string profSeqNo)
+        [Route("criminal/{fileId}/appearance-detail/{appearanceId}/{partId}")]
+        public async Task<ActionResult<CriminalAppearanceDetail>> GetCriminalAppearanceDetails(string fileId, string appearanceId, string partId)
         {
-            var appearanceDetail = await _filesService.CriminalAppearanceDetailAsync(fileId, appearanceId, partId, profSeqNo);
+            var appearanceDetail = await _filesService.CriminalAppearanceDetailAsync(fileId, appearanceId, partId);
             if (appearanceDetail == null)
                 throw new NotFoundException("Couldn't find appearance details with the provided parameters.");
             return Ok(appearanceDetail);

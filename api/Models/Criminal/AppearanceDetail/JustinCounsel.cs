@@ -14,5 +14,7 @@
         public string CounselRrepId { get; set; }
         public string PartyAppearanceMethod { get; set; }
         public string PartyAppearanceMethodDesc { get; set; }
+        public string AttendanceMethodCd { get; set; }
+        public string AttendanceMethodDesc { get; set; }
     }
 }

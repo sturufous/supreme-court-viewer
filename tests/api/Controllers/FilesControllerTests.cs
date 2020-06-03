@@ -361,7 +361,7 @@ namespace tests.api.Controllers
         [Fact]
         public async void Criminal_Appearance_Details()
         {
-            var actionResult = await _controller.GetCriminalAppearanceDetails("2934", "36548.0734", "19498.0042", "1");
+            var actionResult = await _controller.GetCriminalAppearanceDetails("2934", "36548.0734", "19498.0042");
 
             var criminalAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Equal(1, criminalAppearanceDetail.Charges.Count);
@@ -382,7 +382,7 @@ namespace tests.api.Controllers
             var fileDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
 
             //Now call criminalAppearanceDetails. 
-            var actionResult2 = await _controller.GetCriminalAppearanceDetails("2934", "36548.0734", "19498.0042", "1");
+            var actionResult2 = await _controller.GetCriminalAppearanceDetails("2934", "36548.0734", "19498.0042");
 
             var criminalAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult2);
             Assert.Equal(1, criminalAppearanceDetail.Charges.Count);
@@ -393,7 +393,7 @@ namespace tests.api.Controllers
             Assert.Equal(1, criminalAppearanceDetail.AppearanceMethods.Count);
             Assert.Equal("TC", criminalAppearanceDetail.AppearanceMethods.First().AppearanceMethodCd);
         }
-
+ 
         #region Helpers
 
         private void SetupMocks()
