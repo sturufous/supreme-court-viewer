@@ -1,5 +1,4 @@
 <template>
-<body>
     <b-card bg-variant="white">
         <div>
             <h3 class="mx-2 font-weight-normal" v-if="!showSections['Past Appearances']"> Last Three Past Appearances</h3>
@@ -94,8 +93,6 @@
         </b-card>
       
     </b-card> 
-
-</body>
 </template>
 
 <script lang="ts">
