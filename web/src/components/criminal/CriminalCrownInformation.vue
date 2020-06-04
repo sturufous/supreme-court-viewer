@@ -2,15 +2,16 @@
    <b-card  v-if= "isMounted">
        <div>         
             <h3 class="mx-2 font-weight-normal"> Crown Information </h3>
-            <hr class="mb-0 bg-light" style="height: 5px;"/>         
+            <hr class="mb-3 bg-light" style="height: 5px;"/>         
         </div>       
-        <b-card bg-variant="white">
+        <b-card bg-variant="white" no-body>
             <b-table
             :items="crownInformation"
             :fields="fields"            
             thead-class="d-none"
             responsive="sm"
-            borderless               
+            borderless 
+            small              
             striped
             >
                 <template  v-slot:cell(CrownInfoValue)="data">

@@ -3,65 +3,77 @@
    <b-card  v-if= "isMounted">
         <div>         
             <h3 class="mx-2 font-weight-normal"> Documents ({{NumberOfDocuments}}) </h3>
-            <hr class="mb-0 bg-light" style="height: 5px;"/>         
-        </div>  
+            <hr class="mb-1 bg-light" style="height: 2px;"/>                   
+        </div>
        
-        <b-card bg-variant="white">
-            <b-tabs  nav-wrapper-class = "bg-light text-dark"
-                     active-nav-item-class="text-uppercase font-weight-bold text-white bg-primary"                     
-                     pills >
-                <b-tab 
-                v-for="(tabMapping, index) in categories" 
-                :key="index"                 
-                :title="tabMapping"                 
-                v-on:click="activetab = tabMapping" 
-                v-bind:class="[ activetab === tabMapping ? 'active' : '' ]"
-                ></b-tab>
-            </b-tabs>
-        </b-card>        
+        <b-tabs nav-wrapper-class = "bg-light text-dark"
+                active-nav-item-class="text-uppercase font-weight-bold text-white bg-primary"                     
+                pills >
+            <b-tab 
+            v-for="(tabMapping, index) in categories" 
+            :key="index"                 
+            :title="tabMapping"                 
+            v-on:click="activetab = tabMapping" 
+            v-bind:class="[ activetab === tabMapping ? 'active mb-3' : 'mb-3' ]"
+            ></b-tab>
+        </b-tabs>
+               
        
-        <b-card/>
- 
+        
         <b-overlay :show="loadingPdf" rounded="sm">  
-            <b-card bg-variant="light" style="max-height: 400px; overflow-y: auto;">           
+            <b-card bg-variant="light" style="max-height: 500px; overflow-y: auto;">           
                 <b-table
                 :items="FilteredDocuments"
                 :fields="fields[fieldsTab]"
                 :sort-by.sync="sortBy"
                 :sort-desc.sync="sortDesc"
                 :no-sort-reset="true"
-                @row-hovered="rowHover"
-                striped
                 sort-icon-left
+                sticky-header
+                small
+                striped
                 responsive="sm"
                 >   
                     <template v-for="(field,index) in fields[fieldsTab]" v-slot:[`head(${field.key})`]="data">
                         <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
                     </template>
-                    <template v-for="(field,index) in fields[fieldsTab]" v-slot:[`cell(${field.key})`]="data" >
-                        <span 
-                            v-bind:key= "index" 
-                            v-if="field.key.includes('Date')"                           
-                            v-on:click= "cellClick(index, data)"
-                            :class= "cellClass(field, index, data)"    
-                            style= "white-space: pre-line"> {{data.value|beautify-date}}
-                        </span>
-                        <span 
-                            v-bind:key= "index" 
-                            v-b-hover= "colHover" 
-                            v-else-if="field.key.includes('Document')"                           
-                            v-on:click= "cellClick(index, data)"
-                            :class= "cellClass(field, index, data)"    
-                            style= "white-space: pre-line"> {{data.value}}
-                        </span>
-                         <span 
-                            v-bind:key= "index" 
-                            v-else                           
-                            v-on:click= "cellClick(index, data)"
-                            :class= "cellClass(field, index, data)"    
-                            style= "white-space: pre-line"> {{data.value}}
+
+                    <template v-slot:[`cell(${fields[fieldsTab][datePlace[fieldsTab]].key})`]="data" >
+                        {{ data.value | beautify-date}}
+                    </template> 
+
+                    <template v-slot:[`cell(${fields[fieldsTab][documentPlace[fieldsTab]].key})`]="data" >
+                        <b-button 
+                            v-if="data.item.PdfAvail" 
+                            variant="outline-primary text-info" 
+                            style="border:0px;"
+                            @click="cellClick(data)"
+                            size="sm">
+                                {{data.value}}
+                        </b-button>
+                        <span class="ml-2" v-else>
+                             {{data.value}}
                         </span>
                     </template>
+
+                    <template v-slot:cell(Act)="data" >
+                        <b-badge 
+                            variant="secondary"
+                            style="display: block; margin-top: 1px; font-size: 14px; max-width : 50px;"                     
+                            v-for="(act, actIndex) in data.value"  
+                            v-bind:key="actIndex"                               
+                            v-b-tooltip.hover.left 
+                            :title="act.Description"> 
+                                {{act.Code}}<br> 
+                        </b-badge>
+                    </template>
+
+                    <template v-slot:cell(Issues)="data" >
+                        <span style= "white-space: pre-line"> 
+                            {{data.value}}
+                        </span>
+                    </template>
+
                 </b-table>
             </b-card>
             <template v-slot:overlay>               
@@ -118,16 +130,16 @@ export default class CivilDocumentsView extends Vue {
     isMounted = false;
 
     activetab = 'ALL';            
-    sortBy = 'Seq.';
-    sortDesc = false;
-    hoverRow =-1;
-    hoverCol = 0;
+    
+    sortDesc = false;    
 
     documents: any[] = [];
     summaryDocuments: any[] = [];
     categories: string[] = []; 
 
     fieldsTab = fieldTab.Categories;
+    documentPlace = [1,0]
+    datePlace = [3,1]
 
     fields = [ 
         [
@@ -144,30 +156,13 @@ export default class CivilDocumentsView extends Vue {
         
     ];
 
-    public cellClick(index, data)
-    {
-        if(data.item.PdfAvail && index==1 && this.activetab!='COURT SUMMARY')
-        {
-            this.openDocumentsPdf(data.item['Document ID']);
-        }
-        else if (index==0 && this.activetab=='COURT SUMMARY')
-        {
-            this.openCourtSummaryPdf(data.item['Appearance ID']);
-        }         
-    }
-
-    public cellClass(field, index, data)
-    {
-        if(data.item.PdfAvail && index==1 && this.activetab!='COURT SUMMARY')
-        {
-            if(this.hoverCol==1 && this.hoverRow==data.item.Index) return 'text-white bg-warning'; else return 'text-info';            
-        }
-        else if(index==0 && this.activetab=='COURT SUMMARY')
-        {
-            if(this.hoverCol==0 && this.hoverRow==data.item.Index) return 'text-white bg-warning'; else return 'text-info';   
-        }
-        else 
-            return field.cellStyle;
+    public cellClick(data)
+    {     
+        console.log(data.value)    
+        if(data.value !='CourtSummary')        
+            this.openDocumentsPdf(data.item['Document ID']);        
+        else        
+            this.openCourtSummaryPdf(data.item['Appearance ID'])              
     }
 
     public navigateToLandingPage() {
@@ -193,8 +188,13 @@ export default class CivilDocumentsView extends Vue {
                 docInfo["Category"] = jDoc.category? jDoc.category : '';
                 if((this.categories.indexOf(docInfo["Category"]) < 0) && docInfo["Category"].length > 0) this.categories.push(docInfo["Category"])
                 // ensure all documentSupport elements only have one row
-                const docSupport: any = jDoc.documentSupport.length? jDoc.documentSupport[0]:'{}';
-                docInfo["Act"] = (docSupport==={})? '': docSupport.actCd;
+                docInfo["Act"] = [];            
+                if (jDoc.documentSupport && jDoc.documentSupport.length > 0) {
+                    for (const act of jDoc.documentSupport) {
+                        docInfo["Act"].push({'Code': act.actCd, 'Description': act.actDsc})
+                    }
+                }  
+
                 docInfo["Document ID"] = jDoc.civilDocumentId;            
                 docInfo["PdfAvail"] = jDoc.imageId? true : false 
                 docInfo["Date Filed"] = jDoc.filedDt? jDoc.filedDt.split(' ')[0] : '';
@@ -258,7 +258,21 @@ export default class CivilDocumentsView extends Vue {
                 }
             }); 
         }       
-    }    
+    }
+    
+    get sortBy()
+    {
+        if(this.activetab == 'COURT SUMMARY')
+        {
+            this.sortDesc = true;
+            return 'Appearance Date';
+        }
+        else
+        {
+           this.sortDesc = false;
+           return 'Seq.'; 
+        }
+    }
 
     public openDocumentsPdf(documentId): void {
         this.loadingPdf = true;
@@ -273,14 +287,6 @@ export default class CivilDocumentsView extends Vue {
         const filename = 'court summary_'+appearanceId+'.pdf';
         window.open(`/api/files/civil/court-summary-report/${appearanceId}/${filename}`)
         this.loadingPdf = false;
-    }
-    
-    public colHover(hovered, mouseEvent) {            
-        hovered && mouseEvent.fromElement != null? this.hoverCol = mouseEvent.fromElement.cellIndex: this.hoverCol =-1;
-    }
-
-    public rowHover(row) {
-        this.hoverRow = row.Index;
     }
     
     get NumberOfDocuments() {       

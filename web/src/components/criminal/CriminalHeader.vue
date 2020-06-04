@@ -1,6 +1,6 @@
 <template>
 <div>
-    <b-navbar type="white" variant="white" v-if="isMounted">
+    <b-navbar type="white" variant="white" v-if="isMounted" style="height:30px">
       <b-navbar-nav>
 
         <b-nav-text class="text-info mt-1 mr-2" style="font-size: 12px;">
@@ -46,9 +46,9 @@
             <b-dropdown-item-button        
             v-for="(restriction, index) in adjudicatorRestrictions"
             :key="index">
-                <b-button style="font-size: 12px; padding: 0px 2px;" 
-                          variant="primary" 
-                          v-b-tooltip.hover 
+                <b-button style="font-size: 14px; padding: 0px 2px;" 
+                          variant="secondary" 
+                          v-b-tooltip.hover.left 
                           :title='restriction["Full Name"]'>
                     {{restriction["Adj Restriction"]}}
                 </b-button>
@@ -57,7 +57,7 @@
       </b-navbar-nav>
     </b-navbar>
 
-    <hr class="mx-3  bg-info" style="height: 2px;"/>  
+    <hr class="mx-3 bg-warning" style="border-top: 2px double #FCBA19"/> 
       
 </div>
 </template>
@@ -98,7 +98,7 @@ export default class CriminalHeader extends Vue {
       this.setActiveParticipantIndex(this.SortedParticipants[0].Index)
   } 
 
-  maximumFullNameLength = 17;
+  maximumFullNameLength = 15;
   numberOfParticipants = 0;
   fileNumberText;
   agencyLocation = {Name:'', Code:0, Region:'' };
@@ -149,7 +149,7 @@ export default class CriminalHeader extends Vue {
     const nameOfParticipant = this.getNameOfParticipant(this.activeCriminalParticipantIndex);
 
     if(nameOfParticipant.length > this.maximumFullNameLength)   
-        return nameOfParticipant.substr(0, this.maximumFullNameLength) +'. ';    
+        return nameOfParticipant.substr(0, this.maximumFullNameLength) +' ... ';    
     else 
         return  nameOfParticipant;
      

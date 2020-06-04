@@ -11,7 +11,8 @@
             </template> 
         </b-overlay> 
     </b-card>
-    <b-card bg-variant="light" v-else>
+
+    <b-card bg-variant="light" v-else no-body>
       <b-card bg-variant="white">
         <b-row cols="2">            
             <b-col md="8" cols="8" style="overflow: auto;">
@@ -24,56 +25,62 @@
                         <span class="text-muted"> No documents. </span>
                     </b-card>                           
                     <b-table
-                    v-if="appearanceDocuments.length > 0"
-                    :items="appearanceDocuments"
-                    :fields="documentFields"               
-                    borderless
-                    striped                    
-                    @row-hovered="rowHover"               
-                    responsive="sm"
-                    >   
-                        <template v-for="(field,index) in documentFields" v-slot:[`head(${field.key})`]="data">
-                            <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
-                        </template>                
-                        <template v-for="(field,index) in documentFields" v-slot:[`cell(${field.key})`]="data" >
-                            <span v-bind:key= "index" v-b-hover= "colHover" 
-                                v-if="field.key.includes('Document')" 
-                                v-on:click="documentClick(data.item)" 
-                                :class="documentCellClass(field, data.item)"    
-                                :style="field.cellStyle"> {{data.value}}
-                            </span>
-                            <span v-bind:key="index" :class="field.cellClass" v-else-if="field.key.includes('Date')">{{ data.value|beautify-date }}</span>
-                            <span v-bind:key="index" v-else-if="field.key.includes('Act')">
-                                <span 
-                                    v-for="(act, actIndex) in data.value"  
-                                    v-bind:key="actIndex"
-                                    variant="outline-primary border-white"
-                                    v-b-tooltip.hover                            
-                                    :title="act.Description"
-                                    :class="field.cellClass" 
-                                    :style ="field.cellStyle">{{ act.Code }}<br>
+                        v-if="appearanceDocuments.length > 0"
+                        :items="appearanceDocuments"
+                        :fields="documentFields"               
+                        borderless
+                        striped 
+                        small               
+                        responsive="sm"
+                        >   
+                            <template v-slot:[`cell(${documentFields[1].key})`]="data" >
+                                <b-button 
+                                    v-if="data.item.PdfAvail" 
+                                    variant="outline-primary text-info" 
+                                    style="border:0px;"
+                                    @click="documentClick(data)"
+                                    size="sm">
+                                        {{data.value}}
+                                </b-button>
+                                <span class="ml-2" v-else>
+                                    {{data.value}}
                                 </span>
-                            </span>
-                            <span v-bind:key="index" v-else-if="field.key.includes('Result') && data.value" 
-                                variant="outline-primary border-white"
-                                v-b-tooltip.hover                            
-                                :title="data.item['Result Description']"
-                                :class="field.cellClass" 
-                                :style ="field.cellStyle">{{ data.value }}                                
-                            </span>
-                            <ul v-bind:key="index" v-else-if="field.key.includes('Issue')">
+                            </template>
+
+                            <template v-slot:cell(Act)="data" >
+                                <b-badge 
+                                    variant="secondary"
+                                    style="display: block; margin-top: 1px; font-size: 14px; max-width : 50px;"                     
+                                    v-for="(act, actIndex) in data.value"  
+                                    v-bind:key="actIndex"                               
+                                    v-b-tooltip.hover.left
+                                    :title="act.Description"> 
+                                        {{act.Code}} 
+                                </b-badge>
+                            </template>                            
+
+                            <template v-slot:[`cell(${documentFields[3].key})`]="data" >
+                                {{ data.value | beautify-date}}
+                            </template>
+
+                             <template v-slot:cell(Result)="data" >
+                                <b-badge
+                                    v-if="data.value"  
+                                    variant="secondary"
+                                    v-b-tooltip.hover.left                            
+                                    title="data.item['Result Description']">
+                                        {{data.value}}                                 
+                                </b-badge>
+                             </template>
+
+                            <template v-slot:cell(Issues)="data" >                               
                                 <li 
                                     v-for="(issue, issueIndex) in data.value"  
-                                    v-bind:key="issueIndex"                                    
-                                    :class="field.cellClass" 
-                                    :style ="field.cellStyle">{{ issue }}
+                                    v-bind:key="issueIndex"
+                                    style="line-height: 100%;">
+                                        {{ issue }}
                                 </li>
-                            </ul>
-                            <span v-bind:key="index" :class="field.cellClass" v-else>{{ data.value }}</span>
-
-                    
-                        </template>
-
+                            </template>           
                     </b-table>
                     <template v-slot:overlay>               
                         <div style="text-align: center"> 
@@ -88,21 +95,20 @@
                     <hr class="mb-0 bg-light" style="height: 5px;"/> 
                 </div>                           
                 <b-table
-                :items="appearanceParties"
-                :fields="partyFields"               
-                borderless
-                striped               
-                responsive="sm"
-                >   
-                    <template v-for="(field,index) in partyFields" v-slot:[`head(${field.key})`]="data">
-                        <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
-                    </template>                
-                    <template v-for="(field,index) in partyFields" v-slot:[`cell(${field.key})`]="data" >
-                        <span v-bind:key="index" :style="field.cellStyle" v-if="data.field.key != 'Current Counsel'">  {{ data.value }} </span>
-                        <span v-bind:key="index" :style="field.cellStyle" v-if="data.field.key == 'Current Counsel' && data.value">CEIS: {{ data.value }}</span> 
-                    </template>
-                </b-table>
-                
+                    :items="appearanceParties"
+                    :fields="partyFields"               
+                    borderless
+                    striped               
+                    responsive="sm"
+                    >   
+                        <template v-for="(field,index) in partyFields" v-slot:[`head(${field.key})`]="data">
+                            <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
+                        </template>                
+                        <template v-for="(field,index) in partyFields" v-slot:[`cell(${field.key})`]="data" >
+                            <span v-bind:key="index" :style="field.cellStyle" v-if="data.field.key != 'Current Counsel'">  {{ data.value }} </span>
+                            <span v-bind:key="index" :style="field.cellStyle" v-if="data.field.key == 'Current Counsel' && data.value">CEIS: {{ data.value }}</span> 
+                        </template>
+                </b-table>                
             </b-col>
             <b-col col md="4" cols="4" style="overflow: auto;">
                  <div>
@@ -111,17 +117,15 @@
                 </div>
                            
                 <b-table
-                :items="appearanceAdditionalInfo"
-                :fields="addInfoFields"
-                thead-class="d-none"               
-                borderless                                  
-                responsive="sm"
-                >
-                <template  v-slot:cell(key)="data">
-                    <span >
-                        <b > {{ data.value }}</b>
-                    </span>                    
-                </template>
+                    :items="appearanceAdditionalInfo"
+                    :fields="addInfoFields"
+                    thead-class="d-none"               
+                    borderless                                  
+                    responsive="sm"
+                    >
+                        <template  v-slot:cell(key)="data">                           
+                            <b > {{ data.value }}</b>                                               
+                        </template>
                 </b-table>                
             </b-col>          
         </b-row>
@@ -174,9 +178,7 @@ export default class CivilAppearanceDetails extends Vue {
     appearanceDocuments: any[] = [];
     appearanceParties: any[] = [];
     additionalInfo = {};
-    hoverRow =-1;
-    hoverCol = 0;
-
+  
     appearanceAdditionalInfo: any[] = [];
 
     addInfoFields =  
@@ -187,12 +189,12 @@ export default class CivilAppearanceDetails extends Vue {
 
     documentFields =  
     [
-        {key:'Seq.',           sortable:false,  tdClass: 'border-top', headerStyle:'text', cellClass:'text',             cellStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
+        {key:'Seq.',           sortable:false,  tdClass: 'border-top', headerStyle:'text', cellClass:'text',                  cellStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
         {key:'Document Type',  sortable:false,  tdClass: 'border-top', headerStyle:'text', cellClass:'text',                  cellStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
         {key:'Act',            sortable:false,  tdClass: 'border-top', headerStyle:'text', cellClass:'badge badge-dark mt-2', cellStyle: 'display: block; margin-top: 1px; font-size: 14px;'},
         {key:'Date Filed',     sortable:false,  tdClass: 'border-top', headerStyle:'text', cellClass:'text',                  cellStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
         {key:'Result',         sortable:false,  tdClass: 'border-top', headerStyle:'text', cellClass:'badge badge-dark mt-2', cellStyle: 'display: block; margin-top: 1px; font-size: 14px;'},
-        {key:'Issue',          sortable:false,  tdClass: 'border-top', headerStyle:'text', cellClass:'text',                  cellStyle: 'font-weight: normal; font-size: 14px; padding-top:6px'}
+        {key:'Issues',          sortable:false,  tdClass: 'border-top', headerStyle:'text', cellClass:'text',                 cellStyle: 'font-weight: normal; font-size: 14px; padding-top:6px'}
     ];
     
     partyFields =  
@@ -237,11 +239,11 @@ export default class CivilAppearanceDetails extends Vue {
             docInfo["Date Filed"]= document.filedDt? document.filedDt.split(' ')[0] : '';
             docInfo["Result"]= document.appearanceResultCd
             docInfo["Result Description"]= document.appearanceResultDesc            
-            docInfo["Issue"] = [];
+            docInfo["Issues"] = [];
             docInfo["Index"] = documentIndex;
             if (document.issue && document.issue.length > 0) {
                 for (const issue of document.issue) {
-                    docInfo["Issue"].push(issue.issueDsc)
+                    docInfo["Issues"].push(issue.issueDsc)
                 }
             }    
 
@@ -273,24 +275,13 @@ export default class CivilAppearanceDetails extends Vue {
             return ( lastName + ", " + givenName );        
     }
 
-    public documentClick(document) {
-
-        if(document.PdfAvail && document.DocTypeCd != "CSR") {
-            this.openDocumentsPdf(document['ID']);
-        } else if (document.DocTypeCd == "CSR") {
+    public documentClick(document) 
+    {
+        if(document.item.DocTypeCd != "CSR") {
+            this.openDocumentsPdf(document.item['ID']);
+        } else if (document.item.DocTypeCd == "CSR") {
             this.openCourtSummaryPdf(this.additionalInfo["Appearance ID"]);
         }
-
-    }
-
-    public documentCellClass(field, document) {        
-        
-        if ((document.PdfAvail && document.DocTypeCd != "CSR") || document.DocTypeCd == "CSR") {            
-
-            if(this.hoverCol==1 && this.hoverRow==document.Index) return 'text-white bg-warning'; else return 'text-info';
-
-        } else 
-            return field.cellClass;
     }
 
     public openDocumentsPdf(documentId): void {
@@ -306,14 +297,6 @@ export default class CivilAppearanceDetails extends Vue {
         const filename = 'court summary_'+appearanceId+'.pdf';
         window.open(`/api/files/civil/court-summary-report/${appearanceId}/${filename}`)
         this.loadingPdf = false;
-    }
-
-    public colHover(hovered, mouseEvent) {            
-        hovered && mouseEvent.fromElement != null? this.hoverCol = mouseEvent.fromElement.cellIndex: this.hoverCol =-1;
-    }
-
-    public rowHover(row) {
-        this.hoverRow = row.Index;
     }
 
 

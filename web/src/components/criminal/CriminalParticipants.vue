@@ -3,54 +3,54 @@
     <b-card bg-variant="white">
         <div>
             <h3 class="mx-2 font-weight-normal"> Participants ({{numberOfParticipants}}) </h3>
-            <hr class="mb-0 bg-light" style="height: 5px;"/> 
+            <hr class="mb-2 bg-light" style="height: 5px;"/> 
         </div>
 
-        <b-card bg-variant="white">           
-            <b-table
-            :items="participantList"
-            :fields="fields"
-            :sort-by.sync="sortBy"
-            :sort-desc.sync="sortDesc"
-            :no-sort-reset="true"
-            borderless
-            sort-icon-left
-            responsive="sm"
-            >   
-                <template v-for="(field,index) in fields" v-slot:[`head(${field.key})`]="data">
-                    <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
-                </template>                
-                <template v-for="(field,index) in fields" v-slot:[`cell(${field.key})`]="data" >
-                    <span v-bind:key="index" :class="field.cellStyle" v-if="data.field.key != 'Status' && data.field.key != 'Name'">  {{ data.value }} </span>
-                </template>                
-                <template v-slot:cell(Name)="data" >                   
-                    <span :class="data.item.Charges.length>0?data.field.cellStyle:''" > 
-                         {{ data.value }}
-                        <b-dropdown size="sm" variant="white text-info" v-if="data.item.Charges.length>0" >
-                            <b-dropdown-text variant="white text-danger">Charges</b-dropdown-text>
-                            <b-dropdown-divider></b-dropdown-divider>
-                            <b-dropdown-item-button 
-                                disabled                                                               
-                                v-for="(file,index) in data.item.Charges" 
-                                :key="index">                                
-                                   <b>{{file["Code"]}}</b> &mdash; {{file["Description"]}}
-                            </b-dropdown-item-button> 
-                        </b-dropdown>                       
-                    </span>
-                </template>
-                <template v-slot:cell(Status)="data" >
-                        <b-badge  
-                            v-for="(field,index) in data.value"
-                            :key="index" 
-                            class="mr-1"
-                            style="font-weight: normal; font-size: 16px;"
-                            v-b-tooltip.hover 
-                            :title='field.key' > 
-                            {{ field.abbr }} 
-                        </b-badge>
-                </template>
-            </b-table>
-        </b-card>
+        <b-table
+        :items="participantList"
+        :fields="fields"
+        :sort-by.sync="sortBy"
+        :sort-desc.sync="sortDesc"
+        :no-sort-reset="true"
+        sort-icon-left
+        borderless
+        small
+        responsive="sm"
+        >   
+            <template v-for="(field,index) in fields" v-slot:[`head(${field.key})`]="data">
+                <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
+            </template>                
+            <template v-for="(field,index) in fields" v-slot:[`cell(${field.key})`]="data" >
+                <span v-bind:key="index" :class="field.cellStyle" v-if="data.field.key != 'Status' && data.field.key != 'Name'">  {{ data.value }} </span>
+            </template>                
+            <template v-slot:cell(Name)="data" >                   
+                <span :class="data.item.Charges.length>0?data.field.cellStyle:''" > 
+                        {{ data.value }}
+                    <b-dropdown size="sm" variant="white text-info" v-if="data.item.Charges.length>0" >
+                        <b-dropdown-text variant="white text-danger">Charges</b-dropdown-text>
+                        <b-dropdown-divider></b-dropdown-divider>
+                        <b-dropdown-item-button 
+                            disabled                                                               
+                            v-for="(file,index) in data.item.Charges" 
+                            :key="index">                                
+                                <b>{{file["Code"]}}</b> &mdash; {{file["Description"]}}
+                        </b-dropdown-item-button> 
+                    </b-dropdown>                       
+                </span>
+            </template>
+            <template v-slot:cell(Status)="data" >
+                    <b-badge  
+                        v-for="(field,index) in data.value"
+                        :key="index" 
+                        class="mr-1 mt-1"
+                        style="font-weight: normal; font-size: 14px;"
+                        v-b-tooltip.hover 
+                        :title='field.key' > 
+                        {{ field.abbr }} 
+                    </b-badge>
+            </template>
+        </b-table>
+       
     </b-card> 
 
 </template>

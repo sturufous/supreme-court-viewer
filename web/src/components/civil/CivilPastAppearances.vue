@@ -1,9 +1,9 @@
 <template>
 <div>
-    <b-card bg-variant="white">
+    <!-- <b-card bg-variant="white"> -->
         <div>
             <h3 class="mx-2 font-weight-normal" v-if="!showSections['Past Appearances']"> Last Three Past Appearances</h3>
-            <hr class="mb-0 bg-light" style="height: 5px;"/> 
+            <hr class="mb-3 bg-light" style="height: 5px;"/> 
         </div>
 
         <b-card v-if="!isDataReady && isMounted">
@@ -22,7 +22,7 @@
             </b-overlay> 
         </b-card>
 
-        <b-card bg-variant="white" v-if="isDataReady" style="overflow: auto;">           
+        <b-card bg-variant="white" v-if="isDataReady" style="overflow: auto;" no-body>           
             <b-table
             :items="SortedPastAppearances"
             :fields="fields"
@@ -56,20 +56,18 @@
                     </span> 
                 </template>
                 <template v-slot:row-details>
-                    <b-card> 
-                        <civil-appearance-details/>
-                    </b-card>
+                    <civil-appearance-details/>
                 </template>
 
                 <template  v-slot:cell(Reason)="data">
-                    <b-button 
+                    <b-badge
                             :class="data.field.cellClass"
-                            variant="outline-primary border-white"
-                            v-b-tooltip.hover                            
+                            variant="secondary"
+                            v-b-tooltip.hover.right                            
                             :title="data.item['Reason Description']"
                             :style="data.field.cellStyle">  
                             {{data.value}}
-                    </b-button>
+                    </b-badge>
                 </template>
 
                 <template  v-slot:cell(Result)="data" >
@@ -77,7 +75,7 @@
                             v-if="data.value"
                             :class="data.field.cellClass"
                             variant="outline-primary border-white"
-                            v-b-tooltip.hover                            
+                            v-b-tooltip.hover.right                            
                             :title="data.item['Result Description']"
                             :style="data.field.cellStyle"> 
                             {{data.value}}
@@ -85,15 +83,15 @@
                 </template>
 
                 <template  v-slot:cell(Presider)="data">
-                    <b-button                              
-                            variant="outline-primary border-white"
+                    <b-badge                              
+                            variant="secondary"
                             v-if="data.value"
                             :class="data.field.cellClass"
                             :style="data.field.cellStyle"
-                            v-b-tooltip.hover                           
+                            v-b-tooltip.hover.left                           
                             :title="data.item['Judge Full Name']"> 
                             {{data.value}}
-                    </b-button>
+                    </b-badge>
                 </template>                
 
                 <template  v-slot:cell(Status)="data">
@@ -103,7 +101,7 @@
             </b-table>
         </b-card>
       
-    </b-card> 
+    <!-- </b-card>  -->
 
 </div>
 </template>
@@ -165,14 +163,14 @@ export default class CivilPastAppearances extends Vue {
     fields =  
     [
         {key:'Date',            sortable:true,  tdClass: 'border-top', headerStyle:'text-primary',  cellClass:'text-info mt-2 d-inline-flex', cellStyle: 'display: inline-flex; font-size: 14px;'},
-        {key:'Reason',          sortable:true,  tdClass: 'border-top', headerStyle:'text-primary',  cellClass:'font-weight-bold',             cellStyle: 'margin-top: 1px; font-size: 14px;'},
-        {key:'Document Type',   sortable:false, tdClass: 'border-top', headerStyle:'text',          cellClass:'text',                         cellStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
-        {key:'Result',          sortable:true,  tdClass: 'border-top', headerStyle:'text-primary',  cellClass:'badge badge-dark mt-2',        cellStyle: 'margin-top: 1px; font-size: 14px;'},
+        {key:'Reason',          sortable:true,  tdClass: 'border-top', headerStyle:'text-primary',  cellClass:'badge badge-secondary mt-2',   cellStyle: 'font-size: 14px;'},
+        {key:'Document Type',   sortable:false, tdClass: 'border-top', headerStyle:'text',          cellClass:'text',                         cellStyle: 'font-weight: normal;font-size: 14px; padding-top:12px'},
+        {key:'Result',          sortable:true,  tdClass: 'border-top', headerStyle:'text-primary',  cellClass:'badge badge-secondary mt-2',   cellStyle: 'font-size: 14px;'},
         {key:'Time',            sortable:false, tdClass: 'border-top', headerStyle:'text',          cellClass:'text',                         cellStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
         {key:'Duration',        sortable:false, tdClass: 'border-top', headerStyle:'text',          cellClass:'text',                         cellStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
         {key:'Location',        sortable:true,  tdClass: 'border-top', headerStyle:'text-primary',  cellClass:'text',                         cellStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
         {key:'Room',            sortable:false, tdClass: 'border-top', headerStyle:'text',          cellClass:'text',                         cellStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
-        {key:'Presider',        sortable:true,  tdClass: 'border-top', headerStyle:'text-primary',  cellClass:'text',                         cellStyle: 'font-size: 14px;'},        
+        {key:'Presider',        sortable:true,  tdClass: 'border-top', headerStyle:'text-primary',  cellClass:'badge badge-secondary mt-2',   cellStyle: 'font-size: 14px;'},        
         {key:'Status',          sortable:true,  tdClass: 'border-top', headerStyle:'text-primary',  cellClass:'badge',                        cellStyle: 'font-size: 14px;'}
     ];    
   

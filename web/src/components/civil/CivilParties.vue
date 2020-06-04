@@ -5,20 +5,18 @@
             <b-col class="mt-2" md="6" cols="6">
                 <div>
                     <h3 class="mx-2 font-weight-normal"> {{leftRole}} ({{numberOfLeftParties}}) </h3>
-                    <hr class="mb-0 bg-light" style="height: 5px;"/> 
+                    <hr class="mb-2 bg-light" style="height: 5px;"/> 
                 </div>
 
-                <b-card bg-variant="white" style="max-height: 400px; overflow-y: auto;">           
+                <b-card bg-variant="white" style="max-height: 400px; overflow-y: auto;" no-body>           
                     <b-table
                     :items="leftPartiesInfo"
-                    :fields="fields"
-                    :sort-by.sync="sortBy"
-                    :sort-desc.sync="sortDesc"
-                    :no-sort-reset="true"
+                    :fields="fields"                    
+                    :no-sort-reset="true" 
+                    sort-icon-left
                     borderless
                     striped
                     small
-                    sort-icon-left
                     responsive="sm"
                     >   
                         <template v-for="(field,index) in fields" v-slot:[`head(${field.key})`]="data">
@@ -35,15 +33,13 @@
             <b-col class="mt-2" md="6" cols="6" >
                 <div>
                     <h3 class="mx-2 font-weight-normal"> {{rightRole}} ({{numberOfRightParties}}) </h3>
-                    <hr class="mb-0 bg-light" style="height: 5px;"/> 
+                    <hr class="mb-2 bg-light" style="height: 5px;"/> 
                 </div>
 
-                <b-card bg-variant="white" style="max-height: 400px; overflow-y: auto;">           
+                <b-card bg-variant="white" style="max-height: 400px; overflow-y: auto;" no-body>           
                     <b-table
                     :items="rightPartiesInfo"
-                    :fields="fields"
-                    :sort-by.sync="sortBy"
-                    :sort-desc.sync="sortDesc"
+                    :fields="fields"                    
                     :no-sort-reset="true"
                     borderless
                     striped

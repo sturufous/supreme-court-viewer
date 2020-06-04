@@ -29,8 +29,8 @@
             :sort-desc.sync="sortDesc"
             :no-sort-reset="true"
             sort-icon-left
-            borderless
-            small
+            borderless            
+            small            
             responsive="sm"
             >   
                 <template v-for="(field,index) in fields" v-slot:[`head(${field.key})`]="data">
@@ -61,24 +61,24 @@
                 </template>
 
                 <template  v-slot:cell(Reason)="data">
-                    <b-button 
-                            :class="data.field.cellStyle"
-                            variant="outline-primary border-white"
-                            v-b-tooltip.hover                            
+                    <b-badge
+                            variant="secondary"
+                            v-b-tooltip.hover.right                            
                             :title="data.item['Reason Description']"
-                            style="margin-top: 1px;"> 
+                            style="margin-top: 10px; font-size: 14px;"> 
                             {{data.value}}
-                    </b-button>
+                    </b-badge>
                 </template>
 
                 <template  v-slot:cell(Presider)="data">
-                    <b-button                              
-                            variant="outline-primary border-white"
+                    <b-badge                              
+                            variant="secondary"
                             v-if="data.value"
-                            v-b-tooltip.hover                           
-                            :title="data.item['Judge Full Name']"> 
+                            v-b-tooltip.hover.left                           
+                            :title="data.item['Judge Full Name']"
+                            style="margin-top: 10px; font-size: 14px;"> 
                             {{data.value}}
-                    </b-button>
+                    </b-badge>
                 </template>
 
                 <template  v-slot:cell(Accused)="data">
@@ -155,7 +155,7 @@ export default class PastAppearances extends Vue {
     fields =  
     [
         {key:'Date',       sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'text-info mt-2 d-inline-flex'},
-        {key:'Reason',     sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'font-weight-bold'},
+        {key:'Reason',     sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:''},
         {key:'Time',       sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:'text'},
         {key:'Duration',   sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:'text'},
         {key:'Location',   sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'text'},

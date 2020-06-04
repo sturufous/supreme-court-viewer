@@ -1,6 +1,6 @@
 <template>
 <div>  
-    <b-navbar type="white" variant="white" v-if="isMounted">
+    <b-navbar type="white" variant="white" v-if="isMounted" style="height:30px;">
       <b-navbar-nav>
             <b-nav-text style="font-size: 14px;" variant="white">
                 <b-badge class="mr-1" variant="primary">{{courtClassDescription}}</b-badge>                                

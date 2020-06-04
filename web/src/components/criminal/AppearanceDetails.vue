@@ -32,9 +32,9 @@
                 
                     <template v-slot:cell(Finding)="data" >                        
                         <b-badge 
-                            variant="light" 
+                            variant="secondary" 
                             v-if="data.item['Finding']"                               
-                            v-b-tooltip.hover 
+                            v-b-tooltip.hover.left 
                             :title='data.item["Finding Description"]'> 
                             {{ data.item["Finding"] }} 
                         </b-badge>                       
@@ -42,9 +42,9 @@
 
                     <template v-slot:cell(LastResult)="data" >
                             <b-badge 
-                                variant="light"
+                                variant="secondary"
                                 v-if="data.item['Last Result']"
-                                v-b-tooltip.hover 
+                                v-b-tooltip.hover.left 
                                 :title='data.item["Last Result Description"]' > 
                                 {{ data.item["Last Result"] }} 
                             </b-badge>

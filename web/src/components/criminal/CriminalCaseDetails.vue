@@ -126,7 +126,7 @@ export default class CriminalCaseDetails extends Vue {
     participantJson;
     participantFiles: any[] = [];
     sidePanelTitles = [ 
-       'Case Details', 'Future Appearances', 'Past Appearances', 'Witnesses', 'Criminal Documents', 'Sentence/Order Details'    
+       'Case Details', 'Future Appearances', 'Past Appearances', 'Witnesses', 'Documents', 'Sentence/Order Details'    
     ];
     topTitles = [ 
        'Case Details', 'Future Appearances', 'Past Appearances', 'Witnesses', 'Criminal Documents', 'Criminal Sentences'    
@@ -148,7 +148,7 @@ export default class CriminalCaseDetails extends Vue {
     
     get showDocuments()
     {        
-        return ((this.showSections['Case Details'] || this.showSections['Criminal Documents'] ) && this.isDataReady)
+        return ((this.showSections['Case Details'] || this.showSections['Documents'] ) && this.isDataReady)
     }
 
     get showFutureAppearances()

@@ -3,14 +3,14 @@
     <b-card bg-variant="white">
         <div>
             <h3 class="mx-2 font-weight-normal" v-if="!showSections['Future Appearances']"> Next Three Future Appearances</h3>
-            <hr class="mb-0 bg-light" style="height: 5px;"/> 
+            <hr class="mb-3 bg-light" style="height: 5px;"/> 
         </div>
 
         <b-card v-if="!isDataReady && isMounted">
             <span class="text-muted"> No future appearances. </span>
         </b-card>
 
-        <b-card bg-variant="light" v-if= "!isMounted && !isDataReady">
+        <b-card bg-variant="light" v-if= "!isMounted && !isDataReady" >
             <b-overlay :show= "true"> 
                 <b-card  style="min-height: 100px;"/>                   
                 <template v-slot:overlay>               
@@ -22,7 +22,7 @@
             </b-overlay> 
         </b-card>
 
-        <b-card bg-variant="white" v-if="isDataReady">           
+        <b-card bg-variant="white" v-if="isDataReady" no-body>           
             <b-table
             :items="SortedFutureAppearances"
             :fields="fields"
@@ -62,24 +62,13 @@
                 </template>
 
                 <template  v-slot:cell(Reason)="data">
-                    <b-button 
-                            :class="data.field.cellStyle"
-                            variant="outline-primary border-white"
-                            v-b-tooltip.hover                            
+                    <b-badge
+                            variant="secondary"
+                            v-b-tooltip.hover.right                            
                             :title="data.item['Reason Description']"
-                            style="margin-top: 1px;"> 
+                            style="margin-top: 10px; font-size: 14px;"> 
                             {{data.value}}
-                    </b-button>
-                </template>
-
-                <template  v-slot:cell(Presider)="data">
-                    <b-button                              
-                            variant="outline-primary border-white"
-                            v-if="data.value"
-                            v-b-tooltip.hover                           
-                            :title="data.item['Judge Full Name']"> 
-                            {{data.value}}
-                    </b-button>
+                    </b-badge>
                 </template>
 
                 <template  v-slot:cell(Accused)="data">

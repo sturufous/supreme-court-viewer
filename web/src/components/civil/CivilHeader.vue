@@ -1,6 +1,6 @@
 <template>
 <div>
-    <b-navbar type="white" variant="white" v-if="isMounted">
+    <b-navbar type="white" variant="white" v-if="isMounted" style="height:30px;">
       <b-navbar-nav>
 
         <b-nav-text class="mt-1 mr-2" style="font-size: 14px;">
@@ -52,18 +52,18 @@
             <b-dropdown-item-button        
             v-for="(restriction, index) in adjudicatorRestrictionsInfo"
             :key="index">
-                <b-button style="font-size: 12px; padding: 0px 2px;" 
-                          variant="primary" 
-                          v-b-tooltip.hover 
+                <b-badge style="font-size: 14px; padding: 5px 2px;" 
+                          variant="secondary" 
+                          v-b-tooltip.hover.left 
                           :title='restriction["Full Name"]'>
                     {{restriction["Adj Restriction"]}}
-                </b-button>
+                </b-badge>
             </b-dropdown-item-button>
         </b-nav-item-dropdown>
 
       </b-navbar-nav>
     </b-navbar>
-    <hr class="mx-3 bg-warning" style="border-top: 2px double #FCBA19"/>      
+    <hr class="mx-1 bg-warning" style="border-top: 2px double #FCBA19"/>      
 </div>
 </template>
 
