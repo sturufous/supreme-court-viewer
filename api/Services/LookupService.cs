@@ -45,11 +45,6 @@ namespace Scv.Api.Services
 
         #region Collection Methods
 
-        public async Task<CodeLookup> GetCriminalPartyAttendanceTypes()
-        {
-            return await GetDataFromCache("CriminalPartyAttendanceTypes",async () => await _lookupClient.CodesCriminalAppearancePartyAttendanceTypesAsync());
-        }
-
         public async Task<CodeLookup> GetAgencyLocations()
         {
             return await GetDataFromCache("AgencyLocations",
@@ -160,21 +155,6 @@ namespace Scv.Api.Services
         #endregion Collection Methods
 
         #region Lookup Methods
-   
-        public async Task<string> GetPartyAttendanceType(string targetCode)
-        {
-            if (targetCode == null)
-                return null;
-            var codes = await GetCriminalPartyAttendanceTypes();
-            if (targetCode == "RA") return FindShortDescriptionFromCode(codes, targetCode);
-
-            var result = "";
-            foreach (var character in targetCode.Select(b => b))
-            {
-                result += $"{FindShortDescriptionFromCode(codes, character.ToString())} ";
-            }
-            return result.Trim();
-        }
 
         public async Task<string> GetAgencyLocationDescription(string code) => FindLongDescriptionFromCode(await GetAgencyLocations(), code);
 

@@ -28,6 +28,7 @@ namespace Scv.Api.Models.Civil.Detail
         public string TrialRemarkTxt { get; set; }
         public string CommentToJudgeTxt { get; set; }
         public string SheriffCommentText { get; set; }
+        public string FileCommentText { get; set; }
 
         /// <summary>
         /// Extended party object. Hides fields.
