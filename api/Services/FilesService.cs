@@ -287,6 +287,7 @@ namespace Scv.Api.Services
                     foreach (var criminalSentence in count.Sentence)
                     {
                         criminalSentence.JudgesRecommendation = appearance.JudgesRecommendation;
+                        criminalSentence.SentenceTypeDesc = await _lookupService.GetCriminalSentenceDescription(criminalSentence.SntpCd);
                     }
                     count.FindingDsc = await _lookupService.GetFindingDescription(count.Finding);
                     criminalCount.Add(count);
@@ -345,7 +346,7 @@ namespace Scv.Api.Services
             {
                 participant.Document = documents.Where(doc => doc.PartId == participant.PartId).ToList();
                 participant.HideJustinCounsel = false;   //TODO tie this to a permission. View Witness List permission
-                //TODO COUNSEL? Not sure where  to get this data from
+                //TODO COUNSEL? This would have to come from law society data, which is stored in a CSV file. 
                 foreach (var accusedFile in accusedFiles.Where(af => af?.PartId == participant.PartId))
                 {
                     participant.Count.AddRange(await PopulateCounts(accusedFile, detail));

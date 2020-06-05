@@ -43,6 +43,7 @@
             <future-appearances v-if="showFutureAppearances" />
             <criminal-documents-view v-if="showDocuments"/>
             <criminal-witnesses v-if="showWitnesses" />
+            <criminal-sentence-details v-if="showSentenceOrderDetails"/>
             <b-card><br></b-card>  
         </b-col>
     </b-row>
@@ -63,6 +64,7 @@ import PastAppearances from '@components/criminal/PastAppearances.vue'
 import FutureAppearances from '@components/criminal/FutureAppearances.vue'
 import CriminalCrownNotes from '@components/criminal/CriminalCrownNotes.vue';
 import CriminalWitnesses from '@components/criminal/CriminalWitnesses.vue';
+import CriminalSentenceDetails from '@components/criminal/CriminalSentenceDetails.vue';
 import '@store/modules/CriminalFileInformation';
 const criminalState = namespace('CriminalFileInformation');
 
@@ -78,7 +80,8 @@ const criminalState = namespace('CriminalFileInformation');
         PastAppearances,
         FutureAppearances,
         CriminalCrownNotes,
-        CriminalWitnesses
+        CriminalWitnesses,
+        CriminalSentenceDetails
     }
 })
 export default class CriminalCaseDetails extends Vue {
@@ -125,12 +128,15 @@ export default class CriminalCaseDetails extends Vue {
     sidePanelTitles = [ 
        'Case Details', 'Future Appearances', 'Past Appearances', 'Witnesses', 'Criminal Documents', 'Sentence/Order Details'    
     ];
+    topTitles = [ 
+       'Case Details', 'Future Appearances', 'Past Appearances', 'Witnesses', 'Criminal Documents', 'Criminal Sentences'    
+    ];
     
     get selectedSideBar()
     {
-        for(const title of this.sidePanelTitles)
+        for(const titleInx in this.sidePanelTitles)
         {
-          if (this.showSections[title] == true ) return '   '+ title
+          if (this.showSections[this.sidePanelTitles[titleInx]] == true ) return '   '+ this.topTitles[titleInx]
         }
         return ''
     }
