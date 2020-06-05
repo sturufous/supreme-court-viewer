@@ -129,7 +129,6 @@ namespace Scv.Api.Services
             if (targetAppearance == null || detail == null)
                 return null;
 
-   
             //Sometimes we can have a bogus location, querying court list wont work. 
             ClCivilCourtList civilCourtList = null;
             if (agencyId != null)
@@ -142,7 +141,6 @@ namespace Scv.Api.Services
 
             var appearanceParty = await appearancePartyTask;
             var appearanceMethodsResponse = await appearanceMethodsTask;
-            var fileContent = await fileContentTask;
             
             var appearanceDetail = appearances.ApprDetail?.FirstOrDefault(app => app.AppearanceId == appearanceId);
             var fileDetailDocuments = detail.Document.Where(doc => doc.Appearance != null && doc.Appearance.Any(app => app.AppearanceId == appearanceId)).ToList();
@@ -157,8 +155,6 @@ namespace Scv.Api.Services
                 AppearanceDt = targetAppearance.AppearanceDt,
                 AppearanceMethod = appearanceMethodsResponse.AppearanceMethod,
                 Party = await PopulateCivilDetailedAppearancePartiesAsync(appearanceParty.Party, civilCourtList?.Parties), 
-                OldParty = appearanceParty.Party,
-                CourtListParties = civilCourtList?.Parties,
                 Document = await PopulateCivilDetailedAppearanceDocuments(fileDetailDocuments, appearanceDetail)
             };
             return detailedAppearance;
@@ -666,7 +662,7 @@ namespace Scv.Api.Services
                 var courtListParty = courtListParties?.FirstOrDefault(clp => clp.PartyId == partyGroup.Key);
                 if (courtListParty != null)
                 {
-                    party.AttendanceMethodCd = courtListParty.AttendanceMethodCd ?? "P"; //TODO double check this, supposidly if there is no value, it's assumed as present.
+                    party.AttendanceMethodCd = courtListParty.AttendanceMethodCd ?? "IP"; //TODO double check this, supposedly if there is no value, it's assumed as present.
                     party.AttendanceMethodDesc = await _lookupService.GetCivilAssetsDescription(party.AttendanceMethodCd);
                     party.Counsel = courtListParty.Counsel;
                     party.Representative = courtListParty.Representative;

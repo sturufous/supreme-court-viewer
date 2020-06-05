@@ -22,10 +22,5 @@ namespace Scv.Api.Models.Civil.AppearanceDetail
         /// </summary>
         public ICollection<CivilAppearanceDocument> Document { get; set; }
         public ICollection<CivilAppearanceMethod> AppearanceMethod { get; set; }
-
-
-        //TODO Temp, remove.
-        public ICollection<ClParty> CourtListParties { get; set; }
-        public ICollection<CivilAppearanceParty> OldParty { get; set; }
     }
 }
