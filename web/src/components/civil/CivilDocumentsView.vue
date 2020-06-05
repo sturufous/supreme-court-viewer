@@ -25,7 +25,7 @@
                 <b-table
                 :items="FilteredDocuments"
                 :fields="fields[fieldsTab]"
-                :sort-by.sync="sortBy"
+                :sort-by="sortBy"
                 :sort-desc.sync="sortDesc"
                 :no-sort-reset="true"
                 sort-icon-left
@@ -157,8 +157,7 @@ export default class CivilDocumentsView extends Vue {
     ];
 
     public cellClick(data)
-    {     
-        console.log(data.value)    
+    {          
         if(data.value !='CourtSummary')        
             this.openDocumentsPdf(data.item['Document ID']);        
         else        
