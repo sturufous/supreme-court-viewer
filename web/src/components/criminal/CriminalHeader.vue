@@ -1,5 +1,5 @@
 <template>
-<body>
+<div>
     <b-navbar type="white" variant="white" v-if="isMounted">
       <b-navbar-nav>
 
@@ -32,10 +32,10 @@
 
         <b-nav-item-dropdown class="mr-3" text right>
             <b-dropdown-item-button
-                v-for="(participant, index) in SortedParticipants"
-                :key="index"
-                v-on:click="activeparticipant = index"
-            >{{getNameOfParticipant(index)}}</b-dropdown-item-button>
+                v-for="participant in SortedParticipants"
+                :key="participant['Index']"
+                v-on:click="setActiveParticipantIndex(participant['Index'])"
+            >{{getNameOfParticipant(participant['Index'])}}</b-dropdown-item-button>
         </b-nav-item-dropdown>
 
         <b-nav-text style="font-size: 14px;" variant="white">
@@ -59,11 +59,12 @@
 
     <hr class="mx-3  bg-info" style="height: 2px;"/>  
       
-</body>
+</div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
+import * as _ from 'underscore';
 import { namespace } from "vuex-class";
 import "@store/modules/CriminalFileInformation";
 const criminalState = namespace("CriminalFileInformation");
@@ -73,6 +74,12 @@ export default class CriminalHeader extends Vue {
 
   @criminalState.State
   public criminalFileInformation!: any;
+
+  @criminalState.State
+  public activeCriminalParticipantIndex    
+
+  @criminalState.Action
+  public UpdateActiveCriminalParticipantIndex!: (newActiveCriminalParticipantIndex: any) => void
 
   mounted() {
     this.getHeaderInfo();
@@ -87,11 +94,11 @@ export default class CriminalHeader extends Vue {
       this.adjudicatorRestrictionsJson = data.hearingRestriction;
       this.participantJson = data.participant 
       this.ExtractParticipantInfo();
-      this.isMounted = true;          
+      this.isMounted = true; 
+      this.setActiveParticipantIndex(this.SortedParticipants[0].Index)
   } 
 
   maximumFullNameLength = 17;
-  activeparticipant = 0;
   numberOfParticipants = 0;
   fileNumberText;
   agencyLocation = {Name:'', Code:0, Region:'' };
@@ -108,7 +115,7 @@ export default class CriminalHeader extends Vue {
       const fileInfo = {};
       const jFile = this.participantJson[fileIndex];
       fileInfo["Index"] = fileIndex;
-      fileInfo["First Name"] = jFile.givenNm ? jFile.givenNm : "";
+      fileInfo["First Name"] = jFile.givenNm.trim().length>0 ? jFile.givenNm : "";
       fileInfo["Last Name"] = jFile.lastNm ? jFile.lastNm : jFile.orgNm;
       this.participantList.push(fileInfo);
     }
@@ -122,17 +129,24 @@ export default class CriminalHeader extends Vue {
     }
   }
 
-  public getNameOfParticipant(num) {
-    return (
-      this.participantList[num]["Last Name"] +
-      ", " +
-      this.participantList[num]["First Name"]
-    );
+  public setActiveParticipantIndex(index)
+  {                   
+      this.UpdateActiveCriminalParticipantIndex(index);  
+  }	
+
+  public getNameOfParticipant(num)
+  {        
+      if(!this.participantList[num]["First Name"])
+          return  this.participantList[num]["Last Name"];
+      else if(!this.participantList[num]["Last Name"])
+          return this.participantList[num]["First Name"];
+      else
+          return  this.participantList[num]["Last Name"]+', '+this.participantList[num]["First Name"];           
   }
 
   public getNameOfParticipantTrunc() {
 
-    const nameOfParticipant = this.getNameOfParticipant(this.activeparticipant);
+    const nameOfParticipant = this.getNameOfParticipant(this.activeCriminalParticipantIndex);
 
     if(nameOfParticipant.length > this.maximumFullNameLength)   
         return nameOfParticipant.substr(0, this.maximumFullNameLength) +'. ';    
@@ -141,14 +155,10 @@ export default class CriminalHeader extends Vue {
      
   }
 
-  get SortedParticipants() {
-    return this.participantList.sort((a, b): any => {
-      const LastName1 = a["Last Name"] ? a["Last Name"].toUpperCase() : "";
-      const LastName2 = b["Last Name"] ? b["Last Name"].toUpperCase() : "";
-      if (LastName1 > LastName2) return 1;
-      if (LastName1 < LastName2) return -1;
-      return 0;
-    });
+  get SortedParticipants()
+  {         
+      return _.sortBy(this.participantList,(participant=>{return (participant["Last Name"]? participant["Last Name"].toUpperCase() : '')}))       
   }
+
 }
 </script>

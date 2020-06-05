@@ -1,5 +1,4 @@
 <template>
-<body>
    <b-card  v-if= "isMounted">
        <div>         
             <h3 class="mx-2 font-weight-normal"> Crown Information </h3>
@@ -25,7 +24,6 @@
             </b-table>            
         </b-card>       
    </b-card> 
-</body>
 </template>
 
 <script lang="ts">

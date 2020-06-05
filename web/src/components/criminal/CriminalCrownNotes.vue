@@ -1,5 +1,4 @@
 <template>
-<body>
    <b-card bg-variant="white">
         <div>
             <h3 class="mx-2 font-weight-normal"> Crown Notes to JCM </h3>
@@ -24,7 +23,6 @@
             </b-table>
         </b-card>
     </b-card>
-</body>
 </template>
 
 <script lang="ts">

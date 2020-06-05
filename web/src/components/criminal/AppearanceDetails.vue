@@ -1,5 +1,5 @@
 <template>
-<body>
+
     <b-card bg-variant="light" v-if= "!isMounted ">
         <b-overlay :show= "true"> 
             <b-card  style="min-height: 100px;"/>                   
@@ -73,7 +73,6 @@
       </b-card>  
     </b-card> 
 
-</body>
 </template>
 
 <script lang="ts">
