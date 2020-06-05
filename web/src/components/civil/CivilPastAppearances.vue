@@ -1,119 +1,115 @@
 <template>
 <div>
-    <!-- <b-card bg-variant="white"> -->
-        <div>
-            <h3 class="mx-2 font-weight-normal" v-if="!showSections['Past Appearances']"> Last Three Past Appearances</h3>
-            <hr class="mb-3 bg-light" style="height: 5px;"/> 
-        </div>
+    <div>
+        <h3 class="mx-2 font-weight-normal" v-if="!showSections['Past Appearances']"> Last Three Past Appearances</h3>
+        <hr class="mb-3 bg-light" style="height: 5px;"/> 
+    </div>
 
-        <b-card v-if="!isDataReady && isMounted">
-            <span class="text-muted"> No past appearances. </span>
-        </b-card>
+    <b-card v-if="!isDataReady && isMounted">
+        <span class="text-muted"> No past appearances. </span>
+    </b-card>
 
-        <b-card bg-variant="light" v-if= "!isMounted && !isDataReady">
-            <b-overlay :show= "true"> 
-                <b-card  style="min-height: 100px;"/>                   
-                <template v-slot:overlay>               
-                <div> 
-                        <loading-spinner/> 
-                        <p id="loading-label">Loading ...</p>
-                </div>                
-                </template> 
-            </b-overlay> 
-        </b-card>
+    <b-card bg-variant="light" v-if= "!isMounted && !isDataReady">
+        <b-overlay :show= "true"> 
+            <b-card  style="min-height: 100px;"/>                   
+            <template v-slot:overlay>               
+            <div> 
+                    <loading-spinner/> 
+                    <p id="loading-label">Loading ...</p>
+            </div>                
+            </template> 
+        </b-overlay> 
+    </b-card>
 
-        <b-card bg-variant="white" v-if="isDataReady" style="overflow: auto;" no-body>           
-            <b-table
-            :items="SortedPastAppearances"
-            :fields="fields"
-            :sort-by.sync="sortBy"
-            :sort-desc.sync="sortDesc"
-            :no-sort-reset="true"
-            sort-icon-left
-            borderless
-            small
-            responsive="sm"
-            >   
-                <template v-for="(field,index) in fields" v-slot:[`head(${field.key})`]="data">
-                    <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
-                </template>
+    <b-card bg-variant="white" v-if="isDataReady" style="overflow: auto;" no-body>           
+        <b-table
+        :items="SortedPastAppearances"
+        :fields="fields"
+        :sort-by.sync="sortBy"
+        :sort-desc.sync="sortDesc"
+        :no-sort-reset="true"
+        sort-icon-left
+        borderless
+        small
+        responsive="sm"
+        >   
+            <template v-for="(field,index) in fields" v-slot:[`head(${field.key})`]="data">
+                <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
+            </template>
 
-                <template  v-slot:cell()="data">
-                    <b-badge                        
-                        :style="data.field.cellStyle" 
-                        variant="white" > 
-                            {{data.value}} 
-                    </b-badge>
-                </template>
+            <template  v-slot:cell()="data">
+                <b-badge                        
+                    :style="data.field.cellStyle" 
+                    variant="white" > 
+                        {{data.value}} 
+                </b-badge>
+            </template>
 
-                <template v-slot:cell(Date)="data" >
-                    <span :class="data.field.cellClass" :style="data.field.cellStyle"> 
-                        <b-button style="transform: translate(0,-7px);" @click="OpenDetails(data);data.toggleDetails();" variant="outline-primary border-white" class="mr-2">
-                            <b-icon-caret-right-fill  v-if="!data.item['_showDetails']"></b-icon-caret-right-fill>
-                            <b-icon-caret-down-fill v-if="data.item['_showDetails']"></b-icon-caret-down-fill>
-                        </b-button>
-                        {{data.value| beautify-date}}
-                    </span> 
-                </template>
-                <template v-slot:row-details>
-                    <civil-appearance-details/>
-                </template>
+            <template v-slot:cell(Date)="data" >
+                <span :class="data.field.cellClass" :style="data.field.cellStyle"> 
+                    <b-button style="transform: translate(0,-7px);" @click="OpenDetails(data);data.toggleDetails();" variant="outline-primary border-white" class="mr-2">
+                        <b-icon-caret-right-fill  v-if="!data.item['_showDetails']"></b-icon-caret-right-fill>
+                        <b-icon-caret-down-fill v-if="data.item['_showDetails']"></b-icon-caret-down-fill>
+                    </b-button>
+                    {{data.value| beautify-date}}
+                </span> 
+            </template>
+            <template v-slot:row-details>
+                <civil-appearance-details/>
+            </template>
 
-                <template  v-slot:cell(Reason)="data">
-                    <b-badge
-                            :class="data.field.cellClass"
-                            variant="secondary"
-                            v-b-tooltip.hover.right                            
-                            :title="data.item['Reason Description']"
-                            :style="data.field.cellStyle">  
-                            {{data.value}}
-                    </b-badge>
-                </template>
+            <template  v-slot:cell(Reason)="data">
+                <b-badge
+                        :class="data.field.cellClass"
+                        variant="secondary"
+                        v-b-tooltip.hover.right                            
+                        :title="data.item['Reason Description']"
+                        :style="data.field.cellStyle">  
+                        {{data.value}}
+                </b-badge>
+            </template>
 
-                <template  v-slot:cell(Result)="data" >
-                    <span
-                            v-if="data.value"
-                            :class="data.field.cellClass"
-                            variant="outline-primary border-white"
-                            v-b-tooltip.hover.right                            
-                            :title="data.item['Result Description']"
-                            :style="data.field.cellStyle"> 
-                            {{data.value}}
-                    </span>
-                </template>
+            <template  v-slot:cell(Result)="data" >
+                <span
+                        v-if="data.value"
+                        :class="data.field.cellClass"
+                        variant="outline-primary border-white"
+                        v-b-tooltip.hover.right                            
+                        :title="data.item['Result Description']"
+                        :style="data.field.cellStyle"> 
+                        {{data.value}}
+                </span>
+            </template>
 
-                <template  v-slot:cell(Presider)="data">
-                    <b-badge                              
-                            variant="secondary"
-                            v-if="data.value"
-                            :class="data.field.cellClass"
-                            :style="data.field.cellStyle"
-                            v-b-tooltip.hover.left                           
-                            :title="data.item['Judge Full Name']"> 
-                            {{data.value}}
-                    </b-badge>
-                </template>                
+            <template  v-slot:cell(Presider)="data">
+                <b-badge                              
+                        variant="secondary"
+                        v-if="data.value"
+                        :class="data.field.cellClass"
+                        :style="data.field.cellStyle"
+                        v-b-tooltip.hover.left                           
+                        :title="data.item['Judge Full Name']"> 
+                        {{data.value}}
+                </b-badge>
+            </template>                
 
-                <template  v-slot:cell(Status)="data">
-                    <b :class = "getStatusStyle(data.value)" :style="data.field.cellStyle"> {{data.value}} </b>
-                </template>
-                
-            </b-table>
-        </b-card>
-      
-    <!-- </b-card>  -->
-
+            <template  v-slot:cell(Status)="data">
+                <b :class = "data.item['Status Style']" :style="data.field.cellStyle"> {{data.value}} </b>
+            </template>
+            
+        </b-table>
+    </b-card>
 </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
-
 import CivilAppearanceDetails from '@components/civil/CivilAppearanceDetails.vue';
-
+import "@store/modules/CommonInformation";
 import "@store/modules/CivilFileInformation";
 const civilState = namespace("CivilFileInformation");
+const commonState = namespace("CommonInformation");
 
 enum appearanceStatus {UNCF='Unconfirmed', CNCL='Canceled', SCHD='Scheduled' }
 
@@ -135,6 +131,30 @@ export default class CivilPastAppearances extends Vue {
 
     @civilState.Action
     public UpdateAppearanceInfo!: (newAppearanceInfo: any) => void
+
+    @commonState.State
+    public displayName!: string;    
+
+    @commonState.Action
+    public UpdateDisplayName!: (newInputNames: any) => void
+
+    @commonState.State
+    public duration
+
+    @commonState.Action
+    public UpdateDuration!: (duration: any) => void
+
+    @commonState.State
+    public time
+
+    @commonState.Action
+    public UpdateTime!: (time: any) => void
+    
+    @commonState.State
+    public statusStyle
+    
+    @commonState.Action
+    public UpdateStatusStyle!: (statusStyle: any) => void
 
     mounted() {
         this.getPastAppearances();
@@ -193,7 +213,7 @@ export default class CivilPastAppearances extends Vue {
             appInfo["Location"] = jApp.courtLocation;
             appInfo["Room"] =jApp.courtRoomCd              
             appInfo["Status"] = jApp.appearanceStatusCd ? appearanceStatus[jApp.appearanceStatusCd] :''
-
+            appInfo["Status Style"] = this.getStatusStyle(appInfo["Status"])
             appInfo["Presider"] =  jApp.judgeInitials ? jApp.judgeInitials :''
             appInfo["Judge Full Name"] =  jApp.judgeInitials ? jApp.judgeFullNm : ''
 
@@ -206,41 +226,19 @@ export default class CivilPastAppearances extends Vue {
         }
     }
 
-    public getStatusStyle(status)
-    {
-        if(status == appearanceStatus.UNCF) return "badge badge-danger mt-2";
-        else if(status == appearanceStatus.CNCL) return "badge badge-warning mt-2";
-        else if(status == appearanceStatus.SCHD) return "badge badge-primary mt-2";
+    public getStatusStyle(status) {
+        this.UpdateStatusStyle(status);
+        return this.statusStyle;
     }
 
-    public getTime(time)
-    {
-        const time12 = (Number(time.substr(0,2)) % 12 || 12 ) + time.substr(2,3)
-       
-        if(Number(time.substr(0,2))<12) return time12 +' AM'; 
-            else  return time12 +' PM';       
+    public getTime(time) {
+        this.UpdateTime(time);
+        return this.time;     
     }
 
-    public getDuration(hr, min)
-    {        
-        let duration = '';
-        if(hr)
-        {
-            if(Number(hr)==1)            
-                duration += '1 Hr ';
-            else if(Number(hr)>1)
-                duration += Number(hr)+' Hrs ';
-        }
-
-        if(min)
-        {
-            if(Number(min)==1)            
-                duration += '1 Min ';
-            else if(Number(min)>1)
-                duration += Number(min)+' Mins ';
-        }
-
-        return duration
+    public getDuration(hr, min) {
+        this.UpdateDuration({'hr': hr, 'min': min});
+        return this.duration;
     }
 
     public OpenDetails(data)

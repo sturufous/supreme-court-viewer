@@ -138,10 +138,10 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
-
+import "@store/modules/CommonInformation";
 import "@store/modules/CivilFileInformation";
 const civilState = namespace("CivilFileInformation");
-
+const commonState = namespace("CommonInformation");
 
 @Component
 export default class CivilAppearanceDetails extends Vue {
@@ -151,6 +151,12 @@ export default class CivilAppearanceDetails extends Vue {
 
     @civilState.State
     public appearanceInfo!: any;
+
+    @commonState.State
+    public displayName!: string;    
+
+    @commonState.Action
+    public UpdateDisplayName!: (newInputNames: any) => void
 
     mounted() {
         this.getAdditionalInfo();
@@ -255,24 +261,13 @@ export default class CivilAppearanceDetails extends Vue {
             const partyInfo = {};             
             partyInfo["First Name"] = party.givenNm? party.givenNm: '';
             partyInfo["Last Name"] =  party.lastNm? party.lastNm: party.orgNm ;
-            partyInfo["Name"] = this.getNameOfParty(partyInfo["Last Name"], partyInfo["First Name"])
+            this.UpdateDisplayName({'lastName': partyInfo["Last Name"], 'givenName': partyInfo["First Name"]});
+            partyInfo["Name"] = this.displayName
             partyInfo["Current Counsel"] = party.counselNm? party.counselNm: '';
             partyInfo["Role"] = party.partyRoleTypeDesc? party.partyRoleTypeDesc: '';  
 
             this.appearanceParties.push(partyInfo);
         }
-    }
-
-    public getNameOfParty(lastName, givenName) {      
-
-        if(lastName.length==0)        
-            return givenName;       
-        else if(givenName.length==0)       
-            return lastName;      
-         else if(givenName.length==0 && lastName.length==0)       
-            return '';    
-        else         
-            return ( lastName + ", " + givenName );        
     }
 
     public documentClick(document) 

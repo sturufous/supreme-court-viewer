@@ -86,7 +86,7 @@
                 </template>
 
                 <template  v-slot:cell(Status)="data">
-                    <b :class = "getStatusStyle(data.value)" style="font-weight: normal; font-size: 16px;"> {{data.value}} </b>
+                    <b :class = "data.item['Status Style']" style="font-weight: normal; font-size: 16px;"> {{data.value}} </b>
                 </template>
                 
             </b-table>
@@ -211,7 +211,7 @@ export default class PastAppearances extends Vue {
             fileInfo["Last Name"] = jFile.lastNm ? jFile.lastNm : jFile.orgNm;
             fileInfo["Accused"] = this.getNameOfParticipant(fileInfo["Last Name"], fileInfo["First Name"]);  
             fileInfo["Status"] = jFile.appearanceStatusCd ? appearanceStatus[jFile.appearanceStatusCd] :''
-
+            fileInfo["Status Style"] = this.getStatusStyle(fileInfo["Status"])
             fileInfo["Presider"] =  jFile.judgeInitials ? jFile.judgeInitials :''
             fileInfo["Judge Full Name"] =  jFile.judgeInitials ? jFile.judgeFullNm : ''
 
@@ -233,17 +233,14 @@ export default class PastAppearances extends Vue {
     public getNameOfParticipant(lastName, givenName) {
         this.UpdateDisplayName({'lastName': lastName, 'givenName': givenName});
         return this.displayName;
-        // return ( lastName + ", " + givenName );
     }
 
-    public getTime(time)
-    {
+    public getTime(time) {
         this.UpdateTime(time);
         return this.time;     
     }
 
-    public getDuration(hr, min)
-    {
+    public getDuration(hr, min) {
         this.UpdateDuration({'hr': hr, 'min': min});
         return this.duration;
     }
