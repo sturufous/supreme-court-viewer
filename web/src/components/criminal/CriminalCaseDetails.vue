@@ -43,7 +43,7 @@
             <future-appearances v-if="showFutureAppearances" />
             <criminal-documents-view v-if="showDocuments"/>
             <criminal-witnesses v-if="showWitnesses" />
-            <criminal-sentence-details v-if="showSentenceOrderDetails"/>
+            <criminal-sentence v-if="showSentenceOrder"/>
             <b-card><br></b-card>  
         </b-col>
     </b-row>
@@ -64,7 +64,7 @@ import PastAppearances from '@components/criminal/PastAppearances.vue'
 import FutureAppearances from '@components/criminal/FutureAppearances.vue'
 import CriminalCrownNotes from '@components/criminal/CriminalCrownNotes.vue';
 import CriminalWitnesses from '@components/criminal/CriminalWitnesses.vue';
-import CriminalSentenceDetails from '@components/criminal/CriminalSentenceDetails.vue';
+import CriminalSentence from '@components/criminal/CriminalSentence.vue';
 import '@store/modules/CriminalFileInformation';
 const criminalState = namespace('CriminalFileInformation');
 
@@ -81,7 +81,7 @@ const criminalState = namespace('CriminalFileInformation');
         FutureAppearances,
         CriminalCrownNotes,
         CriminalWitnesses,
-        CriminalSentenceDetails
+        CriminalSentence
     }
 })
 export default class CriminalCaseDetails extends Vue {
@@ -166,7 +166,7 @@ export default class CriminalCaseDetails extends Vue {
         return (this.showSections['Witnesses'] && this.isDataReady)
     }
 
-    get showSentenceOrderDetails()
+    get showSentenceOrder()
     {        
         return ((this.showSections['Case Details'] || this.showSections['Sentence/Order Details'] ) && this.isDataReady)
     }
