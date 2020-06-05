@@ -16,14 +16,16 @@ namespace Scv.Api.Models.Civil.AppearanceDetail
         /// Extended object. 
         /// </summary>
         public ICollection<CivilAppearanceDetailParty> Party { get; set; }
-
-        public ICollection<ClParty> CourtListParty { get; set; }
-
+        
         /// <summary>
         /// Extended document object.
         /// </summary>
         public ICollection<CivilAppearanceDocument> Document { get; set; }
-
         public ICollection<CivilAppearanceMethod> AppearanceMethod { get; set; }
+
+
+        //TODO Temp, remove.
+        public ICollection<ClParty> CourtListParties { get; set; }
+        public ICollection<CivilAppearanceParty> OldParty { get; set; }
     }
 }

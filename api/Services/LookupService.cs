@@ -68,6 +68,11 @@ namespace Scv.Api.Services
             return await GetDataFromCache("CivilAppearanceStatuses",
                 async () => await _lookupClient.CodesCivilAppearanceStatusesAsync());
         }
+        public async Task<CodeLookup> GetCivilAssets()
+        {
+            return await GetDataFromCache("CivilAssetsDescriptions",
+                async () => await _lookupClient.CodesCivilAssetsAsync());
+        }
 
         public async Task<CodeLookup> GetComplexityTypeDescription()
         {
@@ -165,6 +170,8 @@ namespace Scv.Api.Services
         public async Task<string> GetCivilAppearanceReasonsDescription(string code) => FindShortDescriptionFromCode(await GetCivilAppearanceReasons(), code);
 
         public async Task<string> GetCivilAppearanceResultsDescription(string code) => FindShortDescriptionFromCode(await GetCivilAppearanceResults(), code);
+        
+        public async Task<string> GetCivilAssetsDescription(string code) => FindLongDescriptionFromCode(await GetCivilAssets(), code);
 
         public async Task<string> GetComplexityTypeDescription(string code) => FindLongDescriptionFromCode(await GetComplexityTypeDescription(), code);
 

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Scv.Api.Models.Civil.Detail
 {
     /// <summary>
-    /// This is used to refine information from CivilFileDetailResponse.
+    /// This is used to refine information from <see cref="CivilFileDetailResponse"/>.
     /// </summary>
     public class RedactedCivilFileDetailResponse
     {
