@@ -59,13 +59,22 @@
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import "@store/modules/CriminalFileInformation";
+import "@store/modules/CommonInformation";
 const criminalState = namespace("CriminalFileInformation");
+const commonState = namespace("CommonInformation");
+
 
 @Component
 export default class CriminalParticipants extends Vue {
 
     @criminalState.State
     public criminalFileInformation!: any;
+    
+    @commonState.State
+    public displayName!: string;    
+
+    @commonState.Action
+    public UpdateDisplayName!: (newInputNames: any) => void    
 
     mounted() {
         this.getParticipants();
@@ -111,7 +120,8 @@ export default class CriminalParticipants extends Vue {
             fileInfo["Index"] = fileIndex;
             fileInfo["First Name"] = jFile.givenNm.trim().length>0 ? jFile.givenNm : "";
             fileInfo["Last Name"] = jFile.lastNm ? jFile.lastNm : jFile.orgNm;
-            fileInfo["Name"] = this.getNameOfParticipant(fileInfo["Last Name"], fileInfo["First Name"]);            
+            this.UpdateDisplayName({'lastName': fileInfo["Last Name"], 'givenName': fileInfo["First Name"]});
+            fileInfo["Name"] = this.displayName;            
             fileInfo["D.O.B."] = jFile.birthDt? (new Date(jFile.birthDt.split(' ')[0])).toUTCString().substr(4,12) : '';
 
             fileInfo["Charges"] = [];         
@@ -131,36 +141,13 @@ export default class CriminalParticipants extends Vue {
                 if(jFile[status.code] =='Y')
                     fileInfo["Status"].push(status);
             }
-   
-            fileInfo['Counsel'] = this.getNameOfJustin(jFile.counselLastNm, jFile.counselGivenNm)
+
+            this.UpdateDisplayName({'lastName': jFile.counselLastNm? jFile.counselLastNm: '', 'givenName': jFile.counselGivenNm? jFile.counselGivenNm: ''});
+            fileInfo['Counsel'] = this.displayName.trim.length? 'JUSTIN: ' + this.displayName: '';
             fileInfo['Counsel Designation Filed'] = jFile.designatedCounselYN           
             this.participantList.push(fileInfo); 
         }
         this.numberOfParticipants = this.participantList.length;
-    }
-
-    public getNameOfParticipant(lastName, givenName) {      
-
-        if(lastName.length==0)        
-            return givenName;       
-        else if(givenName.length==0)       
-            return lastName;      
-         else if(givenName.length==0 && lastName.length==0)       
-            return '';    
-        else         
-            return ( lastName + ", " + givenName );        
-    }
-
-    public getNameOfJustin(lastName, givenName) {      
-
-        if(!lastName && !givenName)        
-            return
-        if(!lastName)        
-            return 'JUSTIN: '+givenName;       
-        else if(!givenName)       
-            return 'JUSTIN: '+lastName;      
-        else         
-            return ('JUSTIN: '+givenName +' ' + lastName );        
     }
 
 }

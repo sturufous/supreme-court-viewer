@@ -67,16 +67,13 @@ import { Component, Vue} from 'vue-property-decorator';
 import * as _ from 'underscore';
 import { namespace } from 'vuex-class';
 import '@store/modules/CriminalFileInformation';
-const criminalState = namespace('CriminalFileInformation');
+const criminalState = namespace("CriminalFileInformation");
 
 @Component
-export default class CriminalSentenceDetails extends Vue {
-
-   
+export default class CriminalSentenceDetails extends Vue {   
 
     @criminalState.State
-    public criminalParticipantSentenceInformation  
-
+    public criminalParticipantSentenceInformation
     
     public getParticipants(): void {       
          

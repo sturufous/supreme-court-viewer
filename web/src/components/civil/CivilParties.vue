@@ -110,19 +110,7 @@ export default class CivilParties extends Vue {
         {key:'Name',                  sortable:true,  tdClass: 'border-top',  headerStyle:'text-primary',   cellStyle:'font-weight: bold; font-size: 14px;'},
         {key:'Role',                  sortable:false, tdClass: 'border-top',  headerStyle:'text',         cellStyle:'font-size: 14px;'},
         {key:'Counsel',               sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:'font-size: 14px;'}
-    ]; 
-
-    public getNameOfJustin(lastName, givenName) {      
-
-        if(!lastName && !givenName)        
-            return
-        if(!lastName)        
-            return 'JUSTIN: '+givenName;       
-        else if(!givenName)       
-            return 'JUSTIN: '+lastName;      
-        else         
-            return ('JUSTIN: '+givenName +' ' + lastName );        
-    }
+    ];    
 
 }
 </script>

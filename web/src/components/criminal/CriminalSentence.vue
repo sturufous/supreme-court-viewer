@@ -66,7 +66,9 @@ import * as _ from 'underscore';
 import { namespace } from 'vuex-class';
 import CriminalSentenceDetails from '@components/criminal/CriminalSentenceDetails.vue';
 import '@store/modules/CriminalFileInformation';
-const criminalState = namespace('CriminalFileInformation');
+import "@store/modules/CommonInformation";
+const criminalState = namespace("CriminalFileInformation");
+const commonState = namespace("CommonInformation");
 
 @Component({
     components: {
@@ -87,6 +89,12 @@ export default class CriminalSentence extends Vue {
     @criminalState.Action
     public UpdateCriminalParticipantSentenceInformation!: (newCriminalParticipantSentenceInformation: any) => void
 
+    @commonState.State
+    public displayName!: string;    
+
+    @commonState.Action
+    public UpdateDisplayName!: (newInputNames: any) => void
+
     public getParticipants(): void {       
         const data = this.criminalFileInformation.detailsData;
         this.participantJson = data.participant
@@ -106,17 +114,7 @@ export default class CriminalSentence extends Vue {
 
     fields = [        
         {key:'Name', tdClass: 'border-top', headerStyle:'text-primary',  cellStyle:'text-info'},
-    ];
-
-    public getNameOfParticipant(firstName, lastName)
-    {        
-        if(!firstName)
-            return  lastName;
-        else if(!lastName)
-            return firstName;
-        else
-            return  lastName+', '+firstName;           
-    }
+    ];    
     
     public ExtractParticipantInfo(): void {        
         
@@ -128,8 +126,9 @@ export default class CriminalSentence extends Vue {
             fileInfo["Part ID"] = jFile.partId;
             fileInfo["First Name"] = jFile.givenNm.trim().length>0 ? jFile.givenNm : "";
             fileInfo["Last Name"] = jFile.lastNm ? jFile.lastNm : jFile.orgNm;
-            fileInfo["Name"] = this.getNameOfParticipant(fileInfo["First Name"], fileInfo["Last Name"]);            
-            
+            this.UpdateDisplayName({'lastName': fileInfo["Last Name"], 'givenName': fileInfo["First Name"]});
+            fileInfo["Name"] = this.displayName;
+
             fileInfo["Counts"] = [];
             const counts: any[] = [];           
               

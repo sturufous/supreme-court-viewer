@@ -110,7 +110,7 @@ export default class CriminalCaseDetails extends Vue {
                     this.criminalFileInformation.detailsData = data; 
                     this.participantJson = data.participant                
                     this.UpdateCriminalFile(this.criminalFileInformation);               
-                    this.ExtractDocumentInfo()
+                    this.ExtractFileInfo()
                     if(this.participantFiles.length)
                     {                    
                         this.isDataReady = true;
@@ -148,7 +148,7 @@ export default class CriminalCaseDetails extends Vue {
     
     get showDocuments()
     {        
-        return ((this.showSections['Case Details'] || this.showSections['Documents'] ) && this.isDataReady)
+        return (this.showSections['Documents'] && this.isDataReady)
     }
 
     get showFutureAppearances()
@@ -168,10 +168,10 @@ export default class CriminalCaseDetails extends Vue {
 
     get showSentenceOrder()
     {        
-        return ((this.showSections['Case Details'] || this.showSections['Sentence/Order Details'] ) && this.isDataReady)
+        return (this.showSections['Sentence/Order Details'] && this.isDataReady)
     }
 
-    public ExtractDocumentInfo(): void {
+    public ExtractFileInfo(): void {
         for(const jFile of this.participantJson)
         {            
             const fileInfo = {};            
