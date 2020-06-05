@@ -89,11 +89,10 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
-
 import AppearanceDetails from '@components/criminal/AppearanceDetails.vue';
-
-import "@store/modules/CriminalFileInformation";
+import "@store/modules/CommonInformation";
 const criminalState = namespace("CriminalFileInformation");
+const commonState = namespace("CommonInformation");
 
 enum appearanceStatus {UNCF='Unconfirmed', CNCL='Canceled', SCHD='Scheduled' }
 
@@ -111,10 +110,34 @@ export default class FutureAppearances extends Vue {
     public showSections
     
     @criminalState.State
-    public pastAppearanceInfo!: any;
+    public appearanceInfo!: any;
 
     @criminalState.Action
-    public UpdatePastAppearanceInfo!: (newPastAppearanceInfo: any) => void
+    public UpdateAppearanceInfo!: (newAppearanceInfo: any) => void
+
+    @commonState.State
+    public displayName!: string;    
+
+    @commonState.Action
+    public UpdateDisplayName!: (newInputNames: any) => void
+
+    @commonState.State
+    public duration
+
+    @commonState.Action
+    public UpdateDuration!: (duration: any) => void
+
+    @commonState.State
+    public time
+
+    @commonState.Action
+    public UpdateTime!: (time: any) => void
+    
+    @commonState.State
+    public statusStyle
+    
+    @commonState.Action
+    public UpdateStatusStyle!: (statusStyle: any) => void
 
     mounted() {
         this.getFutureAppearances();
@@ -131,7 +154,6 @@ export default class FutureAppearances extends Vue {
         }
     
     this.isMounted = true;
-                       
            
     } 
   
@@ -192,59 +214,38 @@ export default class FutureAppearances extends Vue {
 
     public getStatusStyle(status)
     {
-        if(status == appearanceStatus.UNCF) return "badge badge-danger mt-2";
-        else if(status == appearanceStatus.CNCL) return "badge badge-warning mt-2";
-        else if(status == appearanceStatus.SCHD) return "badge badge-primary mt-2";
+        this.UpdateStatusStyle(status);
+        return this.statusStyle;
     }
 
     public getNameOfParticipant(lastName, givenName) {
-        return ( lastName + ", " + givenName );
+        this.UpdateDisplayName({'lastName': lastName, 'givenName': givenName});
+        return this.displayName;        
     }
 
     public getTime(time)
     {
-        const time12 = (Number(time.substr(0,2)) % 12 || 12 ) + time.substr(2,3)
-       
-        if(Number(time.substr(0,2))<12) return time12 +' AM'; 
-            else  return time12 +' PM';       
+        this.UpdateTime(time);
+        return this.time;      
     }
 
     public getDuration(hr, min)
-    {        
-        let duration = '';
-        if(hr)
-        {
-            if(Number(hr)==1)            
-                duration += '1 Hr ';
-            else if(Number(hr)>1)
-                duration += Number(hr)+' Hrs ';
-        }
-
-        if(min)
-        {
-            if(Number(min)==1)            
-                duration += '1 Min ';
-            else if(Number(min)>1)
-                duration += Number(min)+' Mins ';
-        }
-
-        return duration
+    {
+        this.UpdateDuration({'hr': hr, 'min': min});
+        return this.duration;
     }
 
     public OpenDetails(data)
     {
         if(!data.detailsShowing)
         {
-            this.pastAppearanceInfo.fileNo = this.criminalFileInformation.fileNumber; 
-            
-            this.pastAppearanceInfo.appearanceId = data.item["Appearance ID"]
-            this.pastAppearanceInfo.supplementalEquipmentTxt = data.item["Supplemental Equipment"]
-            this.pastAppearanceInfo.securityRestrictionTxt = data.item["Security Restriction"]
-            this.pastAppearanceInfo.outOfTownJudgeTxt = data.item["OutOfTown Judge"]
-
-            this.UpdatePastAppearanceInfo(this.pastAppearanceInfo);
-        }
-        
+            this.appearanceInfo.fileNo = this.criminalFileInformation.fileNumber;
+            this.appearanceInfo.appearanceId = data.item["Appearance ID"]
+            this.appearanceInfo.supplementalEquipmentTxt = data.item["Supplemental Equipment"]
+            this.appearanceInfo.securityRestrictionTxt = data.item["Security Restriction"]
+            this.appearanceInfo.outOfTownJudgeTxt = data.item["OutOfTown Judge"]
+            this.UpdateAppearanceInfo(this.appearanceInfo);
+        }        
     }
 
     get SortedFutureAppearances()

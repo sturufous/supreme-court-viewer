@@ -35,7 +35,7 @@
                 v-for="participant in SortedParticipants"
                 :key="participant['Index']"
                 v-on:click="setActiveParticipantIndex(participant['Index'])"
-            >{{getNameOfParticipant(participant['Index'])}}</b-dropdown-item-button>
+            >{{participant['Name']}}</b-dropdown-item-button>
         </b-nav-item-dropdown>
 
         <b-nav-text style="font-size: 14px;" variant="white">
@@ -67,7 +67,9 @@ import { Component, Vue } from "vue-property-decorator";
 import * as _ from 'underscore';
 import { namespace } from "vuex-class";
 import "@store/modules/CriminalFileInformation";
+import "@store/modules/CommonInformation";
 const criminalState = namespace("CriminalFileInformation");
+const commonState = namespace("CommonInformation");
 
 @Component
 export default class CriminalHeader extends Vue {
@@ -80,6 +82,12 @@ export default class CriminalHeader extends Vue {
 
   @criminalState.Action
   public UpdateActiveCriminalParticipantIndex!: (newActiveCriminalParticipantIndex: any) => void
+
+  @commonState.State
+  public displayName!: string;    
+
+  @commonState.Action
+  public UpdateDisplayName!: (newInputNames: any) => void
 
   mounted() {
     this.getHeaderInfo();
@@ -117,6 +125,8 @@ export default class CriminalHeader extends Vue {
       fileInfo["Index"] = fileIndex;
       fileInfo["First Name"] = jFile.givenNm.trim().length>0 ? jFile.givenNm : "";
       fileInfo["Last Name"] = jFile.lastNm ? jFile.lastNm : jFile.orgNm;
+      this.UpdateDisplayName({'lastName': fileInfo["Last Name"], 'givenName': fileInfo["First Name"]});
+      fileInfo["Name"] = this.displayName;
       this.participantList.push(fileInfo);
     }
     this.numberOfParticipants = this.participantList.length - 1;
@@ -134,14 +144,9 @@ export default class CriminalHeader extends Vue {
       this.UpdateActiveCriminalParticipantIndex(index);  
   }	
 
-  public getNameOfParticipant(num)
-  {        
-      if(!this.participantList[num]["First Name"])
-          return  this.participantList[num]["Last Name"];
-      else if(!this.participantList[num]["Last Name"])
-          return this.participantList[num]["First Name"];
-      else
-          return  this.participantList[num]["Last Name"]+', '+this.participantList[num]["First Name"];           
+  public getNameOfParticipant(num) {        
+      this.UpdateDisplayName({'lastName': this.participantList[num]["Last Name"], 'givenName': this.participantList[num]["First Name"]});
+      return this.displayName;
   }
 
   public getNameOfParticipantTrunc() {

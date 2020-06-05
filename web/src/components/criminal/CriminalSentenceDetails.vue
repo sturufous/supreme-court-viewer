@@ -11,7 +11,7 @@
                     v-for="participant in SortedParticipants" 
                     :key="participant['Index']"
                     v-on:click="setActiveParticipantIndex(participant['Index'])">
-                        {{getNameOfParticipant(participant['Index'])}}
+                        {{participant['Name']}}
                 </b-dropdown-item-button> 
             </b-dropdown> 
         </b-card>
@@ -84,7 +84,9 @@ import { Component, Vue} from 'vue-property-decorator';
 import * as _ from 'underscore';
 import { namespace } from 'vuex-class';
 import '@store/modules/CriminalFileInformation';
-const criminalState = namespace('CriminalFileInformation');
+import "@store/modules/CommonInformation";
+const criminalState = namespace("CriminalFileInformation");
+const commonState = namespace("CommonInformation");
 
 @Component
 export default class CriminalSentenceDetails extends Vue {
@@ -100,6 +102,12 @@ export default class CriminalSentenceDetails extends Vue {
 
     @criminalState.Action
     public UpdateActiveCriminalParticipantIndex!: (newActiveCriminalParticipantIndex: any) => void
+
+    @commonState.State
+    public displayName!: string;    
+
+    @commonState.Action
+    public UpdateDisplayName!: (newInputNames: any) => void
 
     public getParticipants(): void {       
         const data = this.criminalFileInformation.detailsData;
@@ -133,13 +141,10 @@ export default class CriminalSentenceDetails extends Vue {
     ];
 
     public getNameOfParticipant(num)
-    {        
-        if(!this.participantFiles[num]["First Name"])
-            return  this.participantFiles[num]["Last Name"];
-        else if(!this.participantFiles[num]["Last Name"])
-            return this.participantFiles[num]["First Name"];
-        else
-            return  this.participantFiles[num]["Last Name"]+', '+this.participantFiles[num]["First Name"];           
+    {
+        
+        this.UpdateDisplayName({'lastName': this.participantFiles[num]["Last Name"], 'givenName': this.participantFiles[num]["First Name"]});
+        return this.displayName;
     }
 
     public setActiveParticipantIndex(index)
@@ -157,7 +162,8 @@ export default class CriminalSentenceDetails extends Vue {
             fileInfo["Part ID"] = jFile.partId;
             fileInfo["First Name"] = jFile.givenNm.trim().length>0 ? jFile.givenNm : "";
             fileInfo["Last Name"] = jFile.lastNm ? jFile.lastNm : jFile.orgNm;            
-            
+            this.UpdateDisplayName({'lastName': fileInfo["Last Name"], 'givenName': fileInfo["First Name"]});
+            fileInfo["Name"] = this.displayName;
             fileInfo["Counts"] = [];
             const counts: any[] = [];           
               

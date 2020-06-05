@@ -25,7 +25,7 @@
                     v-for="participant in SortedParticipants" 
                     :key="participant['Index']"
                     v-on:click="setActiveParticipantIndex(participant['Index'])">
-                        {{getNameOfParticipant(participant['Index'])}}                        
+                        {{participant['Name']}}                        
                 </b-dropdown-item-button> 
             </b-dropdown>                 
         </b-card>
@@ -85,7 +85,9 @@ import { Component, Vue, Watch } from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
 import * as _ from 'underscore';
 import '@store/modules/CriminalFileInformation';
-const criminalState = namespace('CriminalFileInformation');
+import "@store/modules/CommonInformation";
+const criminalState = namespace("CriminalFileInformation");
+const commonState = namespace("CommonInformation");
 
 enum fieldTab {Categories=0, Summary}
 enum DecodeCourtLevel {'P'= 0, 'S' = 1, 'A' = 2 }
@@ -109,6 +111,12 @@ export default class CriminalDocumentsView extends Vue {
 
     @criminalState.Action
     public UpdateActiveCriminalParticipantIndex!: (newActiveCriminalParticipantIndex: any) => void
+
+    @commonState.State
+    public displayName!: string;    
+
+    @commonState.Action
+    public UpdateDisplayName!: (newInputNames: any) => void
 
     public getDocuments(): void {
        
@@ -180,20 +188,16 @@ export default class CriminalDocumentsView extends Vue {
     public setActiveParticipantIndex(index)
     {                   
         this.UpdateActiveCriminalParticipantIndex(index);  
-    }	
-
-    public getNameOfParticipant(num)
-    {        
-        if(!this.participantFiles[num]["First Name"])
-            return  this.participantFiles[num]["Last Name"];
-        else if(!this.participantFiles[num]["Last Name"])
-            return this.participantFiles[num]["First Name"];
-        else
-            return  this.participantFiles[num]["Last Name"]+', '+this.participantFiles[num]["First Name"];           
     }
 
     public navigateToLandingPage() {
         this.$router.push({name:'Home'})
+    }
+
+    public getNameOfParticipant(num)
+    {
+        this.UpdateDisplayName({'lastName': this.participantFiles[num]["Last Name"], 'givenName': this.participantFiles[num]["First Name"]});
+        return this.displayName;
     }
    
     public ExtractDocumentInfo(): void {
@@ -208,7 +212,8 @@ export default class CriminalDocumentsView extends Vue {
             fileInfo["Prof Seq No"] = jFile.profSeqNo;
             fileInfo["First Name"] = jFile.givenNm.trim().length>0 ? jFile.givenNm : "";
             fileInfo["Last Name"] = jFile.lastNm ? jFile.lastNm : jFile.orgNm;            
-            
+            this.UpdateDisplayName({'lastName': fileInfo["Last Name"], 'givenName': fileInfo["First Name"]});
+            fileInfo["Name"] = this.displayName;
             fileInfo["Documents"] = [];
             fileInfo["Record of Proceedings"] = [];
 
