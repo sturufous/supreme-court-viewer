@@ -45,13 +45,14 @@ namespace Scv.Api.Controllers
         /// <summary>
         /// Provides facilities for performing a civil file search.
         /// </summary>
-        /// <param name="fcq">FileCivilQuery object with many parameters</param>
+        /// <param name="fcq">FileCivilQuery object with many parameters - Search Modes: FILENO = 0, PARTNAME = 1, CROWN = 2, JUSTINNO = 3, PHYSID = 4</param>
+        /// 
         /// <returns>FileSearchResponse</returns>
         [HttpPost]
         [Route("civil/search")]
         public async Task<ActionResult<FileSearchResponse>> FilesCivilSearchAsync(FilesCivilQuery fcq)
         {
-            var fileSearchResponse = await _filesService.FilesCivilAsync(fcq);
+            var fileSearchResponse = await _filesService.CivilSearchAsync(fcq);
             return Ok(fileSearchResponse);
         }
 
@@ -64,7 +65,9 @@ namespace Scv.Api.Controllers
         [Route("civil/{fileId}")]
         public async Task<ActionResult<RedactedCivilFileDetailResponse>> GetCivilFileDetailByFileId(string fileId)
         {
-            var civilFileDetailResponse = await _filesService.FilesCivilFileIdAsync(fileId);
+            var civilFileDetailResponse = await _filesService.CivilFileIdAsync(fileId);
+            if (civilFileDetailResponse?.PhysicalFileId == null)
+                throw new NotFoundException("Couldn't find civil file with this id.");
             return Ok(civilFileDetailResponse);
         }
 
@@ -78,8 +81,10 @@ namespace Scv.Api.Controllers
         [Route("civil/{fileId}/appearance-detail/{appearanceId}")]
         public async Task<ActionResult<CivilAppearanceDetail>> GetCivilAppearanceDetails(string fileId, string appearanceId)
         {
-            var res = await _filesService.FilesCivilDetailedAppearanceAsync(fileId, appearanceId);
-            return Ok(res);
+            var civilAppearanceDetail = await _filesService.CivilDetailedAppearanceAsync(fileId, appearanceId);
+            if (civilAppearanceDetail == null)
+                throw new NotFoundException("Couldn't find appearance detail with the provided file id and appearance id.");
+            return Ok(civilAppearanceDetail);
         }
 
         /// <summary>
@@ -92,7 +97,7 @@ namespace Scv.Api.Controllers
         [Route("civil/court-summary-report/{appearanceId}/{fileNameAndExtension}")]
         public async Task<IActionResult> GetCivilCourtSummaryReport(string appearanceId, string fileNameAndExtension)
         {
-            var justinReportResponse = await _filesService.FilesCivilCourtsummaryreportAsync(appearanceId, JustinReportName.CEISR035);
+            var justinReportResponse = await _filesService.CivilCourtSummaryReportAsync(appearanceId, JustinReportName.CEISR035);
 
             if (justinReportResponse.ReportContent == null || justinReportResponse.ReportContent.Length <= 0)
                 throw new NotFoundException("Couldn't find CSR with this appearance id.");
@@ -113,7 +118,7 @@ namespace Scv.Api.Controllers
         [Route("civil/file-content")]
         public async Task<ActionResult<CivilFileContent>> GetCivilFileContent(string agencyId = null, string roomCode = null, DateTime? proceeding = null, string appearanceId = null, string physicalFileId = "")
         {
-            var civilFileContent = await _filesService.FilesCivilFilecontentAsync(agencyId, roomCode, proceeding, appearanceId, physicalFileId);
+            var civilFileContent = await _filesService.CivilFileContentAsync(agencyId, roomCode, proceeding, appearanceId, physicalFileId);
             return Ok(civilFileContent);
         }
 
@@ -130,7 +135,7 @@ namespace Scv.Api.Controllers
         [Route("criminal/search")]
         public async Task<ActionResult<FileSearchResponse>> FilesCriminalSearchAsync(FilesCriminalQuery fcq)
         {
-            var fileSearchResponse = await _filesService.FilesCriminalAsync(fcq);
+            var fileSearchResponse = await _filesService.CriminalSearchAsync(fcq);
             return Ok(fileSearchResponse);
         }
 
@@ -143,26 +148,27 @@ namespace Scv.Api.Controllers
         [Route("criminal/{fileId}")]
         public async Task<ActionResult<RedactedCriminalFileDetailResponse>> GetCriminalFileDetailByFileId(string fileId)
         {
-            var redactedCriminalFileDetailResponse = await _filesService.FilesCriminalFileIdAsync(fileId);
+            var redactedCriminalFileDetailResponse = await _filesService.CriminalFileIdAsync(fileId);
             if (redactedCriminalFileDetailResponse?.JustinNo == null)
                 throw new NotFoundException("Couldn't find criminal file with this id.");
             return Ok(redactedCriminalFileDetailResponse);
         }
 
         /// <summary>
-        /// Gets detailed information regarding an appearance given criminal file id and appearance id.
+        /// Gets detailed information regarding an appearance given criminal file id, appearance id, participant id.
         /// </summary>
         /// <param name="fileId"></param>
         /// <param name="appearanceId"></param>
         /// <param name="partId"></param>
-        /// <param name="profSeqNo"></param>
         /// <returns>CriminalAppearanceDetail</returns>
         [HttpGet]
-        [Route("criminal/{fileId}/appearance-detail/{appearanceId}")]
-        public async Task<ActionResult<CriminalAppearanceDetail>> GetCriminalAppearanceDetails(string fileId, string appearanceId, string partId = null, string profSeqNo = null)
+        [Route("criminal/{fileId}/appearance-detail/{appearanceId}/{partId}")]
+        public async Task<ActionResult<CriminalAppearanceDetail>> GetCriminalAppearanceDetails(string fileId, string appearanceId, string partId)
         {
-            var res = await _filesService.FilesCriminalAppearanceDetailAsync(fileId, appearanceId, partId, profSeqNo);
-            return Ok(res);
+            var appearanceDetail = await _filesService.CriminalAppearanceDetailAsync(fileId, appearanceId, partId);
+            if (appearanceDetail == null)
+                throw new NotFoundException("Couldn't find appearance details with the provided parameters.");
+            return Ok(appearanceDetail);
         }
 
         /// <summary>
@@ -178,7 +184,7 @@ namespace Scv.Api.Controllers
         [Route("criminal/file-content")]
         public async Task<ActionResult<CriminalFileContent>> GetCriminalFileContent(string agencyId = null, string roomCode = null, DateTime? proceeding = null, string appearanceId = null, string justinNumber = null)
         {
-            var criminalFileContent = await _filesService.FilesCriminalFilecontentAsync(agencyId, roomCode, proceeding, appearanceId, justinNumber);
+            var criminalFileContent = await _filesService.CriminalFileContentAsync(agencyId, roomCode, proceeding, appearanceId, justinNumber);
             return Ok(criminalFileContent);
         }
 
@@ -195,7 +201,7 @@ namespace Scv.Api.Controllers
         [Route("criminal/record-of-proceedings/{partId}/{fileNameAndExtension}")]
         public async Task<IActionResult> GetRecordsOfProceeding(string partId, string fileNameAndExtension, string profSequenceNumber, CourtLevelCd courtLevelCode, CourtClassCd courtClassCode)
         {
-            var recordsOfProceeding = await _filesService.FilesRecordOfProceedingsAsync(partId, profSequenceNumber, courtLevelCode, courtClassCode);
+            var recordsOfProceeding = await _filesService.RecordOfProceedingsAsync(partId, profSequenceNumber, courtLevelCode, courtClassCode);
 
             if (recordsOfProceeding.B64Content == null || recordsOfProceeding.B64Content.Length <= 0)
                 throw new NotFoundException("Couldn't find ROP with this part id.");
@@ -218,7 +224,7 @@ namespace Scv.Api.Controllers
         [Route("court-list")]
         public async Task<ActionResult<CourtList>> GetCourtList(string agencyId, string roomCode, DateTime? proceeding, string divisionCode, string fileNumber)
         {
-            var courtList = await _filesService.FilesCourtlistAsync(agencyId, roomCode, proceeding, divisionCode,
+            var courtList = await _filesService.CourtListAsync(agencyId, roomCode, proceeding, divisionCode,
                 fileNumber);
             return Ok(courtList);
         }
@@ -234,7 +240,7 @@ namespace Scv.Api.Controllers
         [Route("document/{documentId}/{fileNameAndExtension}")]
         public async Task<IActionResult> GetDocument(string documentId, string fileNameAndExtension, bool isCriminal = false)
         {
-            var documentResponse = await _filesService.FilesDocumentAsync(documentId, isCriminal);
+            var documentResponse = await _filesService.DocumentAsync(documentId, isCriminal);
 
             if (documentResponse.B64Content == null || documentResponse.B64Content.Length <= 0)
                 throw new NotFoundException("Couldn't find document with this id.");
