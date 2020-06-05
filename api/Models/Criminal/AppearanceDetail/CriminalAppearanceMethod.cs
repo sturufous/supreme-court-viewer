@@ -1,7 +1,7 @@
 ﻿namespace Scv.Api.Models.Criminal.AppearanceDetail
 {
     /// <summary>
-    /// Extends JCCommon.Clients.FileServices.CriminalAppearanceMethod
+    /// Extends <see cref="JCCommon.Clients.FileServices.CriminalAppearanceMethod"/>
     /// </summary>
     public class CriminalAppearanceMethod : JCCommon.Clients.FileServices.CriminalAppearanceMethod
     {

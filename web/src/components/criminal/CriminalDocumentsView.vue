@@ -1,5 +1,5 @@
 <template>
-<body>
+
    <b-card  v-if= "isMounted">
         <div>         
             <h3 class="mx-2 font-weight-normal"> Documents ({{NumberOfDocuments}}) </h3>
@@ -20,12 +20,12 @@
         </b-card>       
       
         <b-card>
-            <b-dropdown  variant="light text-info" :text="getNameOfParticipant(activeparticipant)" class="m-2">    
+            <b-dropdown  variant="light text-info" :text="getNameOfParticipant(activeCriminalParticipantIndex)" class="m-2">    
                 <b-dropdown-item-button  
-                    v-for="(file,index) in SortedParticipants" 
-                    :key="index"
-                    v-on:click="activeparticipant = index">
-                        {{getNameOfParticipant(index)}}
+                    v-for="participant in SortedParticipants" 
+                    :key="participant['Index']"
+                    v-on:click="setActiveParticipantIndex(participant['Index'])">
+                        {{getNameOfParticipant(participant['Index'])}}                        
                 </b-dropdown-item-button> 
             </b-dropdown>                 
         </b-card>
@@ -38,33 +38,34 @@
                 :sort-by.sync="sortBy"
                 :sort-desc.sync="sortDesc"
                 :no-sort-reset="true"
-                @row-hovered="rowHover"
+                small
                 striped
                 borderless
                 sort-icon-left
                 responsive="sm"
                 >   
-                    <template v-for="(field,index) in fields[fieldsTab]" v-slot:[`head(${field.key})`]="data">
+                    <template v-for="(field, index) in fields[fieldsTab]" v-slot:[`head(${field.key})`]="data">
                     <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
                     </template>
-                    <template v-for="(field,index) in fields[fieldsTab]" v-slot:[`cell(${field.key})`]="data" >
-                        <span 
-                            v-bind:key="index" 
-                            v-b-hover="colHover"                             
-                            v-if="field.key.includes('Date')"
-                            v-on:click= "cellClick(index, data)"
-                            :class= "cellClass(field, index, data)"  
-                            style="white-space: pre-line"> {{ data.value | beautify-date}}
-                        </span>
-                        <span 
-                            v-bind:key="index" 
-                            v-b-hover="colHover"                             
-                            v-else
-                            v-on:click= "cellClick(index, data)"
-                            :class= "cellClass(field, index, data)"  
-                            style="white-space: pre-line"> {{ data.value }}
+
+                    <template v-slot:[`cell(${fields[0][0].key})`]="data" >
+                         {{ data.value | beautify-date}}
+                    </template> 
+
+                    <template v-slot:[`cell(${fields[fieldsTab][documentPlace[fieldsTab]].key})`]="data" >
+                        <b-button 
+                            v-if="data.item.PdfAvail" 
+                            variant="outline-primary text-info" 
+                            style="border:0px;"
+                            @click="cellClick(data)"
+                            size="sm">
+                                {{data.value}}
+                        </b-button>
+                        <span class="ml-2" v-else>
+                             {{data.value}}
                         </span>
                     </template>
+
                 </b-table>
             </b-card>
             <template v-slot:overlay>               
@@ -76,12 +77,13 @@
         </b-overlay>
 
    </b-card> 
-</body>
+
 </template>
 
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
+import * as _ from 'underscore';
 import '@store/modules/CriminalFileInformation';
 const criminalState = namespace('CriminalFileInformation');
 
@@ -102,6 +104,11 @@ export default class CriminalDocumentsView extends Vue {
     @criminalState.Action
     public UpdateCriminalFile!: (newCriminalFileInformation: any) => void
 
+    @criminalState.State
+    public activeCriminalParticipantIndex    
+
+    @criminalState.Action
+    public UpdateActiveCriminalParticipantIndex!: (newActiveCriminalParticipantIndex: any) => void
 
     public getDocuments(): void {
        
@@ -139,7 +146,7 @@ export default class CriminalDocumentsView extends Vue {
     
     activetab = 'ALL';
     tabIndex = 0; 
-    activeparticipant = 0;           
+              
     sortBy = 'Date Filed/Issued';
     sortDesc = true;
     hoverRow =-1;
@@ -153,6 +160,7 @@ export default class CriminalDocumentsView extends Vue {
     categories: any = []; 
 
     fieldsTab = fieldTab.Categories;
+    documentPlace = [1,0]
 
     fields = [ 
         [
@@ -169,41 +177,25 @@ export default class CriminalDocumentsView extends Vue {
         
     ];
 
+    public setActiveParticipantIndex(index)
+    {                   
+        this.UpdateActiveCriminalParticipantIndex(index);  
+    }	
+
     public getNameOfParticipant(num)
     {        
-        return  this.participantFiles[num]["Last Name"]+', '+this.participantFiles[num]["First Name"];           
+        if(!this.participantFiles[num]["First Name"])
+            return  this.participantFiles[num]["Last Name"];
+        else if(!this.participantFiles[num]["Last Name"])
+            return this.participantFiles[num]["First Name"];
+        else
+            return  this.participantFiles[num]["Last Name"]+', '+this.participantFiles[num]["First Name"];           
     }
 
     public navigateToLandingPage() {
         this.$router.push({name:'Home'})
     }
-
-    public cellClick(index, data)
-    {        
-        if(data.item.PdfAvail && index==1 && this.activetab!='ROP')
-        {
-            this.openDocumentsPdf(data.item["Image ID"]);
-        }
-        else if (index==0 && this.activetab=='ROP')
-        {
-            this.openRopPdf(data.item["Index"])     
-        }         
-    }
-
-    public cellClass(field, index, data)
-    {
-         if(data.item.PdfAvail && index==1 && this.activetab!='ROP')
-        {
-            if(this.hoverCol==1 && this.hoverRow==data.item.Index) return 'text-white bg-warning'; else return 'text-info';            
-        }
-        else if(index==0 && this.activetab=='ROP')
-        {
-            if(this.hoverCol==0 && this.hoverRow==data.item.Index) return 'text-white bg-warning'; else return 'text-info';   
-        }
-        else 
-            return field.cellStyle;
-    }
-    
+   
     public ExtractDocumentInfo(): void {
         let ropExists = false 
         
@@ -214,7 +206,7 @@ export default class CriminalDocumentsView extends Vue {
             fileInfo["Index"] = fileIndex; 
             fileInfo["Part ID"] = jFile.partId;
             fileInfo["Prof Seq No"] = jFile.profSeqNo;
-            fileInfo["First Name"] = jFile.givenNm ? jFile.givenNm : "";
+            fileInfo["First Name"] = jFile.givenNm.trim().length>0 ? jFile.givenNm : "";
             fileInfo["Last Name"] = jFile.lastNm ? jFile.lastNm : jFile.orgNm;            
             
             fileInfo["Documents"] = [];
@@ -242,6 +234,7 @@ export default class CriminalDocumentsView extends Vue {
                     docInfo["Document Type"]= 'Record of Proceedings';
                     docInfo["Category"]= "ROP";
                     docInfo["Pages"]= doc.documentPageCount;
+                    docInfo["PdfAvail"]= true 
                     docInfo["Index"] = fileIndex;
                     rop.push(docInfo);
                     ropExists = true
@@ -255,30 +248,22 @@ export default class CriminalDocumentsView extends Vue {
 
          this.categories.sort()
          if(ropExists) this.categories.push("ROP");
-         this.categories.unshift("ALL") 
-        
+         this.categories.unshift("ALL")         
     }
 
     get SortedParticipants()
-    {
-        return this.participantFiles.sort((a, b): any =>
-        {
-            const LastName1 = a["Last Name"]? a["Last Name"].toUpperCase() : '';
-            const LastName2 = b["Last Name"]? b["Last Name"].toUpperCase() : '';
-            if(LastName1 > LastName2) return 1;
-            if(LastName1 < LastName2) return -1;
-            return 0;
-        });        
+    {         
+        return _.sortBy(this.participantFiles,(participant=>{return (participant["Last Name"]? participant["Last Name"].toUpperCase() : '')}))       
     }
 
     get FilteredDocuments() {       
         if(this.activetab == 'ROP')
         {
             this.fieldsTab = fieldTab.Summary;
-            return this.participantFiles[this.activeparticipant]["Record of Proceedings"];
+            return this.participantFiles[this.activeCriminalParticipantIndex]["Record of Proceedings"];
         }
         else{  
-            return this.participantFiles[this.activeparticipant]["Documents"].filter(doc => {                
+            return this.participantFiles[this.activeCriminalParticipantIndex]["Documents"].filter(doc => {                
                 this.fieldsTab = fieldTab.Categories;
                 if ( this.activetab != 'ALL' )
                 {
@@ -298,19 +283,19 @@ export default class CriminalDocumentsView extends Vue {
     get NumberOfDocuments() {       
         if(this.activetab == 'ROP')
         {           
-            return(this.participantFiles[this.activeparticipant]["Record of Proceedings"].length)
+            return(this.participantFiles[this.activeCriminalParticipantIndex]["Record of Proceedings"].length)
         }
         else{  
-            return(this.participantFiles[this.activeparticipant]["Documents"].length)            
+            return(this.participantFiles[this.activeCriminalParticipantIndex]["Documents"].length)            
         }    
     }
 
-    public colHover(hovered, mouseEvent) {            
-        hovered && mouseEvent.fromElement != null? this.hoverCol = mouseEvent.fromElement.cellIndex: this.hoverCol =-1;
-    }
-
-    public rowHover(row) {
-        this.hoverRow = row.Index;
+    public cellClick(data)
+    {         
+        if(data.item.Category !='ROP')        
+            this.openDocumentsPdf(data.item["Image ID"]);        
+        else        
+            this.openRopPdf(data.item["Index"])              
     }
 
     public openDocumentsPdf(imageId): void {
@@ -321,7 +306,7 @@ export default class CriminalDocumentsView extends Vue {
     }
     
     public openRopPdf(index): void {
-        this.loadingPdf = true;  
+        this.loadingPdf = true;         
         const partID = this.participantFiles[index]["Part ID"];
         const profSeqNo = this.participantFiles[index]["Prof Seq No"];      
         const filename = 'ROP_'+partID+'.pdf';

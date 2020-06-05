@@ -1,5 +1,4 @@
 <template>
-<body>
     <div class="m-2">
         <br/>
         <div class="mx-auto bg-white">
@@ -14,8 +13,7 @@
                     </b-nav-item>    
             </b-nav>
         </div>
-    </div>
-</body>    
+    </div>    
 </template>
 
 <script lang="ts">
