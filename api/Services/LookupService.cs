@@ -45,11 +45,6 @@ namespace Scv.Api.Services
 
         #region Collection Methods
 
-        public async Task<CodeLookup> GetCriminalPartyAttendanceTypes()
-        {
-            return await GetDataFromCache("CriminalPartyAttendanceTypes",async () => await _lookupClient.CodesCriminalAppearancePartyAttendanceTypesAsync());
-        }
-
         public async Task<CodeLookup> GetAgencyLocations()
         {
             return await GetDataFromCache("AgencyLocations",
@@ -72,6 +67,11 @@ namespace Scv.Api.Services
         {
             return await GetDataFromCache("CivilAppearanceStatuses",
                 async () => await _lookupClient.CodesCivilAppearanceStatusesAsync());
+        }
+        public async Task<CodeLookup> GetCivilAssets()
+        {
+            return await GetDataFromCache("CivilAssetsDescriptions",
+                async () => await _lookupClient.CodesCivilAssetsAsync());
         }
 
         public async Task<CodeLookup> GetComplexityTypeDescription()
@@ -162,21 +162,6 @@ namespace Scv.Api.Services
         #endregion Collection Methods
 
         #region Lookup Methods
-   
-        public async Task<string> GetPartyAttendanceType(string targetCode)
-        {
-            if (targetCode == null)
-                return null;
-            var codes = await GetCriminalPartyAttendanceTypes();
-            if (targetCode == "RA") return FindShortDescriptionFromCode(codes, targetCode);
-
-            var result = "";
-            foreach (var character in targetCode.Select(b => b))
-            {
-                result += $"{FindShortDescriptionFromCode(codes, character.ToString())} ";
-            }
-            return result.Trim();
-        }
 
         public async Task<string> GetAgencyLocationDescription(string code) => FindLongDescriptionFromCode(await GetAgencyLocations(), code);
 
@@ -187,6 +172,8 @@ namespace Scv.Api.Services
         public async Task<string> GetCivilAppearanceReasonsDescription(string code) => FindShortDescriptionFromCode(await GetCivilAppearanceReasons(), code);
 
         public async Task<string> GetCivilAppearanceResultsDescription(string code) => FindShortDescriptionFromCode(await GetCivilAppearanceResults(), code);
+        
+        public async Task<string> GetCivilAssetsDescription(string code) => FindLongDescriptionFromCode(await GetCivilAssets(), code);
 
         public async Task<string> GetComplexityTypeDescription(string code) => FindLongDescriptionFromCode(await GetComplexityTypeDescription(), code);
 
