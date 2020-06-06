@@ -37,7 +37,8 @@
 
             <civil-parties v-if="showCaseDetails"/>
             <civil-adjudicator-restrictions v-if="showCaseDetails"/>
-            <civil-documents-view v-if="showCaseDetails"/>
+            <civil-documents-view v-if="showCaseDetails"/>            
+            <civil-past-appearances v-if="showPastAppearances" />
             <b-card><br></b-card>  
         </b-col>
     </b-row>
@@ -48,18 +49,22 @@
 import { Component, Vue } from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
 import CivilDocumentsView from '@components/civil/CivilDocumentsView.vue';
+import CivilPastAppearances from '@components/civil/CivilPastAppearances.vue';
 import CivilAdjudicatorRestrictions from '@components/civil/CivilAdjudicatorRestrictions.vue';
 import CivilParties from '@components/civil/CivilParties.vue';
 import CivilHeaderTop from '@components/civil/CivilHeaderTop.vue';
 import CivilHeader from '@components/civil/CivilHeader.vue';
 import CivilSidePanel from '@components/civil/CivilSidePanel.vue';
-import '@store/modules/CivilFileInformation';
-const civilState = namespace('CivilFileInformation');
+import "@store/modules/CommonInformation";
+import "@store/modules/CivilFileInformation";
+const civilState = namespace("CivilFileInformation");
+const commonState = namespace("CommonInformation");
 
 @Component({
     components: {
         CivilAdjudicatorRestrictions,
         CivilDocumentsView,
+        CivilPastAppearances,
         CivilParties,
         CivilSidePanel,
         CivilHeaderTop,
@@ -75,7 +80,13 @@ export default class CivilCaseDetails extends Vue {
     public UpdateCivilFile!: (newCivilFileInformation: any) => void
     
     @civilState.State
-    public showSections    
+    public showSections
+    
+    @commonState.State
+    public displayName!: string;    
+
+    @commonState.Action
+    public UpdateDisplayName!: (newInputNames: any) => void
     
     mounted () { 
         this.civilFileInformation.fileNumber = this.$route.params.fileNumber
@@ -158,7 +169,8 @@ export default class CivilCaseDetails extends Vue {
             partyInfo["Left/Right"] = jParty.leftRightCd;
             partyInfo["First Name"] = jParty.givenNm? jParty.givenNm: '';
             partyInfo["Last Name"] =  jParty.lastNm? jParty.lastNm: jParty.orgNm ;
-            partyInfo["Name"] = this.getNameOfParty(partyInfo["Last Name"], partyInfo["First Name"])
+            this.UpdateDisplayName({'lastName': partyInfo["Last Name"], 'givenName': partyInfo["First Name"]});
+            partyInfo["Name"] = this.displayName            
             partyInfo["ID"] = jParty.partyId            
             if (partyInfo["Left/Right"] == "R") {
                 this.rightPartiesInfo.push(partyInfo);
@@ -179,18 +191,6 @@ export default class CivilCaseDetails extends Vue {
                     
             this.adjudicatorRestrictionsInfo.push(restrictionInfo);      
         }
-    }
-
-    public getNameOfParty(lastName, givenName) {      
-
-        if(lastName.length==0)        
-            return givenName;       
-        else if(givenName.length==0)       
-            return lastName;      
-         else if(givenName.length==0 && lastName.length==0)       
-            return '';    
-        else         
-            return ( lastName + ", " + givenName );        
     }
 
     public SortParties(partiesList) {

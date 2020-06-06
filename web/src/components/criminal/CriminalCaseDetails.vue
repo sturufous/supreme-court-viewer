@@ -35,10 +35,10 @@
                 {{selectedSideBar}}
             </h2>
 
-            <criminal-participants v-if="showCaseDetails"/>
+            <criminal-participants v-if="showCaseDetails"/>            
+            <adjudicator-restrictions v-if="showCaseDetails"/>
             <criminal-crown-information v-if="showCaseDetails"/>
             <criminal-crown-notes v-if="showCaseDetails"/>
-            <adjudicator-restrictions v-if="showCaseDetails"/>
             <past-appearances v-if="showPastAppearances" />
             <future-appearances v-if="showFutureAppearances" />
             <criminal-documents-view v-if="showDocuments"/>
@@ -110,7 +110,7 @@ export default class CriminalCaseDetails extends Vue {
                     this.criminalFileInformation.detailsData = data; 
                     this.participantJson = data.participant                
                     this.UpdateCriminalFile(this.criminalFileInformation);               
-                    this.ExtractDocumentInfo()
+                    this.ExtractFileInfo()
                     if(this.participantFiles.length)
                     {                    
                         this.isDataReady = true;
@@ -126,7 +126,7 @@ export default class CriminalCaseDetails extends Vue {
     participantJson;
     participantFiles: any[] = [];
     sidePanelTitles = [ 
-       'Case Details', 'Future Appearances', 'Past Appearances', 'Witnesses', 'Criminal Documents', 'Sentence/Order Details'    
+       'Case Details', 'Future Appearances', 'Past Appearances', 'Witnesses', 'Documents', 'Sentence/Order Details'    
     ];
     topTitles = [ 
        'Case Details', 'Future Appearances', 'Past Appearances', 'Witnesses', 'Criminal Documents', 'Criminal Sentences'    
@@ -136,7 +136,7 @@ export default class CriminalCaseDetails extends Vue {
     {
         for(const titleInx in this.sidePanelTitles)
         {
-          if (this.showSections[this.sidePanelTitles[titleInx]] == true ) return '   '+ this.topTitles[titleInx]
+          if (this.showSections[this.sidePanelTitles[titleInx]] == true ) return '  '+ this.topTitles[titleInx]
         }
         return ''
     }
@@ -148,7 +148,7 @@ export default class CriminalCaseDetails extends Vue {
     
     get showDocuments()
     {        
-        return ((this.showSections['Case Details'] || this.showSections['Criminal Documents'] ) && this.isDataReady)
+        return (this.showSections['Documents'] && this.isDataReady)
     }
 
     get showFutureAppearances()
@@ -168,10 +168,10 @@ export default class CriminalCaseDetails extends Vue {
 
     get showSentenceOrderDetails()
     {        
-        return ((this.showSections['Case Details'] || this.showSections['Sentence/Order Details'] ) && this.isDataReady)
+        return (this.showSections['Sentence/Order Details'] && this.isDataReady)
     }
 
-    public ExtractDocumentInfo(): void {
+    public ExtractFileInfo(): void {
         for(const jFile of this.participantJson)
         {            
             const fileInfo = {};            

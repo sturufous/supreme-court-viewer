@@ -3,54 +3,54 @@
     <b-card bg-variant="white">
         <div>
             <h3 class="mx-2 font-weight-normal"> Participants ({{numberOfParticipants}}) </h3>
-            <hr class="mb-0 bg-light" style="height: 5px;"/> 
+            <hr class="mb-2 bg-light" style="height: 5px;"/> 
         </div>
 
-        <b-card bg-variant="white">           
-            <b-table
-            :items="participantList"
-            :fields="fields"
-            :sort-by.sync="sortBy"
-            :sort-desc.sync="sortDesc"
-            :no-sort-reset="true"
-            borderless
-            sort-icon-left
-            responsive="sm"
-            >   
-                <template v-for="(field,index) in fields" v-slot:[`head(${field.key})`]="data">
-                    <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
-                </template>                
-                <template v-for="(field,index) in fields" v-slot:[`cell(${field.key})`]="data" >
-                    <span v-bind:key="index" :class="field.cellStyle" v-if="data.field.key != 'Status' && data.field.key != 'Name'">  {{ data.value }} </span>
-                </template>                
-                <template v-slot:cell(Name)="data" >                   
-                    <span :class="data.item.Charges.length>0?data.field.cellStyle:''" > 
-                         {{ data.value }}
-                        <b-dropdown size="sm" variant="white text-info" v-if="data.item.Charges.length>0" >
-                            <b-dropdown-text variant="white text-danger">Charges</b-dropdown-text>
-                            <b-dropdown-divider></b-dropdown-divider>
-                            <b-dropdown-item-button 
-                                disabled                                                               
-                                v-for="(file,index) in data.item.Charges" 
-                                :key="index">                                
-                                   <b>{{file["Code"]}}</b> &mdash; {{file["Description"]}}
-                            </b-dropdown-item-button> 
-                        </b-dropdown>                       
-                    </span>
-                </template>
-                <template v-slot:cell(Status)="data" >
-                        <b-badge  
-                            v-for="(field,index) in data.value"
-                            :key="index" 
-                            class="mr-1"
-                            style="font-weight: normal; font-size: 16px;"
-                            v-b-tooltip.hover 
-                            :title='field.key' > 
-                            {{ field.abbr }} 
-                        </b-badge>
-                </template>
-            </b-table>
-        </b-card>
+        <b-table
+        :items="participantList"
+        :fields="fields"
+        :sort-by.sync="sortBy"
+        :sort-desc.sync="sortDesc"
+        :no-sort-reset="true"
+        sort-icon-left
+        borderless
+        small
+        responsive="sm"
+        >   
+            <template v-for="(field,index) in fields" v-slot:[`head(${field.key})`]="data">
+                <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
+            </template>                
+            <template v-for="(field,index) in fields" v-slot:[`cell(${field.key})`]="data" >
+                <span v-bind:key="index" :class="field.cellStyle" v-if="data.field.key != 'Status' && data.field.key != 'Name'">  {{ data.value }} </span>
+            </template>                
+            <template v-slot:cell(Name)="data" >                   
+                <span :class="data.item.Charges.length>0?data.field.cellStyle:''" > 
+                        {{ data.value }}
+                    <b-dropdown size="sm" variant="white text-info" v-if="data.item.Charges.length>0" >
+                        <b-dropdown-text variant="white text-danger">Charges</b-dropdown-text>
+                        <b-dropdown-divider></b-dropdown-divider>
+                        <b-dropdown-item-button 
+                            disabled                                                               
+                            v-for="(file,index) in data.item.Charges" 
+                            :key="index">                                
+                                <b>{{file["Code"]}}</b> &mdash; {{file["Description"]}}
+                        </b-dropdown-item-button> 
+                    </b-dropdown>                       
+                </span>
+            </template>
+            <template v-slot:cell(Status)="data" >
+                    <b-badge  
+                        v-for="(field,index) in data.value"
+                        :key="index" 
+                        class="mr-1 mt-1"
+                        style="font-weight: normal; font-size: 14px;"
+                        v-b-tooltip.hover 
+                        :title='field.key' > 
+                        {{ field.abbr }} 
+                    </b-badge>
+            </template>
+        </b-table>
+       
     </b-card> 
 
 </template>
@@ -59,13 +59,22 @@
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import "@store/modules/CriminalFileInformation";
+import "@store/modules/CommonInformation";
 const criminalState = namespace("CriminalFileInformation");
+const commonState = namespace("CommonInformation");
+
 
 @Component
 export default class CriminalParticipants extends Vue {
 
     @criminalState.State
     public criminalFileInformation!: any;
+    
+    @commonState.State
+    public displayName!: string;    
+
+    @commonState.Action
+    public UpdateDisplayName!: (newInputNames: any) => void    
 
     mounted() {
         this.getParticipants();
@@ -111,7 +120,8 @@ export default class CriminalParticipants extends Vue {
             fileInfo["Index"] = fileIndex;
             fileInfo["First Name"] = jFile.givenNm.trim().length>0 ? jFile.givenNm : "";
             fileInfo["Last Name"] = jFile.lastNm ? jFile.lastNm : jFile.orgNm;
-            fileInfo["Name"] = this.getNameOfParticipant(fileInfo["Last Name"], fileInfo["First Name"]);            
+            this.UpdateDisplayName({'lastName': fileInfo["Last Name"], 'givenName': fileInfo["First Name"]});
+            fileInfo["Name"] = this.displayName;            
             fileInfo["D.O.B."] = jFile.birthDt? (new Date(jFile.birthDt.split(' ')[0])).toUTCString().substr(4,12) : '';
 
             fileInfo["Charges"] = [];         
@@ -131,36 +141,13 @@ export default class CriminalParticipants extends Vue {
                 if(jFile[status.code] =='Y')
                     fileInfo["Status"].push(status);
             }
-   
-            fileInfo['Counsel'] = this.getNameOfJustin(jFile.counselLastNm, jFile.counselGivenNm)
+
+            this.UpdateDisplayName({'lastName': jFile.counselLastNm? jFile.counselLastNm: '', 'givenName': jFile.counselGivenNm? jFile.counselGivenNm: ''});
+            fileInfo['Counsel'] = this.displayName.trim.length? 'JUSTIN: ' + this.displayName: '';
             fileInfo['Counsel Designation Filed'] = jFile.designatedCounselYN           
             this.participantList.push(fileInfo); 
         }
         this.numberOfParticipants = this.participantList.length;
-    }
-
-    public getNameOfParticipant(lastName, givenName) {      
-
-        if(lastName.length==0)        
-            return givenName;       
-        else if(givenName.length==0)       
-            return lastName;      
-         else if(givenName.length==0 && lastName.length==0)       
-            return '';    
-        else         
-            return ( lastName + ", " + givenName );        
-    }
-
-    public getNameOfJustin(lastName, givenName) {      
-
-        if(!lastName && !givenName)        
-            return
-        if(!lastName)        
-            return 'JUSTIN: '+givenName;       
-        else if(!givenName)       
-            return 'JUSTIN: '+lastName;      
-        else         
-            return ('JUSTIN: '+givenName +' ' + lastName );        
     }
 
 }

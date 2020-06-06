@@ -1,19 +1,21 @@
 <template>
-   <b-card  v-if= "isMounted">
+   <b-card  v-if= "isMounted" no-body>
         <div>         
-            <h3 class="mx-2 font-weight-normal"> Counts ({{NumberOfCounts}}) </h3>
-            <hr class="mx-1 bg-light" style="height: 5px;"/>         
+            <h3 class="mx-2 mt-5 font-weight-normal"> Counts ({{NumberOfCounts}}) </h3>
+            <hr class="mx-2 bg-light" style="height: 5px;"/>         
         </div>      
         
-        <b-dropdown  variant="light text-info" :text="getNameOfParticipant(activeCriminalParticipantIndex)" class="m-2">    
-            <b-dropdown-item-button  
-                v-for="participant in SortedParticipants" 
-                :key="participant['Index']"
-                v-on:click="setActiveParticipantIndex(participant['Index'])">
-                    {{getNameOfParticipant(participant['Index'])}}
-            </b-dropdown-item-button> 
-        </b-dropdown> 
-
+        <b-card>
+            <b-dropdown  variant="light text-info" :text="getNameOfParticipant(activeCriminalParticipantIndex)" class="m-0">    
+                <b-dropdown-item-button  
+                    v-for="participant in SortedParticipants" 
+                    :key="participant['Index']"
+                    v-on:click="setActiveParticipantIndex(participant['Index'])">
+                        {{participant['Name']}}
+                </b-dropdown-item-button> 
+            </b-dropdown> 
+        </b-card>
+        <b-card> 
         <b-table-simple small responsive borderless>
             <b-thead>                    
                 <b-tr >
@@ -37,8 +39,8 @@
                         <span v-if="counts.ChargeIssueCd[index]">
                             &mdash; 
                             <b-badge
-                                variant = "light"  
-                                v-b-tooltip.hover 
+                                variant = "secondary"  
+                                v-b-tooltip.hover.right 
                                 :title="counts.ChargeIssueDscFull[index]"> 
                                 {{counts.ChargeIssueDsc[index]}} 
                             </b-badge>
@@ -47,8 +49,9 @@
                     
                     <b-td :rowspan="counts.Len" v-if="index==0">
                         <b-badge
-                            variant = "light"  
-                            v-b-tooltip.hover 
+                            v-if="counts['Finding']"
+                            variant = "secondary"
+                            v-b-tooltip.hover.right
                             :title="counts.FindingDsc"> 
                             {{counts['Finding']}} 
                         </b-badge>
@@ -56,8 +59,9 @@
 
                     <b-td>
                         <b-badge
-                            variant = "light"  
-                            v-b-tooltip.hover 
+                            v-if="sentence"
+                            variant = "secondary"  
+                            v-b-tooltip.hover.right                             
                             :title="counts.SentenceDsc[index]"> 
                             {{sentence}} 
                         </b-badge>
@@ -70,7 +74,8 @@
                     
                 </b-tr>                       
             </b-tbody>
-        </b-table-simple>       
+        </b-table-simple>
+      </b-card>       
    </b-card> 
 </template>
 
@@ -79,7 +84,9 @@ import { Component, Vue} from 'vue-property-decorator';
 import * as _ from 'underscore';
 import { namespace } from 'vuex-class';
 import '@store/modules/CriminalFileInformation';
-const criminalState = namespace('CriminalFileInformation');
+import "@store/modules/CommonInformation";
+const criminalState = namespace("CriminalFileInformation");
+const commonState = namespace("CommonInformation");
 
 @Component
 export default class CriminalSentenceDetails extends Vue {
@@ -95,6 +102,12 @@ export default class CriminalSentenceDetails extends Vue {
 
     @criminalState.Action
     public UpdateActiveCriminalParticipantIndex!: (newActiveCriminalParticipantIndex: any) => void
+
+    @commonState.State
+    public displayName!: string;    
+
+    @commonState.Action
+    public UpdateDisplayName!: (newInputNames: any) => void
 
     public getParticipants(): void {       
         const data = this.criminalFileInformation.detailsData;
@@ -128,13 +141,10 @@ export default class CriminalSentenceDetails extends Vue {
     ];
 
     public getNameOfParticipant(num)
-    {        
-        if(!this.participantFiles[num]["First Name"])
-            return  this.participantFiles[num]["Last Name"];
-        else if(!this.participantFiles[num]["Last Name"])
-            return this.participantFiles[num]["First Name"];
-        else
-            return  this.participantFiles[num]["Last Name"]+', '+this.participantFiles[num]["First Name"];           
+    {
+        
+        this.UpdateDisplayName({'lastName': this.participantFiles[num]["Last Name"], 'givenName': this.participantFiles[num]["First Name"]});
+        return this.displayName;
     }
 
     public setActiveParticipantIndex(index)
@@ -152,7 +162,8 @@ export default class CriminalSentenceDetails extends Vue {
             fileInfo["Part ID"] = jFile.partId;
             fileInfo["First Name"] = jFile.givenNm.trim().length>0 ? jFile.givenNm : "";
             fileInfo["Last Name"] = jFile.lastNm ? jFile.lastNm : jFile.orgNm;            
-            
+            this.UpdateDisplayName({'lastName': fileInfo["Last Name"], 'givenName': fileInfo["First Name"]});
+            fileInfo["Name"] = this.displayName;
             fileInfo["Counts"] = [];
             const counts: any[] = [];           
               
@@ -174,7 +185,7 @@ export default class CriminalSentenceDetails extends Vue {
                 { 
                     countInfo["Count"] += charge.countNum + ',';
                     countInfo["ChargeIssueCd"].push(charge.chargeTxt? charge.chargeTxt: '') ;
-                    countInfo["ChargeIssueDsc"].push(charge.chargeDscTxt? (charge.chargeDscTxt.length>10 ? charge.chargeDscTxt.substr(0,10)+'...':charge.chargeDscTxt): '');
+                    countInfo["ChargeIssueDsc"].push(charge.chargeDscTxt? (charge.chargeDscTxt.length>10 ? charge.chargeDscTxt.substr(0,10)+' ...':charge.chargeDscTxt): '');
                     countInfo["ChargeIssueDscFull"].push(charge.chargeDscTxt? charge.chargeDscTxt:'');
                 }
                 countInfo["Count"]= countInfo["Count"].slice(0, -1); 

@@ -2,15 +2,16 @@
    <b-card  v-if= "isMounted">
        <div>         
             <h3 class="mx-2 font-weight-normal"> Crown Information </h3>
-            <hr class="mb-0 bg-light" style="height: 5px;"/>         
+            <hr class="mb-3 bg-light" style="height: 5px;"/>         
         </div>       
-        <b-card bg-variant="white">
+        <b-card bg-variant="white" no-body>
             <b-table
             :items="crownInformation"
             :fields="fields"            
             thead-class="d-none"
             responsive="sm"
-            borderless               
+            borderless 
+            small              
             striped
             >
                 <template  v-slot:cell(CrownInfoValue)="data">
@@ -30,13 +31,21 @@
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
 import '@store/modules/CriminalFileInformation';
-const criminalState = namespace('CriminalFileInformation');
+import "@store/modules/CommonInformation";
+const criminalState = namespace("CriminalFileInformation");
+const commonState = namespace("CommonInformation");
 
 @Component
 export default class CriminalCrownInformation extends Vue {
 
     @criminalState.State
     public criminalFileInformation!: any
+
+    @commonState.State
+    public displayName!: string;
+
+    @commonState.Action
+    public UpdateDisplayName!: (newInputNames: any) => void
 
     fields =[
         {key:"CrownInfoFieldName", tdClass: 'border-top',label: "Crown Info Field Name"},
@@ -49,7 +58,8 @@ export default class CriminalCrownInformation extends Vue {
         const assignedCrown: string[] = [];
         if (data.crown.length > 0) {
             for (const assignee of data.crown) {
-                assignedCrown.push(this.formatNames(assignee.lastNm) + ", " + this.formatNames(assignee.givenNm))
+                this.UpdateDisplayName({'lastName': assignee.lastNm, 'givenName': assignee.givenNm});
+                assignedCrown.push(this.displayName)
             }
         }
         let crownInfo = {};
@@ -83,11 +93,8 @@ export default class CriminalCrownInformation extends Vue {
         this.crownInformation.push(crownInfo);
         this.isMounted = true;
 
-    }
+    }   
     
-    public formatNames (name: string): string {
-        return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
-    }
 
     mounted () {              
         this.getCrownInfo();  

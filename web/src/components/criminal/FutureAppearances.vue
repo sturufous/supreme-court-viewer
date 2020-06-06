@@ -3,14 +3,14 @@
     <b-card bg-variant="white">
         <div>
             <h3 class="mx-2 font-weight-normal" v-if="!showSections['Future Appearances']"> Next Three Future Appearances</h3>
-            <hr class="mb-0 bg-light" style="height: 5px;"/> 
+            <hr class="mb-3 bg-light" style="height: 5px;"/> 
         </div>
 
         <b-card v-if="!isDataReady && isMounted">
             <span class="text-muted"> No future appearances. </span>
         </b-card>
 
-        <b-card bg-variant="light" v-if= "!isMounted && !isDataReady">
+        <b-card bg-variant="light" v-if= "!isMounted && !isDataReady" >
             <b-overlay :show= "true"> 
                 <b-card  style="min-height: 100px;"/>                   
                 <template v-slot:overlay>               
@@ -22,7 +22,7 @@
             </b-overlay> 
         </b-card>
 
-        <b-card bg-variant="white" v-if="isDataReady">           
+        <b-card bg-variant="white" v-if="isDataReady" no-body>           
             <b-table
             :items="SortedFutureAppearances"
             :fields="fields"
@@ -48,7 +48,7 @@
 
                 <template v-slot:cell(Date)="data" >
                     <span :class="data.field.cellStyle"> 
-                        <b-button style="transform: translate(0,-7px)" @click="OpenDetails(data);data.toggleDetails();" variant="outline-primary border-white" class="mr-2">
+                        <b-button style="transform: translate(0,-7px)" size="sm" @click="OpenDetails(data);data.toggleDetails();" variant="outline-primary border-white" class="mr-2 mt-1">
                             <b-icon-caret-right-fill v-if="!data.item['_showDetails']"></b-icon-caret-right-fill>
                             <b-icon-caret-down-fill v-if="data.item['_showDetails']"></b-icon-caret-down-fill>
                         </b-button>
@@ -62,24 +62,13 @@
                 </template>
 
                 <template  v-slot:cell(Reason)="data">
-                    <b-button 
-                            :class="data.field.cellStyle"
-                            variant="outline-primary border-white"
-                            v-b-tooltip.hover                            
+                    <b-badge
+                            variant="secondary"
+                            v-b-tooltip.hover.right                            
                             :title="data.item['Reason Description']"
-                            style="margin-top: 1px;"> 
+                            style="margin-top: 10px; font-size: 14px;"> 
                             {{data.value}}
-                    </b-button>
-                </template>
-
-                <template  v-slot:cell(Presider)="data">
-                    <b-button                              
-                            variant="outline-primary border-white"
-                            v-if="data.value"
-                            v-b-tooltip.hover                           
-                            :title="data.item['Judge Full Name']"> 
-                            {{data.value}}
-                    </b-button>
+                    </b-badge>
                 </template>
 
                 <template  v-slot:cell(Accused)="data">
@@ -87,7 +76,7 @@
                 </template>
 
                 <template  v-slot:cell(Status)="data">
-                    <b :class = "getStatusStyle(data.value)" style="font-weight: normal; font-size: 16px;"> {{data.value}} </b>
+                    <b :class = "data.item['Status Style']" style="font-weight: normal; font-size: 16px;"> {{data.value}} </b>
                 </template>
                 
             </b-table>
@@ -100,11 +89,10 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
-
 import AppearanceDetails from '@components/criminal/AppearanceDetails.vue';
-
-import "@store/modules/CriminalFileInformation";
+import "@store/modules/CommonInformation";
 const criminalState = namespace("CriminalFileInformation");
+const commonState = namespace("CommonInformation");
 
 enum appearanceStatus {UNCF='Unconfirmed', CNCL='Canceled', SCHD='Scheduled' }
 
@@ -122,10 +110,34 @@ export default class FutureAppearances extends Vue {
     public showSections
     
     @criminalState.State
-    public pastAppearanceInfo!: any;
+    public appearanceInfo!: any;
 
     @criminalState.Action
-    public UpdatePastAppearanceInfo!: (newPastAppearanceInfo: any) => void
+    public UpdateAppearanceInfo!: (newAppearanceInfo: any) => void
+
+    @commonState.State
+    public displayName!: string;    
+
+    @commonState.Action
+    public UpdateDisplayName!: (newInputNames: any) => void
+
+    @commonState.State
+    public duration
+
+    @commonState.Action
+    public UpdateDuration!: (duration: any) => void
+
+    @commonState.State
+    public time
+
+    @commonState.Action
+    public UpdateTime!: (time: any) => void
+    
+    @commonState.State
+    public statusStyle
+    
+    @commonState.Action
+    public UpdateStatusStyle!: (statusStyle: any) => void
 
     mounted() {
         this.getFutureAppearances();
@@ -142,7 +154,6 @@ export default class FutureAppearances extends Vue {
         }
     
     this.isMounted = true;
-                       
            
     } 
   
@@ -188,7 +199,7 @@ export default class FutureAppearances extends Vue {
             fileInfo["Last Name"] = jFile.lastNm ? jFile.lastNm : jFile.orgNm;
             fileInfo["Accused"] = this.getNameOfParticipant(fileInfo["Last Name"], fileInfo["First Name"]);  
             fileInfo["Status"] = jFile.appearanceStatusCd ? appearanceStatus[jFile.appearanceStatusCd] :''
-
+            fileInfo["Status Style"] = this.getStatusStyle(fileInfo["Status"])
             fileInfo["Presider"] =  jFile.judgeInitials ? jFile.judgeInitials :''
             fileInfo["Judge Full Name"] =  jFile.judgeInitials ? jFile.judgeFullNm : ''
 
@@ -203,59 +214,38 @@ export default class FutureAppearances extends Vue {
 
     public getStatusStyle(status)
     {
-        if(status == appearanceStatus.UNCF) return "badge badge-danger mt-2";
-        else if(status == appearanceStatus.CNCL) return "badge badge-warning mt-2";
-        else if(status == appearanceStatus.SCHD) return "badge badge-primary mt-2";
+        this.UpdateStatusStyle(status);
+        return this.statusStyle;
     }
 
     public getNameOfParticipant(lastName, givenName) {
-        return ( lastName + ", " + givenName );
+        this.UpdateDisplayName({'lastName': lastName, 'givenName': givenName});
+        return this.displayName;        
     }
 
     public getTime(time)
     {
-        const time12 = (Number(time.substr(0,2)) % 12 || 12 ) + time.substr(2,3)
-       
-        if(Number(time.substr(0,2))<12) return time12 +' AM'; 
-            else  return time12 +' PM';       
+        this.UpdateTime(time);
+        return this.time;      
     }
 
     public getDuration(hr, min)
-    {        
-        let duration = '';
-        if(hr)
-        {
-            if(Number(hr)==1)            
-                duration += '1 Hr ';
-            else if(Number(hr)>1)
-                duration += Number(hr)+' Hrs ';
-        }
-
-        if(min)
-        {
-            if(Number(min)==1)            
-                duration += '1 Min ';
-            else if(Number(min)>1)
-                duration += Number(min)+' Mins ';
-        }
-
-        return duration
+    {
+        this.UpdateDuration({'hr': hr, 'min': min});
+        return this.duration;
     }
 
     public OpenDetails(data)
     {
         if(!data.detailsShowing)
         {
-            this.pastAppearanceInfo.fileNo = this.criminalFileInformation.fileNumber; 
-            
-            this.pastAppearanceInfo.appearanceId = data.item["Appearance ID"]
-            this.pastAppearanceInfo.supplementalEquipmentTxt = data.item["Supplemental Equipment"]
-            this.pastAppearanceInfo.securityRestrictionTxt = data.item["Security Restriction"]
-            this.pastAppearanceInfo.outOfTownJudgeTxt = data.item["OutOfTown Judge"]
-
-            this.UpdatePastAppearanceInfo(this.pastAppearanceInfo);
-        }
-        
+            this.appearanceInfo.fileNo = this.criminalFileInformation.fileNumber;
+            this.appearanceInfo.appearanceId = data.item["Appearance ID"]
+            this.appearanceInfo.supplementalEquipmentTxt = data.item["Supplemental Equipment"]
+            this.appearanceInfo.securityRestrictionTxt = data.item["Security Restriction"]
+            this.appearanceInfo.outOfTownJudgeTxt = data.item["OutOfTown Judge"]
+            this.UpdateAppearanceInfo(this.appearanceInfo);
+        }        
     }
 
     get SortedFutureAppearances()
