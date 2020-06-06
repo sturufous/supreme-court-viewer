@@ -2,22 +2,22 @@
 
    <b-card  v-if= "isMounted" no-body>
         <div>         
-            <h3 class="mx-2 font-weight-normal"> Documents ({{NumberOfDocuments}}) </h3>
-            <hr class="mx-2 mb-2 bg-light" style="height: 5px;"/>         
+            <h3 class="mx-4 font-weight-normal"> Documents ({{NumberOfDocuments}}) </h3>
+            <hr class="mx-3 mb-0 bg-light" style="height: 5px;"/>         
         </div>
-       
-        <b-tabs  nav-wrapper-class = "bg-light text-dark"
-                    active-nav-item-class="text-white bg-primary"                     
-                    pills >
-            <b-tab 
-            v-for="(tabMapping, index) in categories"                 
-            :key="index"                 
-            :title="tabMapping"                 
-            v-on:click="activetab = tabMapping" 
-            v-bind:class="[ activetab === tabMapping ? 'active' : '' ]"
-            ></b-tab>
-        </b-tabs>
-              
+        <b-card>
+            <b-tabs  nav-wrapper-class = "bg-light text-dark"
+                        active-nav-item-class="text-white bg-primary"                     
+                        pills >
+                <b-tab 
+                v-for="(tabMapping, index) in categories"                 
+                :key="index"                 
+                :title="tabMapping"                 
+                v-on:click="activetab = tabMapping" 
+                v-bind:class="[ activetab === tabMapping ? 'active' : '' ]"
+                ></b-tab>
+            </b-tabs>
+        </b-card>       
       
         <b-card>
             <b-dropdown  variant="light text-info" :text="getNameOfParticipant(activeCriminalParticipantIndex)" class="m-0">    
@@ -31,7 +31,7 @@
         </b-card>
 
         <b-overlay :show="loadingPdf" rounded="sm">  
-            <b-card bg-variant="light">           
+            <b-card class="mx-3" bg-variant="light">           
                 <b-table
                 :items="FilteredDocuments"
                 :fields="fields[fieldsTab]"

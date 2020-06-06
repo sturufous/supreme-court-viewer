@@ -35,10 +35,10 @@
                 {{selectedSideBar}}
             </h2>
 
-            <criminal-participants v-if="showCaseDetails"/>
+            <criminal-participants v-if="showCaseDetails"/>            
+            <adjudicator-restrictions v-if="showCaseDetails"/>
             <criminal-crown-information v-if="showCaseDetails"/>
             <criminal-crown-notes v-if="showCaseDetails"/>
-            <adjudicator-restrictions v-if="showCaseDetails"/>
             <past-appearances v-if="showPastAppearances" />
             <future-appearances v-if="showFutureAppearances" />
             <criminal-documents-view v-if="showDocuments"/>
@@ -136,7 +136,7 @@ export default class CriminalCaseDetails extends Vue {
     {
         for(const titleInx in this.sidePanelTitles)
         {
-          if (this.showSections[this.sidePanelTitles[titleInx]] == true ) return '   '+ this.topTitles[titleInx]
+          if (this.showSections[this.sidePanelTitles[titleInx]] == true ) return '  '+ this.topTitles[titleInx]
         }
         return ''
     }
