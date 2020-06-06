@@ -13,6 +13,8 @@ class CivilFileInformation extends VuexModule {
     'Past Appearances': false
   }
 
+  public appearanceInfo = {}
+
   @Mutation
   public setCivilFile(civilFileInformation): void {
     this.civilFileInformation = civilFileInformation
@@ -41,6 +43,16 @@ class CivilFileInformation extends VuexModule {
   @Action
   public UpdateShowSections(newShowSections): void {
     this.context.commit('setShowSections', newShowSections)
+  }
+
+  @Mutation
+  public setAppearanceInfo(appearanceInfo): void {
+    this.appearanceInfo = appearanceInfo
+  }
+
+  @Action
+  public UpdateAppearanceInfo(newAppearanceInfo): void {
+    this.context.commit('setAppearanceInfo', newAppearanceInfo)
   }
 
 }

@@ -3,14 +3,14 @@
     <b-card bg-variant="white">
         <div>
             <h3 class="mx-2 font-weight-normal"> Adjudicator Restrictions </h3>
-            <hr class="mb-0 bg-light" style="height: 5px;"/> 
+            <hr class="mb-2 bg-light" style="height: 5px;"/> 
         </div>
 
         <b-card v-if="!(adjudicatorRestrictionsInfo.length>0)">
             <span class="text-muted"> No adjudicator restrictions. </span>
         </b-card>
 
-        <b-card bg-variant="white" v-if="isMounted && (adjudicatorRestrictionsInfo.length>0)">           
+        <b-card bg-variant="white" v-if="isMounted && (adjudicatorRestrictionsInfo.length>0)" no-body>           
             <b-table        
             borderless
             :items="adjudicatorRestrictionsInfo"
@@ -18,6 +18,7 @@
             :sort-by.sync="sortBy"
             :sort-desc.sync="sortDesc"
             sort-icon-left
+            small
             responsive="sm"
             >   
                 <template v-for="(field,index) in fields" v-slot:[`head(${field.key})`]="data">
@@ -26,7 +27,7 @@
                 <template v-slot:cell(Status)="data" >                   
                     <b-badge 
                         variant="primary" 
-                        style="font-weight: normal; font-size: 16px;"> 
+                        style="font-weight: normal; font-size: 14px;"> 
                         {{ data.value }}
                     </b-badge>
                 </template>
@@ -64,7 +65,7 @@ export default class  CivilAdjudicatorRestrictions extends Vue {
   isMounted = false;
 
   fields = [
-      {key:'Adjudicator', sortable:true, tdClass: 'border-top',  headerStyle:'table-borderless text-primary'},       
+      {key:'Adjudicator', sortable:true, tdClass: 'border-top',  headerStyle:'text-primary'},       
       {key:'Status',      sortable:true, tdClass: 'border-top',  headerStyle:'text-primary'},
       {key:'Applies to',  sortable:true, tdClass: 'border-top',  headerStyle:'text-primary'}           
   ];  
