@@ -213,6 +213,7 @@ export default class CriminalPastAppearances extends Vue {
             appInfo["Judge Full Name"] =  jApp.judgeInitials ? jApp.judgeFullNm : ''
 
             appInfo["Appearance ID"] = jApp.appearanceId
+            appInfo["Part ID"] = jApp.partId
             appInfo["Supplemental Equipment"] = jApp.supplementalEquipmentTxt
             appInfo["Security Restriction"] = jApp.securityRestrictionTxt
             appInfo["OutOfTown Judge"] = jApp.outOfTownJudgeTxt
@@ -249,6 +250,7 @@ export default class CriminalPastAppearances extends Vue {
             this.appearanceInfo.fileNo = this.criminalFileInformation.fileNumber; 
             
             this.appearanceInfo.appearanceId = data.item["Appearance ID"]
+            this.appearanceInfo.partId = data.item["Part ID"]
             this.appearanceInfo.supplementalEquipmentTxt = data.item["Supplemental Equipment"]
             this.appearanceInfo.securityRestrictionTxt = data.item["Security Restriction"]
             this.appearanceInfo.outOfTownJudgeTxt = data.item["OutOfTown Judge"]
