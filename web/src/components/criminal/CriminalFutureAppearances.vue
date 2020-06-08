@@ -48,7 +48,11 @@
 
                 <template v-slot:cell(Date)="data" >
                     <span :class="data.field.cellStyle"> 
-                        <b-button style="transform: translate(0,-7px)" size="sm" @click="OpenDetails(data);data.toggleDetails();" variant="outline-primary border-white text-info" class="mr-2 mt-1">
+                        <b-button style="transform: translate(0,-7px)" 
+                                  size="sm" 
+                                  @click="OpenDetails(data);data.toggleDetails();" 
+                                  variant="outline-primary border-white text-info" 
+                                  class="mr-2 mt-1">
                             <b-icon-caret-right-fill v-if="!data.item['_showDetails']"></b-icon-caret-right-fill>
                             <b-icon-caret-down-fill v-if="data.item['_showDetails']"></b-icon-caret-down-fill>
                             {{data.item.FormattedDate}}
@@ -204,7 +208,8 @@ export default class CriminalFutureAppearances extends Vue {
             appInfo["Presider"] =  jApp.judgeInitials ? jApp.judgeInitials :''
             appInfo["Judge Full Name"] =  jApp.judgeInitials ? jApp.judgeFullNm : ''
 
-            appInfo["Appearance ID"] = jApp.appearanceId
+            appInfo["Appearance ID"] = jApp.appearanceId            
+            appInfo["Part ID"] = jApp.partId
             appInfo["Supplemental Equipment"] = jApp.supplementalEquipmentTxt
             appInfo["Security Restriction"] = jApp.securityRestrictionTxt
             appInfo["OutOfTown Judge"] = jApp.outOfTownJudgeTxt
@@ -242,6 +247,7 @@ export default class CriminalFutureAppearances extends Vue {
         {
             this.appearanceInfo.fileNo = this.criminalFileInformation.fileNumber;
             this.appearanceInfo.appearanceId = data.item["Appearance ID"]
+            this.appearanceInfo.partId = data.item["Part ID"]
             this.appearanceInfo.supplementalEquipmentTxt = data.item["Supplemental Equipment"]
             this.appearanceInfo.securityRestrictionTxt = data.item["Security Restriction"]
             this.appearanceInfo.outOfTownJudgeTxt = data.item["OutOfTown Judge"]
@@ -264,8 +270,7 @@ export default class CriminalFutureAppearances extends Vue {
                 else if(a["Date"] < b["Date"]) return 1;
                 else return 0;
             })
-            .slice(0, 3);
-           
+            .slice(0, 3);           
         }        
     }
 }

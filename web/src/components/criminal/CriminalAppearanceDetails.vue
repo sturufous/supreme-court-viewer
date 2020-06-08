@@ -99,7 +99,7 @@ export default class CriminalAppearanceDetails extends Vue {
 
     public getAppearanceDetails(): void {      
     
-        this.$http.get('/api/files/criminal/'+ this.appearanceDetailsInfo["File Number"]+'/appearance-detail/'+this.appearanceDetailsInfo["Appearance ID"])
+        this.$http.get('/api/files/criminal/'+ this.appearanceDetailsInfo["File Number"]+'/appearance-detail/'+this.appearanceDetailsInfo["Appearance ID"]+ '/'+this.appearanceDetailsInfo["Part ID"])
             .then(Response => Response.json(), err => {console.log(err);} )        
             .then(data => {
                 if(data){  
@@ -147,7 +147,8 @@ export default class CriminalAppearanceDetails extends Vue {
             this.appearanceAdditionalInfo.push({'key':info,'value':this.appearanceDetailsInfo[info]});
 
         this.appearanceDetailsInfo["File Number"] = this.appearanceInfo.fileNo; 
-        this.appearanceDetailsInfo["Appearance ID"] = this.appearanceInfo.appearanceId;    
+        this.appearanceDetailsInfo["Appearance ID"] = this.appearanceInfo.appearanceId;
+        this.appearanceDetailsInfo["Part ID"] = this.appearanceInfo.partId;     
     }
 
     public ExtractAppearanceDetailsInfo()
