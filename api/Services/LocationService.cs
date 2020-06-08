@@ -62,8 +62,7 @@ namespace Scv.Api.Services
 
         private async Task<T> GetDataFromCache<T>(string key, Func<Task<T>> fetchFunction)
         {
-            return await _cache.GetOrAddAsync(key,
-                async () => await fetchFunction.Invoke());
+            return await _cache.GetOrAddAsync(key, async () => await fetchFunction.Invoke());
         }
 
         private string FindLongDescriptionFromCode(CodeValue lookupCodes, string code) => lookupCodes.FirstOrDefault(lookupCode => lookupCode.Code == code)?.LongDesc;
