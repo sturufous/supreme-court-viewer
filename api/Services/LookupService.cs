@@ -157,8 +157,6 @@ namespace Scv.Api.Services
                 async () => await _lookupClient.CodesCriminalSentencesAsync());
         }
 
-        public async Task<CodeLookup> GetCriminalSentences() => await GetDataFromCache("CriminalSentences", async () => await _lookupClient.CodesCriminalSentencesAsync());
-
         #endregion Collection Methods
 
         #region Lookup Methods
