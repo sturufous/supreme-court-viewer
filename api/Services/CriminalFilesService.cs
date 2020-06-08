@@ -109,8 +109,8 @@ namespace Scv.Api.Services
             var appearancesTask = _cache.GetOrAddAsync($"CriminalAppearancesFull-{fileId}", Appearances);
             var fileDetailTask = _cache.GetOrAddAsync($"CriminalFileDetail-{fileId}", FileDetails);
             var fileContentTask = _cache.GetOrAddAsync($"CriminalFileContent-{fileId}", FileContent);
-            var appearanceCountTask = _cache.GetOrAddAsync($"CriminalAppearanceCounts-{fileId}", AppearanceCounts);
-            var appearanceMethodsTask = _cache.GetOrAddAsync($"CriminalAppearanceMethods-{fileId}", AppearanceMethods);
+            var appearanceCountTask = _cache.GetOrAddAsync($"CriminalAppearanceCounts-{fileId}-{appearanceId}", AppearanceCounts);
+            var appearanceMethodsTask = _cache.GetOrAddAsync($"CriminalAppearanceMethods-{fileId}-{appearanceId}", AppearanceMethods);
 
             //Probably cached, user has the path: FileDetails -> Appearances -> AppearanceDetails. 
             var appearances = await appearancesTask;

@@ -103,9 +103,9 @@ namespace Scv.Api.Services
             async Task<CivilFileAppearancesResponse> Appearances() => await PopulateDetailAppearancesAsync(FutureYN2.Y, HistoryYN2.Y, fileId);
 
             var fileDetailTask = _cache.GetOrAddAsync($"CivilFileDetail-{fileId}", FileDetails);
-            var appearancePartyTask = _cache.GetOrAddAsync($"CivilAppearanceParty-{fileId}", AppearanceParty);
+            var appearancePartyTask = _cache.GetOrAddAsync($"CivilAppearanceParty-{fileId}-{appearanceId}", AppearanceParty);
             var fileContentTask = _cache.GetOrAddAsync($"CivilFileContent-{fileId}", FileContent);
-            var appearanceMethodsTask = _cache.GetOrAddAsync($"CivilAppearanceMethods-{fileId}", AppearanceMethods);
+            var appearanceMethodsTask = _cache.GetOrAddAsync($"CivilAppearanceMethods-{fileId}-{appearanceId}", AppearanceMethods);
             var appearancesTask = _cache.GetOrAddAsync($"CivilAppearancesFull-{fileId}", Appearances);
 
             var detail = await fileDetailTask;
@@ -127,7 +127,7 @@ namespace Scv.Api.Services
             }
 
             var appearanceParty = await appearancePartyTask;
-            var appearanceMethodsResponse = await appearanceMethodsTask;
+            var appearanceMethods = await appearanceMethodsTask;
 
             var appearanceDetail = appearances.ApprDetail?.FirstOrDefault(app => app.AppearanceId == appearanceId);
             var fileDetailDocuments = detail.Document.Where(doc => doc.Appearance != null && doc.Appearance.Any(app => app.AppearanceId == appearanceId)).ToList();
@@ -140,7 +140,7 @@ namespace Scv.Api.Services
                 CourtRoomCd = targetAppearance.CourtRoomCd,
                 FileNumberTxt = detail.FileNumberTxt,
                 AppearanceDt = targetAppearance.AppearanceDt,
-                AppearanceMethod = appearanceMethodsResponse.AppearanceMethod,
+                AppearanceMethod = appearanceMethods.AppearanceMethod,
                 Party = await PopulateDetailedAppearancePartiesAsync(appearanceParty.Party, civilCourtList?.Parties),
                 Document = await PopulateDetailedAppearanceDocuments(fileDetailDocuments, appearanceDetail)
             };
