@@ -1,10 +1,7 @@
-﻿using JCCommon.Clients.FileServices;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using JCCommon.Clients.FileServices;
 
-namespace Scv.Api.Models.Civil.Appearances
+namespace Scv.Api.Models.Civil.AppearanceDetail
 {
     public class CivilAppearanceDetailParty
     {
