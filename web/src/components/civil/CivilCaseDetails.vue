@@ -15,7 +15,7 @@
 
     <b-card bg-variant="light" v-if= "isMounted && !isDataReady">
         <b-card  style="min-height: 100px;">
-            <span v-if="errorCode<=404">This <b>File-Number '{{this.civilFileInformation.fileNumber}}'</b> doesn't exist in the <b>civil</b> records.</span>
+            <span v-if="errorCode==404">This <b>File-Number '{{this.civilFileInformation.fileNumber}}'</b> doesn't exist in the <b>civil</b> records.</span>
             <span v-if="errorCode>405"> Server doesn't respond. <b>({{errorText}})</b> </span>
         </b-card>
         <b-card>         

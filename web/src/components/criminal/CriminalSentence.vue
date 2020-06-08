@@ -1,6 +1,6 @@
 <template>
 
-    <b-card bg-variant="white">
+    <b-card bg-variant="white" v-if="isMounted">
         <div>            
             <hr class="mb-3 bg-light" style="height: 5px;"/> 
         </div>
@@ -68,31 +68,66 @@
 
         <b-modal v-model="showRecommendation" id="bv-modal-recommendation" hide-footer>
             <template v-slot:modal-title>
-                Judge's Recommendations
+                 <h2 class="mb-0"> Recommendations </h2>
             </template>
-            <div class="d-block text-center">
-                <h3>Hello From This Modal!</h3>
-            </div>
-            <b-button class="mt-3" @click="$bvModal.hide('bv-modal-recommendation')">Close Me</b-button>
+            <b-table                
+                :items="SortedJudgesRecommendation"
+                :fields="orderMadeFields"                
+                borderless
+                small                
+                > 
+                <template v-slot:cell(Date)="data" >
+                    <b-button                        
+                        @click="data.toggleDetails();" 
+                        variant="outline-primary border-white text-info"
+                        size="sm">
+                            <b-icon-caret-right-fill v-if="!data.item['_showDetails']"></b-icon-caret-right-fill>
+                            <b-icon-caret-down-fill v-if="data.item['_showDetails']"></b-icon-caret-down-fill>
+                            {{data.item.FormattedDate}}
+                    </b-button>             
+                </template> 
+                <template v-slot:row-details="row">                   
+                    <li                
+                        v-for="(recommendation,inx) in row.item.JudgeRecommendation"
+                        :key="inx"
+                        class="mx-3">
+                            {{recommendation}}                           
+                    </li>                  
+                </template> 
+            </b-table>
+            <b-button class="mt-3" @click="$bvModal.hide('bv-modal-recommendation')">Close</b-button>
         </b-modal>
 
         <b-modal v-model="showOrderMade" id="bv-modal-ordermade" hide-footer>
             <template v-slot:modal-title>
-                OrderMadeDetails
-            </template>
-            <b-table
-                :items="participantFiles[4]['Counts']"
-                :fields="orderMadeFields"
-                :sort-by.sync="sortBy"
-                :sort-desc.sync="sortDesc"
-                :no-sort-reset="true"
-                sort-icon-left
+                <h2 class="mb-0"> Order Made Details </h2>
+            </template>           
+            <b-table                
+                :items="SortedOrderMade"
+                :fields="orderMadeFields"                
                 borderless
-                small
-                responsive="sm"
-                >   
-            </b-table>
-            <b-button class="mt-3" @click="$bvModal.hide('bv-modal-ordermade')">Close Me</b-button>
+                small                
+                > 
+                <template v-slot:cell(Date)="data" >
+                    <b-button                        
+                        @click="data.toggleDetails();" 
+                        variant="outline-primary border-white text-info"
+                        size="sm">
+                            <b-icon-caret-right-fill v-if="!data.item['_showDetails']"></b-icon-caret-right-fill>
+                            <b-icon-caret-down-fill v-if="data.item['_showDetails']"></b-icon-caret-down-fill>
+                            {{data.item.FormattedDate}}
+                    </b-button>             
+                </template> 
+                <template v-slot:row-details="row">
+                        <li                
+                            v-for="(order,inx) in row.item.OrderMade"
+                            :key="inx"
+                            class="mx-3">
+                                {{order}}                           
+                        </li>                  
+                </template> 
+            </b-table>           
+            <b-button class="mt-3" @click="$bvModal.hide('bv-modal-ordermade')">Close</b-button>
         </b-modal>
       
     </b-card> 
@@ -150,6 +185,10 @@ export default class CriminalSentence extends Vue {
     isMounted = false
 
     participantFiles: any[] = [];
+    orderMadeClickedParticipant=0;
+    judgeRecomClickedParticipant =0;
+
+    
 
     fields = [        
         {key:'Name',  tdClass: 'border-bottom', headerStyle:'text-primary',  cellStyle:'text-info'},
@@ -158,8 +197,8 @@ export default class CriminalSentence extends Vue {
     ]; 
     
     orderMadeFields = [
-        {key:'Date',  tdClass: 'border-bottom', headerStyle:'text-primary',  cellStyle:'text'},
-        {key:'Count', tdClass: 'border-bottom', headerStyle:'text',          cellStyle:'text'},
+        {key:'Date',  tdClass: 'border-top', headerStyle:'text-primary',  cellStyle:'text'},
+        {key:'Count', tdClass: 'border-top', headerStyle:'text',          cellStyle:'text'},
     ]
     
     public ExtractParticipantInfo(): void {        
@@ -176,18 +215,23 @@ export default class CriminalSentence extends Vue {
             fileInfo["Name"] = this.displayName;
 
             fileInfo["Counts"] = [];
-            const counts: any[] = [];           
+            const counts: any[] = []; 
+            
+            fileInfo["OrderMade"] = [];
+            fileInfo["OrderMadeDisable"] =  true;
+            fileInfo["JudgesRecommendation"] = [];
+            fileInfo["RecommendationDisable"] =  true;
               
             for(const cnt of this.mergeSentences(jFile.count))           
             {                
                 const countInfo = {}; 
                
                 countInfo["Date"] = cnt.appearanceDate? cnt.appearanceDate.split(' ')[0] : ''; 
+                countInfo["FormattedDate"] = Vue.filter('beautify-date')(countInfo["Date"]);
                                 
                 countInfo["Finding"]= cnt.finding? cnt.finding:'';
-                countInfo["FindingDsc"]= cnt.findingDsc? cnt.findingDsc:'';
-                                   
-               // countInfo["Count"]='';
+                countInfo["FindingDsc"]= cnt.findingDsc? cnt.findingDsc:'';                                   
+               
                 countInfo["ChargeIssueCd"] = [] ;
                 countInfo["ChargeIssueDsc"] = [];
                 countInfo["ChargeIssueDscFull"] = [];
@@ -205,24 +249,27 @@ export default class CriminalSentence extends Vue {
                 countInfo["Term"] = [];
                 countInfo["Amount"]=[];
                 countInfo["Due Date/ Until"]=[];
-                countInfo["Effective Date"]=[]; 
+                countInfo["Effective Date"]=[];
+                countInfo["OrderMade"]=[];
+                countInfo["JudgeRecommendation"]=[]; 
 
                 countInfo["LenCharge"] = cnt.charge.length;
                 countInfo["Len"]= Math.max(cnt.sentence.length , countInfo["LenCharge"]); 
                
                 for(const sentence of cnt.sentence)
                 {                    
-                   countInfo["Sentence/Disposition Type"].push(sentence.sntpCd); 
-                   countInfo["SentenceDsc"].push(sentence.sentenceTypeDesc? sentence.sentenceTypeDesc:'');
-                   countInfo["Term"].push(sentence.sentTermPeriodQty? (sentence.sentTermPeriodQty + ' ' + sentence.sentTermCd.replace('-','')):'')
-                   countInfo["Amount"].push(sentence.sentMonetaryAmt? sentence.sentMonetaryAmt:'')
-                   countInfo["Due Date/ Until"].push(sentence.sentDueTtpDt? sentence.sentDueTtpDt.split(' ')[0]:'')
-                   countInfo["Effective Date"].push(sentence.sentEffectiveDt?  sentence.sentEffectiveDt.split(' ')[0]:'') 
-                  if(sentence.sentDetailTxt)  
-                  {console.log( countInfo["Date"])
-                   console.log(sentence.sentDetailTxt) 
-                  }                 
-                }                
+                    countInfo["Sentence/Disposition Type"].push(sentence.sntpCd); 
+                    countInfo["SentenceDsc"].push(sentence.sentenceTypeDesc? sentence.sentenceTypeDesc:'');
+                    countInfo["Term"].push(sentence.sentTermPeriodQty? (sentence.sentTermPeriodQty + ' ' + sentence.sentTermCd.replace('-','')):'')
+                    countInfo["Amount"].push(sentence.sentMonetaryAmt? sentence.sentMonetaryAmt:'')
+                    countInfo["Due Date/ Until"].push(sentence.sentDueTtpDt? sentence.sentDueTtpDt.split(' ')[0]:'')
+                    countInfo["Effective Date"].push(sentence.sentEffectiveDt?  sentence.sentEffectiveDt.split(' ')[0]:'') 
+                    if(sentence.judgesRecommendation)
+                        countInfo["JudgeRecommendation"].push(sentence.judgesRecommendation);
+                    
+                    if(sentence.sentDetailTxt)
+                        countInfo["OrderMade"].push(sentence.sentDetailTxt);                                   
+                }                               
                 
                 if(cnt.sentence.length < countInfo["Len"])
                 {
@@ -247,14 +294,22 @@ export default class CriminalSentence extends Vue {
                 }
                   
                 counts.push(countInfo);
+                if(countInfo["OrderMade"].length>0)
+                {
+                    fileInfo["OrderMade"].push(countInfo)
+                    fileInfo["OrderMadeDisable"] =  false;
+                }
+
+                 if(countInfo["JudgeRecommendation"].length>0)
+                {
+                    fileInfo["JudgesRecommendation"].push(countInfo)
+                    fileInfo["RecommendationDisable"] =  false;
+                }
             }
             fileInfo["Counts"] = counts;
             fileInfo["CountsDisable"] = counts.length>0 ? false: true;
-            fileInfo["RecommendationDisable"] = counts.length>0 ? false: true;
-            fileInfo["OrderMadeDisable"] = counts.length>0 ? false: true;
-
-
-                        
+            
+            
             this.participantFiles.push(fileInfo);
         } 
         const participantInfo = {participantFiles:{}, selectedParticipant:0}
@@ -287,9 +342,18 @@ export default class CriminalSentence extends Vue {
         return _.sortBy(this.participantFiles,(participant=>{return (participant["Last Name"]? participant["Last Name"].toUpperCase() : '')}))       
     }
 
-    public OpenDetails(data)
+    get SortedOrderMade()
     {
-        console.log(data)
+        return _.sortBy(this.participantFiles[this.orderMadeClickedParticipant].OrderMade, 'Date').reverse()
+    }
+
+     get SortedJudgesRecommendation()
+    {
+        return _.sortBy(this.participantFiles[this.judgeRecomClickedParticipant].JudgesRecommendation, 'Date').reverse()
+    }
+
+    public OpenDetails(data)
+    {        
         if(!data.detailsShowing)
         {    
             const participantInfo = this.criminalParticipantSentenceInformation
@@ -304,13 +368,15 @@ export default class CriminalSentence extends Vue {
     public OpenOrderMadeDetails(data)
     {
         console.log(data)
+        this.orderMadeClickedParticipant = data.item.Index
         this.showOrderMade=true
     }
 
     public OpenJudgeRecommendation(data)
-    {
-        this.showRecommendation=true
-        console.log(data)           
+    { 
+        console.log(data)
+        this.judgeRecomClickedParticipant = data.item.Index
+        this.showRecommendation=true           
     }
 
 }
