@@ -309,25 +309,25 @@ namespace Scv.Api.Services
                 FullName = fullName,
                 PartId = partyAppearanceMethod?.PartId,
                 PartyAppearanceMethod = partyAppearanceMethod?.PartyAppearanceMethod,
-                PartyAppearanceMethodDesc = null,  //TODO waiting for correct code lookup, I don't seem to have
+                PartyAppearanceMethodDesc = await _lookupService.GetCriminalAccusedAttend(partyAppearanceMethod?.PartyAppearanceMethod), 
                 AttendanceMethodCd = attendanceMethod?.AttendanceMethodCd,
                 AttendanceMethodDesc = await _lookupService.GetCriminalAssetsDescriptions(attendanceMethod?.AttendanceMethodCd)
             };
         }
 
-        private async Task<Adjudicator> PopulateAppearanceDetailAdjudicator(CfcAppearance appearanceFromAccused, ICollection<ClAttendanceMethod> attendanceMethods)
+        private async Task<CriminalAdjudicator> PopulateAppearanceDetailAdjudicator(CfcAppearance appearanceFromAccused, ICollection<ClAttendanceMethod> attendanceMethods)
         {
             var partyAppearanceMethod = appearanceFromAccused?.PartyAppearanceMethod.FirstOrDefault(pam => pam.PartyRole == "ADJ");
             var attendanceMethod = attendanceMethods?.FirstOrDefault(am => am.RoleType == "ADJ");
             if (partyAppearanceMethod == null)
                 return null;
 
-            return new Adjudicator
+            return new CriminalAdjudicator
             {
                 FullName = partyAppearanceMethod.PartyName.ConvertNameLastCommaFirstToFirstLast(),
                 PartId = partyAppearanceMethod.PartId,
                 PartyAppearanceMethod = partyAppearanceMethod.PartyAppearanceMethod,
-                PartyAppearanceMethodDesc = null, //TODO waiting for correct code lookup, I don't seem to have
+                PartyAppearanceMethodDesc = await _lookupService.GetCriminalAdjudicatorAttend(partyAppearanceMethod?.PartyAppearanceMethod),
                 AttendanceMethodCd = attendanceMethod?.AttendanceMethodCd,
                 AttendanceMethodDesc = await _lookupService.GetCriminalAssetsDescriptions(attendanceMethod?.AttendanceMethodCd)
             };
@@ -345,7 +345,7 @@ namespace Scv.Api.Services
                 FullName = partyAppearanceMethod.PartyName.ConvertNameLastCommaFirstToFirstLast(),
                 PartId = partyAppearanceMethod.PartId,
                 PartyAppearanceMethod = partyAppearanceMethod.PartyAppearanceMethod,
-                PartyAppearanceMethodDesc = null,  //TODO waiting for correct code lookup, I don't seem to have
+                PartyAppearanceMethodDesc = await _lookupService.GetCriminalCrownAttend(partyAppearanceMethod?.PartyAppearanceMethod),
                 AttendanceMethodCd = attendanceMethod?.AttendanceMethodCd,
                 AttendanceMethodDesc = await _lookupService.GetCriminalAssetsDescriptions(attendanceMethod?.AttendanceMethodCd)
             };
@@ -360,10 +360,9 @@ namespace Scv.Api.Services
             var partyAppearanceMethod = appearanceFromAccused?.PartyAppearanceMethod.FirstOrDefault(pam => pam.PartyRole == "CON");
             var attendanceMethod = attendanceMethods?.FirstOrDefault(am => am.RoleType == "CON");
             justinCounsel.PartyAppearanceMethod = partyAppearanceMethod?.PartyAppearanceMethod;
-            justinCounsel.PartyAppearanceMethodDesc = null;  //TODO waiting for correct code lookup, I don't seem to have
+            justinCounsel.PartyAppearanceMethodDesc = await _lookupService.GetCriminalCounselAttend(partyAppearanceMethod?.PartyAppearanceMethod);
             justinCounsel.AttendanceMethodCd = attendanceMethod?.AttendanceMethodCd;
             justinCounsel.AttendanceMethodDesc = await _lookupService.GetCriminalAssetsDescriptions(attendanceMethod?.AttendanceMethodCd);
-            //justinCounsel.PartyAppearanceMethodDesc = await _lookupService.GetCriminalAppearanceMethodAccusedCounsel(partyAppearanceMethod?.PartyAppearanceMethod);
             //We could assign name here from the PartyAppearance, but that doesn't appear to be correct. 
             //While testing I found data inside of PartyAppearances, but used CourtList and saw there was no assigned counsel. 
             //FileId 1180, AppearanceId 1528.0026, PartId 15911.0026 is an example of this on the Development Environment. 
@@ -402,7 +401,7 @@ namespace Scv.Api.Services
             foreach (var appearanceMethod in criminalAppearanceMethods)
             {
                 appearanceMethod.AppearanceMethodDesc = await _lookupService.GetCriminalAssetsDescriptions(appearanceMethod.AppearanceMethodCd);
-                appearanceMethod.RoleTypeDsc = await _lookupService.GetCriminalParticipantRoleDescription(appearanceMethod.RoleTypeCd); // double check this one. 
+                appearanceMethod.RoleTypeDsc = await _lookupService.GetCriminalParticipantRoleDescription(appearanceMethod.RoleTypeCd); // TODO double check this one. 
             }
             return criminalAppearanceMethods;
         }

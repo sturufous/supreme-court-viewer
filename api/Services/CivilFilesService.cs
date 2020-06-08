@@ -78,7 +78,7 @@ namespace Scv.Api.Services
             var appearances = await appearancesTask;
             var fileContent = await fileContentTask;
 
-            if (fileDetail.PhysicalFileId == null)
+            if (fileDetail?.PhysicalFileId == null)
                 return null;
 
             var detail = _mapper.Map<RedactedCivilFileDetailResponse>(fileDetail);
@@ -111,6 +111,7 @@ namespace Scv.Api.Services
             var detail = await fileDetailTask;
             var appearances = await appearancesTask;
             var agencyId = await _locationService.GetLocationAgencyIdentifier(detail?.HomeLocationAgenId);
+            var fileContent = await fileContentTask;
 
             var targetAppearance = appearances?.ApprDetail?.FirstOrDefault(app => app.AppearanceId == appearanceId);
             if (targetAppearance == null || detail == null)
@@ -120,7 +121,7 @@ namespace Scv.Api.Services
             ClCivilCourtList civilCourtList = null;
             if (agencyId != null)
             {
-                async Task<CourtList> CourtList() => await _filesClient.FilesCourtlistAsync(agencyId, targetAppearance.CourtRoomCd, targetAppearance.AppearanceDt, "CR", detail.FileNumberTxt);
+                async Task<CourtList> CourtList() => await _filesClient.FilesCourtlistAsync(agencyId, targetAppearance.CourtRoomCd, targetAppearance.AppearanceDt, "CI", detail.FileNumberTxt);
                 var courtListTask = _cache.GetOrAddAsync($"CivilCourtList-{agencyId}-{targetAppearance.CourtRoomCd}-{targetAppearance.AppearanceDt}-{detail.FileNumberTxt}", CourtList);
                 var courtList = await courtListTask;
                 civilCourtList = courtList.CivilCourtList.FirstOrDefault(cl => cl.AppearanceId == appearanceId);
@@ -132,6 +133,8 @@ namespace Scv.Api.Services
             var appearanceDetail = appearances.ApprDetail?.FirstOrDefault(app => app.AppearanceId == appearanceId);
             var fileDetailDocuments = detail.Document.Where(doc => doc.Appearance != null && doc.Appearance.Any(app => app.AppearanceId == appearanceId)).ToList();
 
+            var previousAppearance = fileContent?.CivilFile.FirstOrDefault(cf => cf.PhysicalFileID == fileId)?.PreviousAppearance.FirstOrDefault(pa => pa?.AppearanceId == appearanceId);
+
             var detailedAppearance = new CivilAppearanceDetail
             {
                 PhysicalFileId = fileId,
@@ -141,8 +144,9 @@ namespace Scv.Api.Services
                 FileNumberTxt = detail.FileNumberTxt,
                 AppearanceDt = targetAppearance.AppearanceDt,
                 AppearanceMethod = appearanceMethods.AppearanceMethod,
-                Party = await PopulateDetailedAppearancePartiesAsync(appearanceParty.Party, civilCourtList?.Parties),
-                Document = await PopulateDetailedAppearanceDocuments(fileDetailDocuments, appearanceDetail)
+                Party = await PopulateDetailedAppearancePartiesAsync(appearanceParty.Party, civilCourtList?.Parties, previousAppearance),
+                Document = await PopulateDetailedAppearanceDocuments(fileDetailDocuments, appearanceDetail),
+                PreviousAppearance = previousAppearance
             };
             return detailedAppearance;
         }
@@ -255,13 +259,26 @@ namespace Scv.Api.Services
 
         #region Civil Appearance Details
 
+      /*  private async Task<CivilAdjudicator> PopulateDetailedAppearanceAdjudicator(CvfcPreviousAppearance previousAppearance)
+        {
+            if (previousAppearance == null)
+                return null;
+
+            var adjudicator = new CivilAdjudicator()
+            {
+                AttendanceMethodDesc = ,
+                AttendanceMethodCd = previousAppearance.AdjudicatorAppearanceMethod,
+                FullName = previousAppearance.AdjudicatorName,
+                PartId = previousAppearance.BuildAdapter(),
+                PartyAppearanceMethod = previousAppearance.CourtParticipant.,
+                PartyAppearanceMethodDesc = ,
+            }
+
+        }*/
         /// <summary>
         /// This is mostly based off of getAppearanceCivilParty and expands by court list.
         /// </summary>
-        /// <param name="parties"></param>
-        /// <param name="courtListParties"></param>
-        /// <returns></returns>
-        private async Task<ICollection<CivilAppearanceDetailParty>> PopulateDetailedAppearancePartiesAsync(ICollection<JCCommon.Clients.FileServices.CivilAppearanceParty> parties, ICollection<ClParty> courtListParties)
+        private async Task<ICollection<CivilAppearanceDetailParty>> PopulateDetailedAppearancePartiesAsync(ICollection<JCCommon.Clients.FileServices.CivilAppearanceParty> parties, ICollection<ClParty> courtListParties, CvfcPreviousAppearance previousAppearance)
         {
             var resultParties = new List<CivilAppearanceDetailParty>();
             foreach (var partyGroup in parties.GroupBy(a => a.PartyId))
@@ -286,6 +303,18 @@ namespace Scv.Api.Services
                     party.Representative = courtListParty.Representative;
                     party.LegalRepresentative = courtListParty.LegalRepresentative;
                 }
+
+                //Add additional information from previous appearance. 
+                if (previousAppearance != null)
+                {
+                    //var 
+                    //party.PartyAppearanceMethod = previousAppearance.AdjudicatorAppearanceMethod;
+                    //party.PartyAppearanceMethod = previousAppearance.AdjudicatorName;
+                    //previousAppearance.GeneralAttendee.FirstOrDefault().AttendeeName
+
+                       // previousAppearance.CourtParticipant.FirstOrDefault().Counsel.FirstOrDefault().
+                }
+
                 resultParties.Add(party);
             }
             return resultParties;

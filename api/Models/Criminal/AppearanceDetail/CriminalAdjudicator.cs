@@ -1,6 +1,6 @@
 ﻿namespace Scv.Api.Models.Criminal.AppearanceDetail
 {
-    public class Adjudicator
+    public class CriminalAdjudicator
     {
         public string FullName { get; set; }
         public string PartId { get; set; }

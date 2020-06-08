@@ -13,6 +13,8 @@ namespace Scv.Api.Models.Civil.AppearanceDetail
         public string GivenNm { get; set; }
         public string OrgNm { get; set; }
         public string CourtParticipantId { get; set; }
+        public string PartyAppearanceMethod { get; set; }
+        public string PartyAppearanceMethodDesc { get; set; }
         //The fields below this are from CourtList. 
         public string AttendanceMethodCd { get; set; }
         public string AttendanceMethodDesc { get; set; }
