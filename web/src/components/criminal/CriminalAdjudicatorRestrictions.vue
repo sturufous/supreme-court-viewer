@@ -42,7 +42,7 @@ import "@store/modules/CriminalFileInformation";
 const criminalState = namespace("CriminalFileInformation");
 
 @Component
-export default class  AdjudicatorRestrictions extends Vue {
+export default class  CriminalAdjudicatorRestrictions extends Vue {
 
   @criminalState.State
   public criminalFileInformation!: any;

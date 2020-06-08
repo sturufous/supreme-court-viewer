@@ -36,11 +36,11 @@
             </h2>
 
             <criminal-participants v-if="showCaseDetails"/>            
-            <adjudicator-restrictions v-if="showCaseDetails"/>
+            <criminal-adjudicator-restrictions v-if="showCaseDetails"/>
             <criminal-crown-information v-if="showCaseDetails"/>
             <criminal-crown-notes v-if="showCaseDetails"/>
-            <past-appearances v-if="showPastAppearances" />
-            <future-appearances v-if="showFutureAppearances" />
+            <criminal-past-appearances v-if="showPastAppearances" />
+            <criminal-future-appearances v-if="showFutureAppearances" />
             <criminal-documents-view v-if="showDocuments"/>
             <criminal-witnesses v-if="showWitnesses" />
             <criminal-sentence-details v-if="showSentenceOrderDetails"/>
@@ -58,10 +58,10 @@ import CriminalHeaderTop from '@components/criminal/CriminalHeaderTop.vue';
 import CriminalHeader from '@components/criminal/CriminalHeader.vue';
 import CriminalSidePanel from '@components/criminal/CriminalSidePanel.vue';
 import CriminalParticipants from '@components/criminal/CriminalParticipants.vue';
-import AdjudicatorRestrictions from '@components/criminal/AdjudicatorRestrictions.vue'
+import CriminalAdjudicatorRestrictions from '@components/criminal/CriminalAdjudicatorRestrictions.vue'
 import CriminalCrownInformation from '@components/criminal/CriminalCrownInformation.vue';
-import PastAppearances from '@components/criminal/PastAppearances.vue'
-import FutureAppearances from '@components/criminal/FutureAppearances.vue'
+import CriminalPastAppearances from '@components/criminal/CriminalPastAppearances.vue'
+import CriminalFutureAppearances from '@components/criminal/CriminalFutureAppearances.vue'
 import CriminalCrownNotes from '@components/criminal/CriminalCrownNotes.vue';
 import CriminalWitnesses from '@components/criminal/CriminalWitnesses.vue';
 import CriminalSentenceDetails from '@components/criminal/CriminalSentenceDetails.vue';
@@ -75,10 +75,10 @@ const criminalState = namespace('CriminalFileInformation');
         CriminalHeaderTop,
         CriminalHeader,
         CriminalParticipants,
-        AdjudicatorRestrictions,
+        CriminalAdjudicatorRestrictions,
         CriminalCrownInformation,
-        PastAppearances,
-        FutureAppearances,
+        CriminalPastAppearances,
+        CriminalFutureAppearances,
         CriminalCrownNotes,
         CriminalWitnesses,
         CriminalSentenceDetails

@@ -1,8 +1,8 @@
 <template>
 <div>
-   <b-card  v-if= "isMounted">
+   <b-card  v-if= "isMounted" no-body>
         <div>         
-            <h3 class="mx-2 font-weight-normal"> Documents ({{NumberOfDocuments}}) </h3>
+            <h3 class="mt-4 mx-2 font-weight-normal"> Documents ({{NumberOfDocuments}}) </h3>
             <hr class="mb-1 bg-light" style="height: 2px;"/>                   
         </div>
        
