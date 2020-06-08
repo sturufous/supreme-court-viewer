@@ -1,8 +1,8 @@
 <template>
-<div>
+<b-card bg-variant="white" no-body>
     <div>
-        <h3 class="mx-2 font-weight-normal" v-if="!showSections['Past Appearances']"> Last Three Past Appearances</h3>
-        <hr class="mb-3 bg-light" style="height: 5px;"/> 
+        <h3 class="mt-4 mx-4 font-weight-normal" v-if="!showSections['Past Appearances']"> Last Three Past Appearances</h3>
+        <hr class="mx-2 bg-light" style="height: 5px;"/> 
     </div>
 
     <b-card v-if="!isDataReady && isMounted">
@@ -21,7 +21,7 @@
         </b-overlay> 
     </b-card>
 
-    <b-card bg-variant="white" v-if="isDataReady" style="overflow: auto;" no-body>           
+    <b-card bg-variant="white" v-if="isDataReady" style="overflow: auto;" no-body class="mx-2">           
         <b-table
         :items="SortedPastAppearances"
         :fields="fields"
@@ -47,11 +47,11 @@
 
             <template v-slot:cell(Date)="data" >
                 <span :class="data.field.cellClass" :style="data.field.cellStyle"> 
-                    <b-button style="transform: translate(0,-7px);" size="sm" @click="OpenDetails(data);data.toggleDetails();" variant="outline-primary border-white" class="mr-2">
-                        <b-icon-caret-right-fill  v-if="!data.item['_showDetails']"></b-icon-caret-right-fill>
+                    <b-button style="transform: translate(0,-7px);" size="sm" @click="OpenDetails(data);data.toggleDetails();" variant="outline-primary border-white  text-info" class="mr-2">
+                        <b-icon-caret-right-fill v-if="!data.item['_showDetails']"></b-icon-caret-right-fill>
                         <b-icon-caret-down-fill v-if="data.item['_showDetails']"></b-icon-caret-down-fill>
+                        {{data.item.FormattedDate}}
                     </b-button>
-                    {{data.value| beautify-date}}
                 </span> 
             </template>
             <template v-slot:row-details>
@@ -69,7 +69,7 @@
                 </b-badge>
             </template>
 
-            <template  v-slot:cell(Result)="data" >
+            <template v-slot:cell(Result)="data" >
                 <span
                         v-if="data.value"
                         :class="data.field.cellClass"
@@ -81,7 +81,7 @@
                 </span>
             </template>
 
-            <template  v-slot:cell(Presider)="data">
+            <template v-slot:cell(Presider)="data">
                 <b-badge                              
                         variant="secondary"
                         v-if="data.value"
@@ -93,13 +93,13 @@
                 </b-badge>
             </template>                
 
-            <template  v-slot:cell(Status)="data">
+            <template v-slot:cell(Status)="data">
                 <b :class = "data.item['Status Style']" :style="data.field.cellStyle"> {{data.value}} </b>
             </template>
             
         </b-table>
     </b-card>
-</div>
+</b-card>
 </template>
 
 <script lang="ts">
@@ -202,7 +202,8 @@ export default class CivilPastAppearances extends Vue {
 
             appInfo["Index"] = appIndex;
             appInfo["Date"] = jApp.appearanceDt.split(' ')[0]
-            if(new Date(appInfo["Date"]) >= currentDate) continue;
+            if(new Date(appInfo["Date"]) >= currentDate) continue;            
+            appInfo["FormattedDate"] = Vue.filter('beautify-date')(appInfo["Date"]);
             appInfo["Document Type"] = jApp.documentTypeDsc;
             appInfo["Result"] = jApp.appearanceResultCd;
             appInfo["Result Description"] = jApp.appearanceResultDsc? jApp.appearanceResultDsc: '';

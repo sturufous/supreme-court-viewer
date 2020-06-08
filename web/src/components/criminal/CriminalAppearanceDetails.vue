@@ -84,7 +84,7 @@ const criminalState = namespace("CriminalFileInformation");
 
 
 @Component
-export default class AppearanceDetails extends Vue {
+export default class CriminalAppearanceDetails extends Vue {
 
     @criminalState.State
     public criminalFileInformation!: any;

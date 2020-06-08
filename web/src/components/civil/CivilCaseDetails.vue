@@ -136,7 +136,7 @@ export default class CivilCaseDetails extends Vue {
     {
         for(const title of this.sidePanelTitles)
         {
-          if (this.showSections[title] == true ) return '   '+ title
+          if (this.showSections[title] == true ) return  title
         }
         return ''
     }
