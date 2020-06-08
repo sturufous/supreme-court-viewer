@@ -60,12 +60,15 @@
                 </div>
                            
                 <b-table
-                :items="appearanceAdditionalInfo"
-                :fields="addInfoFields"
-                thead-class="d-none"               
-                borderless                                  
-                responsive="sm"
-                > 
+                    :items="appearanceAdditionalInfo"
+                    :fields="addInfoFields"
+                    thead-class="d-none"               
+                    borderless                                  
+                    responsive="sm"
+                    > 
+                        <template v-slot:cell(key)="data">
+                            <b>{{data.value}}</b>
+                        </template>
                 </b-table>
                 
             </b-col>          

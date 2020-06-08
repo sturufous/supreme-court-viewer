@@ -1,11 +1,11 @@
 <template>
 
-    <b-card bg-variant="white" v-if="isMounted">
+    <b-card bg-variant="white" no-body v-if="isMounted">
         <div>            
-            <hr class="mb-3 bg-light" style="height: 5px;"/> 
+            <hr class="mx-3 bg-light" style="height: 5px;"/> 
         </div>
 
-        <b-card bg-variant="white" no-body>           
+        <b-card bg-variant="white" no-body class="mx-3">           
             <b-table
             :items="SortedParticipants"
             :fields="fields"

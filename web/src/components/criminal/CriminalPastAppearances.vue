@@ -5,8 +5,8 @@
             <hr class="mx-3 bg-light" style="height: 5px;"/> 
         </div>
 
-        <b-card v-if="!isDataReady && isMounted">
-            <span class="text-muted"> No past appearances. </span>
+        <b-card v-if="!isDataReady && isMounted" no-body>
+            <span class="text-muted ml-4 mb-5"> No past appearances. </span>
         </b-card>
 
         <b-card bg-variant="light" v-if= "!isMounted && !isDataReady">
@@ -21,7 +21,7 @@
             </b-overlay> 
         </b-card>
 
-        <b-card bg-variant="white" v-if="isDataReady" no-body class="mx-3">           
+        <b-card bg-variant="white" v-if="isDataReady" no-body class="mx-3" style="overflow:auto">           
             <b-table
             :items="SortedPastAppearances"
             :fields="fields"
@@ -29,12 +29,12 @@
             :sort-desc.sync="sortDesc"
             :no-sort-reset="true"
             sort-icon-left
-            borderless            
+            borderless           
             small            
-            responsive="sm"
+            responsive ="sm"
             >   
                 <template v-for="(field,index) in fields" v-slot:[`head(${field.key})`]="data">
-                    <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
+                    <b v-bind:key="index" :class="field.headerStyle"> {{ data.label }}</b>
                 </template>
 
                 <template  v-slot:cell()="data">
@@ -86,7 +86,7 @@
                 </template>
 
                 <template  v-slot:cell(Status)="data">
-                    <b :class = "data.item['Status Style']" style="font-weight: normal; font-size: 16px;"> {{data.value}} </b>
+                    <b :class = "data.item['Status Style']" style="font-weight: normal; font-size: 16px; width:110px"> {{data.value}} </b>
                 </template>
                 
             </b-table>

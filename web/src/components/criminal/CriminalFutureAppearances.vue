@@ -6,8 +6,8 @@
             <hr class="mx-3 bg-light" style="height: 5px;"/> 
         </div>
 
-        <b-card v-if="!isDataReady && isMounted">
-            <span class="text-muted"> No future appearances. </span>
+        <b-card v-if="!isDataReady && isMounted" no-body>
+            <span class="text-muted ml-4 mb-5"> No future appearances. </span>
         </b-card>
 
         <b-card bg-variant="light" v-if= "!isMounted && !isDataReady" >
@@ -80,7 +80,7 @@
                 </template>
 
                 <template  v-slot:cell(Status)="data">
-                    <b :class = "data.item['Status Style']" style="font-weight: normal; font-size: 16px;"> {{data.value}} </b>
+                    <b :class = "data.item['Status Style']" style="font-weight: normal; font-size: 16px; width:110px"> {{data.value}} </b>
                 </template>
                 
             </b-table>
