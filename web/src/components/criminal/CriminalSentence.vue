@@ -9,6 +9,7 @@
             <b-table
             :items="SortedParticipants"
             :fields="fields"
+            thead-class="d-none"
             borderless
             small
             responsive="sm"
@@ -17,36 +18,45 @@
                     <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
                 </template>
 
-                <template v-slot:cell()="data" >
-                    <span > 
-
-                        <b-button   
-                            size="sm" 
-                            @click="OpenDetails(data);data.toggleDetails();" 
-                            variant="outline-primary border-white"
-                            :disabled="data.item.CountsDiable" 
-                            class="mr-2">
-                                <b-icon-caret-right-fill v-if="!data.item['_showDetails']"></b-icon-caret-right-fill>
-                                <b-icon-caret-down-fill v-if="data.item['_showDetails']"></b-icon-caret-down-fill>
-                        </b-button>
-
-                        <span :class="data.field.cellStyle" style= "white-space: pre">                     
-                            {{data.value}}       
-                        </span>
-
-                        <b-button size="sm" variant="outline-primary border-white" class=" mr-2">
-                            Order Made Details
-                        </b-button>
-
-                        <b-button size="sm" variant="outline-primary border-white" class=" mr-2">
-                           Judge's Recommendations
-                        </b-button>
-
-                        <span>
-                            Counts({{data.item.Counts.length}})
-                        </span>
-                    </span> 
+                <template v-slot:cell(Name)="data" >
+                    <b-button   
+                        size="sm" 
+                        @click="OpenDetails(data);data.toggleDetails();" 
+                        :variant="!data.item.CountsDisable ? 'outline-primary border-white text-info' :'text-muted'"
+                        :disabled="data.item.CountsDisable">
+                            <b-icon-caret-right-fill v-if="!data.item['_showDetails']"></b-icon-caret-right-fill>
+                            <b-icon-caret-down-fill v-if="data.item['_showDetails']"></b-icon-caret-down-fill>
+                            {{data.value}}
+                    </b-button>             
                 </template>
+
+                <template v-slot:cell(Judge)="data" >
+                    <b-button 
+                        size="sm" 
+                        @click="OpenOrderMadeDetails(data)"
+                        :variant="!data.item.OrderMadeDisable ? 'outline-primary border-white text-info' :'text-muted'"
+                        :disabled="data.item.OrderMadeDisable" 
+                        class=" mr-2">
+                            Order Made Details
+                    </b-button>
+                    <b-button 
+                        size="sm" 
+                        @click="OpenJudgeRecommendation(data)"
+                        :variant="!data.item.RecommendationDisable ? 'outline-primary border-white text-info' :'text-muted'"
+                        :disabled="data.item.RecommendationDisable" 
+                        class=" mr-2">
+                            Judge's Recommendations
+                    </b-button>
+                </template>
+
+                <template v-slot:cell(Count)="data" >
+                    <b-button size="sm" disabled variant="white"> 
+                        <b>
+                            Counts ({{data.item.Counts.length}})
+                        </b>    
+                    </b-button>                
+                </template>
+
                 <template v-slot:row-details>
                     <b-card no-body bg-border="dark"> 
                         <criminal-sentence-details/>
@@ -55,6 +65,35 @@
                 
             </b-table>
         </b-card>
+
+        <b-modal v-model="showRecommendation" id="bv-modal-recommendation" hide-footer>
+            <template v-slot:modal-title>
+                Judge's Recommendations
+            </template>
+            <div class="d-block text-center">
+                <h3>Hello From This Modal!</h3>
+            </div>
+            <b-button class="mt-3" @click="$bvModal.hide('bv-modal-recommendation')">Close Me</b-button>
+        </b-modal>
+
+        <b-modal v-model="showOrderMade" id="bv-modal-ordermade" hide-footer>
+            <template v-slot:modal-title>
+                OrderMadeDetails
+            </template>
+            <b-table
+                :items="participantFiles[4]['Counts']"
+                :fields="orderMadeFields"
+                :sort-by.sync="sortBy"
+                :sort-desc.sync="sortDesc"
+                :no-sort-reset="true"
+                sort-icon-left
+                borderless
+                small
+                responsive="sm"
+                >   
+            </b-table>
+            <b-button class="mt-3" @click="$bvModal.hide('bv-modal-ordermade')">Close Me</b-button>
+        </b-modal>
       
     </b-card> 
 
@@ -113,8 +152,15 @@ export default class CriminalSentence extends Vue {
     participantFiles: any[] = [];
 
     fields = [        
-        {key:'Name', tdClass: 'border-top', headerStyle:'text-primary',  cellStyle:'text-info'},
-    ];    
+        {key:'Name',  tdClass: 'border-bottom', headerStyle:'text-primary',  cellStyle:'text-info'},
+        {key:'Count', tdClass: 'border-bottom', headerStyle:'text-primary',  cellStyle:'text-info'},
+        {key:'Judge', tdClass: 'border-bottom', headerStyle:'text-primary',  cellStyle:'text-info'},
+    ]; 
+    
+    orderMadeFields = [
+        {key:'Date',  tdClass: 'border-bottom', headerStyle:'text-primary',  cellStyle:'text'},
+        {key:'Count', tdClass: 'border-bottom', headerStyle:'text',          cellStyle:'text'},
+    ]
     
     public ExtractParticipantInfo(): void {        
         
@@ -141,19 +187,18 @@ export default class CriminalSentence extends Vue {
                 countInfo["Finding"]= cnt.finding? cnt.finding:'';
                 countInfo["FindingDsc"]= cnt.findingDsc? cnt.findingDsc:'';
                                    
-                countInfo["Count"]='';
+               // countInfo["Count"]='';
                 countInfo["ChargeIssueCd"] = [] ;
                 countInfo["ChargeIssueDsc"] = [];
                 countInfo["ChargeIssueDscFull"] = [];
-                
+                countInfo["Count"] =cnt.countNumber;
+
                 for(const charge of cnt.charge)
-                { 
-                    countInfo["Count"] += charge.countNum + ',';
+                {                     
                     countInfo["ChargeIssueCd"].push(charge.chargeTxt? charge.chargeTxt: '') ;
                     countInfo["ChargeIssueDsc"].push(charge.chargeDscTxt? (charge.chargeDscTxt.length>10 ? charge.chargeDscTxt.substr(0,10)+' ...':charge.chargeDscTxt): '');
                     countInfo["ChargeIssueDscFull"].push(charge.chargeDscTxt? charge.chargeDscTxt:'');
-                }
-                countInfo["Count"]= countInfo["Count"].slice(0, -1); 
+                }                
 
                 countInfo["Sentence/Disposition Type"]=[];
                 countInfo["SentenceDsc"]=[];
@@ -172,7 +217,11 @@ export default class CriminalSentence extends Vue {
                    countInfo["Term"].push(sentence.sentTermPeriodQty? (sentence.sentTermPeriodQty + ' ' + sentence.sentTermCd.replace('-','')):'')
                    countInfo["Amount"].push(sentence.sentMonetaryAmt? sentence.sentMonetaryAmt:'')
                    countInfo["Due Date/ Until"].push(sentence.sentDueTtpDt? sentence.sentDueTtpDt.split(' ')[0]:'')
-                   countInfo["Effective Date"].push(sentence.sentEffectiveDt?  sentence.sentEffectiveDt.split(' ')[0]:'')                   
+                   countInfo["Effective Date"].push(sentence.sentEffectiveDt?  sentence.sentEffectiveDt.split(' ')[0]:'') 
+                  if(sentence.sentDetailTxt)  
+                  {console.log( countInfo["Date"])
+                   console.log(sentence.sentDetailTxt) 
+                  }                 
                 }                
                 
                 if(cnt.sentence.length < countInfo["Len"])
@@ -200,7 +249,9 @@ export default class CriminalSentence extends Vue {
                 counts.push(countInfo);
             }
             fileInfo["Counts"] = counts;
-            fileInfo["CountsDiable"] = counts.length>0 ? false: true;
+            fileInfo["CountsDisable"] = counts.length>0 ? false: true;
+            fileInfo["RecommendationDisable"] = counts.length>0 ? false: true;
+            fileInfo["OrderMadeDisable"] = counts.length>0 ? false: true;
 
 
                         
@@ -221,18 +272,15 @@ export default class CriminalSentence extends Vue {
 
         return _.map(groupedCounts, function (countGroup) {
             const mergedCount = countGroup[0];
+            mergedCount.countNumber = _.uniq(_.sortBy(_.pluck(countGroup, "countNumber"))).join(", ");
             mergedCount.charge = _.chain(countGroup)
-            .sortBy(function(stooge){ return stooge.countNumber; })
+            .sortBy(function(sort){ return sort.countNumber; })            
             .map(function (group) { return group.countNumber+ "|" + group.sectionTxt + "|" + group.sectionDscTxt })
             .uniq()
-            .map(function (charge) { return { countNum:charge.split("|")[0], chargeTxt: charge.split("|")[1], chargeDscTxt: charge.split("|")[2] }; })
+            .map(function (charge) {return { countNum:charge.split("|")[0], chargeTxt: charge.split("|")[1], chargeDscTxt: charge.split("|")[2] }; })
             .value();                return mergedCount;
         });
     }
-
-    // get NumberOfCounts() { 
-    //     return(this.participantFiles[this.activeCriminalParticipantIndex]["Counts"].length) 
-    // }
 
     get SortedParticipants()
     {         
@@ -248,6 +296,21 @@ export default class CriminalSentence extends Vue {
             participantInfo.selectedParticipant = data.item.Index
             this.UpdateCriminalParticipantSentenceInformation(participantInfo); 
         }       
+    }
+
+    showRecommendation=false
+    showOrderMade=false
+
+    public OpenOrderMadeDetails(data)
+    {
+        console.log(data)
+        this.showOrderMade=true
+    }
+
+    public OpenJudgeRecommendation(data)
+    {
+        this.showRecommendation=true
+        console.log(data)           
     }
 
 }
