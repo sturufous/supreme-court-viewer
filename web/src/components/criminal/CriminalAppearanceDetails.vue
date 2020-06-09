@@ -60,12 +60,15 @@
                 </div>
                            
                 <b-table
-                :items="appearanceAdditionalInfo"
-                :fields="addInfoFields"
-                thead-class="d-none"               
-                borderless                                  
-                responsive="sm"
-                > 
+                    :items="appearanceAdditionalInfo"
+                    :fields="addInfoFields"
+                    thead-class="d-none"               
+                    borderless                                  
+                    responsive="sm"
+                    > 
+                        <template v-slot:cell(key)="data">
+                            <b>{{data.value}}</b>
+                        </template>
                 </b-table>
                 
             </b-col>          
@@ -84,42 +87,25 @@ const criminalState = namespace("CriminalFileInformation");
 
 
 @Component
-export default class AppearanceDetails extends Vue {
+export default class CriminalAppearanceDetails extends Vue {
 
+    /* eslint-disable */
     @criminalState.State
     public criminalFileInformation!: any;
 
     @criminalState.State
     public appearanceInfo!: any;
-
-    mounted() {
-        this.getAppearanceInfo();
-        this.getAppearanceDetails();
-    }
-
-    public getAppearanceDetails(): void {      
     
-        this.$http.get('/api/files/criminal/'+ this.appearanceDetailsInfo["File Number"]+'/appearance-detail/'+this.appearanceDetailsInfo["Appearance ID"])
-            .then(Response => Response.json(), err => {console.log(err);} )        
-            .then(data => {
-                if(data){  
-                    this.appearanceDetailsJson = data;              
-                    this.ExtractAppearanceDetailsInfo();
-                }
-                this.isMounted = true;                       
-            }); 
-    } 
+    appearanceAdditionalInfo: any[] = [];
+    appearanceCharges: any[] = [];
+    /* eslint-enable */ 
   
     isMounted = false;
     isDataReady = false;
-    appearanceDetailsJson;
-    
+    appearanceDetailsJson;    
     sortBy = 'Date';
-    sortDesc = true;
-    appearanceCharges: any[] = [];
-    appearanceDetailsInfo = {};
-
-    appearanceAdditionalInfo: any[] = [];
+    sortDesc = true;    
+    appearanceDetailsInfo = {};    
 
     addInfoFields =  
     [
@@ -134,8 +120,25 @@ export default class AppearanceDetails extends Vue {
         {key:'Description',    sortable:false,  tdClass: 'border-top', headerStyle:'text',         cellStyle:'text'},
         {key:'LastResult',     sortable:false,  tdClass: 'border-top', headerStyle:'text',         cellStyle:'text'},
         {key:'Finding',        sortable:false,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'text'},
-    ];   
+    ];
     
+    mounted() {
+        this.getAppearanceInfo();
+        this.getAppearanceDetails();
+    }
+
+    public getAppearanceDetails(): void {      
+    
+        this.$http.get('/api/files/criminal/'+ this.appearanceDetailsInfo["File Number"]+'/appearance-detail/'+this.appearanceDetailsInfo["Appearance ID"]+ '/'+this.appearanceDetailsInfo["Part ID"])
+            .then(Response => Response.json(), err => {console.log(err);} )        
+            .then(data => {
+                if(data){  
+                    this.appearanceDetailsJson = data;              
+                    this.ExtractAppearanceDetailsInfo();
+                }
+                this.isMounted = true;                       
+            }); 
+    }    
     
     public getAppearanceInfo()
     {       
@@ -147,7 +150,8 @@ export default class AppearanceDetails extends Vue {
             this.appearanceAdditionalInfo.push({'key':info,'value':this.appearanceDetailsInfo[info]});
 
         this.appearanceDetailsInfo["File Number"] = this.appearanceInfo.fileNo; 
-        this.appearanceDetailsInfo["Appearance ID"] = this.appearanceInfo.appearanceId;    
+        this.appearanceDetailsInfo["Appearance ID"] = this.appearanceInfo.appearanceId;
+        this.appearanceDetailsInfo["Part ID"] = this.appearanceInfo.partId;     
     }
 
     public ExtractAppearanceDetailsInfo()

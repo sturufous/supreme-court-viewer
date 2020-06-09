@@ -1,15 +1,15 @@
 <template>
-    <b-card bg-variant="white">
+    <b-card bg-variant="white" no-body>
         <div>
-            <h3 class="mx-2 font-weight-normal"> Adjudicator Restrictions </h3>
-            <hr class="mb-2 bg-light" style="height: 5px;"/> 
+            <h3 class="mx-4 font-weight-normal"> Adjudicator Restrictions </h3>
+            <hr class="mx-3 bg-light" style="height: 5px;"/> 
         </div>
 
-        <b-card v-if="!(adjudicatorRestrictions.length>0)">
-            <span class="text-muted"> No adjudicator restrictions. </span>
+        <b-card v-if="!(adjudicatorRestrictions.length>0)" no-body>
+            <span class="text-muted ml-4 mb-5"> No adjudicator restrictions. </span>
         </b-card>
 
-        <b-card bg-variant="white" v-if="isMounted && (adjudicatorRestrictions.length>0)" no-body>           
+        <b-card bg-variant="white" v-if="isMounted && (adjudicatorRestrictions.length>0)" no-body class="mx-3 mb-5">           
             <b-table        
             borderless
             :items="adjudicatorRestrictions"
@@ -42,10 +42,27 @@ import "@store/modules/CriminalFileInformation";
 const criminalState = namespace("CriminalFileInformation");
 
 @Component
-export default class  AdjudicatorRestrictions extends Vue {
+export default class  CriminalAdjudicatorRestrictions extends Vue {
 
+  /* eslint-disable */
   @criminalState.State
   public criminalFileInformation!: any;
+
+  adjudicatorRestrictions: any[] = [];
+  /* eslint-enable */
+  
+  sortBy = 'Adjudicator';
+  sortDesc = false;  
+  adjudicatorRestrictionsJson;
+  isMounted = false;  
+
+  fields =  
+  [
+      {key:'Adjudicator', sortable:true, tdClass: 'border-top',  headerStyle:'table-borderless text-primary'},       
+      {key:'Status',      sortable:true, tdClass: 'border-top',  headerStyle:'text-primary'},
+      {key:'Applies to',  sortable:true, tdClass: 'border-top',  headerStyle:'text-primary'},
+           
+  ];
 
   mounted() {
     this.getAdjudicatorRestrictions();
@@ -57,21 +74,6 @@ export default class  AdjudicatorRestrictions extends Vue {
       this.ExtractAdjudicatorRestrictionsInfo();
       this.isMounted = true;          
   } 
-
-  sortBy = 'Adjudicator';
-  sortDesc = false;  
-  adjudicatorRestrictionsJson;
-  isMounted = false;
-
-  adjudicatorRestrictions: any[] = [];
-
-  fields =  
-  [
-      {key:'Adjudicator', sortable:true, tdClass: 'border-top',  headerStyle:'table-borderless text-primary'},       
-      {key:'Status',      sortable:true, tdClass: 'border-top',  headerStyle:'text-primary'},
-      {key:'Applies to',  sortable:true, tdClass: 'border-top',  headerStyle:'text-primary'},
-           
-  ];
 
   public ExtractAdjudicatorRestrictionsInfo(): void {
 

@@ -1,16 +1,15 @@
 <template>
-<div>
-    <b-card bg-variant="white">
+    <b-card bg-variant="white" no-body>
         <div>
-            <h3 class="mx-2 font-weight-normal"> Adjudicator Restrictions </h3>
-            <hr class="mb-2 bg-light" style="height: 5px;"/> 
+            <h3 class="mx-4 font-weight-normal"> Adjudicator Restrictions </h3>
+            <hr class="mx-3 bg-light" style="height: 5px;"/> 
         </div>
 
         <b-card v-if="!(adjudicatorRestrictionsInfo.length>0)">
-            <span class="text-muted"> No adjudicator restrictions. </span>
+            <span class="text-muted ml-4 mb-5"> No adjudicator restrictions. </span>
         </b-card>
 
-        <b-card bg-variant="white" v-if="isMounted && (adjudicatorRestrictionsInfo.length>0)" no-body>           
+        <b-card bg-variant="white" v-if="isMounted && (adjudicatorRestrictionsInfo.length>0)" no-body class="mx-3 mb-5">           
             <b-table        
             borderless
             :items="adjudicatorRestrictionsInfo"
@@ -34,8 +33,6 @@
             </b-table>
         </b-card>
     </b-card>
-    
-</div>
 </template>
 
 <script lang="ts">
@@ -47,9 +44,23 @@ const civilState = namespace("CivilFileInformation");
 @Component
 export default class  CivilAdjudicatorRestrictions extends Vue {
 
+  /* eslint-disable */
   @civilState.State
   public civilFileInformation!: any;
+    
+  adjudicatorRestrictionsInfo: any[] = [];
+  /* eslint-enable */  
 
+  sortBy = 'Adjudicator';
+  sortDesc = false;
+  isMounted = false;
+
+  fields = [
+      {key:'Adjudicator', sortable:true, tdClass: 'border-top',  headerStyle:'text-primary'},       
+      {key:'Status',      sortable:true, tdClass: 'border-top',  headerStyle:'text-primary'},
+      {key:'Applies to',  sortable:true, tdClass: 'border-top',  headerStyle:'text-primary'}           
+  ];
+  
   mounted() {
     this.getAdjudicatorRestrictions();
   }
@@ -58,17 +69,6 @@ export default class  CivilAdjudicatorRestrictions extends Vue {
       this.adjudicatorRestrictionsInfo = this.civilFileInformation.adjudicatorRestrictionsInfo;     
       this.isMounted = true;          
   } 
-
-  sortBy = 'Adjudicator';
-  sortDesc = false;  
-  adjudicatorRestrictionsInfo: any[] = [];
-  isMounted = false;
-
-  fields = [
-      {key:'Adjudicator', sortable:true, tdClass: 'border-top',  headerStyle:'text-primary'},       
-      {key:'Status',      sortable:true, tdClass: 'border-top',  headerStyle:'text-primary'},
-      {key:'Applies to',  sortable:true, tdClass: 'border-top',  headerStyle:'text-primary'}           
-  ];  
   
 }
 </script>

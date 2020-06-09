@@ -76,26 +76,10 @@ const civilState = namespace("CivilFileInformation");
 @Component
 export default class CivilHeader extends Vue {
 
+  /* eslint-disable */
   @civilState.State
   public civilFileInformation!: any;
-
-  mounted() {
-    this.getHeaderInfo();
-  }
-
-  public getHeaderInfo(): void {      
-      const data = this.civilFileInformation.detailsData;
-      this.fileNumberText = data.fileNumberTxt;
-      this.activityClassCode = data.activityClassCd;      
-      this.agencyLocation.Name = data.homeLocationAgencyName;
-      this.agencyLocation.Code = data.homeLocationAgencyCode;
-      this.agencyLocation.Region = data.homeLocationRegionName;
-      this.partyDisplayedTxt = data.socTxt;
-      this.leftPartiesInfo = this.civilFileInformation.leftPartiesInfo;
-      this.rightPartiesInfo = this.civilFileInformation.rightPartiesInfo; 
-      this.adjudicatorRestrictionsInfo = this.civilFileInformation.adjudicatorRestrictionsInfo;
-      this.isMounted = true;          
-  } 
+   /* eslint-enable */  
 
   maximumFullNameLength = 47;
   activeParty = 0;
@@ -116,6 +100,24 @@ export default class CivilHeader extends Vue {
       SIT: 'color: #d33;',
       NS: 'color: #999;'
   }
+
+  mounted() {
+    this.getHeaderInfo();
+  }
+
+  public getHeaderInfo(): void {      
+      const data = this.civilFileInformation.detailsData;
+      this.fileNumberText = data.fileNumberTxt;
+      this.activityClassCode = data.activityClassCd;      
+      this.agencyLocation.Name = data.homeLocationAgencyName;
+      this.agencyLocation.Code = data.homeLocationAgencyCode;
+      this.agencyLocation.Region = data.homeLocationRegionName;
+      this.partyDisplayedTxt = data.socTxt;
+      this.leftPartiesInfo = this.civilFileInformation.leftPartiesInfo;
+      this.rightPartiesInfo = this.civilFileInformation.rightPartiesInfo; 
+      this.adjudicatorRestrictionsInfo = this.civilFileInformation.adjudicatorRestrictionsInfo;
+      this.isMounted = true;          
+  } 
 
   public getNameOfPartyTrunc() {
       if (this.partyDisplayedTxt) {          

@@ -15,7 +15,8 @@
 
     <b-card bg-variant="light" v-if= "isMounted && !isDataReady">
         <b-card  style="min-height: 100px;">
-            <span>This <b>File-Number '{{this.criminalFileInformation.fileNumber}}'</b> doesn't exist in the <b>criminal</b> records. </span>
+            <span v-if="errorCode==404">This <b>File-Number '{{this.criminalFileInformation.fileNumber}}'</b> doesn't exist in the <b>criminal</b> records. </span>
+            <span v-if="errorCode>405"> Server doesn't respond. <b>({{errorText}})</b> </span>
         </b-card>
         <b-card>         
             <b-button variant="info" @click="navigateToLandingPage">Back to the Landing Page</b-button>
@@ -36,14 +37,14 @@
             </h2>
 
             <criminal-participants v-if="showCaseDetails"/>            
-            <adjudicator-restrictions v-if="showCaseDetails"/>
+            <criminal-adjudicator-restrictions v-if="showCaseDetails"/>
             <criminal-crown-information v-if="showCaseDetails"/>
             <criminal-crown-notes v-if="showCaseDetails"/>
-            <past-appearances v-if="showPastAppearances" />
-            <future-appearances v-if="showFutureAppearances" />
+            <criminal-past-appearances v-if="showPastAppearances" />
+            <criminal-future-appearances v-if="showFutureAppearances" />
             <criminal-documents-view v-if="showDocuments"/>
             <criminal-witnesses v-if="showWitnesses" />
-            <criminal-sentence-details v-if="showSentenceOrderDetails"/>
+            <criminal-sentence v-if="showSentenceOrder"/>
             <b-card><br></b-card>  
         </b-col>
     </b-row>
@@ -58,13 +59,13 @@ import CriminalHeaderTop from '@components/criminal/CriminalHeaderTop.vue';
 import CriminalHeader from '@components/criminal/CriminalHeader.vue';
 import CriminalSidePanel from '@components/criminal/CriminalSidePanel.vue';
 import CriminalParticipants from '@components/criminal/CriminalParticipants.vue';
-import AdjudicatorRestrictions from '@components/criminal/AdjudicatorRestrictions.vue'
+import CriminalAdjudicatorRestrictions from '@components/criminal/CriminalAdjudicatorRestrictions.vue'
 import CriminalCrownInformation from '@components/criminal/CriminalCrownInformation.vue';
-import PastAppearances from '@components/criminal/PastAppearances.vue'
-import FutureAppearances from '@components/criminal/FutureAppearances.vue'
+import CriminalPastAppearances from '@components/criminal/CriminalPastAppearances.vue'
+import CriminalFutureAppearances from '@components/criminal/CriminalFutureAppearances.vue'
 import CriminalCrownNotes from '@components/criminal/CriminalCrownNotes.vue';
 import CriminalWitnesses from '@components/criminal/CriminalWitnesses.vue';
-import CriminalSentenceDetails from '@components/criminal/CriminalSentenceDetails.vue';
+import CriminalSentence from '@components/criminal/CriminalSentence.vue';
 import '@store/modules/CriminalFileInformation';
 const criminalState = namespace('CriminalFileInformation');
 
@@ -75,26 +76,45 @@ const criminalState = namespace('CriminalFileInformation');
         CriminalHeaderTop,
         CriminalHeader,
         CriminalParticipants,
-        AdjudicatorRestrictions,
+        CriminalAdjudicatorRestrictions,
         CriminalCrownInformation,
-        PastAppearances,
-        FutureAppearances,
+        CriminalPastAppearances,
+        CriminalFutureAppearances,
         CriminalCrownNotes,
         CriminalWitnesses,
-        CriminalSentenceDetails
+        CriminalSentence
     }
 })
 export default class CriminalCaseDetails extends Vue {
 
     @criminalState.State
+    public showSections 
+
+    /* eslint-disable */
+    @criminalState.State
     public criminalFileInformation!: any
 
     @criminalState.Action
-    public UpdateCriminalFile!: (newCriminalFileInformation: any) => void
+    public UpdateCriminalFile!: (newCriminalFileInformation: any) => void 
+   
+    participantFiles: any[] = [];
+    /* eslint-enable */
+
+    isDataReady = false
+    isMounted = false
+    errorCode =0;
+    errorText ='';
     
-    @criminalState.State
-    public showSections    
-    
+    participantJson;
+
+    sidePanelTitles = [ 
+       'Case Details', 'Future Appearances', 'Past Appearances', 'Witnesses', 'Documents', 'Sentence/Order Details'    
+    ];
+
+    topTitles = [ 
+       'Case Details', 'Future Appearances', 'Past Appearances', 'Witnesses', 'Criminal Documents', 'Criminal Sentences'    
+    ];
+
     mounted () { 
         this.criminalFileInformation.fileNumber = this.$route.params.fileNumber
         this.UpdateCriminalFile(this.criminalFileInformation);        
@@ -104,7 +124,7 @@ export default class CriminalCaseDetails extends Vue {
     public getFileDetails(): void {
        
         this.$http.get('/api/files/criminal/'+ this.criminalFileInformation.fileNumber)
-            .then(Response => Response.json(), err => {console.log(err);}        
+            .then(Response => Response.json(), err => {this.errorCode= err.status;this.errorText= err.statusText;console.log(err);}        
             ).then(data => {
                 if(data){
                     this.criminalFileInformation.detailsData = data; 
@@ -120,17 +140,6 @@ export default class CriminalCaseDetails extends Vue {
                        
             });
     }
-
-    isDataReady = false
-    isMounted = false
-    participantJson;
-    participantFiles: any[] = [];
-    sidePanelTitles = [ 
-       'Case Details', 'Future Appearances', 'Past Appearances', 'Witnesses', 'Documents', 'Sentence/Order Details'    
-    ];
-    topTitles = [ 
-       'Case Details', 'Future Appearances', 'Past Appearances', 'Witnesses', 'Criminal Documents', 'Criminal Sentences'    
-    ];
     
     get selectedSideBar()
     {
@@ -166,7 +175,7 @@ export default class CriminalCaseDetails extends Vue {
         return (this.showSections['Witnesses'] && this.isDataReady)
     }
 
-    get showSentenceOrderDetails()
+    get showSentenceOrder()
     {        
         return (this.showSections['Sentence/Order Details'] && this.isDataReady)
     }

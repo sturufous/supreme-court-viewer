@@ -1,14 +1,17 @@
 <template>
 <div>
-   <b-card  v-if= "isMounted">
+   <b-card  v-if= "isMounted" no-body>
         <div>         
-            <h3 class="mx-2 font-weight-normal"> Documents ({{NumberOfDocuments}}) </h3>
-            <hr class="mb-1 bg-light" style="height: 2px;"/>                   
+            <h3 class="mx-4 font-weight-normal"> Documents ({{NumberOfDocuments}}) </h3>
+            <hr class="mx-3 bg-light" style="height: 5px;"/>                   
         </div>
        
         <b-tabs nav-wrapper-class = "bg-light text-dark"
                 active-nav-item-class="text-uppercase font-weight-bold text-white bg-primary"                     
-                pills >
+                pills
+                no-body
+                class="mx-3"
+                >
             <b-tab 
             v-for="(tabMapping, index) in categories" 
             :key="index"                 
@@ -16,12 +19,10 @@
             v-on:click="activetab = tabMapping" 
             v-bind:class="[ activetab === tabMapping ? 'active mb-3' : 'mb-3' ]"
             ></b-tab>
-        </b-tabs>
-               
-       
+        </b-tabs> 
         
         <b-overlay :show="loadingPdf" rounded="sm">  
-            <b-card bg-variant="light" style="max-height: 500px; overflow-y: auto;">           
+            <b-card bg-variant="light" style="max-height: 500px; overflow-y: auto;" no-body class="mx-3 mb-5">           
                 <b-table
                 :items="FilteredDocuments"
                 :fields="fields[fieldsTab]"
@@ -98,11 +99,41 @@ enum fieldTab {Categories=0, Summary}
 @Component
 export default class CivilDocumentsView extends Vue {
 
+    /* eslint-disable */
     @civilState.State
     public civilFileInformation!: any
 
     @civilState.Action
     public UpdateCivilFile!: (newCivilFileInformation: any) => void
+
+    documents: any[] = [];
+    summaryDocuments: any[] = [];
+    /* eslint-enable */
+
+    documentsDetailsJson;
+    loadingPdf = false;
+    isMounted = false;
+    activetab = 'ALL';
+    sortDesc = false;
+    categories: string[] = []; 
+    fieldsTab = fieldTab.Categories;
+    documentPlace = [1,0]
+    datePlace = [3,1]
+
+    fields = [ 
+        [
+            {key:'Seq.',           sortable:true,  headerStyle:'text-primary',  cellStyle:'text'},
+            {key:'Document Type',  sortable:true,  headerStyle:'text-primary',  cellStyle:'text-muted'},
+            {key:'Act',            sortable:false, headerStyle:'text',          cellStyle:'text-white bg-secondary'},
+            {key:'Date Filed',     sortable:true,  headerStyle:'text-danger',   cellStyle:'text'},
+            {key:'Issues',         sortable:false, headerStyle:'text',          cellStyle:'text-muted'}
+        ],
+        [
+            {key:'Document Type',    sortable:false, headerStyle:'text-primary',    cellStyle:'text-info'},
+            {key:'Appearance Date',  sortable:true, headerStyle:'text-danger',     cellStyle:'text'},
+        ]  
+        
+    ];
 
     public getDocuments(): void {
 
@@ -124,37 +155,6 @@ export default class CivilDocumentsView extends Vue {
         this.UpdateCivilFile(this.civilFileInformation);        
         this.getDocuments();        
     }
-
-    documentsDetailsJson;
-    loadingPdf = false;
-    isMounted = false;
-
-    activetab = 'ALL';            
-    
-    sortDesc = false;    
-
-    documents: any[] = [];
-    summaryDocuments: any[] = [];
-    categories: string[] = []; 
-
-    fieldsTab = fieldTab.Categories;
-    documentPlace = [1,0]
-    datePlace = [3,1]
-
-    fields = [ 
-        [
-            {key:'Seq.',           sortable:true,  headerStyle:'text-primary',  cellStyle:'text'},
-            {key:'Document Type',  sortable:true,  headerStyle:'text-primary',  cellStyle:'text-muted'},
-            {key:'Act',            sortable:false, headerStyle:'text',          cellStyle:'text-white bg-secondary'},
-            {key:'Date Filed',     sortable:true,  headerStyle:'text-danger',   cellStyle:'text'},
-            {key:'Issues',         sortable:false, headerStyle:'text',          cellStyle:'text-muted'}
-        ],
-        [
-            {key:'Document Type',    sortable:false, headerStyle:'text-primary',    cellStyle:'text-info'},
-            {key:'Appearance Date',  sortable:true, headerStyle:'text-danger',     cellStyle:'text'},
-        ]  
-        
-    ];
 
     public cellClick(data)
     {          
@@ -186,7 +186,6 @@ export default class CivilDocumentsView extends Vue {
 
                 docInfo["Category"] = jDoc.category? jDoc.category : '';
                 if((this.categories.indexOf(docInfo["Category"]) < 0) && docInfo["Category"].length > 0) this.categories.push(docInfo["Category"])
-                // ensure all documentSupport elements only have one row
                 docInfo["Act"] = [];            
                 if (jDoc.documentSupport && jDoc.documentSupport.length > 0) {
                     for (const act of jDoc.documentSupport) {

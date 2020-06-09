@@ -98,25 +98,64 @@ enum DecodeCourtClass {
 }
 
 @Component
-export default class CriminalDocumentsView extends Vue {
+export default class CriminalDocumentsView extends Vue {    
+
+    @criminalState.State
+    public activeCriminalParticipantIndex
+    
+    @commonState.State
+    public displayName!: string;    
+    
+     /* eslint-disable */
+    @criminalState.Action
+    public UpdateActiveCriminalParticipantIndex!: (newActiveCriminalParticipantIndex: any) => void
 
     @criminalState.State
     public criminalFileInformation!: any
 
     @criminalState.Action
-    public UpdateCriminalFile!: (newCriminalFileInformation: any) => void
-
-    @criminalState.State
-    public activeCriminalParticipantIndex    
-
-    @criminalState.Action
-    public UpdateActiveCriminalParticipantIndex!: (newActiveCriminalParticipantIndex: any) => void
-
-    @commonState.State
-    public displayName!: string;    
+    public UpdateCriminalFile!: (newCriminalFileInformation: any) => void   
 
     @commonState.Action
     public UpdateDisplayName!: (newInputNames: any) => void
+
+    participantFiles: any[] = [];
+    ropDocuments: any[] = [];
+    categories: any = [];
+    /* eslint-enable */    
+
+    participantJson;
+    courtLevel;
+    courtClass;
+
+    message = 'Loading';
+    loadingPdf = false;    
+    activetab = 'ALL';
+    tabIndex = 0;              
+    sortBy = 'Date Filed/Issued';
+    sortDesc = true;
+    hoverRow =-1;
+    hoverCol = 0;
+    isMounted = false
+    isDataValid = false     
+
+    fieldsTab = fieldTab.Categories;
+    documentPlace = [1,0]
+
+    fields = [ 
+        [
+            {key:'Date Filed/Issued',  sortable:true,  tdClass: 'border-top',  headerStyle:'text-danger',   cellStyle:'text'},
+            {key:'Document Type',      sortable:true,  tdClass: 'border-top',  headerStyle:'text-primary',  cellStyle:'text-muted'},
+            {key:'Category',           sortable:false,  tdClass: 'border-top', headerStyle:'text',          cellStyle:'text'},
+            {key:'Pages',              sortable:false,  tdClass: 'border-top', headerStyle:'text',          cellStyle:'text'},
+        ],
+        [
+            {key:'Document Type',    sortable:false,  tdClass: 'border-top', headerStyle:'text-primary',    cellStyle:'text-info'},
+            {key:'Category',         sortable:true,  tdClass: 'border-top',  headerStyle:'text',            cellStyle:'text'},
+            {key:'Pages',            sortable:false,  tdClass: 'border-top', headerStyle:'text',            cellStyle:'text'},
+        ]  
+        
+    ];
 
     public getDocuments(): void {
        
@@ -143,47 +182,6 @@ export default class CriminalDocumentsView extends Vue {
         this.UpdateCriminalFile(this.criminalFileInformation);        
         this.getDocuments();  
     }
-
-    participantJson;
-    courtLevel;
-    courtClass;
-
-    message = 'Loading';
-
-    loadingPdf = false;
-    
-    activetab = 'ALL';
-    tabIndex = 0; 
-              
-    sortBy = 'Date Filed/Issued';
-    sortDesc = true;
-    hoverRow =-1;
-    hoverCol = 0;
-
-    isMounted = false
-    isDataValid = false
-
-    participantFiles: any[] = [];
-    ropDocuments: any[] = [];
-    categories: any = []; 
-
-    fieldsTab = fieldTab.Categories;
-    documentPlace = [1,0]
-
-    fields = [ 
-        [
-            {key:'Date Filed/Issued',  sortable:true,  tdClass: 'border-top',  headerStyle:'text-danger',   cellStyle:'text'},
-            {key:'Document Type',      sortable:true,  tdClass: 'border-top',  headerStyle:'text-primary',  cellStyle:'text-muted'},
-            {key:'Category',           sortable:false,  tdClass: 'border-top', headerStyle:'text',          cellStyle:'text'},
-            {key:'Pages',              sortable:false,  tdClass: 'border-top', headerStyle:'text',          cellStyle:'text'},
-        ],
-        [
-            {key:'Document Type',    sortable:false,  tdClass: 'border-top', headerStyle:'text-primary',    cellStyle:'text-info'},
-            {key:'Category',         sortable:true,  tdClass: 'border-top',  headerStyle:'text',            cellStyle:'text'},
-            {key:'Pages',            sortable:false,  tdClass: 'border-top', headerStyle:'text',            cellStyle:'text'},
-        ]  
-        
-    ];
 
     public setActiveParticipantIndex(index)
     {                   
@@ -217,8 +215,10 @@ export default class CriminalDocumentsView extends Vue {
             fileInfo["Documents"] = [];
             fileInfo["Record of Proceedings"] = [];
 
+            /* eslint-disable */
             const document: any[] = [];
             const rop: any[] = [];
+            /* eslint-enable */
             for(const doc of jFile.document)
             {
                 if(doc.category != 'rop') {
