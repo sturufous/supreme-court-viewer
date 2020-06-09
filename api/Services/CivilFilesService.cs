@@ -146,7 +146,8 @@ namespace Scv.Api.Services
                 AppearanceMethod = appearanceMethods.AppearanceMethod,
                 Party = await PopulateDetailedAppearancePartiesAsync(appearanceParty.Party, civilCourtList?.Parties, previousAppearance),
                 Document = await PopulateDetailedAppearanceDocuments(fileDetailDocuments, appearanceDetail),
-                PreviousAppearance = previousAppearance
+                PreviousAppearance = previousAppearance,
+                Adjudicator = await PopulateDetailedAppearanceAdjudicator(previousAppearance)
             };
             return detailedAppearance;
         }
@@ -259,24 +260,21 @@ namespace Scv.Api.Services
 
         #region Civil Appearance Details
 
-      /*  private async Task<CivilAdjudicator> PopulateDetailedAppearanceAdjudicator(CvfcPreviousAppearance previousAppearance)
+        private async Task<CivilAdjudicator> PopulateDetailedAppearanceAdjudicator(CvfcPreviousAppearance previousAppearance)
         {
             if (previousAppearance == null)
                 return null;
 
-            var adjudicator = new CivilAdjudicator()
+            return new CivilAdjudicator
             {
-                AttendanceMethodDesc = ,
-                AttendanceMethodCd = previousAppearance.AdjudicatorAppearanceMethod,
                 FullName = previousAppearance.AdjudicatorName,
-                PartId = previousAppearance.BuildAdapter(),
-                PartyAppearanceMethod = previousAppearance.CourtParticipant.,
-                PartyAppearanceMethodDesc = ,
-            }
+                AttendanceMethodDesc = previousAppearance.AdjudicatorAppearanceMethod,
+                AttendanceMethodCd = await _lookupService.GetCriminalAdjudicatorAttend(previousAppearance.AdjudicatorAppearanceMethod),
+            };
+        }
 
-        }*/
         /// <summary>
-        /// This is mostly based off of getAppearanceCivilParty and expands by court list.
+        /// This is mostly based off of getAppearanceCivilParty and expands by court list and FileContent. 
         /// </summary>
         private async Task<ICollection<CivilAppearanceDetailParty>> PopulateDetailedAppearancePartiesAsync(ICollection<JCCommon.Clients.FileServices.CivilAppearanceParty> parties, ICollection<ClParty> courtListParties, CvfcPreviousAppearance previousAppearance)
         {
@@ -299,20 +297,32 @@ namespace Scv.Api.Services
                 {
                     party.AttendanceMethodCd = courtListParty.AttendanceMethodCd ?? "IP"; //TODO double check this, supposedly if there is no value, it's assumed as present.
                     party.AttendanceMethodDesc = await _lookupService.GetCivilAssetsDescription(party.AttendanceMethodCd);
-                    party.Counsel = courtListParty.Counsel;
+                    party.Counsel = _mapper.Map<ICollection<CivilCounsel>>(courtListParty.Counsel);
                     party.Representative = courtListParty.Representative;
                     party.LegalRepresentative = courtListParty.LegalRepresentative;
                 }
 
-                //Add additional information from previous appearance. 
-                if (previousAppearance != null)
+                //Add additional information from previous appearance - this comes from FileContent.
+                if (previousAppearance?.CourtParticipant != null && previousAppearance.CourtParticipant.Any(cp => cp.PartId == party.PartyId))
                 {
-                    //var 
-                    //party.PartyAppearanceMethod = previousAppearance.AdjudicatorAppearanceMethod;
-                    //party.PartyAppearanceMethod = previousAppearance.AdjudicatorName;
-                    //previousAppearance.GeneralAttendee.FirstOrDefault().AttendeeName
+                    //Can be multiple rows here, but I think they repeat for the partyRole. 
+                    var targetParticipant = previousAppearance.CourtParticipant.First(cp => cp.PartId == party.PartyId);
+                    party.PartyAppearanceMethod = targetParticipant.PartyAppearanceMethod;
+                    party.PartyAppearanceMethodDesc = await _lookupService.GetCivilPartyAttendanceType(targetParticipant.PartyAppearanceMethod);
 
-                       // previousAppearance.CourtParticipant.FirstOrDefault().Counsel.FirstOrDefault().
+                    //Update the counsel with their appearanceMethod. 
+                    foreach (var counsel in targetParticipant.Counsel)
+                    {
+                        //TODO: I'm not seeing any data for CounselId in DEV. 
+                        //Matching on name doesn't seem like a good idea. 
+                        var targetCounsel = party.Counsel.FirstOrDefault(c => c.CounselId == counsel.CounselId);
+                        if (targetCounsel == null)
+                            continue;
+                        
+                        //I think one of the definitions for cvfcCounsel inside of the RAML is bad for this. I'd change it but not sure the impact on other systems. 
+                        targetCounsel.CounselAppearanceMethod = counsel.AdditionalProperties.ContainsKey("counselAppearanceMethod") ? counsel.AdditionalProperties["counselAppearanceMethod"].ToString() : null;
+                        targetCounsel.CounselAppearanceMethodDesc = await _lookupService.GetCivilCounselAttendanceType(targetCounsel.CounselAppearanceMethod);
+                    }
                 }
 
                 resultParties.Add(party);

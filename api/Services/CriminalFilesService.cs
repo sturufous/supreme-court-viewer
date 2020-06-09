@@ -53,7 +53,6 @@ namespace Scv.Api.Services
 
         #endregion Constructor
 
-
         #region Methods
         public async Task<FileSearchResponse> SearchAsync(FilesCriminalQuery fcq)
         {
@@ -137,7 +136,6 @@ namespace Scv.Api.Services
             if (criminalParticipant == null || accusedFile == null || appearanceFromAccused == null)
                 return null;
 
-            //TODO: Need attendanceMethods for Witness and Respondent Not sure how to tie these back. 
             var appearanceDetail = new CriminalAppearanceDetail
             {
                 JustinNo = fileId,
@@ -345,7 +343,7 @@ namespace Scv.Api.Services
                 FullName = partyAppearanceMethod.PartyName.ConvertNameLastCommaFirstToFirstLast(),
                 PartId = partyAppearanceMethod.PartId,
                 PartyAppearanceMethod = partyAppearanceMethod.PartyAppearanceMethod,
-                PartyAppearanceMethodDesc = await _lookupService.GetCriminalCrownAttend(partyAppearanceMethod?.PartyAppearanceMethod),
+                PartyAppearanceMethodDesc = await _lookupService.GetCriminalCrownAttendanceType(partyAppearanceMethod?.PartyAppearanceMethod),
                 AttendanceMethodCd = attendanceMethod?.AttendanceMethodCd,
                 AttendanceMethodDesc = await _lookupService.GetCriminalAssetsDescriptions(attendanceMethod?.AttendanceMethodCd)
             };
@@ -360,7 +358,7 @@ namespace Scv.Api.Services
             var partyAppearanceMethod = appearanceFromAccused?.PartyAppearanceMethod.FirstOrDefault(pam => pam.PartyRole == "CON");
             var attendanceMethod = attendanceMethods?.FirstOrDefault(am => am.RoleType == "CON");
             justinCounsel.PartyAppearanceMethod = partyAppearanceMethod?.PartyAppearanceMethod;
-            justinCounsel.PartyAppearanceMethodDesc = await _lookupService.GetCriminalCounselAttend(partyAppearanceMethod?.PartyAppearanceMethod);
+            justinCounsel.PartyAppearanceMethodDesc = await _lookupService.GetCriminalCounselAttendanceType(partyAppearanceMethod?.PartyAppearanceMethod);
             justinCounsel.AttendanceMethodCd = attendanceMethod?.AttendanceMethodCd;
             justinCounsel.AttendanceMethodDesc = await _lookupService.GetCriminalAssetsDescriptions(attendanceMethod?.AttendanceMethodCd);
             //We could assign name here from the PartyAppearance, but that doesn't appear to be correct. 
@@ -409,6 +407,5 @@ namespace Scv.Api.Services
         #endregion Criminal Appearance Details
 
         #endregion
-
     }
 }

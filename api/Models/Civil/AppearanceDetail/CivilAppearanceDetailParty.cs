@@ -19,7 +19,7 @@ namespace Scv.Api.Models.Civil.AppearanceDetail
         public string AttendanceMethodCd { get; set; }
         public string AttendanceMethodDesc { get; set; }
         ///These collections are from <see cref="ClParty"/>
-        public ICollection<ClCounsel> Counsel { get; set; }
+        public ICollection<CivilCounsel> Counsel { get; set; }
         public ICollection<ClRepresentative> Representative { get; set; }
         public ICollection<ClLegalRepresentative> LegalRepresentative { get; set; }
         public IEnumerable<ClPartyRole> PartyRole { get; set; }
