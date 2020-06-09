@@ -1,14 +1,14 @@
-﻿using JCCommon.Clients.FileServices;
+﻿using System;
+using System.Threading.Tasks;
+using JCCommon.Clients.FileServices;
 using LazyCache;
 using MapsterMapper;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Serialization;
 using Scv.Api.Helpers;
 using Scv.Api.Helpers.ContractResolver;
-using System;
-using System.Threading.Tasks;
 
-namespace Scv.Api.Services
+namespace Scv.Api.Services.Files
 {
     /// <summary>
     /// This is meant to wrap our FileServicesClient. That way we can easily extend the information provided to us by the FileServicesClient.

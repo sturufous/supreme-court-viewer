@@ -19,7 +19,7 @@ using CriminalAppearanceMethod = Scv.Api.Models.Criminal.AppearanceDetail.Crimin
 using CriminalParticipant = Scv.Api.Models.Criminal.Detail.CriminalParticipant;
 using CriminalWitness = Scv.Api.Models.Criminal.Detail.CriminalWitness;
 
-namespace Scv.Api.Services
+namespace Scv.Api.Services.Files
 {
     public class CriminalFilesService
     {

@@ -10,6 +10,7 @@ using Scv.Api.Models.Criminal.Detail;
 using Scv.Api.Services;
 using System;
 using System.Threading.Tasks;
+using Scv.Api.Services.Files;
 using CivilAppearanceDetail = Scv.Api.Models.Civil.AppearanceDetail.CivilAppearanceDetail;
 using CriminalAppearanceDetail = Scv.Api.Models.Criminal.AppearanceDetail.CriminalAppearanceDetail;
 

@@ -1,4 +1,8 @@
-﻿using JCCommon.Clients.FileServices;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using JCCommon.Clients.FileServices;
 using JCCommon.Models;
 using LazyCache;
 using MapsterMapper;
@@ -10,14 +14,10 @@ using Scv.Api.Helpers.Extensions;
 using Scv.Api.Models.Civil.AppearanceDetail;
 using Scv.Api.Models.Civil.Appearances;
 using Scv.Api.Models.Civil.Detail;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using CivilAppearanceDetail = Scv.Api.Models.Civil.AppearanceDetail.CivilAppearanceDetail;
 using CivilAppearanceMethod = Scv.Api.Models.Civil.AppearanceDetail.CivilAppearanceMethod;
 
-namespace Scv.Api.Services
+namespace Scv.Api.Services.Files
 {
     public class CivilFilesService
     {
@@ -129,7 +129,8 @@ namespace Scv.Api.Services
             }
 
             var appearanceParty = await appearancePartyTask;
-            var appearanceMethods = await appearanceMethodsTask;
+            var appearanceMethodsResponse = await appearanceMethodsTask;
+            var appearanceMethods = appearanceMethodsResponse.AppearanceMethod;
 
             var appearanceDetail = appearances.ApprDetail?.FirstOrDefault(app => app.AppearanceId == appearanceId);
             var fileDetailDocuments = detail.Document.Where(doc => doc.Appearance != null && doc.Appearance.Any(app => app.AppearanceId == appearanceId)).ToList();
@@ -147,10 +148,10 @@ namespace Scv.Api.Services
                 CourtRoomCd = targetAppearance.CourtRoomCd,
                 FileNumberTxt = detail.FileNumberTxt,
                 AppearanceDt = targetAppearance.AppearanceDt,
-                AppearanceMethod = await PopulateAppearanceMethods(appearanceMethods.AppearanceMethod),
-                Party = await PopulateDetailedAppearancePartiesAsync(appearanceParty.Party, civilCourtList?.Parties, previousAppearance, appearanceMethods.AppearanceMethod),
+                AppearanceMethod = await PopulateAppearanceMethods(appearanceMethods),
+                Party = await PopulateDetailedAppearancePartiesAsync(appearanceParty.Party, civilCourtList?.Parties, previousAppearance, appearanceMethods),
                 Document = await PopulateDetailedAppearanceDocuments(fileDetailDocuments),
-                Adjudicator = await PopulateDetailedAppearanceAdjudicator(previousAppearance),
+                Adjudicator = await PopulateDetailedAppearanceAdjudicator(previousAppearance, appearanceMethods),
                 AdjudicatorComment = previousAppearance?.AdjudicatorComment
             };
             return detailedAppearance;
@@ -278,17 +279,19 @@ namespace Scv.Api.Services
             return appearanceMethods;
         }
 
-        private async Task<CivilAdjudicator> PopulateDetailedAppearanceAdjudicator(CvfcPreviousAppearance previousAppearance)
+        private async Task<CivilAdjudicator> PopulateDetailedAppearanceAdjudicator(CvfcPreviousAppearance previousAppearance, ICollection<JCCommon.Clients.FileServices.CivilAppearanceMethod> civilAppearanceMethods)
         {
             if (previousAppearance == null)
                 return null;
 
+            var appearanceMethodCd = civilAppearanceMethods.FirstOrDefault(am => am.RoleTypeCd == "ADJ")?.AppearanceMethodCd;
             return new CivilAdjudicator
             {
                 FullName = previousAppearance.AdjudicatorName,
-                AppearanceMethodCd = previousAppearance.AdjudicatorAppearanceMethod,
-                //For Civil files, CCD uses these codes: JUSTIN:ADJ_APP_METHOD
-                AppearanceMethodDesc = await _lookupService.GetCriminalAdjudicatorAttend(previousAppearance.AdjudicatorAppearanceMethod),
+                AdjudicatorAppearanceMethod = previousAppearance.AdjudicatorAppearanceMethod,
+                AdjudicatorAppearanceMethodDesc = await _lookupService.GetCivilAssetsDescription(previousAppearance.AdjudicatorAppearanceMethod),
+                AppearanceMethodCd = appearanceMethodCd,
+                AppearanceMethodDesc = await _lookupService.GetCivilAssetsDescription(appearanceMethodCd)
             };
         }
 
@@ -315,6 +318,7 @@ namespace Scv.Api.Services
                 //Get information from appearanceMethods.
                 if (civilAppearanceMethods.Any(am => party.PartyRole.Any(pr => pr.RoleTypeCd == am.RoleTypeCd)))
                 {
+                    party.AppearanceMethodCd = civilAppearanceMethods.First().AppearanceMethodCd;
                     party.AppearanceMethodDesc = await _lookupService.GetCivilAssetsDescription(civilAppearanceMethods.First().AppearanceMethodCd);
                 }
 
@@ -332,7 +336,7 @@ namespace Scv.Api.Services
                 //Add additional information from previous appearance - this comes from FileContent.
                 if (previousAppearance?.CourtParticipant != null && previousAppearance.CourtParticipant.Any(cp => cp.PartId == party.PartyId))
                 {
-                    //Can be multiple rows here, but I think they repeat for the partyRole.
+                    //Can be multiple rows here, but they repeat for the partyRole.
                     var targetParticipant = previousAppearance.CourtParticipant.First(cp => cp.PartId == party.PartyId);
                     party.PartyAppearanceMethod = targetParticipant.PartyAppearanceMethod;
                     party.PartyAppearanceMethodDesc = await _lookupService.GetCivilPartyAttendanceType(targetParticipant.PartyAppearanceMethod);

@@ -10,6 +10,7 @@ using JCCommon.Framework;
 using Microsoft.Extensions.Configuration;
 using Scv.Api.Helpers.Extensions;
 using Scv.Api.Services;
+using Scv.Api.Services.Files;
 
 namespace Scv.Api.Helpers.Mapping
 {
