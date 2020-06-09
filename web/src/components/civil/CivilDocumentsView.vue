@@ -3,7 +3,7 @@
    <b-card  v-if= "isMounted" no-body>
         <div>         
             <h3 class="mx-4 font-weight-normal"> Documents ({{NumberOfDocuments}}) </h3>
-            <hr class="mx-3 bg-light" style="height: 2px;"/>                   
+            <hr class="mx-3 bg-light" style="height: 5px;"/>                   
         </div>
        
         <b-tabs nav-wrapper-class = "bg-light text-dark"
