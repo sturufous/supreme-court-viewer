@@ -70,13 +70,21 @@
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import "@store/modules/CriminalFileInformation";
+import "@store/modules/CommonInformation";
 const criminalState = namespace("CriminalFileInformation");
+const commonState = namespace("CommonInformation");
 
 @Component
 export default class CriminalWitnesses extends Vue {
 
     @criminalState.State
     public criminalFileInformation!: any;
+
+    @commonState.State
+    public displayName!: string;    
+
+    @commonState.Action
+    public UpdateDisplayName!: (newInputNames: any) => void
 
     mounted() {
         this.getWitnesses();
@@ -122,7 +130,8 @@ export default class CriminalWitnesses extends Vue {
             
             witnessInfo["First Name"] = jWitness.givenNm ? jWitness.givenNm : '';
             witnessInfo["Last Name"] = jWitness.lastNm ? jWitness.lastNm : '';
-            witnessInfo["Name"] = this.getNameOfWitness(witnessInfo["Last Name"], witnessInfo["First Name"]);            
+            this.UpdateDisplayName({'lastName': witnessInfo["Last Name"], 'givenName': witnessInfo["First Name"]});
+            witnessInfo["Name"] = this.displayName;            
             witnessInfo["Type"] = jWitness.witnessTypeDsc? jWitness.witnessTypeDsc : '';
             witnessInfo["Required"] = jWitness.requiredYN == "Y"? 'Required': '';
             witnessInfo["Agency"] = jWitness.agencyDsc? jWitness.agencyDsc: '';
@@ -158,14 +167,6 @@ export default class CriminalWitnesses extends Vue {
         countInfo['WitnessCountFieldName'] = "Total";
         countInfo['WitnessCountValue'] = this.numberOfTotalWitnesses;
         this.witnessCounts.push(countInfo);
-    }
-
-    public getNameOfWitness(lastName, givenName) {
-        return ( this.formatNames(lastName) + ", " + this.formatNames(givenName) );
-    }
-
-    public formatNames (name: string): string {
-        return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
     }
 
     public totalBackground(item, type){

@@ -15,11 +15,12 @@ namespace Scv.Api.Models.Civil.AppearanceDetail
     {
         public string Category { get; set; }
         public string DocumentTypeDescription { get; set; }
-
         /// <summary>
         /// Modified class, hides fields.
         /// </summary>
         public new ICollection<CivilIssue> Issue { get; set; }
+        public string AppearanceResultCd { get; set; }
+        public string AppearanceResultDesc { get; set; }
 
         /// <summary>
         /// Exclude this property, even though it exists in CvfcDocument3.
