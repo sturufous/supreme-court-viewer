@@ -60,12 +60,15 @@
                 </div>
                            
                 <b-table
-                :items="appearanceAdditionalInfo"
-                :fields="addInfoFields"
-                thead-class="d-none"               
-                borderless                                  
-                responsive="sm"
-                > 
+                    :items="appearanceAdditionalInfo"
+                    :fields="addInfoFields"
+                    thead-class="d-none"               
+                    borderless                                  
+                    responsive="sm"
+                    > 
+                        <template v-slot:cell(key)="data">
+                            <b>{{data.value}}</b>
+                        </template>
                 </b-table>
                 
             </b-col>          
@@ -84,7 +87,7 @@ const criminalState = namespace("CriminalFileInformation");
 
 
 @Component
-export default class AppearanceDetails extends Vue {
+export default class CriminalAppearanceDetails extends Vue {
 
     @criminalState.State
     public criminalFileInformation!: any;
@@ -99,7 +102,7 @@ export default class AppearanceDetails extends Vue {
 
     public getAppearanceDetails(): void {      
     
-        this.$http.get('/api/files/criminal/'+ this.appearanceDetailsInfo["File Number"]+'/appearance-detail/'+this.appearanceDetailsInfo["Appearance ID"])
+        this.$http.get('/api/files/criminal/'+ this.appearanceDetailsInfo["File Number"]+'/appearance-detail/'+this.appearanceDetailsInfo["Appearance ID"]+ '/'+this.appearanceDetailsInfo["Part ID"])
             .then(Response => Response.json(), err => {console.log(err);} )        
             .then(data => {
                 if(data){  
@@ -147,7 +150,8 @@ export default class AppearanceDetails extends Vue {
             this.appearanceAdditionalInfo.push({'key':info,'value':this.appearanceDetailsInfo[info]});
 
         this.appearanceDetailsInfo["File Number"] = this.appearanceInfo.fileNo; 
-        this.appearanceDetailsInfo["Appearance ID"] = this.appearanceInfo.appearanceId;    
+        this.appearanceDetailsInfo["Appearance ID"] = this.appearanceInfo.appearanceId;
+        this.appearanceDetailsInfo["Part ID"] = this.appearanceInfo.partId;     
     }
 
     public ExtractAppearanceDetailsInfo()

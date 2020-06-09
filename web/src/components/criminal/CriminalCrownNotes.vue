@@ -1,14 +1,14 @@
 <template>
-   <b-card bg-variant="white">
+   <b-card bg-variant="white" no-body>
         <div>
-            <h3 class="mx-2 font-weight-normal"> Crown Notes to JCM </h3>
-            <hr class="mb-3 bg-light" style="height: 5px;"/> 
+            <h3 class="mx-4 font-weight-normal"> Crown Notes to JCM </h3>
+            <hr class="mx-3 bg-light" style="height: 5px;"/> 
         </div>
-        <b-card v-if="!(crownNotes.length>0)">
-            <span class="text-muted"> No crown notes to JCM. </span>
+        <b-card v-if="!(crownNotes.length>0)" no-body>
+            <span class="text-muted ml-4 mb-5"> No crown notes to JCM. </span>
         </b-card>
 
-        <b-card bg-variant="white" v-if="isMounted && (crownNotes.length>0)" no-body>           
+        <b-card bg-variant="white" v-if="isMounted && (crownNotes.length>0)" no-body class="mx-3 mb-5">           
             <b-table        
             borderless
             :items="crownNotes"

@@ -8,6 +8,8 @@ class CriminalFileInformation extends VuexModule {
   public criminalFileInfoLoaded = false
   public activeCriminalParticipantIndex = 0
 
+  public criminalParticipantSentenceInformation = { }
+
   public showSections = {
     'Case Details': true,
     'Future Appearances': false,
@@ -28,6 +30,17 @@ class CriminalFileInformation extends VuexModule {
   public UpdateCriminalFile(newCriminalFileInformation): void {
     this.context.commit('setCriminalFile', newCriminalFileInformation)
   }
+
+  @Mutation
+  public setCriminalParticipantSentenceInformation(criminalParticipantSentenceInformation): void {
+    this.criminalParticipantSentenceInformation = criminalParticipantSentenceInformation
+  }
+
+  @Action
+  public UpdateCriminalParticipantSentenceInformation(newCriminalParticipantSentenceInformation): void {
+    this.context.commit('setCriminalParticipantSentenceInformation', newCriminalParticipantSentenceInformation)
+  }
+
 
   @Mutation
   public setCriminalFileInfoLoaded(criminalFileInfoLoaded): void {

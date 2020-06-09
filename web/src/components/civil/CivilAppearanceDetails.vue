@@ -68,7 +68,7 @@
                                     v-if="data.value"  
                                     variant="secondary"
                                     v-b-tooltip.hover.left                            
-                                    title="data.item['Result Description']">
+                                    :title="data.item['Result Description']">
                                         {{data.value}}                                 
                                 </b-badge>
                              </template>
@@ -244,7 +244,7 @@ export default class CivilAppearanceDetails extends Vue {
             
             docInfo["Date Filed"]= document.filedDt? document.filedDt.split(' ')[0] : '';
             docInfo["Result"]= document.appearanceResultCd
-            docInfo["Result Description"]= document.appearanceResultDesc            
+            docInfo["Result Description"]= document.appearanceResultDesc          
             docInfo["Issues"] = [];
             docInfo["Index"] = documentIndex;
             if (document.issue && document.issue.length > 0) {

@@ -17,7 +17,7 @@ schemas:
      {
        "$schema": "http://json-schema.org/draft-04/schema#",
        "type": "object",
-       "description": "A code value as defined in the JUTIN/CEIS web services.",
+       "description": "A code value as defined in the JUSTIN/CEIS web services.",
        "properties": {
          "codeType": {
            "id": "codeType",
@@ -346,6 +346,12 @@ resourceTypes:
         /{statusId}:
           type:
             readOnlyCollectionItem:
+      /partyAttendanceTypes:
+          type:
+            readOnlyCollection:
+          /{partyAttendanceTypeCode}:
+            type:
+              readOnlyCollectionItem:
     /dateDeclinedBy:
       type:
         readOnlyCollection:

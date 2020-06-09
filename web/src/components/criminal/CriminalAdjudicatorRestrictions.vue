@@ -1,15 +1,15 @@
 <template>
-    <b-card bg-variant="white">
+    <b-card bg-variant="white" no-body>
         <div>
-            <h3 class="mx-2 font-weight-normal"> Adjudicator Restrictions </h3>
-            <hr class="mb-2 bg-light" style="height: 5px;"/> 
+            <h3 class="mx-4 font-weight-normal"> Adjudicator Restrictions </h3>
+            <hr class="mx-3 bg-light" style="height: 5px;"/> 
         </div>
 
-        <b-card v-if="!(adjudicatorRestrictions.length>0)">
-            <span class="text-muted"> No adjudicator restrictions. </span>
+        <b-card v-if="!(adjudicatorRestrictions.length>0)" no-body>
+            <span class="text-muted ml-4 mb-5"> No adjudicator restrictions. </span>
         </b-card>
 
-        <b-card bg-variant="white" v-if="isMounted && (adjudicatorRestrictions.length>0)" no-body>           
+        <b-card bg-variant="white" v-if="isMounted && (adjudicatorRestrictions.length>0)" no-body class="mx-3 mb-5">           
             <b-table        
             borderless
             :items="adjudicatorRestrictions"
@@ -42,7 +42,7 @@ import "@store/modules/CriminalFileInformation";
 const criminalState = namespace("CriminalFileInformation");
 
 @Component
-export default class  AdjudicatorRestrictions extends Vue {
+export default class  CriminalAdjudicatorRestrictions extends Vue {
 
   @criminalState.State
   public criminalFileInformation!: any;

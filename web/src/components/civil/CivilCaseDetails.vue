@@ -15,7 +15,8 @@
 
     <b-card bg-variant="light" v-if= "isMounted && !isDataReady">
         <b-card  style="min-height: 100px;">
-            <span>This <b>File-Number '{{this.civilFileInformation.fileNumber}}'</b> doesn't exist in the <b>civil</b> records. </span>
+            <span v-if="errorCode==404">This <b>File-Number '{{this.civilFileInformation.fileNumber}}'</b> doesn't exist in the <b>civil</b> records.</span>
+            <span v-if="errorCode>405"> Server doesn't respond. <b>({{errorText}})</b> </span>
         </b-card>
         <b-card>         
             <b-button variant="info" @click="navigateToLandingPage">Back to the Landing Page</b-button>
@@ -97,7 +98,7 @@ export default class CivilCaseDetails extends Vue {
     public getFileDetails(): void {
        
         this.$http.get('/api/files/civil/'+ this.civilFileInformation.fileNumber)
-            .then(Response => Response.json(), err => {console.log(err);}        
+            .then(Response => Response.json(), err => {this.errorCode= err.status;this.errorText= err.statusText;console.log(err);}        
             ).then(data => {
                 if(data){
                     this.civilFileInformation.detailsData = data;
@@ -120,6 +121,8 @@ export default class CivilCaseDetails extends Vue {
 
     isDataReady = false
     isMounted = false
+    errorCode =0 ;
+    errorText='';
     partiesJson;
     leftPartiesInfo: any[] = [];
     rightPartiesInfo: any[] = [];
@@ -133,7 +136,7 @@ export default class CivilCaseDetails extends Vue {
     {
         for(const title of this.sidePanelTitles)
         {
-          if (this.showSections[title] == true ) return '   '+ title
+          if (this.showSections[title] == true ) return  title
         }
         return ''
     }

@@ -1,8 +1,7 @@
 <template>
-<div>
-    <b-card bg-variant="white">
+    <b-card bg-variant="white" no-body>
         <div>
-            <h3 class="mx-2 font-weight-normal"> Adjudicator Restrictions </h3>
+            <h3 class="mt-4 mx-2 font-weight-normal"> Adjudicator Restrictions </h3>
             <hr class="mb-2 bg-light" style="height: 5px;"/> 
         </div>
 
@@ -34,8 +33,6 @@
             </b-table>
         </b-card>
     </b-card>
-    
-</div>
 </template>
 
 <script lang="ts">
