@@ -44,9 +44,23 @@ const civilState = namespace("CivilFileInformation");
 @Component
 export default class  CivilAdjudicatorRestrictions extends Vue {
 
+  /* eslint-disable */
   @civilState.State
   public civilFileInformation!: any;
+    
+  adjudicatorRestrictionsInfo: any[] = [];
+  /* eslint-enable */  
 
+  sortBy = 'Adjudicator';
+  sortDesc = false;
+  isMounted = false;
+
+  fields = [
+      {key:'Adjudicator', sortable:true, tdClass: 'border-top',  headerStyle:'text-primary'},       
+      {key:'Status',      sortable:true, tdClass: 'border-top',  headerStyle:'text-primary'},
+      {key:'Applies to',  sortable:true, tdClass: 'border-top',  headerStyle:'text-primary'}           
+  ];
+  
   mounted() {
     this.getAdjudicatorRestrictions();
   }
@@ -55,17 +69,6 @@ export default class  CivilAdjudicatorRestrictions extends Vue {
       this.adjudicatorRestrictionsInfo = this.civilFileInformation.adjudicatorRestrictionsInfo;     
       this.isMounted = true;          
   } 
-
-  sortBy = 'Adjudicator';
-  sortDesc = false;  
-  adjudicatorRestrictionsInfo: any[] = [];
-  isMounted = false;
-
-  fields = [
-      {key:'Adjudicator', sortable:true, tdClass: 'border-top',  headerStyle:'text-primary'},       
-      {key:'Status',      sortable:true, tdClass: 'border-top',  headerStyle:'text-primary'},
-      {key:'Applies to',  sortable:true, tdClass: 'border-top',  headerStyle:'text-primary'}           
-  ];  
   
 }
 </script>

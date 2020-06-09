@@ -26,11 +26,13 @@ const civilState = namespace('CivilFileInformation');
 export default class CivilSidePanel extends Vue {
 
     @civilState.State
-    public showSections    
-
+    public showSections 
+    
+    /* eslint-disable */
     @civilState.Action
     public UpdateShowSections!: (newShowSections: any) => void
-
+    /* eslint-enable */
+    
     panelItems = [ 
        'Case Details', 'Future Appearances', 'Past Appearances'    
     ];

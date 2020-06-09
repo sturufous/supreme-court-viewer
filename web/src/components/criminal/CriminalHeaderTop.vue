@@ -23,8 +23,11 @@ const criminalState = namespace("CriminalFileInformation");
 @Component
 export default class CriminalHeaderTop extends Vue {
   
+  /* eslint-disable */
   @criminalState.State
   public criminalFileInformation!: any;
+  /* eslint-enable */ 
+
 
   mounted() {
     this.getFileDescription();

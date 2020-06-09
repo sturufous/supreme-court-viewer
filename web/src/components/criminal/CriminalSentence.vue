@@ -152,43 +152,31 @@ const commonState = namespace("CommonInformation");
 export default class CriminalSentence extends Vue {
 
     @criminalState.State
+    public criminalParticipantSentenceInformation
+    
+    @commonState.State
+    public displayName!: string;
+
+    /* eslint-disable */
+    @criminalState.State
     public criminalFileInformation!: any
 
     @criminalState.Action
     public UpdateCriminalFile!: (newCriminalFileInformation: any) => void
 
-    @criminalState.State
-    public criminalParticipantSentenceInformation    
-
     @criminalState.Action
     public UpdateCriminalParticipantSentenceInformation!: (newCriminalParticipantSentenceInformation: any) => void
-
-    @commonState.State
-    public displayName!: string;    
-
+     
     @commonState.Action
     public UpdateDisplayName!: (newInputNames: any) => void
 
-    public getParticipants(): void {       
-        const data = this.criminalFileInformation.detailsData;
-        this.participantJson = data.participant
-        this.ExtractParticipantInfo()          
-        this.isMounted = true;
-    }
-
-    mounted () {        
-        this.getParticipants();  
-    }
-
-    participantJson;
-   
-    isMounted = false
-
     participantFiles: any[] = [];
-    orderMadeClickedParticipant=0;
-    judgeRecomClickedParticipant =0;
-
+    /* eslint-enable */
     
+    participantJson;   
+    isMounted = false    
+    orderMadeClickedParticipant=0;
+    judgeRecomClickedParticipant =0;    
 
     fields = [        
         {key:'Name',  tdClass: 'border-bottom', headerStyle:'text-primary',  cellStyle:'text-info'},
@@ -200,6 +188,17 @@ export default class CriminalSentence extends Vue {
         {key:'Date',  tdClass: 'border-top', headerStyle:'text-primary',  cellStyle:'text'},
         {key:'Count', tdClass: 'border-top', headerStyle:'text',          cellStyle:'text'},
     ]
+
+    public getParticipants(): void {       
+        const data = this.criminalFileInformation.detailsData;
+        this.participantJson = data.participant
+        this.ExtractParticipantInfo()          
+        this.isMounted = true;
+    }
+
+    mounted () {        
+        this.getParticipants();  
+    }
     
     public ExtractParticipantInfo(): void {        
         
@@ -215,7 +214,9 @@ export default class CriminalSentence extends Vue {
             fileInfo["Name"] = this.displayName;
 
             fileInfo["Counts"] = [];
-            const counts: any[] = []; 
+            /* eslint-disable */
+            const counts: any[] = [];
+             /* eslint-enable */ 
             
             fileInfo["OrderMade"] = [];
             fileInfo["OrderMadeDisable"] =  true;

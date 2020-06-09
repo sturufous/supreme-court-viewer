@@ -74,23 +74,10 @@ const civilState = namespace("CivilFileInformation");
 @Component
 export default class CivilParties extends Vue {
 
+    /* eslint-disable */
     @civilState.State
     public civilFileInformation!: any;
-
-    mounted() {
-        this.getParties();
-    }
-
-    public getParties(): void {
-        this.leftRole = this.civilFileInformation.detailsData.leftRoleDsc;
-        this.rightRole = this.civilFileInformation.detailsData.rightRoleDsc;       
-        this.leftPartiesInfo = this.civilFileInformation.leftPartiesInfo
-        this.rightPartiesInfo = this.civilFileInformation.rightPartiesInfo
-        this.numberOfLeftParties = this.leftPartiesInfo.length;  
-        this.numberOfRightParties = this.rightPartiesInfo.length;
-
-        this.isMounted = true;          
-    } 
+    /* eslint-enable */    
   
     isMounted = false;
     leftPartiesInfo = [];
@@ -107,7 +94,22 @@ export default class CivilParties extends Vue {
         {key:'Name',                  sortable:true,  tdClass: 'border-top',  headerStyle:'text-primary',   cellStyle:'font-weight: bold; font-size: 14px;'},
         {key:'Role',                  sortable:false, tdClass: 'border-top',  headerStyle:'text',         cellStyle:'font-size: 14px;'},
         {key:'Counsel',               sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:'font-size: 14px;'}
-    ];    
+    ];
+    
+    mounted() {
+        this.getParties();
+    }
+
+    public getParties(): void {
+        this.leftRole = this.civilFileInformation.detailsData.leftRoleDsc;
+        this.rightRole = this.civilFileInformation.detailsData.rightRoleDsc;       
+        this.leftPartiesInfo = this.civilFileInformation.leftPartiesInfo
+        this.rightPartiesInfo = this.civilFileInformation.rightPartiesInfo
+        this.numberOfLeftParties = this.leftPartiesInfo.length;  
+        this.numberOfRightParties = this.rightPartiesInfo.length;
+
+        this.isMounted = true;          
+    } 
 
 }
 </script>

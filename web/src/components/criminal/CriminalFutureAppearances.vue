@@ -108,41 +108,62 @@ enum appearanceStatus {UNCF='Unconfirmed', CNCL='Canceled', SCHD='Scheduled' }
 export default class CriminalFutureAppearances extends Vue {
 
     @criminalState.State
+    public showSections  
+
+    @commonState.State
+    public displayName!: string;    
+
+    @commonState.State
+    public duration
+
+    @commonState.State
+    public time
+    
+    @commonState.State
+    public statusStyle
+
+    /* eslint-disable */
+    @criminalState.State
     public criminalFileInformation!: any;
 
-    @criminalState.State
-    public showSections
-    
     @criminalState.State
     public appearanceInfo!: any;
 
     @criminalState.Action
     public UpdateAppearanceInfo!: (newAppearanceInfo: any) => void
 
-    @commonState.State
-    public displayName!: string;    
-
     @commonState.Action
     public UpdateDisplayName!: (newInputNames: any) => void
-
-    @commonState.State
-    public duration
 
     @commonState.Action
     public UpdateDuration!: (duration: any) => void
 
-    @commonState.State
-    public time
-
     @commonState.Action
     public UpdateTime!: (time: any) => void
     
-    @commonState.State
-    public statusStyle
-    
     @commonState.Action
-    public UpdateStatusStyle!: (statusStyle: any) => void
+    public UpdateStatusStyle!: (statusStyle: any) => void    
+  
+    futureAppearancesList: any[] = [];
+    /* eslint-enable */
+    isMounted = false;
+    isDataReady = false;
+    futureAppearancesJson;    
+    sortBy = 'Date';
+    sortDesc = true;    
 
+    fields =  
+    [
+        {key:'Date',       sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'text-info mt-2 d-inline-flex'},
+        {key:'Reason',     sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'font-weight-bold'},
+        {key:'Time',       sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:'text'},
+        {key:'Duration',   sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:'text'},
+        {key:'Location',   sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'text'},
+        {key:'Room',       sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:'text'},
+        {key:'Accused',    sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'text'},
+        {key:'Status',     sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'badge'},
+    ];
+    
     mounted() {
         this.getFutureAppearances();
     }
@@ -155,31 +176,9 @@ export default class CriminalFutureAppearances extends Vue {
         if(this.futureAppearancesList.length)
         {                    
             this.isDataReady = true;
-        }
-    
-    this.isMounted = true;
-           
+        }    
+        this.isMounted = true;           
     } 
-  
-    isMounted = false;
-    isDataReady = false;
-    futureAppearancesJson;
-    
-    sortBy = 'Date';
-    sortDesc = true;
-    futureAppearancesList: any[] = [];
-
-    fields =  
-    [
-        {key:'Date',       sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'text-info mt-2 d-inline-flex'},
-        {key:'Reason',     sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'font-weight-bold'},
-        {key:'Time',       sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:'text'},
-        {key:'Duration',   sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:'text'},
-        {key:'Location',   sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'text'},
-        {key:'Room',       sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:'text'},
-        {key:'Accused',    sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'text'},
-        {key:'Status',     sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'badge'},
-    ];    
   
     public ExtractFutureAppearancesInfo(): void {
         const currentDate = new Date();

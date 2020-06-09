@@ -1,12 +1,12 @@
 <template>
 <b-card bg-variant="white" no-body>
     <div>
-        <h3 class="mt-4 mx-4 font-weight-normal" v-if="!showSections['Past Appearances']"> Last Three Past Appearances</h3>
+        <h3 class="mt-4 mx-4 font-weight-normal" v-if="!showSections['Future Appearances']"> Next Three Future Appearances</h3>
         <hr class="mx-2 bg-light" style="height: 5px;"/> 
     </div>
 
     <b-card v-if="!isDataReady && isMounted">
-        <span class="text-muted"> No past appearances. </span>
+        <span class="text-muted"> No future appearances. </span>
     </b-card>
 
     <b-card bg-variant="light" v-if= "!isMounted && !isDataReady">
@@ -23,7 +23,7 @@
 
     <b-card bg-variant="white" v-if="isDataReady" style="overflow: auto;" no-body class="mx-2">           
         <b-table
-        :items="SortedPastAppearances"
+        :items="SortedFutureAppearances"
         :fields="fields"
         :sort-by.sync="sortBy"
         :sort-desc.sync="sortDesc"
@@ -47,7 +47,11 @@
 
             <template v-slot:cell(Date)="data" >
                 <span :class="data.field.cellClass" :style="data.field.cellStyle"> 
-                    <b-button style="transform: translate(0,-7px);" size="sm" @click="OpenDetails(data);data.toggleDetails();" variant="outline-primary border-white  text-info" class="mr-2">
+                    <b-button style="transform: translate(0,-7px);" 
+                              size="sm" 
+                              @click="OpenDetails(data);data.toggleDetails();" 
+                              variant="outline-primary border-white  text-info" 
+                              class="mr-2">
                         <b-icon-caret-right-fill v-if="!data.item['_showDetails']"></b-icon-caret-right-fill>
                         <b-icon-caret-down-fill v-if="data.item['_showDetails']"></b-icon-caret-down-fill>
                         {{data.item.FormattedDate}}
@@ -118,51 +122,52 @@ enum appearanceStatus {UNCF='Unconfirmed', CNCL='Canceled', SCHD='Scheduled' }
         CivilAppearanceDetails
     }
 })
-export default class CivilPastAppearances extends Vue {    
+export default class CivilFutureAppearances extends Vue {
+
+    @commonState.State
+    public displayName!: string;
 
     @civilState.State
     public showSections
 
-     @commonState.State
-    public statusStyle 
-
     @commonState.State
-    public displayName!: string;    
-
-    @commonState.State
-    public duration    
+    public duration
 
     @commonState.State
     public time
 
+    @commonState.State
+    public statusStyle
+
     /* eslint-disable */
+    @civilState.State
+    public civilFileInformation!: any;
+    
     @civilState.State
     public appearanceInfo!: any;
 
-    @civilState.State
-    public civilFileInformation!: any;
-
     @civilState.Action
-    public UpdateAppearanceInfo!: (newAppearanceInfo: any) => void    
+    public UpdateAppearanceInfo!: (newAppearanceInfo: any) => void        
+
+    @commonState.Action
+    public UpdateDisplayName!: (newInputNames: any) => void    
+
+    @commonState.Action
+    public UpdateDuration!: (duration: any) => void    
 
     @commonState.Action
     public UpdateTime!: (time: any) => void
-
-     @commonState.Action
-    public UpdateDisplayName!: (newInputNames: any) => void
-    
-    @commonState.Action
-    public UpdateDuration!: (duration: any) => void   
     
     @commonState.Action
     public UpdateStatusStyle!: (statusStyle: any) => void
 
-    pastAppearancesList: any[] = [];
-    /* eslint-enable */
+    futureAppearancesList: any[] = [];
+     /* eslint-enable */
 
+   
     isMounted = false;
     isDataReady = false;
-    pastAppearancesJson;    
+    futureAppearancesJson;    
     sortBy = 'Date';
     sortDesc = true;    
 
@@ -177,34 +182,34 @@ export default class CivilPastAppearances extends Vue {
         {key:'Location',        sortable:true,  tdClass: 'border-top', headerStyle:'text-primary',  cellClass:'text',                         cellStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
         {key:'Room',            sortable:false, tdClass: 'border-top', headerStyle:'text',          cellClass:'text',                         cellStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
         {key:'Presider',        sortable:true,  tdClass: 'border-top', headerStyle:'text-primary',  cellClass:'badge badge-secondary mt-2',   cellStyle: 'font-size: 14px;'},        
-        {key:'Status',          sortable:true,  tdClass: 'border-top', headerStyle:'text-primary',  cellClass:'badge',                        cellStyle: 'font-size: 14px; width:110px;'}
+        {key:'Status',          sortable:true,  tdClass: 'border-top', headerStyle:'text-primary',  cellClass:'badge',                        cellStyle: 'font-size: 14px;'}
     ];
     
-    mounted() {
-        this.getPastAppearances();
+     mounted() {
+        this.getFutureAppearances();
     }
 
-    public getPastAppearances(): void {      
+    public getFutureAppearances(): void {      
     
         const data = this.civilFileInformation.detailsData;
-        this.pastAppearancesJson = data.appearances.apprDetail;              
-        this.ExtractPastAppearancesInfo();
-        if(this.pastAppearancesList.length) {                    
+        this.futureAppearancesJson = data.appearances.apprDetail;              
+        this.ExtractFutureAppearancesInfo();
+        if(this.futureAppearancesList.length) {                    
             this.isDataReady = true;
         }
     
         this.isMounted = true;           
-    }
+    }  
   
-    public ExtractPastAppearancesInfo(): void {
+    public ExtractFutureAppearancesInfo(): void {
         const currentDate = new Date();
-        for (const appIndex in this.pastAppearancesJson) {
+        for (const appIndex in this.futureAppearancesJson) {
             const appInfo = {};
-            const jApp = this.pastAppearancesJson[appIndex];
+            const jApp = this.futureAppearancesJson[appIndex];
 
             appInfo["Index"] = appIndex;
             appInfo["Date"] = jApp.appearanceDt.split(' ')[0]
-            if(new Date(appInfo["Date"]) >= currentDate) continue;            
+            if(new Date(appInfo["Date"]) < currentDate) continue;            
             appInfo["FormattedDate"] = Vue.filter('beautify-date')(appInfo["Date"]);
             appInfo["Document Type"] = jApp.documentTypeDsc;
             appInfo["Result"] = jApp.appearanceResultCd;
@@ -219,13 +224,12 @@ export default class CivilPastAppearances extends Vue {
             appInfo["Status Style"] = this.getStatusStyle(appInfo["Status"])
             appInfo["Presider"] =  jApp.judgeInitials ? jApp.judgeInitials :''
             appInfo["Judge Full Name"] =  jApp.judgeInitials ? jApp.judgeFullNm : ''
-
             appInfo["Appearance ID"] = jApp.appearanceId
             appInfo["Supplemental Equipment"] = jApp.supplementalEquipmentTxt
             appInfo["Security Restriction"] = jApp.securityRestrictionTxt
             appInfo["OutOfTown Judge"] = jApp.outOfTownJudgeTxt
                        
-            this.pastAppearancesList.push(appInfo); 
+            this.futureAppearancesList.push(appInfo); 
         }
     }
 
@@ -248,35 +252,32 @@ export default class CivilPastAppearances extends Vue {
     {
         if(!data.detailsShowing)
         {
-            this.appearanceInfo.fileNo = this.civilFileInformation.fileNumber; 
-            
+            this.appearanceInfo.fileNo = this.civilFileInformation.fileNumber;            
             this.appearanceInfo.appearanceId = data.item["Appearance ID"]
             this.appearanceInfo.supplementalEquipmentTxt = data.item["Supplemental Equipment"]
             this.appearanceInfo.securityRestrictionTxt = data.item["Security Restriction"]
             this.appearanceInfo.outOfTownJudgeTxt = data.item["OutOfTown Judge"]
 
             this.UpdateAppearanceInfo(this.appearanceInfo);
-        }
-        
+        }        
     }
 
-    get SortedPastAppearances()
+    get SortedFutureAppearances()
     {           
-        if(this.showSections['Past Appearances'])
+        if(this.showSections['Future Appearances'])
         {
-            return this.pastAppearancesList;
+            return this.futureAppearancesList;
         }
         else
         {
-            return  this.pastAppearancesList
+            return  this.futureAppearancesList
             .sort((a, b): any =>
             {            
                 if(a["Date"] > b["Date"]) return -1;
                 else if(a["Date"] < b["Date"]) return 1;
                 else return 0;
             })
-            .slice(0, 3);
-           
+            .slice(0, 3);           
         }        
     }
 }

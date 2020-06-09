@@ -26,10 +26,12 @@ const criminalState = namespace('CriminalFileInformation');
 export default class CriminalSidePanel extends Vue {
 
     @criminalState.State
-    public showSections    
-
+    public showSections
+    
+    /* eslint-disable */
     @criminalState.Action
     public UpdateShowSections!: (newShowSections: any) => void
+    /* eslint-enable */
 
     panelItems = [ 
        'Case Details', 'Future Appearances', 'Past Appearances', 'Witnesses', 'Documents', 'Sentence/Order Details'    

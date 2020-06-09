@@ -44,11 +44,13 @@
         
         fileInformation = { }
 
+        /* eslint-disable */
         @civilState.Action
         public UpdateCivilFile!: (newCivilFileInformation: any) => void
 
         @criminalState.Action
-        public UpdateCriminalFile!: (newCriminalFileInformation: any) => void           
+        public UpdateCriminalFile!: (newCriminalFileInformation: any) => void
+        /* eslint-enable */           
         
         // TODO: add validation so that the user has to enter values before clicking the search button
         navigateToDocumentsView(fileInformation): void {
@@ -65,7 +67,6 @@
     }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
     button {
         background-color: #036
