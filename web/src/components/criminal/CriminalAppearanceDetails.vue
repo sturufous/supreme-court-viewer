@@ -32,9 +32,9 @@
                 
                     <template v-slot:cell(Finding)="data" >                        
                         <b-badge 
-                            variant="light" 
+                            variant="secondary" 
                             v-if="data.item['Finding']"                               
-                            v-b-tooltip.hover 
+                            v-b-tooltip.hover.left 
                             :title='data.item["Finding Description"]'> 
                             {{ data.item["Finding"] }} 
                         </b-badge>                       
@@ -42,9 +42,9 @@
 
                     <template v-slot:cell(LastResult)="data" >
                             <b-badge 
-                                variant="light"
+                                variant="secondary"
                                 v-if="data.item['Last Result']"
-                                v-b-tooltip.hover 
+                                v-b-tooltip.hover.left 
                                 :title='data.item["Last Result Description"]' > 
                                 {{ data.item["Last Result"] }} 
                             </b-badge>
@@ -60,12 +60,15 @@
                 </div>
                            
                 <b-table
-                :items="appearanceAdditionalInfo"
-                :fields="addInfoFields"
-                thead-class="d-none"               
-                borderless                                  
-                responsive="sm"
-                > 
+                    :items="appearanceAdditionalInfo"
+                    :fields="addInfoFields"
+                    thead-class="d-none"               
+                    borderless                                  
+                    responsive="sm"
+                    > 
+                        <template v-slot:cell(key)="data">
+                            <b>{{data.value}}</b>
+                        </template>
                 </b-table>
                 
             </b-col>          
@@ -84,22 +87,22 @@ const criminalState = namespace("CriminalFileInformation");
 
 
 @Component
-export default class AppearanceDetails extends Vue {
+export default class CriminalAppearanceDetails extends Vue {
 
     @criminalState.State
     public criminalFileInformation!: any;
 
     @criminalState.State
-    public pastAppearanceInfo!: any;
+    public appearanceInfo!: any;
 
     mounted() {
-        this.getAccusedPersonInfo();
+        this.getAppearanceInfo();
         this.getAppearanceDetails();
     }
 
     public getAppearanceDetails(): void {      
     
-        this.$http.get('/api/files/criminal/'+ this.accusedPersonInfo["File Number"]+'/appearance-detail/'+this.accusedPersonInfo["Appearance ID"])
+        this.$http.get('/api/files/criminal/'+ this.appearanceDetailsInfo["File Number"]+'/appearance-detail/'+this.appearanceDetailsInfo["Appearance ID"]+ '/'+this.appearanceDetailsInfo["Part ID"])
             .then(Response => Response.json(), err => {console.log(err);} )        
             .then(data => {
                 if(data){  
@@ -117,7 +120,7 @@ export default class AppearanceDetails extends Vue {
     sortBy = 'Date';
     sortDesc = true;
     appearanceCharges: any[] = [];
-    accusedPersonInfo = {};
+    appearanceDetailsInfo = {};
 
     appearanceAdditionalInfo: any[] = [];
 
@@ -137,37 +140,37 @@ export default class AppearanceDetails extends Vue {
     ];   
     
     
-    public getAccusedPersonInfo()
-    {        
-        
-        this.accusedPersonInfo["Supplemental Equipment"] = this.pastAppearanceInfo.supplementalEquipmentTxt;
-        this.accusedPersonInfo["Security Restriction"] = this.pastAppearanceInfo.securityRestrictionTxt;
-        this.accusedPersonInfo["Out-Of-Town Judge"] =  this.pastAppearanceInfo.outOfTownJudgeTxt;
+    public getAppearanceInfo()
+    {       
+        this.appearanceDetailsInfo["Supplemental Equipment"] = this.appearanceInfo.supplementalEquipmentTxt;
+        this.appearanceDetailsInfo["Security Restriction"] = this.appearanceInfo.securityRestrictionTxt;
+        this.appearanceDetailsInfo["Out-Of-Town Judge"] =  this.appearanceInfo.outOfTownJudgeTxt;
 
-        for(const info in this.accusedPersonInfo)
-            this.appearanceAdditionalInfo.push({'key':info,'value':this.accusedPersonInfo[info]});
+        for(const info in this.appearanceDetailsInfo)
+            this.appearanceAdditionalInfo.push({'key':info,'value':this.appearanceDetailsInfo[info]});
 
-        this.accusedPersonInfo["File Number"] = this.pastAppearanceInfo.fileNo; 
-        this.accusedPersonInfo["Appearance ID"] = this.pastAppearanceInfo.appearanceId;    
+        this.appearanceDetailsInfo["File Number"] = this.appearanceInfo.fileNo; 
+        this.appearanceDetailsInfo["Appearance ID"] = this.appearanceInfo.appearanceId;
+        this.appearanceDetailsInfo["Part ID"] = this.appearanceInfo.partId;     
     }
 
     public ExtractAppearanceDetailsInfo()
     {               
         for(const charge of this.appearanceDetailsJson.charges)
         {              
-            const docInfo = {};             
-            docInfo["Count"] = charge.printSeqNo;
+            const chargeInfo = {};             
+            chargeInfo["Count"] = charge.printSeqNo;
 
-            docInfo["Criminal Code"]= charge.statuteSectionDsc                 
-            docInfo["Description"]= charge.statuteDsc
+            chargeInfo["Criminal Code"]= charge.statuteSectionDsc                 
+            chargeInfo["Description"]= charge.statuteDsc
 
-            docInfo["Last Result"]= charge.appearanceResultCd
-            docInfo["Last Result Description"]= charge.appearanceResultDesc
+            chargeInfo["Last Result"]= charge.appearanceResultCd
+            chargeInfo["Last Result Description"]= charge.appearanceResultDesc
 
-            docInfo["Finding"]= charge.findingCd
-            docInfo["Finding Description"]= charge.findingDsc
+            chargeInfo["Finding"]= charge.findingCd
+            chargeInfo["Finding Description"]= charge.findingDsc
 
-            this.appearanceCharges.push(docInfo);
+            this.appearanceCharges.push(chargeInfo);
         }
     }
 

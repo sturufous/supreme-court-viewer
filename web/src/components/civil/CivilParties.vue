@@ -1,24 +1,21 @@
 <template>
-<div>
-    <b-card bg-variant="white">
+    <b-card bg-variant="white" no-body>
         <b-row cols="2" >
             <b-col class="mt-2" md="6" cols="6">
                 <div>
                     <h3 class="mx-2 font-weight-normal"> {{leftRole}} ({{numberOfLeftParties}}) </h3>
-                    <hr class="mb-0 bg-light" style="height: 5px;"/> 
+                    <hr class="mb-2 bg-light" style="height: 5px;"/> 
                 </div>
 
-                <b-card bg-variant="white" style="max-height: 400px; overflow-y: auto;">           
+                <b-card bg-variant="white" style="max-height: 400px; overflow-y: auto;" no-body>           
                     <b-table
                     :items="leftPartiesInfo"
-                    :fields="fields"
-                    :sort-by.sync="sortBy"
-                    :sort-desc.sync="sortDesc"
-                    :no-sort-reset="true"
+                    :fields="fields"                    
+                    :no-sort-reset="true" 
+                    sort-icon-left
                     borderless
                     striped
                     small
-                    sort-icon-left
                     responsive="sm"
                     >   
                         <template v-for="(field,index) in fields" v-slot:[`head(${field.key})`]="data">
@@ -35,15 +32,13 @@
             <b-col class="mt-2" md="6" cols="6" >
                 <div>
                     <h3 class="mx-2 font-weight-normal"> {{rightRole}} ({{numberOfRightParties}}) </h3>
-                    <hr class="mb-0 bg-light" style="height: 5px;"/> 
+                    <hr class="mb-2 bg-light" style="height: 5px;"/> 
                 </div>
 
-                <b-card bg-variant="white" style="max-height: 400px; overflow-y: auto;">           
+                <b-card bg-variant="white" style="max-height: 400px; overflow-y: auto;" no-body>           
                     <b-table
                     :items="rightPartiesInfo"
-                    :fields="fields"
-                    :sort-by.sync="sortBy"
-                    :sort-desc.sync="sortDesc"
+                    :fields="fields"                    
                     :no-sort-reset="true"
                     borderless
                     striped
@@ -56,7 +51,9 @@
                         </template>                
                         <template v-for="(field,index) in fields" v-slot:[`cell(${field.key})`]="data" >
                             <span v-bind:key="index" :style="field.cellStyle" v-if="data.field.key != 'Counsel'">  {{ data.value }} </span>
-                            <span v-bind:key="index" :style="field.cellStyle" v-if="data.field.key == 'Counsel'"><span v-for="(counsel, counselIndex) in data.value"  v-bind:key="counselIndex" style= "white-space: pre-line" >CEIS: {{ counsel }}</span> </span>
+                            <span v-bind:key="index" :style="field.cellStyle" v-if="data.field.key == 'Counsel'">
+                                <span v-for="(counsel, counselIndex) in data.value"  v-bind:key="counselIndex" style= "white-space: pre-line" >CEIS: {{ counsel }}<br></span>
+                            </span>
                         </template>
                         
                     </b-table>
@@ -65,9 +62,7 @@
             </b-col>    
 
         </b-row>
-    </b-card> 
-
-</div>
+    </b-card>
 </template>
 
 <script lang="ts">
@@ -112,19 +107,7 @@ export default class CivilParties extends Vue {
         {key:'Name',                  sortable:true,  tdClass: 'border-top',  headerStyle:'text-primary',   cellStyle:'font-weight: bold; font-size: 14px;'},
         {key:'Role',                  sortable:false, tdClass: 'border-top',  headerStyle:'text',         cellStyle:'font-size: 14px;'},
         {key:'Counsel',               sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:'font-size: 14px;'}
-    ]; 
-
-    public getNameOfJustin(lastName, givenName) {      
-
-        if(!lastName && !givenName)        
-            return
-        if(!lastName)        
-            return 'JUSTIN: '+givenName;       
-        else if(!givenName)       
-            return 'JUSTIN: '+lastName;      
-        else         
-            return ('JUSTIN: '+givenName +' ' + lastName );        
-    }
+    ];    
 
 }
 </script>
