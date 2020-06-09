@@ -150,7 +150,6 @@ namespace Scv.Api.Services
                 AppearanceMethod = await PopulateAppearanceMethods(appearanceMethods.AppearanceMethod),
                 Party = await PopulateDetailedAppearancePartiesAsync(appearanceParty.Party, civilCourtList?.Parties, previousAppearance, appearanceMethods.AppearanceMethod),
                 Document = await PopulateDetailedAppearanceDocuments(fileDetailDocuments),
-                PreviousAppearance = previousAppearance,
                 Adjudicator = await PopulateDetailedAppearanceAdjudicator(previousAppearance),
                 AdjudicatorComment = previousAppearance?.AdjudicatorComment
             };

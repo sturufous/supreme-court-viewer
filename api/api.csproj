@@ -29,5 +29,6 @@
   <ItemGroup>
     <Folder Include="Models\Civil\CourtList\" />
     <Folder Include="Models\Criminal\CourtList\" />
+    <Folder Include="Services\Files\" />
   </ItemGroup>
 </Project>
