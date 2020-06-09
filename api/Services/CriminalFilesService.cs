@@ -133,6 +133,7 @@ namespace Scv.Api.Services
             var targetCourtList = courtList.CriminalCourtList.FirstOrDefault(cl => cl.CriminalAppearanceID == appearanceId);
             var attendanceMethods = targetCourtList?.AttendanceMethod;
 
+            //CourtList AttendanceMethod is present state, AppearanceMethod is past state they look to be the same values, but haven't found any test data on DEV where they differ. 
             if (criminalParticipant == null || accusedFile == null || appearanceFromAccused == null)
                 return null;
 
@@ -151,10 +152,10 @@ namespace Scv.Api.Services
                 JudgesRecommendation = appearanceFromAccused.JudgesRecommendation,
                 EstimatedTimeHour = appearanceFromAccused.EstimatedTimeHour?.ReturnNullIfEmpty(),
                 EstimatedTimeMin = appearanceFromAccused.EstimatedTimeMin?.ReturnNullIfEmpty(),
-                Accused = await PopulateAppearanceCriminalAccused(criminalParticipant.FullName, appearanceFromAccused, attendanceMethods),
-                Prosecutor = await PopulateAppearanceDetailProsecutor(appearanceFromAccused, attendanceMethods),
-                Adjudicator = await PopulateAppearanceDetailAdjudicator(appearanceFromAccused, attendanceMethods),
-                JustinCounsel = await PopulateAppearanceDetailJustinCounsel(criminalParticipant, appearanceFromAccused, attendanceMethods),
+                Accused = await PopulateAppearanceCriminalAccused(criminalParticipant.FullName, appearanceFromAccused, attendanceMethods, partId, appearanceMethods.AppearanceMethod),
+                Prosecutor = await PopulateAppearanceDetailProsecutor(appearanceFromAccused, attendanceMethods, appearanceMethods.AppearanceMethod),
+                Adjudicator = await PopulateAppearanceDetailAdjudicator(appearanceFromAccused, attendanceMethods, appearanceMethods.AppearanceMethod),
+                JustinCounsel = await PopulateAppearanceDetailJustinCounsel(criminalParticipant, appearanceFromAccused, attendanceMethods, appearanceMethods.AppearanceMethod),
                 Charges = await PopulateCharges(appearanceCount.ApprCount)
             };
             return appearanceDetail;
@@ -298,26 +299,30 @@ namespace Scv.Api.Services
 
         #region Criminal Appearance Details
 
-        private async Task<CriminalAccused> PopulateAppearanceCriminalAccused(string fullName, CfcAppearance appearanceFromAccused, ICollection<ClAttendanceMethod> attendanceMethods)
+        private async Task<CriminalAccused> PopulateAppearanceCriminalAccused(string fullName, CfcAppearance appearanceFromAccused, ICollection<ClAttendanceMethod> attendanceMethods, string partId, ICollection<JCCommon.Clients.FileServices.CriminalAppearanceMethod> appearanceMethods)
         {
             var partyAppearanceMethod = appearanceFromAccused?.PartyAppearanceMethod.FirstOrDefault(pam => pam.PartyRole == "ACC");
             var attendanceMethod = attendanceMethods?.FirstOrDefault(am => am.RoleType == "ACC");
+            var appearanceMethod = appearanceMethods?.FirstOrDefault(am => am.RoleTypeCd == "ACC");
             return new CriminalAccused
             {
                 FullName = fullName,
-                PartId = partyAppearanceMethod?.PartId,
+                PartId = partId, //partyAppearanceMethod, doesn't always have a partId on DEV at least.
                 PartyAppearanceMethod = partyAppearanceMethod?.PartyAppearanceMethod,
                 PartyAppearanceMethodDesc = await _lookupService.GetCriminalAccusedAttend(partyAppearanceMethod?.PartyAppearanceMethod), 
                 AttendanceMethodCd = attendanceMethod?.AttendanceMethodCd,
-                AttendanceMethodDesc = await _lookupService.GetCriminalAssetsDescriptions(attendanceMethod?.AttendanceMethodCd)
-            };
+                AttendanceMethodDesc = await _lookupService.GetCriminalAssetsDescriptions(attendanceMethod?.AttendanceMethodCd),
+                AppearanceMethodCd = appearanceMethod?.AppearanceMethodCd,
+                AppearanceMethodDesc = await _lookupService.GetCriminalAssetsDescriptions(appearanceMethod?.AppearanceMethodCd)
+        };
         }
 
-        private async Task<CriminalAdjudicator> PopulateAppearanceDetailAdjudicator(CfcAppearance appearanceFromAccused, ICollection<ClAttendanceMethod> attendanceMethods)
+        private async Task<CriminalAdjudicator> PopulateAppearanceDetailAdjudicator(CfcAppearance appearanceFromAccused, ICollection<ClAttendanceMethod> attendanceMethods, ICollection<JCCommon.Clients.FileServices.CriminalAppearanceMethod> appearanceMethods)
         {
             var partyAppearanceMethod = appearanceFromAccused?.PartyAppearanceMethod.FirstOrDefault(pam => pam.PartyRole == "ADJ");
             var attendanceMethod = attendanceMethods?.FirstOrDefault(am => am.RoleType == "ADJ");
-            if (partyAppearanceMethod == null)
+            var appearanceMethod = appearanceMethods?.FirstOrDefault(am => am.RoleTypeCd == "ADJ");
+            if (partyAppearanceMethod == null || partyAppearanceMethod.PartyName == null && partyAppearanceMethod.PartId == null && appearanceMethod?.AppearanceMethodCd == null)
                 return null;
 
             return new CriminalAdjudicator
@@ -327,15 +332,18 @@ namespace Scv.Api.Services
                 PartyAppearanceMethod = partyAppearanceMethod.PartyAppearanceMethod,
                 PartyAppearanceMethodDesc = await _lookupService.GetCriminalAdjudicatorAttend(partyAppearanceMethod?.PartyAppearanceMethod),
                 AttendanceMethodCd = attendanceMethod?.AttendanceMethodCd,
-                AttendanceMethodDesc = await _lookupService.GetCriminalAssetsDescriptions(attendanceMethod?.AttendanceMethodCd)
+                AttendanceMethodDesc = await _lookupService.GetCriminalAssetsDescriptions(attendanceMethod?.AttendanceMethodCd),
+                AppearanceMethodCd = appearanceMethod?.AppearanceMethodCd,
+                AppearanceMethodDesc = await _lookupService.GetCriminalAssetsDescriptions(appearanceMethod?.AppearanceMethodCd)
             };
         }
 
-        private async Task<Prosecutor> PopulateAppearanceDetailProsecutor(CfcAppearance appearanceFromAccused, ICollection<ClAttendanceMethod> attendanceMethods)
+        private async Task<Prosecutor> PopulateAppearanceDetailProsecutor(CfcAppearance appearanceFromAccused, ICollection<ClAttendanceMethod> attendanceMethods, ICollection<JCCommon.Clients.FileServices.CriminalAppearanceMethod> appearanceMethods)
         {
             var partyAppearanceMethod = appearanceFromAccused?.PartyAppearanceMethod.FirstOrDefault(pam => pam.PartyRole == "PRO");
             var attendanceMethod = attendanceMethods?.FirstOrDefault(am => am.RoleType == "PRO");
-            if (partyAppearanceMethod == null)
+            var appearanceMethod = appearanceMethods?.FirstOrDefault(am => am.RoleTypeCd == "PRO");
+            if (partyAppearanceMethod == null || partyAppearanceMethod.PartyName == null && partyAppearanceMethod.PartId == null && appearanceMethod?.AppearanceMethodCd == null)
                 return null;
 
             return new Prosecutor
@@ -345,11 +353,13 @@ namespace Scv.Api.Services
                 PartyAppearanceMethod = partyAppearanceMethod.PartyAppearanceMethod,
                 PartyAppearanceMethodDesc = await _lookupService.GetCriminalCrownAttendanceType(partyAppearanceMethod?.PartyAppearanceMethod),
                 AttendanceMethodCd = attendanceMethod?.AttendanceMethodCd,
-                AttendanceMethodDesc = await _lookupService.GetCriminalAssetsDescriptions(attendanceMethod?.AttendanceMethodCd)
+                AttendanceMethodDesc = await _lookupService.GetCriminalAssetsDescriptions(attendanceMethod?.AttendanceMethodCd),
+                AppearanceMethodCd = appearanceMethod?.AppearanceMethodCd,
+                AppearanceMethodDesc = await _lookupService.GetCriminalAssetsDescriptions(appearanceMethod?.AppearanceMethodCd)
             };
         }
 
-        private async Task<JustinCounsel> PopulateAppearanceDetailJustinCounsel(CriminalParticipant criminalParticipant, CfcAppearance appearanceFromAccused, ICollection<ClAttendanceMethod> attendanceMethods)
+        private async Task<JustinCounsel> PopulateAppearanceDetailJustinCounsel(CriminalParticipant criminalParticipant, CfcAppearance appearanceFromAccused, ICollection<ClAttendanceMethod> attendanceMethods, ICollection<JCCommon.Clients.FileServices.CriminalAppearanceMethod> appearanceMethods)
         {
             if (criminalParticipant == null)
                 return null;
@@ -357,10 +367,13 @@ namespace Scv.Api.Services
             var justinCounsel = _mapper.Map<JustinCounsel>(criminalParticipant);
             var partyAppearanceMethod = appearanceFromAccused?.PartyAppearanceMethod.FirstOrDefault(pam => pam.PartyRole == "CON");
             var attendanceMethod = attendanceMethods?.FirstOrDefault(am => am.RoleType == "CON");
+            var appearanceMethod = appearanceMethods?.FirstOrDefault(am => am.RoleTypeCd == "CON");
             justinCounsel.PartyAppearanceMethod = partyAppearanceMethod?.PartyAppearanceMethod;
             justinCounsel.PartyAppearanceMethodDesc = await _lookupService.GetCriminalCounselAttendanceType(partyAppearanceMethod?.PartyAppearanceMethod);
             justinCounsel.AttendanceMethodCd = attendanceMethod?.AttendanceMethodCd;
             justinCounsel.AttendanceMethodDesc = await _lookupService.GetCriminalAssetsDescriptions(attendanceMethod?.AttendanceMethodCd);
+            justinCounsel.AppearanceMethodCd = appearanceMethod?.AppearanceMethodCd;
+            justinCounsel.AppearanceMethodDesc = await _lookupService.GetCriminalAssetsDescriptions(appearanceMethod?.AppearanceMethodCd);
             //We could assign name here from the PartyAppearance, but that doesn't appear to be correct. 
             //While testing I found data inside of PartyAppearances, but used CourtList and saw there was no assigned counsel. 
             //FileId 1180, AppearanceId 1528.0026, PartId 15911.0026 is an example of this on the Development Environment. 
@@ -399,7 +412,7 @@ namespace Scv.Api.Services
             foreach (var appearanceMethod in criminalAppearanceMethods)
             {
                 appearanceMethod.AppearanceMethodDesc = await _lookupService.GetCriminalAssetsDescriptions(appearanceMethod.AppearanceMethodCd);
-                appearanceMethod.RoleTypeDsc = await _lookupService.GetCriminalParticipantRoleDescription(appearanceMethod.RoleTypeCd); // TODO double check this one. 
+                appearanceMethod.RoleTypeDsc = await _lookupService.GetCriminalParticipantRoleDescription(appearanceMethod.RoleTypeCd);
             }
             return criminalAppearanceMethods;
         }
