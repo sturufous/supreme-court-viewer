@@ -3,11 +3,11 @@
         <b-row cols="2" >
             <b-col class="mt-2" md="6" cols="6">
                 <div>
-                    <h3 class="mx-2 font-weight-normal"> {{leftRole}} ({{numberOfLeftParties}}) </h3>
-                    <hr class="mb-2 bg-light" style="height: 5px;"/> 
+                    <h3 class="mx-4 font-weight-normal"> {{leftRole}} ({{numberOfLeftParties}}) </h3>
+                    <hr class="mx-3 bg-light" style="height: 5px;"/> 
                 </div>
 
-                <b-card bg-variant="white" style="max-height: 400px; overflow-y: auto;" no-body>           
+                <b-card bg-variant="white" style="max-height: 400px; overflow-y: auto;" no-body class="mx-3 mb-5">           
                     <b-table
                     :items="leftPartiesInfo"
                     :fields="fields"                    
@@ -15,7 +15,7 @@
                     sort-icon-left
                     borderless
                     striped
-                    small
+                    small 
                     responsive="sm"
                     >   
                         <template v-for="(field,index) in fields" v-slot:[`head(${field.key})`]="data">
@@ -31,11 +31,11 @@
             </b-col>
             <b-col class="mt-2" md="6" cols="6" >
                 <div>
-                    <h3 class="mx-2 font-weight-normal"> {{rightRole}} ({{numberOfRightParties}}) </h3>
-                    <hr class="mb-2 bg-light" style="height: 5px;"/> 
+                    <h3 class="mx-4 font-weight-normal"> {{rightRole}} ({{numberOfRightParties}}) </h3>
+                    <hr class="mx-3 bg-light" style="height: 5px;"/> 
                 </div>
 
-                <b-card bg-variant="white" style="max-height: 400px; overflow-y: auto;" no-body>           
+                <b-card bg-variant="white" style="max-height: 400px; overflow-y: auto;" no-body class="mx-3 mb-5">           
                     <b-table
                     :items="rightPartiesInfo"
                     :fields="fields"                    
@@ -74,23 +74,10 @@ const civilState = namespace("CivilFileInformation");
 @Component
 export default class CivilParties extends Vue {
 
+    /* eslint-disable */
     @civilState.State
     public civilFileInformation!: any;
-
-    mounted() {
-        this.getParties();
-    }
-
-    public getParties(): void {
-        this.leftRole = this.civilFileInformation.detailsData.leftRoleDsc;
-        this.rightRole = this.civilFileInformation.detailsData.rightRoleDsc;       
-        this.leftPartiesInfo = this.civilFileInformation.leftPartiesInfo
-        this.rightPartiesInfo = this.civilFileInformation.rightPartiesInfo
-        this.numberOfLeftParties = this.leftPartiesInfo.length;  
-        this.numberOfRightParties = this.rightPartiesInfo.length;
-
-        this.isMounted = true;          
-    } 
+    /* eslint-enable */    
   
     isMounted = false;
     leftPartiesInfo = [];
@@ -107,7 +94,22 @@ export default class CivilParties extends Vue {
         {key:'Name',                  sortable:true,  tdClass: 'border-top',  headerStyle:'text-primary',   cellStyle:'font-weight: bold; font-size: 14px;'},
         {key:'Role',                  sortable:false, tdClass: 'border-top',  headerStyle:'text',         cellStyle:'font-size: 14px;'},
         {key:'Counsel',               sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:'font-size: 14px;'}
-    ];    
+    ];
+    
+    mounted() {
+        this.getParties();
+    }
+
+    public getParties(): void {
+        this.leftRole = this.civilFileInformation.detailsData.leftRoleDsc;
+        this.rightRole = this.civilFileInformation.detailsData.rightRoleDsc;       
+        this.leftPartiesInfo = this.civilFileInformation.leftPartiesInfo
+        this.rightPartiesInfo = this.civilFileInformation.rightPartiesInfo
+        this.numberOfLeftParties = this.leftPartiesInfo.length;  
+        this.numberOfRightParties = this.rightPartiesInfo.length;
+
+        this.isMounted = true;          
+    } 
 
 }
 </script>

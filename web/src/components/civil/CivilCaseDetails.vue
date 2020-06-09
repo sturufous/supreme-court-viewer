@@ -1,6 +1,5 @@
 <template>
-<div> 
-
+<body> 
     <b-card bg-variant="light" v-if= "!isMounted && !isDataReady">
         <b-overlay :show= "true"> 
             <b-card  style="min-height: 100px;"/>                   
@@ -17,6 +16,7 @@
         <b-card  style="min-height: 100px;">
             <span v-if="errorCode==404">This <b>File-Number '{{this.civilFileInformation.fileNumber}}'</b> doesn't exist in the <b>civil</b> records.</span>
             <span v-if="errorCode>405"> Server doesn't respond. <b>({{errorText}})</b> </span>
+            <span v-if="errorCode==200"> Bad Data.</span>
         </b-card>
         <b-card>         
             <b-button variant="info" @click="navigateToLandingPage">Back to the Landing Page</b-button>
@@ -40,10 +40,11 @@
             <civil-adjudicator-restrictions v-if="showCaseDetails"/>
             <civil-documents-view v-if="showCaseDetails"/>            
             <civil-past-appearances v-if="showPastAppearances" />
+            <civil-future-appearances v-if="showFutureAppearances" />
             <b-card><br></b-card>  
         </b-col>
     </b-row>
-</div>
+</body>
 </template>
 
 <script lang="ts">
@@ -51,6 +52,7 @@ import { Component, Vue } from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
 import CivilDocumentsView from '@components/civil/CivilDocumentsView.vue';
 import CivilPastAppearances from '@components/civil/CivilPastAppearances.vue';
+import CivilFutureAppearances from '@components/civil/CivilFutureAppearances.vue';
 import CivilAdjudicatorRestrictions from '@components/civil/CivilAdjudicatorRestrictions.vue';
 import CivilParties from '@components/civil/CivilParties.vue';
 import CivilHeaderTop from '@components/civil/CivilHeaderTop.vue';
@@ -66,6 +68,7 @@ const commonState = namespace("CommonInformation");
         CivilAdjudicatorRestrictions,
         CivilDocumentsView,
         CivilPastAppearances,
+        CivilFutureAppearances,
         CivilParties,
         CivilSidePanel,
         CivilHeaderTop,
@@ -75,19 +78,35 @@ const commonState = namespace("CommonInformation");
 export default class CivilCaseDetails extends Vue {
 
     @civilState.State
-    public civilFileInformation!: any
-
-    @civilState.Action
-    public UpdateCivilFile!: (newCivilFileInformation: any) => void
-    
-    @civilState.State
     public showSections
     
     @commonState.State
-    public displayName!: string;    
+    public displayName!: string;
+
+    /* eslint-disable */
+    @civilState.State
+    public civilFileInformation!: any
+
+    @civilState.Action
+    public UpdateCivilFile!: (newCivilFileInformation: any) => void 
 
     @commonState.Action
     public UpdateDisplayName!: (newInputNames: any) => void
+
+    leftPartiesInfo: any[] = [];
+    rightPartiesInfo: any[] = [];
+    adjudicatorRestrictionsInfo: any[] = [];
+    /* eslint-enable */
+    
+    isDataReady = false
+    isMounted = false
+    errorCode =0 ;
+    errorText='';
+    partiesJson;    
+    adjudicatorRestrictionsJson;
+    sidePanelTitles = [ 
+       'Case Details', 'Future Appearances', 'Past Appearances'    
+    ];
     
     mounted () { 
         this.civilFileInformation.fileNumber = this.$route.params.fileNumber
@@ -117,20 +136,7 @@ export default class CivilCaseDetails extends Vue {
                 this.isMounted = true;
                        
             });
-    }
-
-    isDataReady = false
-    isMounted = false
-    errorCode =0 ;
-    errorText='';
-    partiesJson;
-    leftPartiesInfo: any[] = [];
-    rightPartiesInfo: any[] = [];
-    adjudicatorRestrictionsJson;
-    adjudicatorRestrictionsInfo: any[] = [];
-    sidePanelTitles = [ 
-       'Case Details', 'Future Appearances', 'Past Appearances'    
-    ];
+    }    
     
     get selectedSideBar()
     {

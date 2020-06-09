@@ -28,7 +28,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
 import '@store/modules/CriminalFileInformation';
 import "@store/modules/CommonInformation";
@@ -38,15 +38,19 @@ const commonState = namespace("CommonInformation");
 @Component
 export default class CriminalCrownInformation extends Vue {
 
-    @criminalState.State
-    public criminalFileInformation!: any
-
     @commonState.State
     public displayName!: string;
+
+    /* eslint-disable */
+    @criminalState.State
+    public criminalFileInformation!: any
 
     @commonState.Action
     public UpdateDisplayName!: (newInputNames: any) => void
 
+    crownInformation: any[] = [];
+    /* eslint-enable */
+    isMounted = false
     fields =[
         {key:"CrownInfoFieldName", tdClass: 'border-top',label: "Crown Info Field Name"},
         {key:"CrownInfoValue", tdClass: 'border-top',label: "Crown Info Value"}
@@ -93,15 +97,13 @@ export default class CriminalCrownInformation extends Vue {
         this.crownInformation.push(crownInfo);
         this.isMounted = true;
 
-    }   
-    
+    }
 
     mounted () {              
         this.getCrownInfo();  
     }
     
-    crownInformation: any[] = [];
-    isMounted = false  
+      
 }
 </script>
 

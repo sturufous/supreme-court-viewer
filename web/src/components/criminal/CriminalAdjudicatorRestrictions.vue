@@ -44,8 +44,25 @@ const criminalState = namespace("CriminalFileInformation");
 @Component
 export default class  CriminalAdjudicatorRestrictions extends Vue {
 
+  /* eslint-disable */
   @criminalState.State
   public criminalFileInformation!: any;
+
+  adjudicatorRestrictions: any[] = [];
+  /* eslint-enable */
+  
+  sortBy = 'Adjudicator';
+  sortDesc = false;  
+  adjudicatorRestrictionsJson;
+  isMounted = false;  
+
+  fields =  
+  [
+      {key:'Adjudicator', sortable:true, tdClass: 'border-top',  headerStyle:'table-borderless text-primary'},       
+      {key:'Status',      sortable:true, tdClass: 'border-top',  headerStyle:'text-primary'},
+      {key:'Applies to',  sortable:true, tdClass: 'border-top',  headerStyle:'text-primary'},
+           
+  ];
 
   mounted() {
     this.getAdjudicatorRestrictions();
@@ -57,21 +74,6 @@ export default class  CriminalAdjudicatorRestrictions extends Vue {
       this.ExtractAdjudicatorRestrictionsInfo();
       this.isMounted = true;          
   } 
-
-  sortBy = 'Adjudicator';
-  sortDesc = false;  
-  adjudicatorRestrictionsJson;
-  isMounted = false;
-
-  adjudicatorRestrictions: any[] = [];
-
-  fields =  
-  [
-      {key:'Adjudicator', sortable:true, tdClass: 'border-top',  headerStyle:'table-borderless text-primary'},       
-      {key:'Status',      sortable:true, tdClass: 'border-top',  headerStyle:'text-primary'},
-      {key:'Applies to',  sortable:true, tdClass: 'border-top',  headerStyle:'text-primary'},
-           
-  ];
 
   public ExtractAdjudicatorRestrictionsInfo(): void {
 

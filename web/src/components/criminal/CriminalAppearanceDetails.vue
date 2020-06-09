@@ -89,12 +89,39 @@ const criminalState = namespace("CriminalFileInformation");
 @Component
 export default class CriminalAppearanceDetails extends Vue {
 
+    /* eslint-disable */
     @criminalState.State
     public criminalFileInformation!: any;
 
     @criminalState.State
     public appearanceInfo!: any;
+    
+    appearanceAdditionalInfo: any[] = [];
+    appearanceCharges: any[] = [];
+    /* eslint-enable */ 
+  
+    isMounted = false;
+    isDataReady = false;
+    appearanceDetailsJson;    
+    sortBy = 'Date';
+    sortDesc = true;    
+    appearanceDetailsInfo = {};    
 
+    addInfoFields =  
+    [
+        {key:'key',    sortable:false},
+        {key:'value',  sortable:false},
+    ];   
+
+    chargesFields =  
+    [
+        {key:'Count',          sortable:false,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'text-info'},
+        {key:'Criminal Code',  sortable:false,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'font-weight-bold'},
+        {key:'Description',    sortable:false,  tdClass: 'border-top', headerStyle:'text',         cellStyle:'text'},
+        {key:'LastResult',     sortable:false,  tdClass: 'border-top', headerStyle:'text',         cellStyle:'text'},
+        {key:'Finding',        sortable:false,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'text'},
+    ];
+    
     mounted() {
         this.getAppearanceInfo();
         this.getAppearanceDetails();
@@ -111,34 +138,7 @@ export default class CriminalAppearanceDetails extends Vue {
                 }
                 this.isMounted = true;                       
             }); 
-    } 
-  
-    isMounted = false;
-    isDataReady = false;
-    appearanceDetailsJson;
-    
-    sortBy = 'Date';
-    sortDesc = true;
-    appearanceCharges: any[] = [];
-    appearanceDetailsInfo = {};
-
-    appearanceAdditionalInfo: any[] = [];
-
-    addInfoFields =  
-    [
-        {key:'key',    sortable:false},
-        {key:'value',  sortable:false},
-    ];   
-
-    chargesFields =  
-    [
-        {key:'Count',          sortable:false,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'text-info'},
-        {key:'Criminal Code',  sortable:false,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'font-weight-bold'},
-        {key:'Description',    sortable:false,  tdClass: 'border-top', headerStyle:'text',         cellStyle:'text'},
-        {key:'LastResult',     sortable:false,  tdClass: 'border-top', headerStyle:'text',         cellStyle:'text'},
-        {key:'Finding',        sortable:false,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'text'},
-    ];   
-    
+    }    
     
     public getAppearanceInfo()
     {       

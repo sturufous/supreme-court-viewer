@@ -20,8 +20,14 @@ const civilState = namespace('CivilFileInformation');
 @Component
 export default class CivilHeaderTop extends Vue {
   
+  /* eslint-disable */
   @civilState.State
   public civilFileInformation!: any;
+  /* eslint-enable */  
+
+  courtLevelDescription;
+  courtClassDescription;
+  isMounted = false;
 
   mounted() {
     this.getFileDescription();
@@ -33,10 +39,6 @@ export default class CivilHeaderTop extends Vue {
       this.courtLevelDescription = data.courtLevelDescription;
       this.isMounted = true;          
   } 
-
-  courtLevelDescription;
-  courtClassDescription;
-  isMounted = false;
  
 }
 </script>
