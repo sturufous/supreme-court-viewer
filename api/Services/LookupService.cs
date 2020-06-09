@@ -79,6 +79,10 @@ namespace Scv.Api.Services
         {
             return await GetDataFromCache("CivilCounselAttendanceTypes", async () => await _lookupClient.CodesCivilPastAppearancePartyAppearanceMethodCounselAsync());
         }
+        private async Task<CodeLookup> GetCivilDocumentIssueTypes()
+        {
+            return await GetDataFromCache("GetCivilIssueTypes", async () => await _lookupClient.CodesCivilDocumentIssueTypesAsync());
+        }
 
         private async Task<CodeLookup> GetCivilPartyAttendanceTypes()
         {
@@ -206,6 +210,8 @@ namespace Scv.Api.Services
         public async Task<string> GetCivilAssetsDescription(string code) => FindLongDescriptionFromCode(await GetCivilAssets(), code);
 
         public async Task<string> GetCivilCounselAttendanceType(string code) => FindShortDescriptionFromCode(await GetCivilCounselAttendanceTypes(), code);
+
+        public async Task<string> GetCivilDocumentIssueType(string code) => FindShortDescriptionFromCode(await GetCivilDocumentIssueTypes(), code);
 
         public async Task<string> GetCivilPartyAttendanceType(string code) => FindShortDescriptionFromCode(await GetCivilPartyAttendanceTypes(), code);
 

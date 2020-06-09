@@ -5,10 +5,12 @@ using System.Threading.Tasks;
 
 namespace Scv.Api.Models.Civil.AppearanceDetail
 {
-    public class CivilAdjudicator
+    /// <summary>
+    /// Extends CivilAppearanceMethod. 
+    /// </summary>
+    public class CivilAppearanceMethod : JCCommon.Clients.FileServices.CivilAppearanceMethod
     {
-        public string FullName { get; set; }
-        public string AppearanceMethodCd { get; set; }
+        public string RoleTypeDesc { get; set; }
         public string AppearanceMethodDesc { get; set; }
     }
 }

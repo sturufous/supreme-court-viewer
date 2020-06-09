@@ -1804,6 +1804,76 @@
         }
       ]
     },
+    "/codes/civil/document/issueTypes": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/lookupCodes"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "No items matching the given criteria were found."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Get a list of available issueTypes.\n",
+        "operationId": "GET_codes-civil-document-issueTypes"
+      }
+    },
+    "/codes/civil/document/issueTypes/{code}": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/lookupCode"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "No items matching the given criteria were found."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Get the specific issueType.\n",
+        "operationId": "GET_codes-civil-document-issueTypes-code"
+      },
+      "parameters": [
+        {
+          "name": "code",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
     "/codes/civil/priority/markers": {
       "get": {
         "responses": {

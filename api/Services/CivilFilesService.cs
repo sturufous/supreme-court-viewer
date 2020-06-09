@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CivilAppearanceDetail = Scv.Api.Models.Civil.AppearanceDetail.CivilAppearanceDetail;
+using CivilAppearanceMethod = Scv.Api.Models.Civil.AppearanceDetail.CivilAppearanceMethod;
 
 namespace Scv.Api.Services
 {
@@ -132,7 +133,6 @@ namespace Scv.Api.Services
 
             var appearanceDetail = appearances.ApprDetail?.FirstOrDefault(app => app.AppearanceId == appearanceId);
             var fileDetailDocuments = detail.Document.Where(doc => doc.Appearance != null && doc.Appearance.Any(app => app.AppearanceId == appearanceId)).ToList();
-
             var previousAppearance = fileContent?.CivilFile.FirstOrDefault(cf => cf.PhysicalFileID == fileId)?.PreviousAppearance.FirstOrDefault(pa => pa?.AppearanceId == appearanceId);
 
             var detailedAppearance = new CivilAppearanceDetail
@@ -143,11 +143,12 @@ namespace Scv.Api.Services
                 CourtRoomCd = targetAppearance.CourtRoomCd,
                 FileNumberTxt = detail.FileNumberTxt,
                 AppearanceDt = targetAppearance.AppearanceDt,
-                AppearanceMethod = appearanceMethods.AppearanceMethod,
-                Party = await PopulateDetailedAppearancePartiesAsync(appearanceParty.Party, civilCourtList?.Parties, previousAppearance),
+                AppearanceMethod = await PopulateAppearanceMethods(appearanceMethods.AppearanceMethod),
+                Party = await PopulateDetailedAppearancePartiesAsync(appearanceParty.Party, civilCourtList?.Parties, previousAppearance, appearanceMethods.AppearanceMethod),
                 Document = await PopulateDetailedAppearanceDocuments(fileDetailDocuments, appearanceDetail),
                 PreviousAppearance = previousAppearance,
-                Adjudicator = await PopulateDetailedAppearanceAdjudicator(previousAppearance)
+                Adjudicator = await PopulateDetailedAppearanceAdjudicator(previousAppearance),
+                AdjudicatorNote = previousAppearance?.AdjudicatorComment
             };
             return detailedAppearance;
         }
@@ -230,6 +231,10 @@ namespace Scv.Api.Services
                 document.DocumentTypeDescription = await _lookupService.GetDocumentDescriptionAsync(document.DocumentTypeCd);
                 document.ImageId = document.SealedYN != "N" ? null : document.ImageId;
                 document.Appearance = null;
+                foreach (var issue in document.Issue)
+                {
+                    issue.IssueTypeDesc = await _lookupService.GetCivilDocumentIssueType(issue.IssueTypeCd);
+                }
             }
             return documents;
         }
@@ -260,6 +265,18 @@ namespace Scv.Api.Services
 
         #region Civil Appearance Details
 
+        private async Task<ICollection<CivilAppearanceMethod>> PopulateAppearanceMethods(ICollection<JCCommon.Clients.FileServices.CivilAppearanceMethod> baseAppearanceMethods)
+        {
+            var appearanceMethods = _mapper.Map<ICollection<CivilAppearanceMethod>>(baseAppearanceMethods);
+            foreach (var appearanceMethod in appearanceMethods)
+            {
+                appearanceMethod.AppearanceMethodDesc = await _lookupService.GetCivilAssetsDescription(appearanceMethod.AppearanceMethodCd);
+                appearanceMethod.RoleTypeDesc = await _lookupService.GetCivilRoleTypeDescription(appearanceMethod.RoleTypeCd);
+            }
+
+            return appearanceMethods;
+        }
+
         private async Task<CivilAdjudicator> PopulateDetailedAppearanceAdjudicator(CvfcPreviousAppearance previousAppearance)
         {
             if (previousAppearance == null)
@@ -268,15 +285,18 @@ namespace Scv.Api.Services
             return new CivilAdjudicator
             {
                 FullName = previousAppearance.AdjudicatorName,
-                AttendanceMethodDesc = previousAppearance.AdjudicatorAppearanceMethod,
-                AttendanceMethodCd = await _lookupService.GetCriminalAdjudicatorAttend(previousAppearance.AdjudicatorAppearanceMethod),
+                AppearanceMethodCd = previousAppearance.AdjudicatorAppearanceMethod,
+                //For Civil files, CCD uses these codes: JUSTIN:ADJ_APP_METHOD
+                AppearanceMethodDesc = await _lookupService.GetCriminalAdjudicatorAttend(previousAppearance.AdjudicatorAppearanceMethod),
             };
         }
 
         /// <summary>
         /// This is mostly based off of getAppearanceCivilParty and expands by court list and FileContent. 
         /// </summary>
-        private async Task<ICollection<CivilAppearanceDetailParty>> PopulateDetailedAppearancePartiesAsync(ICollection<JCCommon.Clients.FileServices.CivilAppearanceParty> parties, ICollection<ClParty> courtListParties, CvfcPreviousAppearance previousAppearance)
+        private async Task<ICollection<CivilAppearanceDetailParty>> PopulateDetailedAppearancePartiesAsync(ICollection<CivilAppearanceParty> parties, 
+            ICollection<ClParty> courtListParties, CvfcPreviousAppearance previousAppearance,
+            ICollection<JCCommon.Clients.FileServices.CivilAppearanceMethod> civilAppearanceMethods)
         {
             var resultParties = new List<CivilAppearanceDetailParty>();
             foreach (var partyGroup in parties.GroupBy(a => a.PartyId))
@@ -291,11 +311,17 @@ namespace Scv.Api.Services
                     RoleTypeDsc = await _lookupService.GetCivilRoleTypeDescription(pg.PartyRoleTypeCd)
                 }).WhenAll();
 
+                //Get information from appearanceMethods.
+                if (civilAppearanceMethods.Any(am => party.PartyRole.Any(pr => pr.RoleTypeCd == am.RoleTypeCd)))
+                {
+                    party.AppearanceMethodDesc = await _lookupService.GetCivilAssetsDescription(civilAppearanceMethods.First().AppearanceMethodCd);
+                }
+
                 //Get the additional information from court list.
                 var courtListParty = courtListParties?.FirstOrDefault(clp => clp.PartyId == partyGroup.Key);
                 if (courtListParty != null)
                 {
-                    party.AttendanceMethodCd = courtListParty.AttendanceMethodCd ?? "IP"; //TODO double check this, supposedly if there is no value, it's assumed as present.
+                    party.AttendanceMethodCd = courtListParty.AttendanceMethodCd;
                     party.AttendanceMethodDesc = await _lookupService.GetCivilAssetsDescription(party.AttendanceMethodCd);
                     party.Counsel = _mapper.Map<ICollection<CivilCounsel>>(courtListParty.Counsel);
                     party.Representative = courtListParty.Representative;
@@ -311,11 +337,11 @@ namespace Scv.Api.Services
                     party.PartyAppearanceMethodDesc = await _lookupService.GetCivilPartyAttendanceType(targetParticipant.PartyAppearanceMethod);
 
                     //Update the counsel with their appearanceMethod. 
-                    foreach (var counsel in targetParticipant.Counsel)
+                    foreach (var counsel in targetParticipant.Counsel.Where(coun => coun.FullNm != null || coun.CounselId != null))
                     {
-                        //TODO: I'm not seeing any data for CounselId in DEV. 
+                        //TODO: Not seeing any data for CounselId in DEV. 
                         //Matching on name doesn't seem like a good idea. 
-                        var targetCounsel = party.Counsel.FirstOrDefault(c => c.CounselId == counsel.CounselId);
+                        var targetCounsel = party.Counsel?.FirstOrDefault(c => c.CounselId == counsel.CounselId);
                         if (targetCounsel == null)
                             continue;
                         
@@ -340,6 +366,10 @@ namespace Scv.Api.Services
                 document.DocumentTypeDescription = await _lookupService.GetDocumentDescriptionAsync(document.DocumentTypeCd);
                 document.AppearanceResultCd = appearance?.AppearanceResultCd;
                 document.AppearanceResultDesc = await _lookupService.GetCriminalAppearanceResultsDescription(appearance?.AppearanceResultCd);
+                foreach (var issue in document.Issue)
+                {
+                    issue.IssueTypeDesc = await _lookupService.GetCivilDocumentIssueType(issue.IssueTypeCd);
+                }
             }
             return documents;
         }

@@ -10,6 +10,7 @@ namespace Scv.Api.Models.Civil.Detail
     /// </summary>
     public class CivilIssue : CvfcIssue2
     {
+        public string IssueTypeDesc { get; set; }
         [JsonIgnore]
         [AdaptIgnore]
         public new string IssueResultCd { get; }

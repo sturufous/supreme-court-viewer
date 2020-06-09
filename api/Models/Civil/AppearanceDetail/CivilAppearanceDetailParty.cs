@@ -15,6 +15,9 @@ namespace Scv.Api.Models.Civil.AppearanceDetail
         public string CourtParticipantId { get; set; }
         public string PartyAppearanceMethod { get; set; }
         public string PartyAppearanceMethodDesc { get; set; }
+        //These fields are from appearanceMethods.
+        public string AppearanceMethodCd { get; set; }
+        public string AppearanceMethodDesc { get; set; }
         //The fields below this are from CourtList. 
         public string AttendanceMethodCd { get; set; }
         public string AttendanceMethodDesc { get; set; }
