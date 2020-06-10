@@ -2,13 +2,16 @@
 <div>
    <b-card  v-if= "isMounted" no-body>
         <div>         
-            <h3 class="mt-4 mx-2 font-weight-normal"> Documents ({{NumberOfDocuments}}) </h3>
-            <hr class="mb-1 bg-light" style="height: 2px;"/>                   
+            <h3 class="mx-4 font-weight-normal"> Documents ({{NumberOfDocuments}}) </h3>
+            <hr class="mx-3 bg-light" style="height: 5px;"/>                   
         </div>
        
         <b-tabs nav-wrapper-class = "bg-light text-dark"
                 active-nav-item-class="text-uppercase font-weight-bold text-white bg-primary"                     
-                pills >
+                pills
+                no-body
+                class="mx-3"
+                >
             <b-tab 
             v-for="(tabMapping, index) in categories" 
             :key="index"                 
@@ -19,7 +22,7 @@
         </b-tabs> 
         
         <b-overlay :show="loadingPdf" rounded="sm">  
-            <b-card bg-variant="light" style="max-height: 500px; overflow-y: auto;">           
+            <b-card bg-variant="light" style="max-height: 500px; overflow-y: auto;" no-body class="mx-3 mb-5">           
                 <b-table
                 :items="FilteredDocuments"
                 :fields="fields[fieldsTab]"

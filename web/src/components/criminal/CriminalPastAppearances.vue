@@ -21,7 +21,7 @@
             </b-overlay> 
         </b-card>
 
-        <b-card bg-variant="white" v-if="isDataReady" no-body class="mx-3" style="overflow:auto">           
+        <b-card bg-variant="white" v-if="isDataReady" no-body class="mx-3 mb-5" style="overflow:auto">           
             <b-table
             :items="SortedPastAppearances"
             :fields="fields"

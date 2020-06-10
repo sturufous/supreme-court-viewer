@@ -1,12 +1,12 @@
 <template>
 <b-card bg-variant="white" no-body>
     <div>
-        <h3 class="mt-4 mx-4 font-weight-normal" v-if="!showSections['Future Appearances']"> Next Three Future Appearances</h3>
-        <hr class="mx-2 bg-light" style="height: 5px;"/> 
+        <h3 class="mx-4 font-weight-normal" v-if="!showSections['Future Appearances']"> Next Three Future Appearances</h3>
+        <hr class="mx-3 bg-light" style="height: 5px;"/> 
     </div>
 
     <b-card v-if="!isDataReady && isMounted">
-        <span class="text-muted"> No future appearances. </span>
+        <span class="text-muted ml-4 mb-5"> No future appearances. </span>
     </b-card>
 
     <b-card bg-variant="light" v-if= "!isMounted && !isDataReady">
@@ -21,7 +21,7 @@
         </b-overlay> 
     </b-card>
 
-    <b-card bg-variant="white" v-if="isDataReady" style="overflow: auto;" no-body class="mx-2">           
+    <b-card bg-variant="white" v-if="isDataReady" style="overflow: auto;" no-body class="mx-3 mb-5">           
         <b-table
         :items="SortedFutureAppearances"
         :fields="fields"

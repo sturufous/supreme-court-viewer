@@ -16,7 +16,7 @@
                 <span class="text-muted" v-if="!(witnessList.length>0)"> No witnesses. </span>
                 <span class="text-muted" v-if="(witnessList.length>0) && !(filteredWitnessList.length>0)"> No witnesses in this category. </span>
             </b-col>            
-            <b-col class="mt-4" md="8" cols="8" style="overflow: auto;" v-if="(filteredWitnessList.length>0)">
+            <b-col class="mt-3" md="8" cols="8" style="overflow: auto;" v-if="(filteredWitnessList.length>0)">
                 <b-table
                 :items="filteredWitnessList"
                 :fields="witnessFields"
@@ -41,9 +41,9 @@
 
                 </b-table>
             </b-col>
-            <b-col col md="4" cols="4" style="overflow: auto;">
+            <b-col class="mt-4" col md="4" cols="4" style="overflow: auto;">
                 
-                    <h4 class="mt-5 font-weight-bold"> Witness Counts </h4>
+                    <h4 class="font-weight-bold"> Witness Counts </h4>
                   
                 <b-table
                 :items="witnessCounts"
