@@ -21,6 +21,7 @@
                 <template v-slot:cell(Name)="data" >
                     <b-button   
                         size="sm" 
+                        style=" font-size:16px"
                         @click="OpenDetails(data);data.toggleDetails();" 
                         :variant="!data.item.CountsDisable ? 'outline-primary border-white text-info' :'text-muted'"
                         :disabled="data.item.CountsDisable">
@@ -32,7 +33,8 @@
 
                 <template v-slot:cell(Judge)="data" >
                     <b-button 
-                        size="sm" 
+                        size="sm"
+                        style=" font-size:16px" 
                         @click="OpenOrderMadeDetails(data)"
                         :variant="!data.item.OrderMadeDisable ? 'outline-primary border-white text-info' :'text-muted'"
                         :disabled="data.item.OrderMadeDisable" 
@@ -40,7 +42,8 @@
                             Order Made Details
                     </b-button>
                     <b-button 
-                        size="sm" 
+                        size="sm"
+                        style=" font-size:16px" 
                         @click="OpenJudgeRecommendation(data)"
                         :variant="!data.item.RecommendationDisable ? 'outline-primary border-white text-info' :'text-muted'"
                         :disabled="data.item.RecommendationDisable" 
@@ -78,7 +81,8 @@
                 > 
                 <template v-slot:cell(Date)="data" >
                     <b-button                        
-                        @click="data.toggleDetails();" 
+                        @click="data.toggleDetails();"
+                        style=" font-size:16px" 
                         variant="outline-primary border-white text-info"
                         size="sm">
                             <b-icon-caret-right-fill v-if="!data.item['_showDetails']"></b-icon-caret-right-fill>
@@ -110,7 +114,8 @@
                 > 
                 <template v-slot:cell(Date)="data" >
                     <b-button                        
-                        @click="data.toggleDetails();" 
+                        @click="data.toggleDetails();"
+                        style=" font-size:16px" 
                         variant="outline-primary border-white text-info"
                         size="sm">
                             <b-icon-caret-right-fill v-if="!data.item['_showDetails']"></b-icon-caret-right-fill>

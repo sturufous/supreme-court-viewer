@@ -1,15 +1,15 @@
 <template>
 <div>
-    <b-navbar type="white" variant="white" v-if="isMounted" style="height:30px">
+    <b-navbar type="white" variant="white" v-if="isMounted" style="height:45px">
       <b-navbar-nav>
 
-        <b-nav-text class="text-info mt-1 mr-2" style="font-size: 12px;">
+        <b-nav-text class="text-primary mr-2" style="margin-top: 6px; font-size: 12px;">
             <b-icon icon="file-earmark-text"></b-icon>
             {{fileNumberText}}
         </b-nav-text>
 
         <b-nav-text
-            class="mt-1 ml-1 mr-2"
+            class="mt-2 ml-1 mr-2"
             style="font-size: 11px;">
               {{agencyLocation.Name}} 
               <span v-if="agencyLocation.Code"> 
@@ -17,20 +17,21 @@
               </span>
         </b-nav-text>
 
-        <b-nav-text class="text-muted mr-3 mt-1" style="font-size: 11px;">
+        <b-nav-text class="text-muted mr-3 mt-2" style="font-size: 11px;">
             {{agencyLocation.Region}}
-        </b-nav-text>
+        </b-nav-text>       
 
-        <b-nav-text class="mr-2">
-            <b-icon icon="person-fill"></b-icon>
-        </b-nav-text>
-
-        <b-nav-text class="text-info">
-            <b>{{getNameOfParticipantTrunc()}}</b>
-            and {{(participantList.length-1)}} other(s)
-        </b-nav-text>
-
-        <b-nav-item-dropdown class="mr-3" text right>
+        <b-nav-item-dropdown class="mr-3 mt-1" right no-caret size="sm">
+            <template v-slot:button-content>
+                <b-button
+                    variant="outline-primary text-info" 
+                    style="transform: translate(0,-4px); border:0px; font-size:16px"
+                    size="sm">
+                    <b-icon class="mr-2" icon="person-fill"></b-icon>
+                    <b>{{getNameOfParticipantTrunc()}}</b> and {{(participantList.length-1)}} other(s)
+                    <b-icon class="ml-1" icon="caret-down-fill" font-scale="1"></b-icon>
+                </b-button>
+            </template>
             <b-dropdown-item-button
                 v-for="participant in SortedParticipants"
                 :key="participant['Index']"
@@ -38,20 +39,31 @@
             >{{participant['Name']}}</b-dropdown-item-button>
         </b-nav-item-dropdown>
 
-        <b-nav-text style="font-size: 14px;" variant="white">
-            <b-badge pill variant="danger">{{adjudicatorRestrictions.length}}</b-badge> Adjudicator Restrictions
+        <b-nav-text style="margin-top: 4px;font-size: 14px;" variant="white">
+            <b-badge pill variant="danger">{{adjudicatorRestrictions.length}}</b-badge>
         </b-nav-text>
 
-        <b-nav-item-dropdown right  v-if="(adjudicatorRestrictions.length>0)">            
-            <b-dropdown-item-button        
-            v-for="(restriction, index) in adjudicatorRestrictions"
-            :key="index">
-                <b-button style="font-size: 14px; padding: 0px 2px;" 
-                          variant="secondary" 
-                          v-b-tooltip.hover.left 
-                          :title='restriction["Full Name"]'>
-                    {{restriction["Adj Restriction"]}}
+        <b-nav-item-dropdown right no-caret > 
+            <template v-slot:button-content>
+                <b-button
+                    :variant="(adjudicatorRestrictions.length>0)? 'outline-primary text-info':'white'" 
+                    :disabled="adjudicatorRestrictions.length==0"
+                    style="transform: translate(-5px,0); border:0px; font-size:14px;text-overflow: ellipsis;"                    
+                    size="sm">                    
+                    Adjudicator Restrictions
+                    <b-icon v-if="(adjudicatorRestrictions.length>0)" class="ml-1" icon="caret-down-fill" font-scale="1"></b-icon>
                 </b-button>
+            </template>       
+
+            <b-dropdown-item-button                      
+              v-for="(restriction, index) in adjudicatorRestrictions"
+              :key="index">
+                  <b-button style="font-size: 14px; padding: 5px 5px;" 
+                            variant="secondary" 
+                            v-b-tooltip.hover.left 
+                            :title='restriction["Full Name"]'>
+                      {{restriction["Adj Restriction"]}}
+                  </b-button>
             </b-dropdown-item-button>
         </b-nav-item-dropdown>
       </b-navbar-nav>

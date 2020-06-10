@@ -30,7 +30,6 @@
                 :sort-desc.sync="sortDesc"
                 :no-sort-reset="true"
                 sort-icon-left
-                sticky-header
                 small
                 striped
                 responsive="sm"
@@ -47,7 +46,7 @@
                         <b-button 
                             v-if="data.item.PdfAvail" 
                             variant="outline-primary text-info" 
-                            style="border:0px;"
+                            style="border:0px; font-size: 16px;"
                             @click="cellClick(data)"
                             size="sm">
                                 {{data.value}}
@@ -71,6 +70,12 @@
 
                     <template v-slot:cell(Issues)="data" >
                         <span style= "white-space: pre-line"> 
+                            {{data.value}}
+                        </span>
+                    </template>
+
+                    <template v-slot:cell(Seq.)="data" >
+                        <span class="ml-2"> 
                             {{data.value}}
                         </span>
                     </template>
