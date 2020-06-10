@@ -64,15 +64,15 @@
                 </b-button>
             </template>       
 
-            <b-dropdown-item-button        
+            <b-dropdown-item-button      
             v-for="(restriction, index) in adjudicatorRestrictionsInfo"
             :key="index">
-                <b-badge style="font-size: 14px;" 
+                <b-button style="font-size: 14px; padding: 5px 5px;" 
                           variant="secondary" 
                           v-b-tooltip.hover.left 
                           :title='restriction["Full Name"]'>
                     {{restriction["Adj Restriction"]}}
-                </b-badge>
+                </b-button>
             </b-dropdown-item-button>
         </b-nav-item-dropdown>
 
