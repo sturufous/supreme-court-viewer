@@ -67,7 +67,7 @@
   }
 
   public onResize() {
-    if(window.innerWidth > 768) { this.footerPosition ='fixed-bottom';}
+    if(window.innerWidth > 1100) { this.footerPosition ='fixed-bottom';}
     else {this.footerPosition = 'flex-bottom';}
   }
 
