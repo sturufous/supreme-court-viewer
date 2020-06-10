@@ -88,14 +88,33 @@ const criminalState = namespace('CriminalFileInformation');
 export default class CriminalCaseDetails extends Vue {
 
     @criminalState.State
+    public showSections 
+
+    /* eslint-disable */
+    @criminalState.State
     public criminalFileInformation!: any
 
     @criminalState.Action
-    public UpdateCriminalFile!: (newCriminalFileInformation: any) => void
+    public UpdateCriminalFile!: (newCriminalFileInformation: any) => void 
+   
+    participantFiles: any[] = [];
+    /* eslint-enable */
+
+    isDataReady = false
+    isMounted = false
+    errorCode =0;
+    errorText ='';
     
-    @criminalState.State
-    public showSections    
-    
+    participantJson;
+
+    sidePanelTitles = [ 
+       'Case Details', 'Future Appearances', 'Past Appearances', 'Witnesses', 'Documents', 'Sentence/Order Details'    
+    ];
+
+    topTitles = [ 
+       'Case Details', 'Future Appearances', 'Past Appearances', 'Witnesses', 'Criminal Documents', 'Criminal Sentences'    
+    ];
+
     mounted () { 
         this.criminalFileInformation.fileNumber = this.$route.params.fileNumber
         this.UpdateCriminalFile(this.criminalFileInformation);        
@@ -121,20 +140,6 @@ export default class CriminalCaseDetails extends Vue {
                        
             });
     }
-
-    isDataReady = false
-    isMounted = false
-    errorCode =0;
-    errorText ='';
-    
-    participantJson;
-    participantFiles: any[] = [];
-    sidePanelTitles = [ 
-       'Case Details', 'Future Appearances', 'Past Appearances', 'Witnesses', 'Documents', 'Sentence/Order Details'    
-    ];
-    topTitles = [ 
-       'Case Details', 'Future Appearances', 'Past Appearances', 'Witnesses', 'Criminal Documents', 'Criminal Sentences'    
-    ];
     
     get selectedSideBar()
     {

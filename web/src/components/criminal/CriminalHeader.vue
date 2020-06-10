@@ -72,22 +72,35 @@ const criminalState = namespace("CriminalFileInformation");
 const commonState = namespace("CommonInformation");
 
 @Component
-export default class CriminalHeader extends Vue {
+export default class CriminalHeader extends Vue {  
 
+  @criminalState.State
+  public activeCriminalParticipantIndex
+  
+  @commonState.State
+  public displayName!: string;
+
+  /* eslint-disable */
   @criminalState.State
   public criminalFileInformation!: any;
-
-  @criminalState.State
-  public activeCriminalParticipantIndex    
 
   @criminalState.Action
   public UpdateActiveCriminalParticipantIndex!: (newActiveCriminalParticipantIndex: any) => void
 
-  @commonState.State
-  public displayName!: string;    
-
   @commonState.Action
   public UpdateDisplayName!: (newInputNames: any) => void
+
+  participantList: any[] = [];
+  adjudicatorRestrictions: any[] = [];
+  /* eslint-enable */
+
+  maximumFullNameLength = 15;
+  numberOfParticipants = 0;
+  fileNumberText;
+  agencyLocation = {Name:'', Code:0, Region:'' };
+  adjudicatorRestrictionsJson;
+  isMounted = false;
+  participantJson;  
 
   mounted() {
     this.getHeaderInfo();
@@ -104,19 +117,7 @@ export default class CriminalHeader extends Vue {
       this.ExtractParticipantInfo();
       this.isMounted = true; 
       this.setActiveParticipantIndex(this.SortedParticipants[0].Index)
-  } 
-
-  maximumFullNameLength = 15;
-  numberOfParticipants = 0;
-  fileNumberText;
-  agencyLocation = {Name:'', Code:0, Region:'' };
-  adjudicatorRestrictionsJson;
-  isMounted = false;
-  participantJson;
-
-  participantList: any[] = [];
-  adjudicatorRestrictions: any[] = [];
- 
+  }  
 
   public ExtractParticipantInfo(): void {
     for (const fileIndex in this.participantJson) {

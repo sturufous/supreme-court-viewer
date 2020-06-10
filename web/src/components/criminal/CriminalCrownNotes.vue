@@ -26,7 +26,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
 import '@store/modules/CriminalFileInformation';
 const criminalState = namespace('CriminalFileInformation');
@@ -34,8 +34,14 @@ const criminalState = namespace('CriminalFileInformation');
 @Component
 export default class CriminalCrownNotes extends Vue {
 
+    /* eslint-disable */
     @criminalState.State
     public criminalFileInformation!: any
+
+    crownNotes: any[] = [];
+    /* eslint-enable */
+    
+    isMounted = false
 
     fields = [
         {key:'CrownNotes', label: 'Crown Notes'}
@@ -57,10 +63,7 @@ export default class CriminalCrownNotes extends Vue {
 
     mounted () {              
         this.getCrownNotes();  
-    }
-
-    crownNotes: any[] = [];
-    isMounted = false  
+    }      
 }
 </script>
 

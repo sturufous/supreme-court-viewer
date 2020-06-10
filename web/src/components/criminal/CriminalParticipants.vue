@@ -69,14 +69,25 @@ const commonState = namespace("CommonInformation");
 @Component
 export default class CriminalParticipants extends Vue {
 
-    @criminalState.State
-    public criminalFileInformation!: any;
-    
     @commonState.State
-    public displayName!: string;    
+    public displayName!: string;
+
+    /* eslint-disable */
+    @criminalState.State
+    public criminalFileInformation!: any; 
 
     @commonState.Action
-    public UpdateDisplayName!: (newInputNames: any) => void    
+    public UpdateDisplayName!: (newInputNames: any) => void
+
+    participantList: any[] = [];
+    /* eslint-enable */ 
+    
+
+    isMounted = false;
+    participantJson;
+    numberOfParticipants = 0;
+    sortBy = 'Name';
+    sortDesc = false;    
 
     mounted() {
         this.getParticipants();
@@ -87,14 +98,7 @@ export default class CriminalParticipants extends Vue {
         this.participantJson = data.participant 
         this.ExtractParticipantInfo();
         this.isMounted = true;          
-    } 
-  
-    isMounted = false;
-    participantJson;
-    numberOfParticipants = 0;
-    sortBy = 'Name';
-    sortDesc = false;
-    participantList: any[] = [];
+    }    
 
     fields =  
     [

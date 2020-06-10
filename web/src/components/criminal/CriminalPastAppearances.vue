@@ -21,7 +21,7 @@
             </b-overlay> 
         </b-card>
 
-        <b-card bg-variant="white" v-if="isDataReady" no-body class="mx-3" style="overflow:auto">           
+        <b-card bg-variant="white" v-if="isDataReady" no-body class="mx-3 mb-5" style="overflow:auto">           
             <b-table
             :items="SortedPastAppearances"
             :fields="fields"
@@ -114,40 +114,44 @@ enum appearanceStatus {UNCF='Unconfirmed', CNCL='Canceled', SCHD='Scheduled' }
 export default class CriminalPastAppearances extends Vue {
 
     @criminalState.State
-    public criminalFileInformation!: any;
-
-    @criminalState.State
     public showSections
-    
-    @criminalState.State
-    public appearanceInfo!: any;
-
-    @criminalState.Action
-    public UpdateAppearanceInfo!: (newAppearanceInfo: any) => void
 
     @commonState.State
-    public displayName!: string;    
-
-    @commonState.Action
-    public UpdateDisplayName!: (newInputNames: any) => void
+    public displayName!: string;
 
     @commonState.State
     public duration
 
-    @commonState.Action
-    public UpdateDuration!: (duration: any) => void
-
     @commonState.State
     public time
 
-    @commonState.Action
-    public UpdateTime!: (time: any) => void
-    
     @commonState.State
     public statusStyle
     
+    /* eslint-disable */
+    @criminalState.State
+    public criminalFileInformation!: any;
+
+    @criminalState.State
+    public appearanceInfo!: any;
+
+    @criminalState.Action
+    public UpdateAppearanceInfo!: (newAppearanceInfo: any) => void       
+
+    @commonState.Action
+    public UpdateDisplayName!: (newInputNames: any) => void    
+
+    @commonState.Action
+    public UpdateDuration!: (duration: any) => void    
+
+    @commonState.Action
+    public UpdateTime!: (time: any) => void    
+    
     @commonState.Action
     public UpdateStatusStyle!: (statusStyle: any) => void
+
+    pastAppearancesList: any[] = [];
+    /* eslint-enable */  
 
     mounted() {
         this.getPastAppearances();
@@ -171,7 +175,7 @@ export default class CriminalPastAppearances extends Vue {
     
     sortBy = 'Date';
     sortDesc = true;
-    pastAppearancesList: any[] = [];
+    
 
     fields =  
     [

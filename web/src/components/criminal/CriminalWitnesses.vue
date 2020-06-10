@@ -16,7 +16,7 @@
                 <span class="text-muted" v-if="!(witnessList.length>0)"> No witnesses. </span>
                 <span class="text-muted" v-if="(witnessList.length>0) && !(filteredWitnessList.length>0)"> No witnesses in this category. </span>
             </b-col>            
-            <b-col class="mt-4" md="8" cols="8" style="overflow: auto;" v-if="(filteredWitnessList.length>0)">
+            <b-col class="mt-3" md="8" cols="8" style="overflow: auto;" v-if="(filteredWitnessList.length>0)">
                 <b-table
                 :items="filteredWitnessList"
                 :fields="witnessFields"
@@ -41,9 +41,9 @@
 
                 </b-table>
             </b-col>
-            <b-col col md="4" cols="4" style="overflow: auto;">
+            <b-col class="mt-4" col md="4" cols="4" style="overflow: auto;">
                 
-                    <h4 class="mt-5 font-weight-bold"> Witness Counts </h4>
+                    <h4 class="font-weight-bold"> Witness Counts </h4>
                   
                 <b-table
                 :items="witnessCounts"
@@ -77,25 +77,19 @@ const commonState = namespace("CommonInformation");
 @Component
 export default class CriminalWitnesses extends Vue {
 
-    @criminalState.State
-    public criminalFileInformation!: any;
-
     @commonState.State
     public displayName!: string;    
+    
+    /* eslint-disable */
+    @criminalState.State
+    public criminalFileInformation!: any;      
 
     @commonState.Action
     public UpdateDisplayName!: (newInputNames: any) => void
 
-    mounted() {
-        this.getWitnesses();
-    }
-
-    public getWitnesses(): void {      
-        const data = this.criminalFileInformation.detailsData;    
-        this.witnessesJson = data.witness 
-        this.ExtractWitnessInfo();
-        this.isMounted = true;          
-    } 
+    witnessList: any[] = [];
+    witnessCounts: any[] = [];
+    /* eslint-enable */    
   
     isMounted = false;
     witnessesJson;
@@ -104,9 +98,7 @@ export default class CriminalWitnesses extends Vue {
     numberOfCivilianWitnesses = 0;
     numberOfExpertWitnesses = 0;
     sortBy = 'Name';
-    sortDesc = false;
-    witnessList: any[] = [];
-    witnessCounts: any[] = [];
+    sortDesc = false;   
     selectedType = 'Required Only';
 
     witnessFields = [
@@ -121,6 +113,17 @@ export default class CriminalWitnesses extends Vue {
     ];
 
     witnessDropDownFields = ['All Witnesses', 'Required Only', 'Personnel Only', 'Civilian Only', 'Expert Only']
+
+    mounted() {
+        this.getWitnesses();
+    }
+
+    public getWitnesses(): void {      
+        const data = this.criminalFileInformation.detailsData;    
+        this.witnessesJson = data.witness 
+        this.ExtractWitnessInfo();
+        this.isMounted = true;          
+    } 
   
     public ExtractWitnessInfo(): void {
         
@@ -169,7 +172,7 @@ export default class CriminalWitnesses extends Vue {
         this.witnessCounts.push(countInfo);
     }
 
-    public totalBackground(item, type){
+    public totalBackground(item){
         if (item.WitnessCountFieldName == 'Total') {
             return 'table-warning'
         }

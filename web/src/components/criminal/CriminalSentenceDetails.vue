@@ -89,13 +89,13 @@ export default class CriminalSentenceDetails extends Vue {
 
     participantJson;         
     sortBy = 'Date';
-    dateSortDir = 'desc';
-   
+    dateSortDir = 'desc';   
     isMounted = false
-
     selectedParticipant = 0;
 
+    /* eslint-disable */
     participantFiles: any[] = [];
+    /* eslint-enable */
 
     fields = [        
         {key:'Date',                     sortable:true,   tdClass: 'border-top', headerStyle:'text-primary',  cellStyle:'text'},

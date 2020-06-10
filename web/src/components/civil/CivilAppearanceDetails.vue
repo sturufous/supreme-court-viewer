@@ -104,11 +104,16 @@
                         <template v-for="(field,index) in partyFields" v-slot:[`head(${field.key})`]="data">
                             <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
                         </template>                
-                        <template v-for="(field,index) in partyFields" v-slot:[`cell(${field.key})`]="data" >
-                            <span v-bind:key="index" :style="field.cellStyle" v-if="data.field.key != 'Current Counsel'">  {{ data.value }} </span>
-                            <span v-bind:key="index" :style="field.cellStyle" v-if="data.field.key == 'Current Counsel' && data.value">CEIS: {{ data.value }}</span> 
+                        <template v-for="(field,index) in partyFields" v-slot:[`cell(${field.key})`]="data" >                                                        
+                            <span v-bind:key="index" :style="field.cellStyle" v-if="data.field.key == 'Current Counsel' && data.value.length>0">
+                                <span v-for="(counsel, counselIndex) in data.value"  v-bind:key="counselIndex" style= "white-space: pre-line" >CEIS: {{ counsel }}<br></span>
+                            </span>
+                            <span v-bind:key="index" :style="field.cellStyle" v-else-if="data.field.key == 'Role' && data.value.length>0">
+                                <span v-for="(role, roleIndex) in data.value"  v-bind:key="roleIndex" style= "white-space: pre-line" >{{ role }}<br></span>
+                            </span>
+                            <span v-bind:key="index" :style="field.cellStyle" v-else-if="data.field.key == 'Name'">  {{ data.value }} </span> 
                         </template>
-                </b-table>                
+                </b-table>                 
             </b-col>
             <b-col col md="4" cols="4" style="overflow: auto;">
                  <div>
@@ -146,46 +151,29 @@ const commonState = namespace("CommonInformation");
 @Component
 export default class CivilAppearanceDetails extends Vue {
 
+    @commonState.State
+    public displayName!: string;
+
+     /* eslint-disable */
     @civilState.State
     public civilFileInformation!: any;
 
     @civilState.State
-    public appearanceInfo!: any;
-
-    @commonState.State
-    public displayName!: string;    
+    public appearanceInfo!: any;        
 
     @commonState.Action
     public UpdateDisplayName!: (newInputNames: any) => void
 
-    mounted() {
-        this.getAdditionalInfo();
-        this.getAppearanceDetails();
-    }
-
-    public getAppearanceDetails(): void {      
-    
-        this.$http.get('/api/files/civil/'+ this.additionalInfo["File Number"]+'/appearance-detail/'+this.additionalInfo["Appearance ID"])
-            .then(Response => Response.json(), err => {console.log(err);} )        
-            .then(data => {
-                if(data){  
-                    this.appearanceDetailsJson = data;              
-                    this.ExtractAppearanceDetailsInfo();
-                }
-                this.isMounted = true;                       
-            }); 
-    }
+    appearanceAdditionalInfo: any[] = [];
+    appearanceDocuments: any[] = [];
+    appearanceParties: any[] = [];
+    /* eslint-enable */
     
     loadingPdf = false;  
     isMounted = false;
     isDataReady = false;
-    appearanceDetailsJson;    
-    
-    appearanceDocuments: any[] = [];
-    appearanceParties: any[] = [];
+    appearanceDetailsJson; 
     additionalInfo = {};
-  
-    appearanceAdditionalInfo: any[] = [];
 
     addInfoFields =  
     [
@@ -209,7 +197,24 @@ export default class CivilAppearanceDetails extends Vue {
         {key:'Role',                  sortable:false, tdClass: 'border-top',  headerStyle:'text',   cellStyle:'font-size: 14px;'},
         {key:'Current Counsel',       sortable:false, tdClass: 'border-top', headerStyle:'text',    cellStyle:'font-size: 14px;'}
     ];
+
+    mounted() {
+        this.getAdditionalInfo();
+        this.getAppearanceDetails();
+    }
+
+    public getAppearanceDetails(): void {      
     
+        this.$http.get('/api/files/civil/'+ this.additionalInfo["File Number"]+'/appearance-detail/'+this.additionalInfo["Appearance ID"])
+            .then(Response => Response.json(), err => {console.log(err);} )        
+            .then(data => {
+                if(data){  
+                    this.appearanceDetailsJson = data;              
+                    this.ExtractAppearanceDetailsInfo();
+                }
+                this.isMounted = true;                       
+            }); 
+    }    
     
     public getAdditionalInfo()
     {
@@ -240,7 +245,7 @@ export default class CivilAppearanceDetails extends Vue {
                 for (const act of document.documentSupport) {
                     docInfo["Act"].push({'Code': act.actCd, 'Description': act.actDsc})
                 }
-            }      
+            }    
             
             docInfo["Date Filed"]= document.filedDt? document.filedDt.split(' ')[0] : '';
             docInfo["Result"]= document.appearanceResultCd
@@ -263,9 +268,18 @@ export default class CivilAppearanceDetails extends Vue {
             partyInfo["Last Name"] =  party.lastNm? party.lastNm: party.orgNm ;
             this.UpdateDisplayName({'lastName': partyInfo["Last Name"], 'givenName': partyInfo["First Name"]});
             partyInfo["Name"] = this.displayName
-            partyInfo["Current Counsel"] = party.counselNm? party.counselNm: '';
-            partyInfo["Role"] = party.partyRoleTypeDesc? party.partyRoleTypeDesc: '';  
-
+            partyInfo["Current Counsel"] = [];
+            if (party.counsel && party.counsel.length > 0) {
+                for (const counsel of party.counsel) {
+                    partyInfo["Current Counsel"].push(counsel.counselFullName)
+                }
+            }
+            partyInfo["Role"] = [];
+            if (party.partyRole && party.partyRole.length > 0) {
+                for (const role of party.partyRole) {
+                    partyInfo["Role"].push(role.roleTypeDsc)
+                }
+            }
             this.appearanceParties.push(partyInfo);
         }
     }
