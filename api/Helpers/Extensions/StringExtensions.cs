@@ -1,4 +1,4 @@
-﻿namespace Scv.Api.Helpers
+﻿namespace Scv.Api.Helpers.Extensions
 {
     public static class StringExtensions
     {

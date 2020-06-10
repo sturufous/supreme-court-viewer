@@ -294,6 +294,14 @@ resourceTypes:
       /{dateDeclinedById}:
         type:
           readOnlyCollectionItem:
+    /document:
+      /issueTypes:
+        type:
+          readOnlyCollection:
+        /{code}:
+          type:
+            readOnlyCollectionItem:
+      
     /priority:
       /markers:
         type:
@@ -301,6 +309,20 @@ resourceTypes:
         /{markerId}:
           type:
             readOnlyCollectionItem:
+    /pastAppearance:
+      /partyAppearanceMethod:
+        /partyAttendanceTypes:
+          type:
+            readOnlyCollection:
+          /{partyAppearanceMethod}:
+            type:
+              readOnlyCollectionItem:
+        /counsel:
+          type:
+            readOnlyCollection:
+          /{partyAppearanceMethod}:
+            type:
+              readOnlyCollectionItem:
   
   /criminal:
     /assets:
@@ -346,12 +368,6 @@ resourceTypes:
         /{statusId}:
           type:
             readOnlyCollectionItem:
-      /partyAttendanceTypes:
-          type:
-            readOnlyCollection:
-          /{partyAttendanceTypeCode}:
-            type:
-              readOnlyCollectionItem:
     /dateDeclinedBy:
       type:
         readOnlyCollection:
@@ -365,4 +381,30 @@ resourceTypes:
         /{markerId}:
           type:
             readOnlyCollectionItem:
+    /pastAppearance:
+      /partyAppearanceMethod:
+        /accused:
+          type:
+            readOnlyCollection:
+          /{partyAppearanceMethod}:
+            type:
+              readOnlyCollectionItem:
+        /accusedCounsel:
+          type:
+            readOnlyCollection:
+          /{partyAppearanceMethod}:
+            type:
+              readOnlyCollectionItem:
+        /adjudicator:
+          type:
+            readOnlyCollection:
+          /{partyAppearanceMethod}:
+            type:
+              readOnlyCollectionItem:
+        /crown:
+          type:
+            readOnlyCollection:
+          /{partyAppearanceMethod}:
+            type:
+              readOnlyCollectionItem:
             

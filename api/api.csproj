@@ -27,8 +27,8 @@
     <ProjectReference Include="..\jc-interface-client\jc-interface-client.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Models\Civil\AppearanceDetail\" />
     <Folder Include="Models\Civil\CourtList\" />
     <Folder Include="Models\Criminal\CourtList\" />
+    <Folder Include="Services\Files\" />
   </ItemGroup>
 </Project>

@@ -16,7 +16,7 @@ namespace Scv.Api.Models.Criminal.AppearanceDetail
         public JustinCounsel JustinCounsel { get; set; }
         public CriminalAccused Accused { get; set; }
         public Prosecutor Prosecutor { get; set; }
-        public Adjudicator Adjudicator { get; set; }
+        public CriminalAdjudicator Adjudicator { get; set; }
         public string JudgesRecommendation { get; set; }
         public string AppearanceNote { get; set; }
         /// <summary>

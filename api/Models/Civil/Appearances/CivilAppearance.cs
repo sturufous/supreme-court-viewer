@@ -3,7 +3,7 @@
     /// <summary>
     /// Extends the original object.
     /// </summary>
-    public class CivilAppearanceDetail : JCCommon.Clients.FileServices.CivilAppearanceDetail
+    public class CivilAppearance : JCCommon.Clients.FileServices.CivilAppearanceDetail
     {
         public string AppearanceReasonDsc { get; set; }
         public string AppearanceResultDsc { get; set; }

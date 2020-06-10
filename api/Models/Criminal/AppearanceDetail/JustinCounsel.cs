@@ -16,5 +16,7 @@
         public string PartyAppearanceMethodDesc { get; set; }
         public string AttendanceMethodCd { get; set; }
         public string AttendanceMethodDesc { get; set; }
+        public string AppearanceMethodCd { get; set; }
+        public string AppearanceMethodDesc { get; set; }
     }
 }

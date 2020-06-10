@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Scv.Api.Models.Criminal.AppearanceDetail
+﻿namespace Scv.Api.Models.Criminal.AppearanceDetail
 {
     public class Prosecutor
     {
@@ -13,5 +8,7 @@ namespace Scv.Api.Models.Criminal.AppearanceDetail
         public string PartyAppearanceMethodDesc { get; set; }
         public string AttendanceMethodCd { get; set; }
         public string AttendanceMethodDesc { get; set; }
+        public string AppearanceMethodCd { get; set; }
+        public string AppearanceMethodDesc { get; set; }
     }
 }
