@@ -1,7 +1,3 @@
-using JCCommon.Clients.FileServices;
-using JCCommon.Clients.LocationServices;
-using JCCommon.Clients.LookupServices;
-using JCCommon.Framework;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Routing;
@@ -11,11 +7,9 @@ using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
-using Scv.Api.Helpers;
 using Scv.Api.Helpers.ContractResolver;
 using Scv.Api.Helpers.Mapping;
 using Scv.Api.Helpers.Middleware;
-using Scv.Api.Services;
 using System;
 using System.IO;
 using System.Reflection;
@@ -29,12 +23,14 @@ namespace Scv.Api
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMapster();
+
+            #region Cors
 
             string corsDomain = Configuration.GetValue<string>("CORS_DOMAIN");
             Console.WriteLine($"CORS_DOMAIN: {corsDomain}");
@@ -47,35 +43,17 @@ namespace Scv.Api
                 });
             });
 
-            services.AddHttpClient<FileServicesClient>(client =>
-            {
-                client.DefaultRequestHeaders.Authorization = new BasicAuthenticationHeaderValue(
-                    Configuration.GetNonEmptyValue("FileServicesClient:Username"),
-                    Configuration.GetNonEmptyValue("FileServicesClient:Password"));
-                client.BaseAddress = new Uri(Configuration.GetNonEmptyValue("FileServicesClient:Url").EnsureEndingForwardSlash());
-            });
+            #endregion Cors
 
-            services.AddHttpClient<LookupServiceClient>(client =>
-            {
-                client.DefaultRequestHeaders.Authorization = new BasicAuthenticationHeaderValue(
-                    Configuration.GetNonEmptyValue("LookupServicesClient:Username"),
-                    Configuration.GetNonEmptyValue("LookupServicesClient:Password"));
-                client.BaseAddress = new Uri(Configuration.GetNonEmptyValue("LookupServicesClient:Url").EnsureEndingForwardSlash());
-            });
+            #region Setup Services
 
-            services.AddHttpClient<LocationServicesClient>(client =>
-            {
-                client.DefaultRequestHeaders.Authorization = new BasicAuthenticationHeaderValue(
-                    Configuration.GetNonEmptyValue("LocationServicesClient:Username"),
-                    Configuration.GetNonEmptyValue("LocationServicesClient:Password"));
-                client.BaseAddress = new Uri(Configuration.GetNonEmptyValue("LocationServicesClient:Url").EnsureEndingForwardSlash());
-            });
+            services.AddHttpClientsAndScvServices(Configuration);
 
-            services.AddScoped<FilesService>();
-            services.AddScoped<LookupService>();
-            services.AddScoped<LocationService>();
+            #endregion Setup Services
 
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
+
+            #region Newtonsoft
 
             services.AddControllers().AddNewtonsoftJson(options =>
             {
@@ -85,6 +63,10 @@ namespace Scv.Api
                 options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
             });
 
+            #endregion Newtonsoft
+
+            #region Swagger
+
             services.AddSwaggerGen(options =>
             {
                 options.EnableAnnotations(true);
@@ -93,6 +75,9 @@ namespace Scv.Api
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 options.IncludeXmlComments(xmlPath);
             });
+
+            #endregion Swagger
+
             services.AddLazyCache();
         }
 
