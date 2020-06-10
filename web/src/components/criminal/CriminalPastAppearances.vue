@@ -30,11 +30,11 @@
             :no-sort-reset="true"
             sort-icon-left
             borderless           
-            small            
+            small                        
             responsive ="sm"
             >   
                 <template v-for="(field,index) in fields" v-slot:[`head(${field.key})`]="data">
-                    <b v-bind:key="index" :class="field.headerStyle"> {{ data.label }}</b>
+                    <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
                 </template>
 
                 <template  v-slot:cell()="data">
@@ -47,7 +47,7 @@
 
                 <template v-slot:cell(Date)="data" >
                     <span :class="data.field.cellStyle" style="display: inline-flex;"> 
-                        <b-button style="transform: translate(0,-7px);" size="sm" @click="OpenDetails(data);data.toggleDetails();" variant="outline-primary border-white text-info" class="mr-2 mt-1">
+                        <b-button style="transform: translate(0,-7px);font-size:16px;" size="sm" @click="OpenDetails(data);data.toggleDetails();" variant="outline-primary border-white text-info" class="mr-2 mt-1">
                             <b-icon-caret-right-fill v-if="!data.item['_showDetails']"></b-icon-caret-right-fill>
                             <b-icon-caret-down-fill v-if="data.item['_showDetails']"></b-icon-caret-down-fill>
                             {{data.item.FormattedDate}}

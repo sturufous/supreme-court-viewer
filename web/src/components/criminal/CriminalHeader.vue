@@ -3,7 +3,7 @@
     <b-navbar type="white" variant="white" v-if="isMounted" style="height:30px">
       <b-navbar-nav>
 
-        <b-nav-text class="text-info mt-1 mr-2" style="font-size: 12px;">
+        <b-nav-text class="text-primary mt-1 mr-2" style="font-size: 12px;">
             <b-icon icon="file-earmark-text"></b-icon>
             {{fileNumberText}}
         </b-nav-text>
@@ -19,18 +19,19 @@
 
         <b-nav-text class="text-muted mr-3 mt-1" style="font-size: 11px;">
             {{agencyLocation.Region}}
-        </b-nav-text>
+        </b-nav-text>       
 
-        <b-nav-text class="mr-2">
-            <b-icon icon="person-fill"></b-icon>
-        </b-nav-text>
-
-        <b-nav-text class="text-info">
-            <b>{{getNameOfParticipantTrunc()}}</b>
-            and {{(participantList.length-1)}} other(s)
-        </b-nav-text>
-
-        <b-nav-item-dropdown class="mr-3" text right>
+        <b-nav-item-dropdown class="mr-3" right no-caret size="sm">
+            <template v-slot:button-content>
+                <b-button
+                    variant="outline-primary text-info" 
+                    style="transform: translate(0,-4px); border:0px; font-size:16px"
+                    size="sm">
+                    <b-icon class="mr-2" icon="person-fill"></b-icon>
+                    <b>{{getNameOfParticipantTrunc()}}</b> and {{(participantList.length-1)}} other(s)
+                    <b-icon class="ml-1" icon="caret-down-fill" font-scale="1"></b-icon>
+                </b-button>
+            </template>
             <b-dropdown-item-button
                 v-for="participant in SortedParticipants"
                 :key="participant['Index']"

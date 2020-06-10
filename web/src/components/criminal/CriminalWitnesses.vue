@@ -36,7 +36,7 @@
                     </template>
 
                     <template v-slot:cell(Required)="data" >                        
-                        <b-badge :class="data.field.cellStyle" >  {{ data.value }} </b-badge>                    
+                        <b-badge :class="data.field.cellStyle" style="font-weight: normal; font-size:16px" >  {{ data.value }} </b-badge>                    
                     </template>
 
                 </b-table>
