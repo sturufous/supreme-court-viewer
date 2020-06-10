@@ -11,7 +11,17 @@ using Moq;
 using Scv.Api.Controllers;
 using Scv.Api.Services;
 using System;
+using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
+using Scv.Api.Helpers.ContractResolver;
+using Scv.Api.Models.Civil.Detail;
+using Scv.Api.Models.Criminal.Detail;
+using Scv.Api.Services.Files;
 using tests.api.Helpers;
 using Xunit;
 
@@ -20,6 +30,7 @@ namespace tests.api.Controllers
     /// <summary>
     /// These tests, ensure Api.FilesController and JC-Client-Interface.FileServicesClient work correctly.
     /// Credit to DARS for most of these tests.
+    /// Note: these tests are intended for the development environment. 
     /// </summary>
     public class FilesControllerTests
     {
@@ -373,8 +384,165 @@ namespace tests.api.Controllers
             Assert.Equal("TC", criminalAppearanceDetail.AppearanceMethods.First().AppearanceMethodCd);
         }
 
+        [Fact]
+        public async void Criminal_Appearance_Details_Accused_Prosecutor_Adjudicator()
+        {
+            var actionResult = await _controller.GetCriminalAppearanceDetails("2800", "34595.0734", "13816.0026");
 
-        [Fact(Skip= "Adhoc Test")]
+            var criminalAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+
+            Assert.Equal("2800", criminalAppearanceDetail.JustinNo);
+            Assert.Contains(criminalAppearanceDetail.Charges, p => p.AppearanceReasonDsc == "First Appearance");
+            Assert.Equal("JONES BARB", criminalAppearanceDetail.JustinCounsel.FullName);
+            Assert.Equal("Woody Allan", criminalAppearanceDetail.Accused.FullName);
+            Assert.Equal("Telephone Conference", criminalAppearanceDetail.Accused.AttendanceMethodDesc);
+            Assert.Equal("Willie Smith", criminalAppearanceDetail.Prosecutor.FullName);
+            Assert.Equal("26139.0045", criminalAppearanceDetail.Prosecutor.PartId);
+            Assert.Equal("R Butler Mon Ami", criminalAppearanceDetail.Adjudicator.FullName);
+        }
+
+        [Fact]
+        public async void Criminal_Appearance_Details_No_Prosecutor_Adjudicator()
+        {
+            var actionResult = await _controller.GetCriminalAppearanceDetails("2934", "36548.0734", "19498.0042");
+
+            var criminalAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+
+            Assert.Equal("2934", criminalAppearanceDetail.JustinNo);
+            Assert.Equal("Telephone Conference", criminalAppearanceDetail.Accused.AttendanceMethodDesc);
+            Assert.Equal("TC", criminalAppearanceDetail.Accused.AttendanceMethodCd);
+            Assert.Equal("Telephone Conference", criminalAppearanceDetail.AppearanceMethods.First().AppearanceMethodDesc);
+            Assert.Equal("TC", criminalAppearanceDetail.AppearanceMethods.First().AppearanceMethodCd);
+            Assert.Equal("79221.0734", criminalAppearanceDetail.JustinCounsel.CounselPartId);
+            Assert.Null(criminalAppearanceDetail.Prosecutor);
+            Assert.Null(criminalAppearanceDetail.Adjudicator);
+        }
+
+
+        [Fact]
+        public async void Criminal_Appearance_Details_Prosecutor_Adjudicator_Accused()
+        {
+            var actionResult = await _controller.GetCriminalAppearanceDetails("1009", "1169.0026", "14188.0026");
+
+            var criminalAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+
+            Assert.Equal("1009", criminalAppearanceDetail.JustinNo);
+            Assert.Equal("Stephen Frank Lewis", criminalAppearanceDetail.Accused.FullName);
+            Assert.Equal("P", criminalAppearanceDetail.Accused.PartyAppearanceMethod);
+            Assert.Equal("Present", criminalAppearanceDetail.Accused.PartyAppearanceMethodDesc);
+            Assert.Equal("Michael Jordan", criminalAppearanceDetail.Adjudicator.FullName);
+            Assert.Equal("14007.0026", criminalAppearanceDetail.Adjudicator.PartId);
+            Assert.Equal("Brad Bow Baggins Stez", criminalAppearanceDetail.Prosecutor.FullName);
+            Assert.Equal("19.0001", criminalAppearanceDetail.Prosecutor.PartId);
+        }
+
+
+        [Fact]
+        public async void Criminal_Appearance_Details_AttendanceMethod_PartyAppearanceMethod_AppearanceMethod()
+        {
+            var actionResult = await _controller.GetCriminalAppearanceDetails("3058", "30503.0734", "19621.0042");
+
+            var criminalAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+            Assert.Equal("VC", criminalAppearanceDetail.JustinCounsel.AppearanceMethodCd);
+            Assert.Equal("VC", criminalAppearanceDetail.JustinCounsel.AttendanceMethodCd);
+            Assert.Equal("CV", criminalAppearanceDetail.JustinCounsel.PartyAppearanceMethod);
+            Assert.Equal("TC", criminalAppearanceDetail.Prosecutor.AppearanceMethodCd);
+            Assert.Equal("TC", criminalAppearanceDetail.Prosecutor.AttendanceMethodCd);
+            Assert.Equal("T", criminalAppearanceDetail.Prosecutor.PartyAppearanceMethod);
+            Assert.Equal("VC", criminalAppearanceDetail.Accused.AppearanceMethodCd);
+            Assert.Equal("VC", criminalAppearanceDetail.Accused.AttendanceMethodCd);
+            Assert.Equal("PV", criminalAppearanceDetail.Accused.PartyAppearanceMethod);
+        }
+
+        [Fact]
+        public async void Civil_Appearance_Details_Adjudicator()
+        {
+            var actionResult = await _controller.GetCivilAppearanceDetails("2255", "13403");
+
+            var civilAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+            Assert.Equal("This is the comment i made to Guy Landry ", civilAppearanceDetail.AdjudicatorComment);
+            Assert.Equal("Butler Mon Ami, R", civilAppearanceDetail.Adjudicator.FullName);
+            Assert.Equal("In Person", civilAppearanceDetail.Adjudicator.AdjudicatorAppearanceMethodDesc);
+            Assert.Equal("IP", civilAppearanceDetail.Adjudicator.AdjudicatorAppearanceMethod);
+        }
+
+        [Fact]
+        public async void Civil_Appearance_Details_Party_AppearanceMethods()
+        {
+            //This test sees if our AppearanceMethod data is tied into the party objects. 
+            var actionResult = await _controller.GetCivilAppearanceDetails("2222", "12047");
+
+            var civilAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+
+            //Here we have AppearanceMethods, for adjudicator.  Note no data for name. 
+            Assert.Equal("VC", civilAppearanceDetail.Adjudicator.AppearanceMethodCd);
+            Assert.Equal("Video Conference", civilAppearanceDetail.Adjudicator.AppearanceMethodDesc);
+            //Also data for applicant.
+            Assert.True(civilAppearanceDetail.Party.Where(p => p.PartyRole.Any(pr => pr.RoleTypeCd == "APP"))
+                .All(p => p.AppearanceMethodCd == "VC"));
+        }
+
+        [Fact]
+        public async void Civil_Appearance_Details_Party_CourtList_AttendanceMethod()
+        {
+            var actionResult = await _controller.GetCivilAppearanceDetails("100", "19");
+
+            var civilAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+            Assert.Contains(civilAppearanceDetail.Party, p => p.PartyId == "11" && p.AttendanceMethodCd == "TC");
+        }
+
+        [Fact]
+        public async void Civil_Appearance_Details_Party_CourtList_LegalRepresentative()
+        {
+            var actionResult = await _controller.GetCivilAppearanceDetails("1984", "8344");
+
+            var civilAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+            var legalRepresentativeParty = civilAppearanceDetail.Party.FirstOrDefault(p => p.PartyId == "896");
+            Assert.NotNull(legalRepresentativeParty);
+            Assert.NotEmpty(legalRepresentativeParty.LegalRepresentative);
+            Assert.True(legalRepresentativeParty.LegalRepresentative.First().LegalRepTypeDsc == "Litigation Guardian");
+            Assert.True(legalRepresentativeParty.LegalRepresentative.First().LegalRepFullName == "SMITH AND BARNEY ASSOCIATES");
+        }
+
+        [Fact]
+        public async void Civil_Appearance_Details_Party_CourtList_Counsel()
+        {
+            var actionResult = await _controller.GetCivilAppearanceDetails("2436", "8430");
+
+            var civilAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+            var counselParty = civilAppearanceDetail.Party.FirstOrDefault(p => p.PartyId == "1928");
+            Assert.NotNull(counselParty);
+            Assert.NotEmpty(counselParty.Counsel);
+            Assert.Equal("119",counselParty.Counsel.First().CounselId);
+            Assert.Equal("PETER, John", counselParty.Counsel.First().CounselFullName);
+            Assert.Equal("(547)123-1233", counselParty.Counsel.First().PhoneNumber);
+        }
+
+        [Fact]
+        public async void Civil_Appearance_Details_Party_CourtList_Representative()
+        {
+            var actionResult = await _controller.GetCivilAppearanceDetails("2307", "9403");
+
+            var civilAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+            var representativeParty = civilAppearanceDetail.Party.FirstOrDefault(p => p.PartyId == "1112");
+            Assert.NotNull(representativeParty);
+            Assert.NotEmpty(representativeParty.Representative);
+            Assert.Equal("bla", representativeParty.Representative.First().RepFullName);
+        }
+
+        [Fact]
+        public async void Civil_Appearance_Details_Party_PreviousAppearance_PartyAppearanceMethod()
+        {
+            var actionResult = await _controller.GetCivilAppearanceDetails("100", "19");
+
+            var civilAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+            var party = civilAppearanceDetail.Party.FirstOrDefault(p => p.PartyId == "21");
+            Assert.NotNull(party);
+            Assert.Equal("P", party.PartyAppearanceMethod);
+            Assert.Equal("Present", party.PartyAppearanceMethodDesc);
+        }
+
+        [Fact(Skip = "Adhoc Test")]
         public async void Criminal_Appearance_Details_CacheTest()
         {
             //This fetches the FileDetail plus the appearances. So these should be cached after this call. 
@@ -393,7 +561,7 @@ namespace tests.api.Controllers
             Assert.Equal(1, criminalAppearanceDetail.AppearanceMethods.Count);
             Assert.Equal("TC", criminalAppearanceDetail.AppearanceMethods.First().AppearanceMethodCd);
         }
- 
+
         #region Helpers
 
         private void SetupMocks()
