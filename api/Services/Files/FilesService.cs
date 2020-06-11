@@ -42,12 +42,7 @@ namespace Scv.Api.Services.Files
         
         #region Courtlist & Document
 
-        public async Task<CourtList> CourtListAsync(string agencyId, string roomCode, DateTime? proceeding, string divisionCode, string fileNumber)
-        {
-            var proceedingDateString = proceeding.HasValue ? proceeding.Value.ToString("yyyy-MM-dd") : "";
-            return await _filesClient.FilesCourtlistAsync(agencyId, roomCode, proceedingDateString, divisionCode,
-                fileNumber);
-        }
+       
 
         public async Task<DocumentResponse> DocumentAsync(string documentId, bool isCriminal)
         {

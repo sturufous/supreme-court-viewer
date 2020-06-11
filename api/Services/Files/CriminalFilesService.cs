@@ -92,7 +92,7 @@ namespace Scv.Api.Services.Files
             detail.Appearances = appearances;
             detail.Witness = await PopulateDetailWitnesses(detail);
             detail.Participant = await PopulateDetailParticipants(detail, documents, fileContent.AccusedFile);
-            detail.HearingRestriction = await PopulateCriminalDetailHearingRestrictions(detail);
+            detail.HearingRestriction = await PopulateDetailHearingRestrictions(detail);
             detail.Crown = PopulateDetailCrown(detail);
             return detail;
         }
@@ -286,7 +286,7 @@ namespace Scv.Api.Services.Files
             return detail;
         }
 
-        private async Task<ICollection<CriminalHearingRestriction>> PopulateCriminalDetailHearingRestrictions(RedactedCriminalFileDetailResponse detail)
+        private async Task<ICollection<CriminalHearingRestriction>> PopulateDetailHearingRestrictions(RedactedCriminalFileDetailResponse detail)
         {
             foreach (var hearingRestriction in detail.HearingRestriction)
                 hearingRestriction.HearingRestrictionTypeDsc = await _lookupService.GetHearingRestrictionDescription(hearingRestriction.HearingRestrictionTypeCd.ToString());

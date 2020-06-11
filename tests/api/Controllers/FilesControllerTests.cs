@@ -53,7 +53,8 @@ namespace tests.api.Controllers
             var lookupService = new LookupService(lookupServices.Configuration, lookupServiceClient, new CachingService());
             var locationService = new LocationService(locationServices.Configuration, locationServiceClient, new CachingService());
             var filesService = new FilesService(fileServices.Configuration, fileServicesClient, new Mapper(), lookupService, locationService, new CachingService());
-            _controller = new FilesController(fileServices.Configuration, fileServices.LogFactory.CreateLogger<FilesController>(), filesService);
+            var courtListService = new CourtListService(fileServices.Configuration, fileServicesClient, new Mapper(), lookupService, locationService, new CachingService());
+            _controller = new FilesController(fileServices.Configuration, fileServices.LogFactory.CreateLogger<FilesController>(), filesService, courtListService);
             SetupMocks();
         }
 

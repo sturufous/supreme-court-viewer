@@ -44,15 +44,15 @@ namespace Scv.Api.Services
 
         #region Collection Methods
 
-        public async Task<CodeValue> GetLocationsFromLazyCache() => await GetDataFromCache("Locations", async () => await _locationClient.LocationsAsync(null, true, true));
+        public async Task<CodeValue> GetLocations() => await GetDataFromCache("Locations", async () => await _locationClient.LocationsAsync(null, true, true));
 
         #endregion Collection Methods
 
         #region Lookup Methods
 
-        public async Task<string> GetLocationName(string code) => FindLongDescriptionFromCode(await GetLocationsFromLazyCache(), code);
+        public async Task<string> GetLocationName(string code) => FindLongDescriptionFromCode(await GetLocations(), code);
 
-        public async Task<string> GetLocationAgencyIdentifier(string code) => FindShortDescriptionFromCode(await GetLocationsFromLazyCache(), code);
+        public async Task<string> GetLocationAgencyIdentifier(string code) => FindShortDescriptionFromCode(await GetLocations(), code);
 
         public async Task<string> GetRegionName(string code) => string.IsNullOrEmpty(code) ? null : await GetDataFromCache($"RegionNameByLocation-{code}", async () => (await _locationClient.LocationsLocationIdRegionAsync(code))?.RegionName);
 
