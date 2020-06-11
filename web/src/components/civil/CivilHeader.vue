@@ -1,6 +1,6 @@
 <template>
-<div>
-    <b-navbar type="white" variant="white" v-if="isMounted" style="height:30px;">
+<b-card no-body>
+    <b-navbar type="white" variant="white" v-if="isMounted" style="height:45px;">
       <b-navbar-nav>
 
         <b-nav-text class="mr-2" style="margin-top: 6px; font-size: 14px;">
@@ -17,20 +17,24 @@
               </span>
         </b-nav-text>
 
-        <b-nav-text class="text-muted mr-3" style="margin-top: 7px; font-size: 11px;">
+        <b-nav-text class="text-muted mr-3" style="margin-top: 8px; font-size: 11px;">
             {{agencyLocation.Region}}
         </b-nav-text>
 
-        <b-nav-text class="mt-1 mr-2">
-            <b-icon icon="person-fill"></b-icon>
-            <span   variant="text-info"
-                    v-b-tooltip.hover.bottomleft 
-                    :title='partyDisplayedTxt'>
-                    {{getNameOfPartyTrunc()}}
-            </span>
-        </b-nav-text>
+        <b-dropdown class="mt-1 mr-2" no-caret right variant="white"> 
 
-        <b-dropdown class="mt-1 mr-3" right variant="white">            
+            <template v-slot:button-content>
+                <b-button
+                    variant="outline-primary text-info" 
+                    style="transform: translate(0,-4px); border:0px; font-size:16px; text-overflow: ellipsis;"
+                    v-b-tooltip.hover.bottomleft 
+                    :title='partyDisplayedTxt'
+                    size="sm">
+                    <b-icon class="mr-2" icon="person-fill"></b-icon>
+                    <b style="text-overflow: ellipsis;"> {{getNameOfPartyTrunc()}} </b>                  
+                    <b-icon class="ml-1" icon="caret-down-fill" font-scale="1"></b-icon>
+                </b-button>
+            </template>           
             <b-dropdown-item-button
                 disabled
                 v-for="leftParty in leftPartiesInfo"
@@ -44,27 +48,38 @@
             >{{rightParty.Name}}</b-dropdown-item-button>
         </b-dropdown>     
  
-        <b-nav-text  style="margin-top: 5px;font-size: 14px;" variant="white">
-            <b-badge pill variant="danger">{{adjudicatorRestrictionsInfo.length}}</b-badge> Adjudicator Restrictions
+        <b-nav-text  style="margin-top: 4px;font-size: 14px;" variant="white">
+            <b-badge pill variant="danger">{{adjudicatorRestrictionsInfo.length}}</b-badge>
         </b-nav-text>
 
-        <b-nav-item-dropdown right  v-if="(adjudicatorRestrictionsInfo.length>0)">            
-            <b-dropdown-item-button        
+        <b-nav-item-dropdown right no-caret > 
+            <template v-slot:button-content>
+                <b-button
+                    :variant="(adjudicatorRestrictionsInfo.length>0)? 'outline-primary text-info':'white'" 
+                    :disabled="adjudicatorRestrictionsInfo.length==0"
+                    style="transform: translate(-5px,0); border:0px; font-size:14px;text-overflow: ellipsis;"                    
+                    size="sm">                    
+                    Adjudicator Restrictions
+                    <b-icon v-if="(adjudicatorRestrictionsInfo.length>0)" class="ml-1" icon="caret-down-fill" font-scale="1"></b-icon>
+                </b-button>
+            </template>       
+
+            <b-dropdown-item-button      
             v-for="(restriction, index) in adjudicatorRestrictionsInfo"
             :key="index">
-                <b-badge style="font-size: 14px; padding: 5px 2px;" 
+                <b-button style="font-size: 14px; padding: 5px 5px;" 
                           variant="secondary" 
                           v-b-tooltip.hover.left 
                           :title='restriction["Full Name"]'>
                     {{restriction["Adj Restriction"]}}
-                </b-badge>
+                </b-button>
             </b-dropdown-item-button>
         </b-nav-item-dropdown>
 
       </b-navbar-nav>
     </b-navbar>
     <hr class="mx-1 bg-warning" style="border-top: 2px double #FCBA19"/>      
-</div>
+</b-card>
 </template>
 
 <script lang="ts">
@@ -81,7 +96,7 @@ export default class CivilHeader extends Vue {
   public civilFileInformation!: any;
    /* eslint-enable */  
 
-  maximumFullNameLength = 47;
+  maximumFullNameLength = 15;
   activeParty = 0;
   fileNumberText;
   activityClassCode;
@@ -120,11 +135,18 @@ export default class CivilHeader extends Vue {
   } 
 
   public getNameOfPartyTrunc() {
-      if (this.partyDisplayedTxt) {          
-          if(this.partyDisplayedTxt.length > this.maximumFullNameLength)   
-            return this.partyDisplayedTxt.substr(0, this.maximumFullNameLength) +',...';    
-          else 
-            return  this.partyDisplayedTxt;
+
+      if (this.partyDisplayedTxt) {
+          let firstParty = this.partyDisplayedTxt.split('/')[0].trim()
+          let secondParty = this.partyDisplayedTxt.split('/')[1].trim()
+
+          if(firstParty.length > this.maximumFullNameLength) 
+            firstParty = firstParty.substr(0, this.maximumFullNameLength) +' ...';
+
+          if(secondParty.length > this.maximumFullNameLength) 
+            secondParty = secondParty.substr(0, this.maximumFullNameLength) +' ...'; 
+          
+            return  firstParty+' / '+secondParty;
       } else {
           return "";
       }    

@@ -26,7 +26,7 @@
                 <template v-slot:cell(Status)="data" >                   
                     <b-badge 
                         variant="primary" 
-                        style="font-weight: normal; font-size: 14px;"> 
+                        style="font-weight: normal; font-size: 16px;"> 
                         {{ data.value }}
                     </b-badge>
                 </template>

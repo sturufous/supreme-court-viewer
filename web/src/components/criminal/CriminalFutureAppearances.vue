@@ -48,7 +48,7 @@
 
                 <template v-slot:cell(Date)="data" >
                     <span :class="data.field.cellStyle"> 
-                        <b-button style="transform: translate(0,-7px)" 
+                        <b-button style="transform: translate(0,-7px); font-size:16px" 
                                   size="sm" 
                                   @click="OpenDetails(data);data.toggleDetails();" 
                                   variant="outline-primary border-white text-info" 

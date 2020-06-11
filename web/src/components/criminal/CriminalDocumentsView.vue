@@ -31,8 +31,9 @@
         </b-card>
 
         <b-overlay :show="loadingPdf" rounded="sm">  
-            <b-card class="mx-3" bg-variant="light">           
+            <b-card class="mx-3" bg-variant="light">                          
                 <b-table
+                v-if="FilteredDocuments.length>0"
                 :items="FilteredDocuments"
                 :fields="fields[fieldsTab]"
                 :sort-by.sync="sortBy"
@@ -45,8 +46,12 @@
                 responsive="sm"
                 >   
                     <template v-for="(field, index) in fields[fieldsTab]" v-slot:[`head(${field.key})`]="data">
-                    <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
+                        <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
                     </template>
+
+                    <template  v-slot:head(Date) > 
+                         <b class="text-danger" >{{getNameOfDateInTabs}}</b>
+                    </template> 
 
                     <template v-slot:[`cell(${fields[0][0].key})`]="data" >
                          {{ data.value | beautify-date}}
@@ -56,7 +61,7 @@
                         <b-button 
                             v-if="data.item.PdfAvail" 
                             variant="outline-primary text-info" 
-                            style="border:0px;"
+                            style="border:0px; font-size:16px"
                             @click="cellClick(data)"
                             size="sm">
                                 {{data.value}}
@@ -67,6 +72,7 @@
                     </template>
 
                 </b-table>
+                <span v-else class="text-muted ml-4 mb-5"> No document with label <b> {{activetab}} </b> . </span>
             </b-card>
             <template v-slot:overlay>               
                <div style="text-align: center"> 
@@ -132,7 +138,7 @@ export default class CriminalDocumentsView extends Vue {
     loadingPdf = false;    
     activetab = 'ALL';
     tabIndex = 0;              
-    sortBy = 'Date Filed/Issued';
+    sortBy = 'Date';
     sortDesc = true;
     hoverRow =-1;
     hoverCol = 0;
@@ -144,7 +150,7 @@ export default class CriminalDocumentsView extends Vue {
 
     fields = [ 
         [
-            {key:'Date Filed/Issued',  sortable:true,  tdClass: 'border-top',  headerStyle:'text-danger',   cellStyle:'text'},
+            {key:'Date',  sortable:true,  tdClass: 'border-top',  headerStyle:'text-danger',   cellStyle:'text'},
             {key:'Document Type',      sortable:true,  tdClass: 'border-top',  headerStyle:'text-primary',  cellStyle:'text-muted'},
             {key:'Category',           sortable:false,  tdClass: 'border-top', headerStyle:'text',          cellStyle:'text'},
             {key:'Pages',              sortable:false,  tdClass: 'border-top', headerStyle:'text',          cellStyle:'text'},
@@ -223,7 +229,7 @@ export default class CriminalDocumentsView extends Vue {
             {
                 if(doc.category != 'rop') {
                     const docInfo = {}; 
-                    docInfo["Date Filed/Issued"]= doc.issueDate? doc.issueDate.split(' ')[0] : ''; 
+                    docInfo["Date"]= doc.issueDate? doc.issueDate.split(' ')[0] : ''; 
                     docInfo["Document Type"]= doc.docmFormDsc;
                     docInfo["Category"]= doc.docmClassification;
                     docInfo["Pages"]= doc.documentPageCount;
@@ -282,6 +288,23 @@ export default class CriminalDocumentsView extends Vue {
                 }
             }); 
         }    
+    }
+
+    get getNameOfDateInTabs()
+    {
+        switch(this.activetab.toLowerCase())
+        {
+            case ("all"):
+                return "Date Filed/Issued";
+            case ("scheduled"):
+                return "Date Sworn/Filed";
+            case ("bail"):
+                return "Date Ordered";
+            case ("psr"):
+                return "Date Filed";
+            default:
+                return "Date Sworn/Issued";
+        }
     }
     
 
