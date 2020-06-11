@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ using Scv.Api.Helpers.ContractResolver;
 using Scv.Api.Helpers.Extensions;
 using Scv.Api.Models.Civil.AppearanceDetail;
 using Scv.Api.Models.Civil.Appearances;
+using Scv.Api.Models.Civil.CourtList;
 using Scv.Api.Models.Civil.Detail;
 using CivilAppearanceDetail = Scv.Api.Models.Civil.AppearanceDetail.CivilAppearanceDetail;
 using CivilAppearanceMethod = Scv.Api.Models.Civil.AppearanceDetail.CivilAppearanceMethod;
@@ -329,7 +331,11 @@ namespace Scv.Api.Services.Files
                     party.AttendanceMethodCd = courtListParty.AttendanceMethodCd;
                     party.AttendanceMethodDesc = await _lookupService.GetCivilAssetsDescription(party.AttendanceMethodCd);
                     party.Counsel = _mapper.Map<ICollection<CivilCounsel>>(courtListParty.Counsel);
-                    party.Representative = courtListParty.Representative;
+                    party.Representative = _mapper.Map<ICollection<CivilRepresentative>>(courtListParty.Representative);
+                    foreach (var representative in party.Representative)
+                    {
+                        representative.AttendanceMethodDesc = await _lookupService.GetCivilAssetsDescription(representative.AttendanceMethodCd); 
+                    }
                     party.LegalRepresentative = courtListParty.LegalRepresentative;
                 }
 

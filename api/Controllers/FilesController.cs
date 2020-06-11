@@ -7,7 +7,6 @@ using Scv.Api.Constants;
 using Scv.Api.Helpers.Exceptions;
 using Scv.Api.Models.Civil.Detail;
 using Scv.Api.Models.Criminal.Detail;
-using Scv.Api.Services;
 using System;
 using System.Threading.Tasks;
 using Scv.Api.Services.Files;
