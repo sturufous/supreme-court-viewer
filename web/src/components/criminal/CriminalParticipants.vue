@@ -20,14 +20,25 @@
             >   
                 <template v-for="(field,index) in fields" v-slot:[`head(${field.key})`]="data">
                     <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
-                </template>                
+                </template>  
+
                 <template v-for="(field,index) in fields" v-slot:[`cell(${field.key})`]="data" >
-                    <span v-bind:key="index" :class="field.cellStyle" v-if="data.field.key != 'Status' && data.field.key != 'Name'">  {{ data.value }} </span>
-                </template>                
-                <template v-slot:cell(Name)="data" >                   
-                    <span :class="data.item.Charges.length>0?data.field.cellStyle:''" > 
-                            {{ data.value }}
-                        <b-dropdown size="sm" variant="white text-info" v-if="data.item.Charges.length>0" >
+                    <b-badge class = "mt-1"  style="font-weight:normal; font-size:16px" variant="white" v-bind:key="index" >  {{ data.value }} </b-badge>
+                </template>
+
+                <template v-slot:cell(Name)="data" >               
+                                               
+                        <b-dropdown size="sm" style="height:35px;" no-caret variant="text-info"  >
+                            <template v-slot:button-content>
+                                <b-button
+                                    :variant="data.item.Charges.length>0? 'outline-primary text-info':'white'" 
+                                    :disabled="data.item.Charges.length==0"
+                                    style="transform: translate(-10px,-4px); border:0px; font-size:16px"
+                                    size="sm"> 
+                                    {{ data.value }}
+                                    <b-icon v-if="data.item.Charges.length>0" class="ml-1" icon="caret-down-fill" font-scale="1"></b-icon>
+                                </b-button>
+                            </template>
                             <b-dropdown-text variant="white text-danger">Charges</b-dropdown-text>
                             <b-dropdown-divider></b-dropdown-divider>
                             <b-dropdown-item-button 
@@ -36,14 +47,14 @@
                                 :key="index">                                
                                     <b>{{file["Code"]}}</b> &mdash; {{file["Description"]}}
                             </b-dropdown-item-button> 
-                        </b-dropdown>                       
-                    </span>
+                        </b-dropdown>                   
                 </template>
+ 
                 <template v-slot:cell(Status)="data" >
                         <b-badge  
                             v-for="(field,index) in data.value"
                             :key="index" 
-                            class="mr-1 mt-1"
+                            class="mr-1 mt-2"
                             style="font-weight: normal; font-size: 14px;"
                             v-b-tooltip.hover 
                             :title='field.key' > 
@@ -102,11 +113,11 @@ export default class CriminalParticipants extends Vue {
 
     fields =  
     [
-        {key:'Name',                    sortable:true,  tdClass: 'border-top',  headerStyle:'text-primary',   cellStyle:'text-info'},
-        {key:'D.O.B.',                  sortable:false, tdClass: 'border-top',  headerStyle:'text',         cellStyle:'text'},
-        {key:'Status',                  sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:'text-white bg-secondary'},
-        {key:'Counsel',                 sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:'text'},
-        {key:'Counsel Designation Filed',sortable:false, tdClass: 'border-top', headerStyle:'text',        cellStyle:'text'},
+        {key:'Name',                    sortable:true,  tdClass: 'border-top',  headerStyle:'text-primary', cellStyle:''},
+        {key:'D.O.B.',                  sortable:false, tdClass: 'border-top',  headerStyle:'text',         cellStyle:''},
+        {key:'Status',                  sortable:false, tdClass: 'border-top', headerStyle:'text',          cellStyle:''},
+        {key:'Counsel',                 sortable:false, tdClass: 'border-top', headerStyle:'text',          cellStyle:''},
+        {key:'Counsel Designation Filed',sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:''},
     ];
 
     statusFields = 
