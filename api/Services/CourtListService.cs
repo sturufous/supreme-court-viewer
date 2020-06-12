@@ -94,28 +94,26 @@ namespace Scv.Api.Services
 
         private async Task<ICollection<CivilCourtList>> PopulateCivilFiles(List<CivilFileDetailResponse> civilFileDetails, ICollection<CivilCourtList> courtList, ICollection<CivilFileAppearancesResponse> civilAppearances)
         {
-            foreach (var civilCourtListFile in courtList)
+            foreach (var courtListFile in courtList)
             {
-                var fileDetail = civilFileDetails.FirstOrDefault(x => x.PhysicalFileId == civilCourtListFile.PhysicalFile.PhysicalFileID);
+                var fileDetail = civilFileDetails.FirstOrDefault(x => x.PhysicalFileId == courtListFile.PhysicalFile.PhysicalFileID);
                 if (fileDetail == null) continue;
 
-                foreach (var hearingRestriction in civilCourtListFile.HearingRestriction)
+                foreach (var hearingRestriction in courtListFile.HearingRestriction)
                 {
                     hearingRestriction.HearingRestrictionTypeDesc = await _lookupService.GetHearingRestrictionDescription(hearingRestriction.HearingRestrictiontype);
                 }
 
-                foreach (var scheduledAppearance in civilCourtListFile.ScheduledAppearance)
+                var targetAppearanceResponse = civilAppearances.FirstOrDefault(ca => ca.ApprDetail.Any(ad => ad.AppearanceId == courtListFile.AppearanceId));
+                var targetAppearance = targetAppearanceResponse?.ApprDetail.FirstOrDefault(ad => ad.AppearanceId == courtListFile.AppearanceId);
+                if (targetAppearance != null)
                 {
-                    var targetAppearanceResponse = civilAppearances.FirstOrDefault(ca => ca.ApprDetail.Any(ad => ad.AppearanceId == scheduledAppearance.AppearanceId));
-                    var targetAppearance = targetAppearanceResponse?.ApprDetail.FirstOrDefault(ad => ad.AppearanceId == scheduledAppearance.AppearanceId);
-                    if (targetAppearance == null)
-                        continue;
-
-                    scheduledAppearance.AppearanceReasonDesc =
+                    courtListFile.AppearanceReasonDesc =
                         await _lookupService.GetCivilAppearanceReasonsDescription(targetAppearance?.AppearanceReasonCd);
-                    scheduledAppearance.OutOfTownJudge = targetAppearance.OutOfTownJudgeTxt;
-                    scheduledAppearance.SecurityRestriction = targetAppearance.SecurityRestrictionTxt;
-                    scheduledAppearance.SupplementalEquipment = targetAppearance.SupplementalEquipmentTxt;
+                    courtListFile.OutOfTownJudge = targetAppearance.OutOfTownJudgeTxt;
+                    courtListFile.SecurityRestriction = targetAppearance.SecurityRestrictionTxt;
+                    courtListFile.SupplementalEquipment = targetAppearance.SupplementalEquipmentTxt;
+                    courtListFile.JudgeInitials = targetAppearance.JudgeInitials;
                 }
             }
 
@@ -139,18 +137,16 @@ namespace Scv.Api.Services
                     hearingRestriction.HearingRestrictionTypeDesc = await _lookupService.GetHearingRestrictionDescription(hearingRestriction.HearingRestrictiontype);
                 }
 
-                foreach (var scheduledAppearance in courtListFile.ScheduledAppearance)
+                var targetAppearanceResponse = criminalAppearances.FirstOrDefault(ca => ca.ApprDetail.Any(ad => ad.AppearanceId == courtListFile.CriminalAppearanceID));
+                var targetAppearance = targetAppearanceResponse?.ApprDetail.FirstOrDefault(ad => ad.AppearanceId == courtListFile.CriminalAppearanceID);
+                if (targetAppearance != null)
                 {
-                    var targetAppearanceResponse = criminalAppearances.FirstOrDefault(ca => ca.ApprDetail.Any(ad => ad.AppearanceId == scheduledAppearance.AppearanceId));
-                    var targetAppearance = targetAppearanceResponse?.ApprDetail.FirstOrDefault(ad => ad.AppearanceId == scheduledAppearance.AppearanceId);
-                    if (targetAppearance == null)
-                        continue;
-
-                    scheduledAppearance.AppearanceReasonDesc =
+                    courtListFile.AppearanceReasonDesc =
                         await _lookupService.GetCivilAppearanceReasonsDescription(targetAppearance?.AppearanceReasonCd);
-                    scheduledAppearance.OutOfTownJudge = targetAppearance.OutOfTownJudgeTxt;
-                    scheduledAppearance.SecurityRestriction = targetAppearance.SecurityRestrictionTxt;
-                    scheduledAppearance.SupplementalEquipment = targetAppearance.SupplementalEquipmentTxt;
+                    courtListFile.OutOfTownJudge = targetAppearance.OutOfTownJudgeTxt;
+                    courtListFile.SecurityRestriction = targetAppearance.SecurityRestrictionTxt;
+                    courtListFile.SupplementalEquipment = targetAppearance.SupplementalEquipmentTxt;
+                    courtListFile.JudgeInitials = targetAppearance.JudgeInitials;
                 }
             }
 

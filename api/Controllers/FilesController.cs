@@ -26,7 +26,6 @@ namespace Scv.Api.Controllers
         private readonly IConfiguration _configuration;
         private readonly ILogger<FilesController> _logger;
         private readonly FilesService _filesService;
-        private readonly CourtListService _courtListService;
         private readonly CivilFilesService _civilFilesService;
         private readonly CriminalFilesService _criminalFilesService;
 
@@ -34,14 +33,13 @@ namespace Scv.Api.Controllers
 
         #region Constructor
 
-        public FilesController(IConfiguration configuration, ILogger<FilesController> logger, FilesService filesService, CourtListService courtListService)
+        public FilesController(IConfiguration configuration, ILogger<FilesController> logger, FilesService filesService)
         {
             _configuration = configuration;
             _logger = logger;
             _filesService = filesService;
             _civilFilesService = filesService.Civil;
             _criminalFilesService = filesService.Criminal;
-            _courtListService = courtListService;
         }
 
         #endregion Constructor
@@ -218,24 +216,6 @@ namespace Scv.Api.Controllers
         }
 
         #endregion Criminal Only
-
-        /// <summary>
-        /// Gets a court list.
-        /// </summary>
-        /// <param name="agencyId">Agency Identifier Code (Location Code); for example 4801 (Kelona).</param>
-        /// <param name="roomCode">The room code; for example </param>
-        /// <param name="proceeding">The proceeding date in the format YYYY-MM-dd</param>
-        /// <param name="divisionCode">The division code; CR, or CV.</param>
-        /// <param name="fileNumber">The full file number; for example 1500-3</param>
-        /// <returns>CourtList</returns>
-        [HttpGet]
-        [Route("court-list")]
-        public async Task<ActionResult<CourtList>> GetCourtList(string agencyId, string roomCode, DateTime? proceeding, string divisionCode, string fileNumber)
-        {
-            var courtList = await _courtListService.CourtListAsync(agencyId, roomCode, proceeding, divisionCode,
-                fileNumber);
-            return Ok(courtList);
-        }
 
         /// <summary>
         /// Gets a document.

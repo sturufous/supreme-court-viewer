@@ -1,11 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using JCCommon.Clients.LocationServices;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Scv.Api.Helpers.Extensions;
 using Scv.Api.Models.Location;
 using Scv.Api.Services;
 
@@ -17,7 +13,7 @@ namespace Scv.Api.Controllers
     {
         private readonly LocationService _locationService;
 
-        public LocationController(IConfiguration configuration, LocationService locationService)
+        public LocationController(LocationService locationService)
         {
             _locationService = locationService;
         }

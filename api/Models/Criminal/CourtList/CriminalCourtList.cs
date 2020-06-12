@@ -13,6 +13,11 @@ namespace Scv.Api.Models.Criminal.CourtList
     /// </summary>
     public class CriminalCourtList : ClCriminalCourtList
     {
+        public string OutOfTownJudge { get; set; }
+        public string SupplementalEquipment { get; set; }
+        public string SecurityRestriction { get; set; }
+        public string AppearanceReasonDesc { get; set; }
+        public string JudgeInitials { get; internal set; }
         public ICollection<CrownWitness> Crown { get; set; }
         public new ICollection<ScheduledAppearance> ScheduledAppearance { get; set; }
         public new ICollection<HearingRestriction> HearingRestriction { get; set; }
