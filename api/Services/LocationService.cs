@@ -46,6 +46,10 @@ namespace Scv.Api.Services
 
         public async Task<CodeValue> GetLocations() => await GetDataFromCache("Locations", async () => await _locationClient.LocationsAsync(null, true, true));
 
+        public async Task<CodeValue> GetCourtRooms()
+        {
+            return await GetDataFromCache($"Locations-Rooms", async () => await _locationClient.LocationsRoomsAsync());
+        }
         #endregion Collection Methods
 
         #region Lookup Methods
