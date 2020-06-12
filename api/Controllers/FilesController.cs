@@ -7,9 +7,10 @@ using Scv.Api.Constants;
 using Scv.Api.Helpers.Exceptions;
 using Scv.Api.Models.Civil.Detail;
 using Scv.Api.Models.Criminal.Detail;
-using Scv.Api.Services;
 using System;
 using System.Threading.Tasks;
+using Scv.Api.Helpers;
+using Scv.Api.Services;
 using Scv.Api.Services.Files;
 using CivilAppearanceDetail = Scv.Api.Models.Civil.AppearanceDetail.CivilAppearanceDetail;
 using CriminalAppearanceDetail = Scv.Api.Models.Criminal.AppearanceDetail.CriminalAppearanceDetail;
@@ -215,24 +216,6 @@ namespace Scv.Api.Controllers
         }
 
         #endregion Criminal Only
-
-        /// <summary>
-        /// Gets a court list.
-        /// </summary>
-        /// <param name="agencyId">Agency Identifier Code (Location Code); for example 4801 (Kelona).</param>
-        /// <param name="roomCode">The room code; for example </param>
-        /// <param name="proceeding">The proceeding date in the format YYYY-MM-dd</param>
-        /// <param name="divisionCode">The division code; CR, or CV.</param>
-        /// <param name="fileNumber">The full file number; for example 1500-3</param>
-        /// <returns>CourtList</returns>
-        [HttpGet]
-        [Route("court-list")]
-        public async Task<ActionResult<CourtList>> GetCourtList(string agencyId, string roomCode, DateTime? proceeding, string divisionCode, string fileNumber)
-        {
-            var courtList = await _filesService.CourtListAsync(agencyId, roomCode, proceeding, divisionCode,
-                fileNumber);
-            return Ok(courtList);
-        }
 
         /// <summary>
         /// Gets a document.

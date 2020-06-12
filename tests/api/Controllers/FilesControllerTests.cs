@@ -10,18 +10,9 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Scv.Api.Controllers;
 using Scv.Api.Services;
-using System;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
-using Microsoft.AspNetCore.Authorization.Infrastructure;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
-using Scv.Api.Helpers.ContractResolver;
-using Scv.Api.Models.Civil.Detail;
-using Scv.Api.Models.Criminal.Detail;
 using Scv.Api.Services.Files;
+using System;
+using System.Linq;
 using tests.api.Helpers;
 using Xunit;
 
@@ -30,7 +21,7 @@ namespace tests.api.Controllers
     /// <summary>
     /// These tests, ensure Api.FilesController and JC-Client-Interface.FileServicesClient work correctly.
     /// Credit to DARS for most of these tests.
-    /// Note: these tests are intended for the development environment. 
+    /// Note: these tests are intended for the development environment.
     /// </summary>
     public class FilesControllerTests
     {
@@ -54,7 +45,7 @@ namespace tests.api.Controllers
             var locationService = new LocationService(locationServices.Configuration, locationServiceClient, new CachingService());
             var filesService = new FilesService(fileServices.Configuration, fileServicesClient, new Mapper(), lookupService, locationService, new CachingService());
             _controller = new FilesController(fileServices.Configuration, fileServices.LogFactory.CreateLogger<FilesController>(), filesService);
-            SetupMocks();
+            _controller.ControllerContext = HttpResponseTest.SetupMockControllerContext();
         }
 
         #endregion Constructor
@@ -168,17 +159,6 @@ namespace tests.api.Controllers
             var civilFile = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Equal("0", civilFile.Appearances.FutureRecCount);
             Assert.Equal("20", civilFile.Appearances.HistoryRecCount);
-        }
-
-        [Fact]
-        public async void GetCourtlist()
-        {
-            var actionResult = await _controller.GetCourtList("4801", "101", DateTime.Parse("2016-04-04"), "CR", "4889-1");
-
-            var criminalFileAppearancesResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
-            Assert.Equal("4801", criminalFileAppearancesResponse.CourtLocationName);
-            Assert.Equal("101", criminalFileAppearancesResponse.CourtRoomCode);
-            Assert.Equal("2016-04-04", criminalFileAppearancesResponse.CourtProceedingsDate);
         }
 
         [Fact]
@@ -418,7 +398,6 @@ namespace tests.api.Controllers
             Assert.Null(criminalAppearanceDetail.Adjudicator);
         }
 
-
         [Fact]
         public async void Criminal_Appearance_Details_Prosecutor_Adjudicator_Accused()
         {
@@ -435,7 +414,6 @@ namespace tests.api.Controllers
             Assert.Equal("Brad Bow Baggins Stez", criminalAppearanceDetail.Prosecutor.FullName);
             Assert.Equal("19.0001", criminalAppearanceDetail.Prosecutor.PartId);
         }
-
 
         [Fact]
         public async void Criminal_Appearance_Details_AttendanceMethod_PartyAppearanceMethod_AppearanceMethod()
@@ -469,12 +447,12 @@ namespace tests.api.Controllers
         [Fact]
         public async void Civil_Appearance_Details_Party_AppearanceMethods()
         {
-            //This test sees if our AppearanceMethod data is tied into the party objects. 
+            //This test sees if our AppearanceMethod data is tied into the party objects.
             var actionResult = await _controller.GetCivilAppearanceDetails("2222", "12047");
 
             var civilAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
 
-            //Here we have AppearanceMethods, for adjudicator.  Note no data for name. 
+            //Here we have AppearanceMethods, for adjudicator.  Note no data for name.
             Assert.Equal("VC", civilAppearanceDetail.Adjudicator.AppearanceMethodCd);
             Assert.Equal("Video Conference", civilAppearanceDetail.Adjudicator.AppearanceMethodDesc);
             //Also data for applicant.
@@ -513,7 +491,7 @@ namespace tests.api.Controllers
             var counselParty = civilAppearanceDetail.Party.FirstOrDefault(p => p.PartyId == "1928");
             Assert.NotNull(counselParty);
             Assert.NotEmpty(counselParty.Counsel);
-            Assert.Equal("119",counselParty.Counsel.First().CounselId);
+            Assert.Equal("119", counselParty.Counsel.First().CounselId);
             Assert.Equal("PETER, John", counselParty.Counsel.First().CounselFullName);
             Assert.Equal("(547)123-1233", counselParty.Counsel.First().PhoneNumber);
         }
@@ -545,11 +523,11 @@ namespace tests.api.Controllers
         [Fact(Skip = "Adhoc Test")]
         public async void Criminal_Appearance_Details_CacheTest()
         {
-            //This fetches the FileDetail plus the appearances. So these should be cached after this call. 
+            //This fetches the FileDetail plus the appearances. So these should be cached after this call.
             var actionResult = await _controller.GetCriminalFileDetailByFileId("2934");
             var fileDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
 
-            //Now call criminalAppearanceDetails. 
+            //Now call criminalAppearanceDetails.
             var actionResult2 = await _controller.GetCriminalAppearanceDetails("2934", "36548.0734", "19498.0042");
 
             var criminalAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult2);

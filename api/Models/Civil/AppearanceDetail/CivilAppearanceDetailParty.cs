@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using JCCommon.Clients.FileServices;
+using Scv.Api.Models.Civil.CourtList;
 
 namespace Scv.Api.Models.Civil.AppearanceDetail
 {
@@ -23,7 +24,10 @@ namespace Scv.Api.Models.Civil.AppearanceDetail
         public string AttendanceMethodDesc { get; set; }
         ///These collections are from <see cref="ClParty"/>
         public ICollection<CivilCounsel> Counsel { get; set; }
-        public ICollection<ClRepresentative> Representative { get; set; }
+        /// <summary>
+        /// Extended.
+        /// </summary>
+        public ICollection<CivilRepresentative> Representative { get; set; }
         public ICollection<ClLegalRepresentative> LegalRepresentative { get; set; }
         public IEnumerable<ClPartyRole> PartyRole { get; set; }
     }

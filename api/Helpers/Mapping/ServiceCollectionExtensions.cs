@@ -58,6 +58,7 @@ namespace Scv.Api.Helpers.Mapping
             services.AddScoped<FilesService>();
             services.AddScoped<LookupService>();
             services.AddScoped<LocationService>();
+            services.AddScoped<CourtListService>();
 
             return services;
         }
