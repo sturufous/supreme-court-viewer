@@ -27,7 +27,7 @@ namespace Scv.Api.Controllers
         /// </summary>
         /// <returns>List{Location}</returns>
         [HttpGet]
-        [Route("locations")]
+        [Route("court-rooms")]
         public async Task<ActionResult<List<Location>>> GetLocationsAndCourtRooms()
         {
             var locations = await _locationService.GetLocations();
@@ -44,7 +44,7 @@ namespace Scv.Api.Controllers
 
             foreach (var location in locationList)
             {
-                location.CourtRooms = courtRooms.Where(cr => cr.Flex == location.LocationId)
+                location.CourtRooms = courtRooms.Where(cr => cr.Flex == location.LocationId && cr.ShortDesc == "CRT")
                     .Select(cr => new CourtRoom {LocationId = cr.Flex, Room = cr.Code, Type = cr.ShortDesc}).ToList();
             }
 
