@@ -76,6 +76,8 @@ namespace Scv.Api
                 options.IncludeXmlComments(xmlPath);
             });
 
+            services.AddSwaggerGenNewtonsoftSupport();
+
             #endregion Swagger
 
             services.AddLazyCache();

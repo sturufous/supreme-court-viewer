@@ -96,9 +96,6 @@ namespace Scv.Api.Services
         {
             foreach (var courtListFile in courtList)
             {
-                var fileDetail = civilFileDetails.FirstOrDefault(x => x.PhysicalFileId == courtListFile.PhysicalFile.PhysicalFileID);
-                if (fileDetail == null) continue;
-
                 foreach (var hearingRestriction in courtListFile.HearingRestriction)
                 {
                     hearingRestriction.HearingRestrictionTypeDesc = await _lookupService.GetHearingRestrictionDescription(hearingRestriction.HearingRestrictiontype);
@@ -126,11 +123,12 @@ namespace Scv.Api.Services
             foreach (var courtListFile in courtList)
             {
                 var fileDetail = criminalFileDetails.FirstOrDefault(x => x.JustinNo == courtListFile.FileInformation.MdocJustinNo);
-                if (fileDetail == null) continue;
-
-                courtListFile.Crown =
-                    _mapper.Map<ICollection<CrownWitness>>(fileDetail.Witness.Where(w => w.RoleTypeCd == CriminalWitnessRoleTypeCd.CRN)
-                        .ToList());
+                if (fileDetail != null)
+                {
+                    courtListFile.Crown =
+                        _mapper.Map<ICollection<CrownWitness>>(fileDetail.Witness.Where(w => w.RoleTypeCd == CriminalWitnessRoleTypeCd.CRN)
+                            .ToList());
+                }
 
 
                 foreach (var hearingRestriction in courtListFile.HearingRestriction)
