@@ -6,6 +6,7 @@
     public class CrownWitness
     {
         public string PartId { get; set; }
+        public bool Assigned { get; set; }
 
         public string FullName => GivenNm != null && LastNm != null
             ? $"{GivenNm?.Trim()} {LastNm?.Trim()}"
@@ -13,5 +14,13 @@
 
         public string LastNm { get; set; }
         public string GivenNm { get; set; }
+
+        public bool IsAssigned(string assignedCrownName)
+        {
+            if (assignedCrownName == null || LastNm == null || GivenNm == null)
+                return false;
+
+            return (assignedCrownName.Trim() == $"{LastNm.Trim()}, {GivenNm.Trim()}");
+        }
     }
 }

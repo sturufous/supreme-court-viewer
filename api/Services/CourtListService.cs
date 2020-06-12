@@ -128,6 +128,10 @@ namespace Scv.Api.Services
                     courtListFile.Crown =
                         _mapper.Map<ICollection<CrownWitness>>(fileDetail.Witness.Where(w => w.RoleTypeCd == CriminalWitnessRoleTypeCd.CRN)
                             .ToList());
+                    foreach (var crownWitness in courtListFile.Crown)
+                    {
+                        crownWitness.Assigned = crownWitness.IsAssigned(fileDetail.AssignedPartNm);
+                    }
                 }
 
 
