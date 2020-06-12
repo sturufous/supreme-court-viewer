@@ -1,6 +1,4 @@
-﻿using JCCommon.Clients.FileServices;
-using System.Collections.Generic;
-using Scv.Api.Models.Civil.Appearances;
+﻿using System.Collections.Generic;
 
 namespace Scv.Api.Models.Civil.AppearanceDetail
 {
@@ -12,6 +10,13 @@ namespace Scv.Api.Models.Civil.AppearanceDetail
         public string CourtRoomCd { get; set; }
         public string FileNumberTxt { get; set; }
         public string AppearanceDt { get; set; }
+        public string AppearanceResultCd { get; set; }
+        public string AppearanceResultDesc { get; set; }
+        public string AppearanceReasonCd { get; set; }
+        public string AppearanceReasonDesc { get; set; }
+        public string AdjudicatorComment { get; set; }
+        public CivilAdjudicator Adjudicator { get; set; }
+        
         /// <summary>
         /// Extended object. 
         /// </summary>
@@ -21,6 +26,10 @@ namespace Scv.Api.Models.Civil.AppearanceDetail
         /// Extended document object.
         /// </summary>
         public ICollection<CivilAppearanceDocument> Document { get; set; }
+
+        /// <summary>
+        /// Extended object.
+        /// </summary>
         public ICollection<CivilAppearanceMethod> AppearanceMethod { get; set; }
     }
 }
