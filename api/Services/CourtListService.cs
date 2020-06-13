@@ -108,6 +108,7 @@ namespace Scv.Api.Services
                 var targetAppearance = targetAppearanceResponse?.ApprDetail.FirstOrDefault(ad => ad.AppearanceId == courtListFile.AppearanceId);
                 if (targetAppearance != null)
                 {
+                    courtListFile.AppearanceReasonCd = targetAppearance?.AppearanceReasonCd;
                     courtListFile.AppearanceReasonDesc =
                         await _lookupService.GetCivilAppearanceReasonsDescription(targetAppearance?.AppearanceReasonCd);
                     courtListFile.OutOfTownJudge = targetAppearance.OutOfTownJudgeTxt;
@@ -141,6 +142,7 @@ namespace Scv.Api.Services
                 var targetAppearance = targetAppearanceResponse?.ApprDetail.FirstOrDefault(ad => ad.AppearanceId == courtListFile.CriminalAppearanceID);
                 if (targetAppearance != null)
                 {
+                    courtListFile.AppearanceReasonCd = targetAppearance?.AppearanceReasonCd;
                     courtListFile.AppearanceReasonDesc =
                         await _lookupService.GetCivilAppearanceReasonsDescription(targetAppearance?.AppearanceReasonCd);
                     courtListFile.OutOfTownJudge = targetAppearance.OutOfTownJudgeTxt;
