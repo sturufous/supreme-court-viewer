@@ -124,32 +124,12 @@ export default class CriminalHeader extends Vue {
       this.agencyLocation.Name = data.homeLocationAgencyName;
       this.agencyLocation.Code = data.homeLocationAgencyCode;
       this.agencyLocation.Region = data.homeLocationRegionName;
-      this.adjudicatorRestrictionsJson = data.hearingRestriction;
-      this.participantJson = data.participant 
-      this.ExtractParticipantInfo();
+      this.adjudicatorRestrictions = this.criminalFileInformation.adjudicatorRestrictionsInfo;
+      this.participantList = this.criminalFileInformation.participantList
+      this.numberOfParticipants = this.participantList.length - 1; 
+      // this.ExtractParticipantInfo();
       this.isMounted = true; 
       this.setActiveParticipantIndex(this.SortedParticipants[0].Index)
-  }  
-
-  public ExtractParticipantInfo(): void {
-    for (const fileIndex in this.participantJson) {
-      const fileInfo = {};
-      const jFile = this.participantJson[fileIndex];
-      fileInfo["Index"] = fileIndex;
-      fileInfo["First Name"] = jFile.givenNm.trim().length>0 ? jFile.givenNm : "";
-      fileInfo["Last Name"] = jFile.lastNm ? jFile.lastNm : jFile.orgNm;
-      this.UpdateDisplayName({'lastName': fileInfo["Last Name"], 'givenName': fileInfo["First Name"]});
-      fileInfo["Name"] = this.displayName;
-      this.participantList.push(fileInfo);
-    }
-    this.numberOfParticipants = this.participantList.length - 1;
-
-    for (const jRestriction of this.adjudicatorRestrictionsJson) {
-      const restrictionInfo = {};     
-      restrictionInfo["Adj Restriction"] = jRestriction.adjInitialsTxt?jRestriction.hearingRestrictionTypeDsc+ ": " + jRestriction.adjInitialsTxt:jRestriction.hearingRestrictionTypeDsc;
-      restrictionInfo["Full Name"] = jRestriction.adjFullNm;      
-      this.adjudicatorRestrictions.push(restrictionInfo);      
-    }
   }
 
   public setActiveParticipantIndex(index)

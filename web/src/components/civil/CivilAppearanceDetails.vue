@@ -179,7 +179,7 @@
                             v-bind:key="index"
                             v-else-if="counsel.Info.length > 0"
                             v-b-tooltip.hover.left
-                            :title="counsel.Info"> 
+                            v-b-tooltip.hover.html="counsel.Info"> 
                                 CEIS: {{ counsel.Name }} 
                         <br></span>
                     </span>
@@ -194,7 +194,8 @@
                     :style="field.cellStyle"
                     v-else-if="data.field.key == 'Name' && data.item.Info.length > 0"
                     v-b-tooltip.hover.left
-                    :title="data.item.Info">
+                    v-b-tooltip.hover.html="data.item.Info"
+                    >
                     {{ data.value }} 
                 </span>
                 <span v-bind:key="index" :style="field.cellStyle" v-else-if="data.field.key == 'Representative' && data.value.length>0">
@@ -205,7 +206,7 @@
                             v-bind:key="index"
                             v-else-if="rep.Info.length > 0"
                             v-b-tooltip.hover.left
-                            :title="rep.Info">
+                            v-b-tooltip.hover.html="rep.Info">
                             {{ rep.Name }} 
                         <br></span>
                     </span>
@@ -377,14 +378,14 @@ export default class CivilAppearanceDetails extends Vue {
             }
             if (party.partyAppearanceMethodDesc) {
                 if (partyInfo["Info"].length > 0) {
-                    partyInfo["Info"] += '\n'
+                    partyInfo["Info"] += '<br>'
                 }
                 //TODO: remove the pre-text when the longDesc is passed through the api
                 partyInfo["Info"]+= 'Appearance: ' + party.partyAppearanceMethodDesc;
             }
             if (party.attendanceMethodDesc) {
                 if (partyInfo["Info"].length > 0) {
-                    partyInfo["Info"] += '\n'
+                    partyInfo["Info"] += '<br>'
                 }
                 partyInfo["Info"]+= 'Attendance: ' + party.attendanceMethodDesc;
             }
@@ -410,16 +411,16 @@ export default class CivilAppearanceDetails extends Vue {
                     let info = '';
                     if (rep.phoneNumber) {
                         info = "Phone Number: " + rep.phoneNumber
-                    }
+                    }                    
                     if (rep.attendenceMethodDsc) {
                         if (info.length > 0) {
-                            info += '\n'
+                            info += '<br>'
                         }
-                        info+= "Attended by " + rep.attendenceMethodDsc
+                        info+= "Attended by " + rep.attendanceMethodDesc
                     }
                     if (rep.instruction) {
                         if (info.length > 0) {
-                            info += '\n'
+                            info += '<br>'
                         }
                         info+= "Instruction: " + rep.instruction
                     }

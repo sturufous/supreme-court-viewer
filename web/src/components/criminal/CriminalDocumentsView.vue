@@ -126,11 +126,11 @@ export default class CriminalDocumentsView extends Vue {
     public UpdateDisplayName!: (newInputNames: any) => void
 
     participantFiles: any[] = [];
+    participantList: any[] = [];
     ropDocuments: any[] = [];
     categories: any = [];
     /* eslint-enable */    
 
-    participantJson;
     courtLevel;
     courtClass;
 
@@ -166,8 +166,7 @@ export default class CriminalDocumentsView extends Vue {
     public getDocuments(): void {
        
         const data = this.criminalFileInformation.detailsData;
-
-        this.participantJson = data.participant 
+        this.participantList = this.criminalFileInformation.participantList 
 
         this.courtLevel = DecodeCourtLevel[data.courtLevelCd];
         this.courtClass = DecodeCourtClass[data.courtClassCd];
@@ -207,17 +206,11 @@ export default class CriminalDocumentsView extends Vue {
     public ExtractDocumentInfo(): void {
         let ropExists = false 
         
-        for(const fileIndex in this.participantJson)
+        for(const fileIndex in this.participantList)
         {            
-            const fileInfo = {};
-            const jFile =  this.participantJson[fileIndex];
-            fileInfo["Index"] = fileIndex; 
-            fileInfo["Part ID"] = jFile.partId;
-            fileInfo["Prof Seq No"] = jFile.profSeqNo;
-            fileInfo["First Name"] = jFile.givenNm.trim().length>0 ? jFile.givenNm : "";
-            fileInfo["Last Name"] = jFile.lastNm ? jFile.lastNm : jFile.orgNm;            
-            this.UpdateDisplayName({'lastName': fileInfo["Last Name"], 'givenName': fileInfo["First Name"]});
-            fileInfo["Name"] = this.displayName;
+            
+            const jFile =  this.participantList[fileIndex];
+            const fileInfo = jFile;
             fileInfo["Documents"] = [];
             fileInfo["Record of Proceedings"] = [];
 
@@ -225,7 +218,7 @@ export default class CriminalDocumentsView extends Vue {
             const document: any[] = [];
             const rop: any[] = [];
             /* eslint-enable */
-            for(const doc of jFile.document)
+            for(const doc of jFile.DocumentsJson)
             {
                 if(doc.category != 'rop') {
                     const docInfo = {}; 
@@ -305,8 +298,7 @@ export default class CriminalDocumentsView extends Vue {
             default:
                 return "Date Sworn/Issued";
         }
-    }
-    
+    }    
 
     get NumberOfDocuments() {       
         if(this.activetab == 'ROP')

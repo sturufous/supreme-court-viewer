@@ -98,18 +98,7 @@ export default class CriminalParticipants extends Vue {
     participantJson;
     numberOfParticipants = 0;
     sortBy = 'Name';
-    sortDesc = false;    
-
-    mounted() {
-        this.getParticipants();
-    }
-
-    public getParticipants(): void {      
-        const data = this.criminalFileInformation.detailsData;    
-        this.participantJson = data.participant 
-        this.ExtractParticipantInfo();
-        this.isMounted = true;          
-    }    
+    sortDesc = false;
 
     fields =  
     [
@@ -120,53 +109,15 @@ export default class CriminalParticipants extends Vue {
         {key:'Counsel Designation Filed',sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:''},
     ];
 
-    statusFields = 
-    [
-        {key:'Warrant Issued',      abbr:'W',   code:'warrantYN'},
-        {key:'In Custody',          abbr:'IC',  code:'inCustodyYN'},
-        {key:'Detention Order',     abbr:'DO',  code:'detainedYN'} , 
-        {key:'Interpreter Required',abbr:'INT', code:'interpreterYN'}
-    ];
-  
-    public ExtractParticipantInfo(): void {
-        
-        for (const fileIndex in this.participantJson) {
-            const fileInfo = {};
-            const jFile = this.participantJson[fileIndex];
-
-            fileInfo["Index"] = fileIndex;
-            fileInfo["First Name"] = jFile.givenNm.trim().length>0 ? jFile.givenNm : "";
-            fileInfo["Last Name"] = jFile.lastNm ? jFile.lastNm : jFile.orgNm;
-            this.UpdateDisplayName({'lastName': fileInfo["Last Name"], 'givenName': fileInfo["First Name"]});
-            fileInfo["Name"] = this.displayName;            
-            fileInfo["D.O.B."] = jFile.birthDt? (new Date(jFile.birthDt.split(' ')[0])).toUTCString().substr(4,12) : '';
-
-            fileInfo["Charges"] = [];         
-            const charges: any[] = [];         
-            for(const charge of jFile.charge)
-            {              
-                    const docInfo = {};                   
-                    docInfo["Description"]= charge.sectionDscTxt
-                    docInfo["Code"]= charge.sectionTxt
-                    charges.push(docInfo);
-            }
-            fileInfo["Charges"] = charges;
-
-            fileInfo["Status"] = [];
-            for (const status of this.statusFields)
-            {
-                if(jFile[status.code] =='Y')
-                    fileInfo["Status"].push(status);
-            }
-
-            this.UpdateDisplayName({'lastName': jFile.counselLastNm? jFile.counselLastNm: '', 'givenName': jFile.counselGivenNm? jFile.counselGivenNm: ''});
-            fileInfo['Counsel'] = this.displayName.trim.length? 'JUSTIN: ' + this.displayName: '';
-            fileInfo['Counsel Designation Filed'] = jFile.designatedCounselYN           
-            this.participantList.push(fileInfo); 
-        }
-        this.numberOfParticipants = this.participantList.length;
+    mounted() {
+        this.getParticipants();
     }
 
+    public getParticipants(): void {   
+        this.participantList = this.criminalFileInformation.participantList 
+        this.numberOfParticipants = this.participantList.length;
+        this.isMounted = true;          
+    } 
 }
 </script>
 
