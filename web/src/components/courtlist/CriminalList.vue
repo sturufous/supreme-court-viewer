@@ -70,6 +70,11 @@
                             {{data.value}}
                     </b-badge>
                 </template>
+
+                <template v-slot:[`cell(${fields[9].key})`]="data" >                     
+                    <span>{{data.value}}</span>
+                    <span class="text-muted" style="font-size:14px">d</span>                  
+                </template>
              <!--   
                 <template  v-slot:cell(Accused)="data">
                      <b-badge  variant="white" style=" font-size: 16px;" class = "mt-2"> {{data.value}} </b-badge>
@@ -188,7 +193,7 @@ export default class CriminalList extends Vue {
 
             criminalListInfo["Index"] = criminalListIndex;
             criminalListInfo['File Number']=jcriminalList.fileNumberText
-            criminalListInfo['Case Age']= jcriminalList.caseAgeDaysNumber? jcriminalList.caseAgeDaysNumber+'d': ''
+            criminalListInfo['Case Age']= jcriminalList.caseAgeDaysNumber? jcriminalList.caseAgeDaysNumber: ''
             criminalListInfo["Time"] = this.getTime(jcriminalList.appearanceTime.split(' ')[1].substr(0,5));
 
             criminalListInfo["Room"] = this.courtRoom
