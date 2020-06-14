@@ -23,7 +23,7 @@
                 </template>  
 
                 <template v-for="(field,index) in fields" v-slot:[`cell(${field.key})`]="data" >
-                    <b-badge class = "mt-1"  style="font-weight:normal; font-size:16px" variant="white" v-bind:key="index" >  {{ data.value }} </b-badge>
+                    <b-badge class = "mt-1"  :style="data.field.cellStyle" variant="white" v-bind:key="index" >  {{ data.value }} </b-badge>
                 </template>
 
                 <template v-slot:cell(Name)="data" >               
@@ -33,7 +33,7 @@
                                 <b-button
                                     :variant="data.item.Charges.length>0? 'outline-primary text-info':'white'" 
                                     :disabled="data.item.Charges.length==0"
-                                    style="transform: translate(-10px,-4px); border:0px; font-size:16px"
+                                    :style="data.field.cellStyle"
                                     size="sm"> 
                                     {{ data.value }}
                                     <b-icon v-if="data.item.Charges.length>0" class="ml-1" icon="caret-down-fill" font-scale="1"></b-icon>
@@ -55,7 +55,7 @@
                             v-for="(field,index) in data.value"
                             :key="index" 
                             class="mr-1 mt-2"
-                            style="font-weight: normal; font-size: 14px;"
+                            :style="data.field.cellStyle"
                             v-b-tooltip.hover 
                             :title='field.key' > 
                             {{ field.abbr }} 
@@ -102,11 +102,11 @@ export default class CriminalParticipants extends Vue {
 
     fields =  
     [
-        {key:'Name',                    sortable:true,  tdClass: 'border-top',  headerStyle:'text-primary', cellStyle:''},
-        {key:'D.O.B.',                  sortable:false, tdClass: 'border-top',  headerStyle:'text',         cellStyle:''},
-        {key:'Status',                  sortable:false, tdClass: 'border-top', headerStyle:'text',          cellStyle:''},
-        {key:'Counsel',                 sortable:false, tdClass: 'border-top', headerStyle:'text',          cellStyle:''},
-        {key:'Counsel Designation Filed',sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:''},
+        {key:'Name',                    sortable:true,  tdClass: 'border-top',  headerStyle:'text-primary', cellStyle:'transform: translate(-10px,-4px); border:0px; font-size:16px'},
+        {key:'D.O.B.',                  sortable:false, tdClass: 'border-top',  headerStyle:'text',         cellStyle:'font-weight:normal; font-size:16px'},
+        {key:'Status',                  sortable:false, tdClass: 'border-top', headerStyle:'text',          cellStyle:'font-weight: normal; font-size: 14px;'},
+        {key:'Counsel',                 sortable:false, tdClass: 'border-top', headerStyle:'text',          cellStyle:'font-weight:normal; font-size:16px'},
+        {key:'Counsel Designation Filed',sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:'font-weight:normal; font-size:16px'},
     ];
 
     mounted() {

@@ -47,8 +47,8 @@
                 </template>
 
                 <template v-slot:cell(Date)="data" >
-                    <span :class="data.field.cellStyle"> 
-                        <b-button style="transform: translate(0,-7px); font-size:16px" 
+                    <span :class="data.field.cellClass"> 
+                        <b-button :style="data.field.cellStyle" 
                                   size="sm" 
                                   @click="OpenDetails(data);data.toggleDetails();" 
                                   variant="outline-primary border-white text-info" 
@@ -70,17 +70,17 @@
                             variant="secondary"
                             v-b-tooltip.hover.right                            
                             :title="data.item['Reason Description']"
-                            style="margin-top: 10px; font-size: 14px;"> 
+                            :style="data.field.cellStyle"> 
                             {{data.value}}
                     </b-badge>
                 </template>
 
                 <template  v-slot:cell(Accused)="data">
-                     <b-badge  variant="white" style=" font-size: 16px;" class = "mt-2"> {{data.value}} </b-badge>
+                     <b-badge  variant="white" :style="data.field.cellStyle" class = "mt-2"> {{data.value}} </b-badge>
                 </template>
 
                 <template  v-slot:cell(Status)="data">
-                    <b :class = "data.item['Status Style']" style="font-weight: normal; font-size: 16px; width:110px"> {{data.value}} </b>
+                    <b :class = "data.item['Status Style']" :style="data.field.cellStyle"> {{data.value}} </b>
                 </template>
                 
             </b-table>
@@ -154,14 +154,14 @@ export default class CriminalFutureAppearances extends Vue {
 
     fields =  
     [
-        {key:'Date',       sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'text-info mt-2 d-inline-flex'},
-        {key:'Reason',     sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'font-weight-bold'},
-        {key:'Time',       sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:'text'},
-        {key:'Duration',   sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:'text'},
-        {key:'Location',   sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'text'},
-        {key:'Room',       sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:'text'},
-        {key:'Accused',    sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'text'},
-        {key:'Status',     sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'badge'},
+        {key:'Date',       sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'transform: translate(0,-7px); font-size:16px', cellClass:'text-info mt-2 d-inline-flex'},
+        {key:'Reason',     sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'margin-top: 10px; font-size: 14px;'},
+        {key:'Time',       sortable:false, tdClass: 'border-top', headerStyle:'text'},
+        {key:'Duration',   sortable:false, tdClass: 'border-top', headerStyle:'text'},
+        {key:'Location',   sortable:true,  tdClass: 'border-top', headerStyle:'text-primary'},
+        {key:'Room',       sortable:false, tdClass: 'border-top', headerStyle:'text'},
+        {key:'Accused',    sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'font-size: 16px;'},
+        {key:'Status',     sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'font-weight: normal; font-size: 16px; width:110px'},
     ];
     
     mounted() {

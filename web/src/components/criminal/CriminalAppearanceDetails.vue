@@ -41,13 +41,13 @@
                     </template>
 
                     <template v-slot:cell(LastResult)="data" >
-                            <b-badge 
-                                variant="secondary"
-                                v-if="data.item['Last Result']"
-                                v-b-tooltip.hover.left 
-                                :title='data.item["Last Result Description"]' > 
-                                {{ data.item["Last Result"] }} 
-                            </b-badge>
+                        <b-badge 
+                            variant="secondary"
+                            v-if="data.item['Last Result']"
+                            v-b-tooltip.hover.left 
+                            :title='data.item["Last Result Description"]' > 
+                            {{ data.item["Last Result"] }} 
+                        </b-badge>
                     </template>
 
                 </b-table>
@@ -115,11 +115,11 @@ export default class CriminalAppearanceDetails extends Vue {
 
     chargesFields =  
     [
-        {key:'Count',          sortable:false,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'text-info'},
-        {key:'Criminal Code',  sortable:false,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'font-weight-bold'},
-        {key:'Description',    sortable:false,  tdClass: 'border-top', headerStyle:'text',         cellStyle:'text'},
-        {key:'LastResult',     sortable:false,  tdClass: 'border-top', headerStyle:'text',         cellStyle:'text'},
-        {key:'Finding',        sortable:false,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'text'},
+        {key:'Count',          sortable:false,  tdClass: 'border-top'},
+        {key:'Criminal Code',  sortable:false,  tdClass: 'border-top'},
+        {key:'Description',    sortable:false,  tdClass: 'border-top'},
+        {key:'LastResult',     sortable:false,  tdClass: 'border-top'},
+        {key:'Finding',        sortable:false,  tdClass: 'border-top'},
     ];
     
     mounted() {

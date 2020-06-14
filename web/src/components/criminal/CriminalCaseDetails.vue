@@ -233,6 +233,7 @@ export default class CriminalCaseDetails extends Vue {
             }
 
             participantInfo['DocumentsJson'] = jParticipant.document;
+            participantInfo['CountsJson'] = jParticipant.count;
 
 
             this.UpdateDisplayName({'lastName': jParticipant.counselLastNm? jParticipant.counselLastNm: '', 'givenName': jParticipant.counselGivenNm? jParticipant.counselGivenNm: ''});

@@ -126,8 +126,7 @@ export default class CriminalHeader extends Vue {
       this.agencyLocation.Region = data.homeLocationRegionName;
       this.adjudicatorRestrictions = this.criminalFileInformation.adjudicatorRestrictionsInfo;
       this.participantList = this.criminalFileInformation.participantList
-      this.numberOfParticipants = this.participantList.length - 1; 
-      // this.ExtractParticipantInfo();
+      this.numberOfParticipants = this.participantList.length - 1;
       this.isMounted = true; 
       this.setActiveParticipantIndex(this.SortedParticipants[0].Index)
   }

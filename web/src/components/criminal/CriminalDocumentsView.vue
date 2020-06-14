@@ -150,15 +150,15 @@ export default class CriminalDocumentsView extends Vue {
 
     fields = [ 
         [
-            {key:'Date',  sortable:true,  tdClass: 'border-top',  headerStyle:'text-danger',   cellStyle:'text'},
-            {key:'Document Type',      sortable:true,  tdClass: 'border-top',  headerStyle:'text-primary',  cellStyle:'text-muted'},
-            {key:'Category',           sortable:false,  tdClass: 'border-top', headerStyle:'text',          cellStyle:'text'},
-            {key:'Pages',              sortable:false,  tdClass: 'border-top', headerStyle:'text',          cellStyle:'text'},
+            {key:'Date',               sortable:true,   tdClass: 'border-top',  headerStyle:'text-danger'},
+            {key:'Document Type',      sortable:true,   tdClass: 'border-top',  headerStyle:'text-primary'},
+            {key:'Category',           sortable:false,  tdClass: 'border-top',  headerStyle:'text'},
+            {key:'Pages',              sortable:false,  tdClass: 'border-top',  headerStyle:'text'},
         ],
         [
-            {key:'Document Type',    sortable:false,  tdClass: 'border-top', headerStyle:'text-primary',    cellStyle:'text-info'},
-            {key:'Category',         sortable:true,  tdClass: 'border-top',  headerStyle:'text',            cellStyle:'text'},
-            {key:'Pages',            sortable:false,  tdClass: 'border-top', headerStyle:'text',            cellStyle:'text'},
+            {key:'Document Type',    sortable:false,  tdClass: 'border-top', headerStyle:'text-primary'},
+            {key:'Category',         sortable:true,   tdClass: 'border-top', headerStyle:'text'},
+            {key:'Pages',            sortable:false,  tdClass: 'border-top', headerStyle:'text'},
         ]  
         
     ];
@@ -206,19 +206,17 @@ export default class CriminalDocumentsView extends Vue {
     public ExtractDocumentInfo(): void {
         let ropExists = false 
         
-        for(const fileIndex in this.participantList)
-        {            
-            
-            const jFile =  this.participantList[fileIndex];
-            const fileInfo = jFile;
-            fileInfo["Documents"] = [];
-            fileInfo["Record of Proceedings"] = [];
+        for(const partIndex in this.participantList)
+        {         
+            const partInfo = this.participantList[partIndex];
+            partInfo["Documents"] = [];
+            partInfo["Record of Proceedings"] = [];
 
             /* eslint-disable */
             const document: any[] = [];
             const rop: any[] = [];
             /* eslint-enable */
-            for(const doc of jFile.DocumentsJson)
+            for(const doc of partInfo.DocumentsJson)
             {
                 if(doc.category != 'rop') {
                     const docInfo = {}; 
@@ -239,15 +237,15 @@ export default class CriminalDocumentsView extends Vue {
                     docInfo["Category"]= "ROP";
                     docInfo["Pages"]= doc.documentPageCount;
                     docInfo["PdfAvail"]= true 
-                    docInfo["Index"] = fileIndex;
+                    docInfo["Index"] = partIndex;
                     rop.push(docInfo);
                     ropExists = true
                 }
             }
-            fileInfo["Documents"] = document;
-            fileInfo["Record of Proceedings"] = rop;
+            partInfo["Documents"] = document;
+            partInfo["Record of Proceedings"] = rop;
                         
-            this.participantFiles.push(fileInfo);
+            this.participantFiles.push(partInfo);
         }
 
          this.categories.sort()
