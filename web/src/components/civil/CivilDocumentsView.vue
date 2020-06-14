@@ -70,12 +70,15 @@
                         </b-badge>
                     </template>
 
-                    <template v-slot:cell(Issues)="data" >
-                        <span :style="data.field.cellStyle"> 
-                            {{data.value}}
-                        </span>
+                    <template v-slot:cell(Issues)="data" >                               
+                        <li 
+                            v-for="(issue, issueIndex) in data.value"  
+                            v-bind:key="issueIndex"
+                            :style="data.field.cellStyle">
+                            {{ issue }}
+                        </li>
                     </template>
-
+                    
                     <template v-slot:cell(Seq.)="data">
                         <span class="ml-2" :style="data.field.cellStyle"> 
                             {{data.value}}
@@ -203,7 +206,12 @@ export default class CivilDocumentsView extends Vue {
                 docInfo["Document ID"] = jDoc.civilDocumentId;            
                 docInfo["PdfAvail"] = jDoc.imageId? true : false 
                 docInfo["Date Filed"] = jDoc.filedDt? jDoc.filedDt.split(' ')[0] : '';
-                docInfo["Issues"] = jDoc.issue.length? this.ExtractIssues(jDoc.issue) : ' ';
+                docInfo["Issues"] = [];
+                if (jDoc.issue && jDoc.issue.length > 0) {
+                    for (const issue of jDoc.issue) {
+                        docInfo["Issues"].push(issue.issueDsc)
+                    }
+                } 
                 this.documents.push(docInfo);
 
             } else {                

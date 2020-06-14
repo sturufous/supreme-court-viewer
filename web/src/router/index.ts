@@ -21,48 +21,14 @@ const routes: Array<RouteConfig> = [
     path: '/civil-file/:fileNumber',
     name: 'CivilCaseDetails',
     component: CivilCaseDetails, 
-    props: true,
-    children: [
-      {
-        path: 'future-appearances',
-        component: CivilFutureAppearances
-      },
-      {
-        path: 'past-appearances',
-        component: CivilPastAppearances
-      }
-    ]
+    props: true
   },
   {
     path: '/criminal-file/:fileNumber',
     name: 'CriminalCaseDetails',
     component: CriminalCaseDetails,
-    props: true,
-    children: [
-      {
-        path: 'future-appearances',
-        component: CriminalFutureAppearances
-      },
-      {
-        path: 'past-appearances',
-        component: CriminalPastAppearances
-      },
-      {
-        path: 'witnesses',
-        component: CriminalWitnesses
-      },
-      {
-        path: 'sentences',
-        component: CriminalSentence
-      },
-      {
-        path: 'documents',
-        component: CriminalDocumentsView
-      }
-
-    ]
+    props: true
   }
 ]
 
 export default routes
-
