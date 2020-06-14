@@ -16,6 +16,7 @@ namespace Scv.Api.Models.Criminal.CourtList
         public string OutOfTownJudge { get; set; }
         public string SupplementalEquipment { get; set; }
         public string SecurityRestriction { get; set; }
+        public string AppearanceReasonCd { get; set; }
         public string AppearanceReasonDesc { get; set; }
         public string JudgeInitials { get; internal set; }
         public ICollection<CrownWitness> Crown { get; set; }
