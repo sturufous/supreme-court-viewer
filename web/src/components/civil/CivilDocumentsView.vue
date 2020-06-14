@@ -39,14 +39,16 @@
                     </template>
 
                     <template v-slot:[`cell(${fields[fieldsTab][datePlace[fieldsTab]].key})`]="data" >
-                        {{ data.value | beautify-date}}
+                        <span :style="data.field.cellStyle">
+                            {{ data.value | beautify-date}}
+                        </span>
                     </template> 
 
                     <template v-slot:[`cell(${fields[fieldsTab][documentPlace[fieldsTab]].key})`]="data" >
                         <b-button 
                             v-if="data.item.PdfAvail" 
                             variant="outline-primary text-info" 
-                            style="border:0px; font-size: 16px;"
+                            :style="data.field.cellStyle"
                             @click="cellClick(data)"
                             size="sm">
                                 {{data.value}}
@@ -59,7 +61,7 @@
                     <template v-slot:cell(Act)="data" >
                         <b-badge 
                             variant="secondary"
-                            style="display: block; margin-top: 1px; font-size: 14px; max-width : 50px;"                     
+                            :style="data.field.cellStyle"                     
                             v-for="(act, actIndex) in data.value"  
                             v-bind:key="actIndex"                               
                             v-b-tooltip.hover.left 
@@ -69,13 +71,13 @@
                     </template>
 
                     <template v-slot:cell(Issues)="data" >
-                        <span style= "white-space: pre-line"> 
+                        <span :style="data.field.cellStyle"> 
                             {{data.value}}
                         </span>
                     </template>
 
-                    <template v-slot:cell(Seq.)="data" >
-                        <span class="ml-2"> 
+                    <template v-slot:cell(Seq.)="data">
+                        <span class="ml-2" :style="data.field.cellStyle"> 
                             {{data.value}}
                         </span>
                     </template>
@@ -127,15 +129,15 @@ export default class CivilDocumentsView extends Vue {
 
     fields = [ 
         [
-            {key:'Seq.',           sortable:true,  headerStyle:'text-primary',  cellStyle:'text'},
-            {key:'Document Type',  sortable:true,  headerStyle:'text-primary',  cellStyle:'text-muted'},
-            {key:'Act',            sortable:false, headerStyle:'text',          cellStyle:'text-white bg-secondary'},
-            {key:'Date Filed',     sortable:true,  headerStyle:'text-danger',   cellStyle:'text'},
-            {key:'Issues',         sortable:false, headerStyle:'text',          cellStyle:'text-muted'}
+            {key:'Seq.',           sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
+            {key:'Document Type',  sortable:true,  headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 16px;'},
+            {key:'Act',            sortable:false, headerStyle:'text',          cellStyle:'display: block; margin-top: 1px; font-size: 14px; max-width : 50px;'},
+            {key:'Date Filed',     sortable:true,  headerStyle:'text-danger',   cellStyle:'font-size: 16px;'},
+            {key:'Issues',         sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px;'}
         ],
         [
-            {key:'Document Type',    sortable:false, headerStyle:'text-primary',    cellStyle:'text-info'},
-            {key:'Appearance Date',  sortable:true, headerStyle:'text-danger',     cellStyle:'text'},
+            {key:'Document Type',    sortable:false, headerStyle:'text-primary',    cellStyle:'border:0px; font-size: 16px;'},
+            {key:'Appearance Date',  sortable:true,  headerStyle:'text-danger',     cellStyle:'font-size: 16px;'},
         ]  
         
     ];

@@ -49,14 +49,14 @@
                                 <b-button 
                                     v-if="data.item.PdfAvail" 
                                     variant="outline-primary text-info" 
-                                    style="border:0px;"
+                                    :style="data.field.cellStyle"
                                     @click="documentClick(data)"
                                     size="sm">
                                         {{data.value}}
                                 </b-button>
                                 <span
                                     class="ml-2"
-                                    :style="data.field.cellStyle"
+                                    :style="data.field.cellLabelStyle"
                                     v-else>
                                         {{data.value}}
                                 </span>
@@ -278,8 +278,8 @@ export default class CivilAppearanceDetails extends Vue {
     documentFields =  
     [
         {key:'Seq.',           sortable:false,  tdClass: 'border-top', headerStyle:'text', cellClass:'text',                  cellStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
-        {key:'Document Type',  sortable:false,  tdClass: 'border-top', headerStyle:'text', cellClass:'text',                  cellStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
-        {key:'Act',            sortable:false,  tdClass: 'border-top', headerStyle:'text', cellClass:'badge badge-dark mt-2', cellStyle: 'display: block; margin-top: 1px; font-size: 14px; max-width : 50px;'},
+        {key:'Document Type',  sortable:false,  tdClass: 'border-top', headerStyle:'text', cellClass:'text',                  cellStyle: 'border:0px; font-size: 14px;', cellLabelStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
+        {key:'Act',            sortable:false,  tdClass: 'border-top', headerStyle:'text', cellClass:'badge badge-dark mt-2', cellStyle: 'display: block; margin-top: 1px; font-size: 12px; max-width : 50px;'},
         {key:'Date Filed',     sortable:false,  tdClass: 'border-top', headerStyle:'text', cellClass:'text',                  cellStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
         {key:'Result',         sortable:false,  tdClass: 'border-top', headerStyle:'text', cellClass:'badge badge-dark mt-2', cellStyle: 'display: block; margin-top: 1px; font-size: 14px;'},
         {key:'Issues',         sortable:false,  tdClass: 'border-top', headerStyle:'text', cellClass:'text',                  cellStyle: 'font-weight: normal; font-size: 14px; padding-top:6px; line-height: 100%;'}
