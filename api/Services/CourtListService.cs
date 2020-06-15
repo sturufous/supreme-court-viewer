@@ -60,8 +60,8 @@ namespace Scv.Api.Services
 
             var courtList = _mapper.Map<Api.Models.CourtList.CourtList>(originalCourtList);
             //Populate file details. 
-            var civilFileTasks = courtList.CivilCourtList.Select(civilFile => _filesClient.FilesCivilFileIdAsync(_requestAgencyIdentifierId, _requestPartId, civilFile.PhysicalFile.PhysicalFileID)).ToList();
-            var criminalFileTasks = courtList.CriminalCourtList.Select(criminalFile => _filesClient.FilesCriminalFileIdAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode,
+            var civilFileDetailTasks = courtList.CivilCourtList.Select(civilFile => _filesClient.FilesCivilFileIdAsync(_requestAgencyIdentifierId, _requestPartId, civilFile.PhysicalFile.PhysicalFileID)).ToList();
+            var criminalFileDetailTasks = courtList.CriminalCourtList.Select(criminalFile => _filesClient.FilesCriminalFileIdAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode,
                     criminalFile.FileInformation.MdocJustinNo)).ToList();
 
             var targetDateInPast = DateTime.Now > proceeding;
@@ -78,8 +78,9 @@ namespace Scv.Api.Services
                 _filesClient.FilesCriminalFileIdAppearancesAsync(_requestAgencyIdentifierId, _requestPartId, lookForFutureAppearancesCriminal, lookForPastAppearancesCriminal, fileId));
 
             //Await our asynchronous requests. 
-            var civilFileDetails = (await civilFileTasks.WhenAll()).ToList();
-            var criminalFileDetails = (await criminalFileTasks.WhenAll()).ToList();
+            var civilFileDetails = (await civilFileDetailTasks.WhenAll()).ToList();
+            var criminalFileDetails = (await criminalFileDetailTasks.WhenAll()).ToList();
+
             var civilAppearances = (await civilAppearanceTasks.WhenAll()).ToList();
             var criminalAppearances = (await criminalAppearanceTasks.WhenAll()).ToList();
 
@@ -97,7 +98,10 @@ namespace Scv.Api.Services
             foreach (var courtListFile in courtList)
             {
                 var fileDetail = civilFileDetails.FirstOrDefault(x => x.PhysicalFileId == courtListFile.PhysicalFile.PhysicalFileID);
-                if (fileDetail == null) continue;
+                if (fileDetail != null)
+                {
+                    courtListFile.ActivityClassCd = await _lookupService.GetActivityClassCd(fileDetail.CourtClassCd.ToString());
+                }
 
                 foreach (var hearingRestriction in courtListFile.HearingRestriction)
                 {
@@ -115,6 +119,8 @@ namespace Scv.Api.Services
                     courtListFile.SecurityRestriction = targetAppearance.SecurityRestrictionTxt;
                     courtListFile.SupplementalEquipment = targetAppearance.SupplementalEquipmentTxt;
                     courtListFile.JudgeInitials = targetAppearance.JudgeInitials;
+                    courtListFile.EstimatedTimeHour = targetAppearance.EstimatedTimeHour?.ReturnNullIfEmpty();
+                    courtListFile.EstimatedTimeMin = targetAppearance.EstimatedTimeMin?.ReturnNullIfEmpty();
                 }
             }
 
@@ -126,11 +132,17 @@ namespace Scv.Api.Services
             foreach (var courtListFile in courtList)
             {
                 var fileDetail = criminalFileDetails.FirstOrDefault(x => x.JustinNo == courtListFile.FileInformation.MdocJustinNo);
-                if (fileDetail == null) continue;
-
-                courtListFile.Crown =
-                    _mapper.Map<ICollection<CrownWitness>>(fileDetail.Witness.Where(w => w.RoleTypeCd == CriminalWitnessRoleTypeCd.CRN)
-                        .ToList());
+                if (fileDetail != null)
+                {
+                    courtListFile.Crown =
+                        _mapper.Map<ICollection<CrownWitness>>(fileDetail.Witness.Where(w => w.RoleTypeCd == CriminalWitnessRoleTypeCd.CRN)
+                            .ToList());
+                    foreach (var crownWitness in courtListFile.Crown)
+                    {
+                        crownWitness.Assigned = crownWitness.IsAssigned(fileDetail.AssignedPartNm);
+                    }
+                    courtListFile.ActivityClassCd = await _lookupService.GetActivityClassCd(fileDetail.CourtClassCd.ToString());
+                }
 
 
                 foreach (var hearingRestriction in courtListFile.HearingRestriction)
@@ -149,6 +161,8 @@ namespace Scv.Api.Services
                     courtListFile.SecurityRestriction = targetAppearance.SecurityRestrictionTxt;
                     courtListFile.SupplementalEquipment = targetAppearance.SupplementalEquipmentTxt;
                     courtListFile.JudgeInitials = targetAppearance.JudgeInitials;
+                    courtListFile.EstimatedTimeHour = targetAppearance.EstimatedTimeHour?.ReturnNullIfEmpty();
+                    courtListFile.EstimatedTimeMin = targetAppearance.EstimatedTimeMin?.ReturnNullIfEmpty();
                 }
             }
 
