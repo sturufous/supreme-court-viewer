@@ -2,8 +2,8 @@
 
     <b-card bg-variant="white" no-body>
         <div>
-            <h2 class="mx-4 mt-5 font-weight-normal text-warning ">Criminal</h2>
-            <hr class="mx-3 bg-warning" style="height: 5px;"/> 
+            <h2 class="mx-4 mt-5 font-weight-normal text-info ">Criminal</h2>
+            <hr class="mx-3 bg-info" style="height: 5px;"/> 
         </div>
 
         <b-card v-if="!isDataReady && isMounted" no-body>
@@ -234,7 +234,7 @@ export default class CriminalList extends Vue {
         //     appInfo["OutOfTown Judge"] = jApp.outOfTownJudgeTxt
                        
             this.criminalList.push(criminalListInfo); 
-            console.log(criminalListInfo)
+            //console.log(criminalListInfo)
         }
     }
 

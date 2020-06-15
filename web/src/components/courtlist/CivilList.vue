@@ -2,8 +2,8 @@
 
     <b-card bg-variant="white" no-body>
         <div>
-            <h2 class="mx-4 mt-5 font-weight-normal text-success">Civil</h2>
-            <hr class="mx-3 bg-success" style="height: 5px;"/> 
+            <h2 class="mx-4 mt-5 font-weight-normal text-warning">Civil</h2>
+            <hr class="mx-3 bg-warning" style="height: 5px;"/> 
         </div>
 
         <b-card v-if="!isDataReady && isMounted" no-body>
@@ -49,8 +49,8 @@
                                 @click="OpenDetails(data); data.toggleDetails();" 
                                 variant="outline-primary border-white text-info" 
                                 class="mr-2 mt-1">
-                        <b-icon-caret-right-fill v-if="!data.item['_showDetails']"></b-icon-caret-right-fill>
-                        <b-icon-caret-down-fill v-if="data.item['_showDetails']"></b-icon-caret-down-fill>
+                        <b-icon-caret-right-fill variant="warning" v-if="!data.item['_showDetails']"></b-icon-caret-right-fill>
+                        <b-icon-caret-down-fill variant="warning" v-if="data.item['_showDetails']"></b-icon-caret-down-fill>
                         {{data.value}}
                     </b-button>                   
                 </template>
