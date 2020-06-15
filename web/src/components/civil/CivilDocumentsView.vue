@@ -136,7 +136,7 @@ export default class CivilDocumentsView extends Vue {
             {key:'Document Type',  sortable:true,  headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 16px;'},
             {key:'Act',            sortable:false, headerStyle:'text',          cellStyle:'display: block; margin-top: 1px; font-size: 14px; max-width : 50px;'},
             {key:'Date Filed',     sortable:true,  headerStyle:'text-danger',   cellStyle:'font-size: 16px;'},
-            {key:'Issues',         sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px;'}
+            {key:'Issues',         sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px;'}
         ],
         [
             {key:'Document Type',    sortable:false, headerStyle:'text-primary',    cellStyle:'border:0px; font-size: 16px;'},
