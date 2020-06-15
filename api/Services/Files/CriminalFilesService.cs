@@ -293,7 +293,15 @@ namespace Scv.Api.Services.Files
             return detail.HearingRestriction.Where(hr => hr.HearingRestrictionTypeCd == HearingRestriction2HearingRestrictionTypeCd.S).ToList(); //TODO conditional permission. MY_CALENDAR_SEIZED_AARS)
         }
 
-        private ICollection<CrownWitness> PopulateDetailCrown(RedactedCriminalFileDetailResponse detail) => _mapper.Map<ICollection<CrownWitness>>(detail.Witness.Where(w => w.RoleTypeCd == CriminalWitnessRoleTypeCd.CRN).ToList());
+        private ICollection<CrownWitness> PopulateDetailCrown(RedactedCriminalFileDetailResponse detail)
+        {
+            var crownWitnesses = _mapper.Map<ICollection<CrownWitness>>(detail.Witness.Where(w => w.RoleTypeCd == CriminalWitnessRoleTypeCd.CRN).ToList());
+            foreach (var crownWitness in crownWitnesses)
+            {
+                crownWitness.Assigned = crownWitness.IsAssigned(detail.AssignedPartNm);
+            }
+            return crownWitnesses;
+        }
 
         #endregion Criminal Details
 
