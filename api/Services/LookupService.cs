@@ -228,7 +228,7 @@ namespace Scv.Api.Services
         
         public async Task<string> GetCivilAssetsDescription(string code) => FindLongDescriptionFromCode(await GetCivilAssets(), code);
 
-        public async Task<string> GetCivilCounselAttendanceType(string code) => FindShortDescriptionFromCode(await GetCivilCounselAttendanceTypes(), code);
+        public async Task<string> GetCivilCounselAttendanceType(string code) => FindLongDescriptionFromCode(await GetCivilCounselAttendanceTypes(), code);
 
         public async Task<string> GetCivilDocumentIssueType(string code) => FindShortDescriptionFromCode(await GetCivilDocumentIssueTypes(), code);
 
