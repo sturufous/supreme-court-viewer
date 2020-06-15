@@ -80,7 +80,8 @@ namespace Scv.Api.Services
             //Await our asynchronous requests. 
             var civilFileDetails = (await civilFileDetailTasks.WhenAll()).ToList();
             var criminalFileDetails = (await criminalFileDetailTasks.WhenAll()).ToList();
-            var civilAppearances = (await civilAppearanceTasks.WhenAll()).ToList()
+
+            var civilAppearances = (await civilAppearanceTasks.WhenAll())
                 .Where(ca => ca.ApprDetail.Any(ad => ad.AppearanceDt == proceedingDateString)).ToList();
             var criminalAppearances = (await criminalAppearanceTasks.WhenAll())
                 .Where(ca => ca.ApprDetail.Any(ad => ad.AppearanceDt == proceedingDateString)).ToList();
