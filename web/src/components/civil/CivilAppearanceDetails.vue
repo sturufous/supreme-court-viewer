@@ -40,11 +40,13 @@
                         v-if="appearanceDocuments.length > 0"
                         :items="appearanceDocuments"
                         :fields="documentFields"               
-                        borderless
-                        striped 
+                        borderless                     
                         small               
                         responsive="sm"
-                        >   
+                        >
+                            <template v-slot:head(Result)>
+                                <b>Result</b><b style="margin-left: 10px">Issues</b>
+                            </template>   
                             <template v-slot:[`cell(${documentFields[1].key})`]="data" >
                                 <b-button 
                                     v-if="data.item.PdfAvail" 
@@ -80,25 +82,34 @@
                                 </span>
                             </template>
 
-                             <template v-slot:cell(Result)="data" >
-                                <b-badge
-                                    v-if="data.value"  
-                                    variant="secondary"
-                                    v-b-tooltip.hover.left
-                                    :style="data.field.cellStyle"                            
-                                    :title="data.item['Result Description']">
-                                        {{data.value}}                                 
-                                </b-badge>
-                             </template>
+                            <template v-slot:cell(Result)="data" >
+                                <b-table
+                                    :items="data.item.Issues"
+                                    :fields="issueFields"
+                                    thead-class="d-none"
+                                    :striped="stripedStyle"
+                                    borderless
+                                    small               
+                                    responsive="sm">
+                                    <template v-slot:cell(Issue)="data" >                               
+                                        <li :style="data.field.cellStyle">
+                                            {{ data.item.Issue }}
+                                        </li>
+                                    </template>
+                                    <template v-slot:cell(Result)="data" >
+                                        <span :style="data.field.cellStyle">                               
+                                            <b-badge
+                                                v-if="data.value"                                     
+                                                variant="secondary"
+                                                v-b-tooltip.hover.left
+                                                :title="data.item['ResultDsc']">
+                                                    {{data.value}}                                 
+                                            </b-badge>
+                                        </span>
+                                    </template>
+                                </b-table>     
 
-                            <template v-slot:cell(Issues)="data" >                               
-                                <li 
-                                    v-for="(issue, issueIndex) in data.value"  
-                                    v-bind:key="issueIndex"
-                                    :style="data.field.cellStyle">
-                                    {{ issue }}
-                                </li>
-                            </template>           
+                            </template> 
                     </b-table>
                     <template v-slot:overlay>               
                         <div style="text-align: center"> 
@@ -168,7 +179,7 @@
             responsive="sm"
             >   
             <template v-for="(field,index) in partyFields" v-slot:[`head(${field.key})`]="data">
-                <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
+                <b v-bind:key="index"> {{ data.label }}</b>
             </template>                
             <template v-for="(field,index) in partyFields" v-slot:[`cell(${field.key})`]="data" >                                                        
                 <span v-bind:key="index" :style="field.cellStyle" v-if="data.field.key == 'Current Counsel' && data.value.length>0">
@@ -264,6 +275,7 @@ export default class CivilAppearanceDetails extends Vue {
     loadingPdf = false;  
     isMounted = false;
     isDataReady = false;
+    stripedStyle = false;
     appearanceDetailsJson; 
     additionalInfo = {};
     adjudicatorComment = '';
@@ -275,23 +287,28 @@ export default class CivilAppearanceDetails extends Vue {
         {key:'value',  sortable:false},
     ];   
 
+    issueFields =
+    [
+        {key:'Result',        sortable:false,  tdClass: '', cellClass:'badge badge-dark mt-2', cellStyle: 'display: block; margin-top: 1px; font-size: 14px; width: 60px;'},
+        {key:'Issue',         sortable:false,  tdClass: '', cellClass:'text',                  cellStyle: 'font-weight: normal; font-size: 14px; padding-top:6px; line-height: 100%;'}
+    ]
+
     documentFields =  
     [
-        {key:'Seq.',           sortable:false,  tdClass: 'border-top', headerStyle:'text', cellClass:'text',                  cellStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
-        {key:'Document Type',  sortable:false,  tdClass: 'border-top', headerStyle:'text', cellClass:'text',                  cellStyle: 'border:0px; font-size: 14px;', cellLabelStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
-        {key:'Act',            sortable:false,  tdClass: 'border-top', headerStyle:'text', cellClass:'badge badge-dark mt-2', cellStyle: 'display: block; margin-top: 1px; font-size: 12px; max-width : 50px;'},
-        {key:'Date Filed',     sortable:false,  tdClass: 'border-top', headerStyle:'text', cellClass:'text',                  cellStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
-        {key:'Result',         sortable:false,  tdClass: 'border-top', headerStyle:'text', cellClass:'badge badge-dark mt-2', cellStyle: 'display: block; margin-top: 1px; font-size: 14px;'},
-        {key:'Issues',         sortable:false,  tdClass: 'border-top', headerStyle:'text', cellClass:'text',                  cellStyle: 'font-weight: normal; font-size: 14px; padding-top:6px; line-height: 100%;'}
+        {key:'Seq.',           sortable:false,  tdClass: 'border-top', cellClass:'text',                  cellStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
+        {key:'Document Type',  sortable:false,  tdClass: 'border-top', cellClass:'text',                  cellStyle: 'border:0px; font-size: 14px;', cellLabelStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
+        {key:'Act',            sortable:false,  tdClass: 'border-top', cellClass:'badge badge-dark mt-2', cellStyle: 'display: block; margin-top: 1px; font-size: 12px; max-width : 50px;'},
+        {key:'Date Filed',     sortable:false,  tdClass: 'border-top', cellClass:'text',                  cellStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
+        {key:'Result',         sortable:false,  tdClass: 'border-top', cellClass:'badge badge-dark mt-2', cellStyle: 'display: block; margin-top: 1px; font-size: 14px;'}
     ];
     
     partyFields =  
     [
-        {key:'Name',                  sortable:false, tdClass: 'border-top',  headerStyle:'text',   cellStyle:'font-weight: bold; font-size: 14px;'},
-        {key:'Role',                  sortable:false, tdClass: 'border-top',  headerStyle:'text',   cellStyle:'font-size: 14px; white-space: pre-line;'},
-        {key:'Current Counsel',       sortable:false, tdClass: 'border-top', headerStyle:'text',    cellStyle: 'display: block; font-size: 14px; white-space: initial;'},
-        {key:'Legal Representative',  sortable:false, tdClass: 'border-top', headerStyle:'text',    cellStyle:'font-size: 14px; white-space: pre-line;'},
-        {key:'Representative',        sortable:false, tdClass: 'border-top', headerStyle:'text',    cellStyle: 'display: block; font-size: 14px; white-space: initial;'}
+        {key:'Name',                  sortable:false, tdClass: 'border-top',  cellStyle:'font-weight: bold; font-size: 14px;'},
+        {key:'Role',                  sortable:false, tdClass: 'border-top',  cellStyle:'font-size: 14px; white-space: pre-line;'},
+        {key:'Current Counsel',       sortable:false, tdClass: 'border-top',  cellStyle: 'display: block; font-size: 14px; white-space: initial;'},
+        {key:'Legal Representative',  sortable:false, tdClass: 'border-top',  cellStyle:'font-size: 14px; white-space: pre-line;'},
+        {key:'Representative',        sortable:false, tdClass: 'border-top',  cellStyle: 'display: block; font-size: 14px; white-space: initial;'}
         
     ];
 
@@ -358,7 +375,7 @@ export default class CivilAppearanceDetails extends Vue {
             docInfo["Index"] = documentIndex;
             if (document.issue && document.issue.length > 0) {
                 for (const issue of document.issue) {
-                    docInfo["Issues"].push(issue.issueDsc)
+                    docInfo["Issues"].push({'Issue': issue.issueDsc, 'Result': issue.issueResultCd, 'ResultDsc': issue.issueResultDsc})
                 }
             }    
 
