@@ -81,10 +81,8 @@ namespace Scv.Api.Services
             var civilFileDetails = (await civilFileDetailTasks.WhenAll()).ToList();
             var criminalFileDetails = (await criminalFileDetailTasks.WhenAll()).ToList();
 
-            var civilAppearances = (await civilAppearanceTasks.WhenAll())
-                .Where(ca => ca.ApprDetail.Any(ad => ad.AppearanceDt == proceedingDateString)).ToList();
-            var criminalAppearances = (await criminalAppearanceTasks.WhenAll())
-                .Where(ca => ca.ApprDetail.Any(ad => ad.AppearanceDt == proceedingDateString)).ToList();
+            var civilAppearances = (await civilAppearanceTasks.WhenAll()).ToList();
+            var criminalAppearances = (await criminalAppearanceTasks.WhenAll()).ToList();
 
             //Join court list + file details + appearances. 
             courtList.CivilCourtList = await PopulateCivilFiles(civilFileDetails, courtList.CivilCourtList, civilAppearances);
