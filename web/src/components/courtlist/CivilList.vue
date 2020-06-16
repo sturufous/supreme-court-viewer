@@ -2,8 +2,8 @@
 
     <b-card bg-variant="white" no-body>
         <div>
-            <h2 class="mx-4 mt-5 font-weight-normal text-warning">Civil</h2>
-            <hr class="mx-3 bg-warning" style="height: 5px;"/> 
+            <h2 :class="'mx-4 mt-5 font-weight-normal text-'+civilClass">{{getClassName}}</h2>
+            <hr :class="'bg-'+civilClass+' mx-3'" style="height: 5px;"/> 
         </div>
 
         <b-card v-if="!isDataReady && isMounted" no-body>
@@ -22,7 +22,7 @@
             </b-overlay> 
         </b-card>
 
-        <b-card bg-variant="white" v-if="isDataReady" no-body class="mx-3">           
+        <b-card bg-variant="white" v-if="isDataReady" no-body class="mx-3" style="overflow:auto">           
             <b-table
             :items="civilList"
             :fields="fields"            
@@ -36,7 +36,7 @@
 
                 <template  v-slot:cell()="data">
                     <b-badge                        
-                        style="font-weight: normal; font-size: 16px; padding-top:12px" 
+                        style="font-weight: normal; font-size: 16px; padding-top:8px" 
                         :class="data.field.cellStyle"
                         variant="white" > 
                             {{data.value}} 
@@ -44,14 +44,15 @@
                 </template>
 
                 <template v-slot:[`cell(${fields[0].key})`]="data" >                     
-                    <b-button style="transform: translate(0,-7px); font-size:16px" 
-                                size="sm" 
-                                @click="OpenDetails(data); data.toggleDetails();" 
-                                variant="outline-primary border-white text-info" 
-                                class="mr-2 mt-1">
-                        <b-icon-caret-right-fill variant="warning" v-if="!data.item['_showDetails']"></b-icon-caret-right-fill>
-                        <b-icon-caret-down-fill variant="warning" v-if="data.item['_showDetails']"></b-icon-caret-down-fill>
-                        {{data.value}}
+                    <b-button 
+                        style=" font-size:16px" 
+                        size="sm" 
+                        @click="OpenDetails(data); data.toggleDetails();" 
+                        variant="outline-primary border-white text-info" 
+                        class="mr-2">
+                            <b-icon-caret-right-fill :variant="civilClass" v-if="!data.item['_showDetails']"></b-icon-caret-right-fill>
+                            <b-icon-caret-down-fill :variant="civilClass" v-if="data.item['_showDetails']"></b-icon-caret-down-fill>
+                            {{data.value}}
                     </b-button>                   
                 </template>
 
@@ -63,12 +64,57 @@
                 
                 <template  v-slot:cell(Reason)="data">
                     <b-badge
-                            variant="secondary"
-                            v-b-tooltip.hover.right                            
-                            :title="data.item['Reason Description']"
-                            style="margin-top: 10px; font-size: 14px;"> 
+                        variant="secondary"
+                        v-b-tooltip.hover.right                            
+                        :title="data.item['ReasonDesc']"
+                        style="margin-top: 6px; font-size: 14px;"> 
                             {{data.value}}
                     </b-badge>
+                </template>
+
+                <template  v-slot:cell(Parties)="data">
+                    <b-badge
+                        v-if="data.item['PartiesTruncApplied']"
+                        variant="white text-success"                        
+                        v-b-tooltip.hover.right                            
+                        :title="data.item['PartiesDesc']"
+                        style="margin-top: 5px; font-size: 16px; font-weight:normal"> 
+                            {{data.value}}
+                    </b-badge>
+                     <b-badge
+                        variant="white"
+                        style="margin-top: 5px; font-size: 16px; font-weight:normal" v-else>
+                            {{data.value}}
+                    </b-badge>
+                </template>
+                <template  v-slot:cell(Counsel)="data">
+                    <b-badge
+                        v-if="data.item['CounselDesc']"
+                        variant="white text-success"                        
+                        v-b-tooltip.hover.left                           
+                        :title="data.item['CounselDesc']"
+                        style="margin-top: 4px; font-size: 16px; font-weight:normal"> 
+                            {{data.value}}
+                    </b-badge>
+                    <b-badge v-else
+                        variant="white"
+                        style="margin-top: 4px; font-size: 16px; font-weight:normal" >
+                            {{data.value}}
+                    </b-badge>
+                </template>
+                 
+            
+
+                <template v-slot:[`cell(${fields[7].key})`]="data" >
+                        <b-badge  
+                            v-for="(field,index) in data.value"
+                            :key="index" 
+                            class="mr-1"
+                            style="margin-top: 6px; font-weight: normal; font-size: 14px;"
+                            v-b-tooltip.hover 
+                            :title='field.key' > 
+                            {{ field.abbr }} 
+                        </b-badge>
                 </template>
 
             </b-table>
@@ -79,7 +125,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Prop } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import CivilAppearanceDetails from '@components/civil/CivilAppearanceDetails.vue';
 
@@ -89,6 +135,8 @@ import '@store/modules/CourtListInformation';
 const courtListState = namespace('CourtListInformation');
 import "@store/modules/CivilFileInformation";
 const civilState = namespace("CivilFileInformation");
+
+enum HearingType {'A'= '+','G' = '@','D'='-', 'S' = '*'  }
 
 @Component({
     components: {
@@ -145,6 +193,8 @@ export default class CivilList extends Vue {
         this.isMounted = true;
     } 
 
+    @Prop() civilClass
+
     civilList: any[] = [];
     
     civilCourtListJson;
@@ -163,61 +213,97 @@ export default class CivilList extends Vue {
         {key:'Counsel',     tdClass: 'border-top', headerStyle:'', cellStyle:''},
         {key:'File Markers',tdClass: 'border-top', headerStyle:'', cellStyle:''},
         {key:'Notes',       tdClass: 'border-top', headerStyle:'', cellStyle:''},
-    ];
-    
-    
+    ]; 
   
     public ExtractCivilListInfo(): void {
-        
+        const listClass = this.civilClass=='family'? 'F': 'I';
         for (const civilListIndex in this.civilCourtListJson) 
         {
             const civilListInfo = {};
             const jcivilList = this.civilCourtListJson[civilListIndex];
 
             civilListInfo["Index"] = civilListIndex;
+            if(jcivilList.activityClassCd != listClass) continue;
+
             civilListInfo['File Number']=jcivilList.physicalFile.fileNumber           
             civilListInfo["Time"] = this.getTime(jcivilList.appearanceTime.substr(0,5));
 
             civilListInfo["Room"] = this.courtRoom
-            civilListInfo["Parties"] = jcivilList.sealFileSOCText
-            civilListInfo['Reason'] = jcivilList.document[0].appearanceReasonCode
-            civilListInfo['Est.'] = jcivilList.scheduledAppearance.length>0 ? this.getDuration(jcivilList.scheduledAppearance[0].estDurationHours, jcivilList.scheduledAppearance.estDurationMins): ''
-            // civilListInfo['Counsel'] = jcivilList.counselFullName
+            const partyNames = this.getNameOfPartyTrunc(jcivilList.sealFileSOCText)
+            civilListInfo["Parties"] = partyNames.name
+            civilListInfo["PartiesTruncApplied"] = partyNames.trunc
+            civilListInfo["PartiesDesc"] = jcivilList.sealFileSOCText
 
-            // civilListInfo['File Markers'] = jcivilList.hearingRestriction.length>0? jcivilList.hearingRestriction[0].hearingRestrictiontype :''
 
-            // civilListInfo['PartID'] =  jcivilList.fileInformation.partId
+            civilListInfo['Reason'] = jcivilList.appearanceReasonCd             
+            civilListInfo['ReasonDesc'] = jcivilList.appearanceReasonDesc
+            civilListInfo['Est.'] = this.getDuration(jcivilList.estimatedTimeHour, jcivilList.estimatedTimeMin)
+            
+            civilListInfo['Counsel'] = ''          
+            civilListInfo['CounselDesc'] =''
+
+            let firstCounselSet=false
+            for (const party of jcivilList.parties)
+            {
+                //console.log(party)
+                for(const counsel of party.counsel)
+                {                    
+                    if(!firstCounselSet)
+                    {
+                        civilListInfo['Counsel'] = counsel.counselFullName;
+                        firstCounselSet = true;
+                    }
+                    else
+                    {
+                        civilListInfo['CounselDesc'] += counsel.counselFullName +', ';
+                    }                    
+                }
+            }
+            if(civilListInfo['CounselDesc']) civilListInfo['CounselDesc'] += civilListInfo['Counsel'];
+
             civilListInfo['FileID'] = jcivilList.physicalFile.physicalFileID
             civilListInfo['AppearanceID'] = jcivilList.appearanceId
-            
-        //     appInfo["Date"] = jApp.appearanceDt.split(' ')[0]
-        //     if(new Date(appInfo["Date"]) < currentDate) continue;            
-        //     appInfo["FormattedDate"] = Vue.filter('beautify-date')(appInfo["Date"]);
-        //     appInfo["Time"] = this.getTime(jApp.appearanceTm.split(' ')[1].substr(0,5));
-        //     appInfo["Reason"] = jApp.appearanceReasonCd;
-        //     appInfo["Reason Description"] = jApp.appearanceReasonDsc? jApp.appearanceReasonDsc: '';
-          
-        //     appInfo["Duration"] = this.getDuration(jApp.estimatedTimeHour, jApp.estimatedTimeMin)           
-        //     appInfo["Location"] = jApp.courtLocation;
-        //     appInfo["Room"] =jApp.courtRoomCd
 
-        //     appInfo["First Name"] = jApp.givenNm ? jApp.givenNm : "";
-        //     appInfo["Last Name"] = jApp.lastNm ? jApp.lastNm : jApp.orgNm;
-        //     appInfo["Accused"] = this.getNameOfParticipant(appInfo["Last Name"], appInfo["First Name"]);  
-        //     appInfo["Status"] = jApp.appearanceStatusCd ? appearanceStatus[jApp.appearanceStatusCd] :''
-        //     appInfo["Status Style"] = this.getStatusStyle(appInfo["Status"])
-        //     appInfo["Presider"] =  jApp.judgeInitials ? jApp.judgeInitials :''
-        //     appInfo["Judge Full Name"] =  jApp.judgeInitials ? jApp.judgeFullNm : ''
-
-        //     appInfo["Appearance ID"] = jApp.appearanceId            
-        //     appInfo["Part ID"] = jApp.partId
-        //     appInfo["Supplemental Equipment"] = jApp.supplementalEquipmentTxt
-        //     appInfo["Security Restriction"] = jApp.securityRestrictionTxt
-        //     appInfo["OutOfTown Judge"] = jApp.outOfTownJudgeTxt
+            civilListInfo['File Markers'] = [];
+            for (const hearingRestriction of jcivilList.hearingRestriction)
+            {
+                const marker =  hearingRestriction.adjInitialsText +  HearingType[hearingRestriction.hearingRestrictiontype]  
+                const markerDesc =  hearingRestriction.judgeName + ' ('+ hearingRestriction.hearingRestrictionTypeDesc+')' 
+                
+                //console.log(markerDesc)
+                civilListInfo['File Markers'].push({abbr:marker, key:markerDesc});
+            }
+            //console.log(civilListInfo['File Markers'])
                        
-            this.civilList.push(civilListInfo); 
+            this.civilList.push(civilListInfo);
             //console.log(civilListInfo)
         }
+    }
+
+    public getNameOfPartyTrunc(partyNames) 
+    {
+        const maximumFullNameLength=15
+        let truncApplied = false 
+        if (partyNames) {
+            let firstParty = partyNames.split('/')[0].trim()
+            let secondParty = partyNames.split('/')[1].trim()
+
+            if(firstParty.length > maximumFullNameLength)
+            { 
+                firstParty = firstParty.substr(0, maximumFullNameLength) +' ...';
+                truncApplied = true;
+            }
+
+            if(secondParty.length > maximumFullNameLength)
+            { 
+                secondParty = secondParty.substr(0, maximumFullNameLength) +' ...';
+                truncApplied = true;
+            } 
+            
+                return  {name: firstParty+' / '+secondParty, trunc:truncApplied};
+        } else {
+            return {name: '', trunc:truncApplied};
+        }    
     }
 
     public getNameOfParticipant(lastName, givenName) {
@@ -249,6 +335,14 @@ export default class CivilList extends Vue {
             // this.appearanceInfo.outOfTownJudgeTxt = data.item["OutOfTown Judge"]
             this.UpdateAppearanceInfo(this.appearanceInfo);
         }        
+    }
+
+    get getClassName()
+    {
+        if (this.civilClass=='family') 
+            return 'Family';
+        else
+            return 'Civil';
     }
 
     get SortedCivilList()

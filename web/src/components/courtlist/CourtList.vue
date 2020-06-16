@@ -69,7 +69,7 @@
                         :disabled="!searchAllowed"
                         placeholder="YYYY-MM-DD"
                         autocomplete="off"
-                        @change="dateChanged"
+                        :state = "selectedDateState?null:false"
                     ></b-form-input>
                     <b-input-group-append>
                         <b-form-datepicker
@@ -84,16 +84,16 @@
                 </b-input-group>           
             </b-col>
             <b-col md="2">
-                <b-form-group            
-                    class = "mr-3"> 
+                <b-form-group class = "mr-3"> 
                     <label for="roomSelect">Room*</label>
                     <b-form-select
+                        v-if="syncFlag"
                         v-model="selectedCourtRoom"
                         id="roomSelect"
                         :disabled="!searchAllowed"
                         @change="RoomChanged"
-                        :state = "selectedCourtRoomState?null:false"
-                        :options="selectedCourtLocation? selectedCourtLocation.Rooms:null"
+                        :options="selectedCourtLocation.Rooms"
+                        :state = "selectedCourtRoomState?null:false"                       
                         style="height:39px">
                     </b-form-select>
                 </b-form-group>
@@ -116,21 +116,21 @@
         <b-card bg-variant="light" v-if= "searchingRequest">
             <b-card class="mb-2">
                 <b-navbar type="white" variant="white" style="height:40px;" >
-                    <b-nav-text class="text-primary mr-2 mt-3">               
+                    <b-nav-text class="text-primary mr-2 mt-2">               
                         <h2>{{fullSelectedDate}}</h2>                
                     </b-nav-text>
 
-                    <b-nav-text class="text-muted ml-5 mt-3">               
+                    <b-nav-text class="text-muted ml-5 mt-2">               
                         <h3>{{courtListLocation}}</h3>               
                     </b-nav-text>
-                    <b-nav-text class="text-muted ml-1" style="padding-top:25px">               
+                    <b-nav-text class="text-muted ml-1" style="padding-top:18px">               
                         <h4>({{courtListLocationID}})</h4>               
                     </b-nav-text>
 
-                    <b-nav-text class=" ml-5 mt-3">               
+                    <b-nav-text class=" ml-5 mt-2">               
                         <h3> CourtRoom: </h3>                
                     </b-nav-text>            
-                    <b-nav-text class=" ml-1 mt-3 ">               
+                    <b-nav-text class=" ml-1 mt-2 ">               
                         <h3>{{courtListRoom}}</h3>                
                     </b-nav-text>
                 </b-navbar>
@@ -155,7 +155,9 @@
             <b-card no-body v-if="isDataReady">
                 <b-row cols="1" class = "mx-2 mt-2 mb-5">
                     <criminal-list/>
-                    <civil-list/>
+                    <civil-list civilClass='family'/>
+                    <civil-list civilClass='civil'/>
+                    
                 </b-row> 
             </b-card>
         </b-card> 
@@ -220,7 +222,7 @@ export default class CourtList extends Vue {
         //console.log('before call')
         //console.log(this.searchingRequest)
        
-        this.$http.get('/api/courtlist/court-list?agencyId='+ this.courtListLocationID +'&roomCode='+ this.courtListRoom+'&proceeding=' +this.selectedDate)
+        this.$http.get('/api/courtlist/court-list?agencyId='+ this.courtListLocationID +'&roomCode='+ this.courtListRoom+'&proceeding=' +this.validSelectedDate)
             .then(Response => Response.json(), err => {this.errorCode= err.status;this.errorText= err.statusText;console.log(err);}        
             ).then(data => {
                 if(data){
@@ -249,15 +251,17 @@ export default class CourtList extends Vue {
     isLocationDataReady = false;
     isLocationDataMounted = false;
     searchAllowed = true;
+    syncFlag = true
 
 
     courtRoomsAndLocationsJson;
     courtRoomsAndLocations: any[] = [];
 
     selectedDate = (new Date).toISOString().substring(0,10);
-    lastValidSelectedDate = this.selectedDate;
+    validSelectedDate = this.selectedDate;
     fullSelectedDate = '';
 
+    selectedDateState = true
     selectedCourtRoom= 'null';
     selectedCourtRoomState=true;
     selectedCourtLocation: any;
@@ -301,61 +305,90 @@ export default class CourtList extends Vue {
         //console.log(this.courtRoomsAndLocations)
     }
 
-    public onCalenderContext(ctx) {
-        // The date formatted in the locale, or the `label-no-date-selected` string
-        //console.log(ctx.selectedFormatted)
-        // The following will be an empty string until a valid date is entered
-        //console.log(ctx.selectedYMD)
+    public onCalenderContext(datePicked) {
+        
+        //console.log(datePicked.selectedFormatted)        
+        //console.log(datePicked.selectedYMD)
         this.searchingRequest = false
-        //console.log('context')
-        //console.log(this.searchingRequest)
-        const tempDate = new Date(this.selectedDate)
-        // //console.log(tempDate)
-        if(!isNaN(tempDate.getTime()))
+        
+        if(datePicked.selectedYMD)
         {
-            //console.log('date ok')
-            this.selectedDate = ctx.selectedYMD
-            this.lastValidSelectedDate = ctx.selectedYMD 
-            this.fullSelectedDate = ctx.selectedFormatted
-        }
-        else
-        {
-           // console.log('date error')
-            this.selectedDate = this.lastValidSelectedDate
-        }        
-    }
-
-    public dateChanged()
-    {
-        //this.searchingRequest = false
-        console.log('changed----')
-        //console.log(this.searchingRequest)
+            this.validSelectedDate = datePicked.selectedYMD
+            this.fullSelectedDate = datePicked.selectedFormatted
+            //console.log('Date OK')
+        } 
     }
 
     public BackToPreviouDay()
     {    
-        this.searchAllowed = false;   
-        const date=new Date(this.selectedDate)
-        date.setDate(date.getDate() - 1)
-        this.selectedDate = date.toISOString().substring(0,10)
-        //console.log( this.selectedDate)
-        // console.log('pre day')
-        //console.log(this.searchingRequest)
-        setTimeout(() => { this.searchForCourtList(); }, 500);
+        if(!this.checkDateInValid())
+        {
+            this.searchAllowed = false;   
+            const date=new Date(this.selectedDate)
+            date.setDate(date.getDate() - 1)
+            this.selectedDate = date.toISOString().substring(0,10)
+            //console.log( this.selectedDate)
+            // console.log('pre day')
+            //console.log(this.searchingRequest)
+            setTimeout(() => { this.searchForCourtList(); }, 500);
+        }
     }
 
     public JumpToNextDay()
     {
-        this.searchAllowed = false;   
-        const date=new Date(this.selectedDate)
-        date.setDate(date.getDate() + 1)
-        this.selectedDate = date.toISOString().substring(0,10)
-        //console.log( this.selectedDate)
-        //console.log('next day')
-        //console.log(this.searchingRequest)
-        setTimeout(() => { this.searchForCourtList(); }, 500);
-        
+        if(!this.checkDateInValid())
+        {
+            this.searchAllowed = false;   
+            const date=new Date(this.selectedDate)
+            date.setDate(date.getDate() + 1)
+            this.selectedDate = date.toISOString().substring(0,10)
+            //console.log( this.selectedDate)
+            //console.log('next day')
+            //console.log(this.searchingRequest)
+            setTimeout(() => { this.searchForCourtList(); }, 500);
+        }
     }
+
+    
+    public checkDateInValid()
+    {
+        if(this.isValidDate(this.selectedDate))
+        {
+           // console.log('date ok')
+           // console.log(this.validSelectedDate)
+            this.selectedDateState = true;
+            return false
+        }
+        else
+        {
+          // console.log('date error')
+           this.selectedDateState = false;
+           return true
+        }         
+    }
+
+    public isValidDate(dateString) 
+    { 
+        if(!/^\d{4}-\d{1,2}-\d{1,2}$/.test(dateString))
+            return false;
+
+        const parts = dateString.split("-");
+        const day = parseInt(parts[2], 10);
+        const month = parseInt(parts[1], 10);
+        const year = parseInt(parts[0], 10);
+        
+        if(year < 1800 || year > 3000 || month == 0 || month > 12)
+            return false;
+
+        const monthLength = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ];
+
+        // Adjust for leap years
+        if(year % 400 == 0 || (year % 100 != 0 && year % 4 == 0))
+            monthLength[1] = 29;
+
+        return day > 0 && day <= monthLength[month - 1];
+    } 
+        
 
     public searchForCourtList()
     {        
@@ -367,25 +400,33 @@ export default class CourtList extends Vue {
         }
         else
         {
-            //console.log('selectedCourtLocation')
-            this.courtListLocation = this.selectedCourtLocation.Location;
-            this.courtListLocationID = this.selectedCourtLocation.LocationID;
-
-            if(this.selectedCourtRoom =='null' || this.selectedCourtRoom== undefined)
-            {
-               // console.log(this.selectedCourtRoom)
-                this.selectedCourtRoomState=false;
+            
+            if(this.checkDateInValid())
+            {                
                 this.searchAllowed = true;
             }
             else
             {
-                //console.log('this.selectedCourtRoom')
-                //console.log(this.selectedCourtRoom) 
-                this.courtListRoom = this.selectedCourtRoom;
-                // console.log('search')
-                //console.log(this.searchingRequest)
-                this.searchAllowed = false;   
-                this.getCourtListDetails();
+                //console.log('selectedCourtLocation')                
+                this.courtListLocation = this.selectedCourtLocation.Location;
+                this.courtListLocationID = this.selectedCourtLocation.LocationID;
+
+                if(this.selectedCourtRoom =='null' || this.selectedCourtRoom== undefined)
+                {
+                // console.log(this.selectedCourtRoom)
+                    this.selectedCourtRoomState = false;
+                    this.searchAllowed = true;
+                }
+                else
+                {
+                    //console.log('this.selectedCourtRoom')
+                    //console.log(this.selectedCourtRoom) 
+                    this.courtListRoom = this.selectedCourtRoom;
+                    // console.log('search')
+                    //console.log(this.searchingRequest)
+                    this.searchAllowed = false;   
+                    this.getCourtListDetails();
+                }
             }
         }
     }
@@ -395,6 +436,8 @@ export default class CourtList extends Vue {
         this.searchingRequest = false;    
         this.selectedCourtRoom = 'null'
         this.selectedCourtLocationState=true;        
+        this.syncFlag = false; 
+        this.syncFlag = true;     
     }
 
     public RoomChanged()
