@@ -23,7 +23,7 @@
                 </template>  
 
                 <template v-for="(field,index) in fields" v-slot:[`cell(${field.key})`]="data" >
-                    <b-badge class = "mt-1"  style="font-weight:normal; font-size:16px" variant="white" v-bind:key="index" >  {{ data.value }} </b-badge>
+                    <b-badge class = "mt-1"  :style="data.field.cellStyle" variant="white" v-bind:key="index" >  {{ data.value }} </b-badge>
                 </template>
 
                 <template v-slot:cell(Name)="data" >               
@@ -33,7 +33,7 @@
                                 <b-button
                                     :variant="data.item.Charges.length>0? 'outline-primary text-info':'white'" 
                                     :disabled="data.item.Charges.length==0"
-                                    style="transform: translate(-10px,-4px); border:0px; font-size:16px"
+                                    :style="data.field.cellStyle"
                                     size="sm"> 
                                     {{ data.value }}
                                     <b-icon v-if="data.item.Charges.length>0" class="ml-1" icon="caret-down-fill" font-scale="1"></b-icon>
@@ -55,7 +55,7 @@
                             v-for="(field,index) in data.value"
                             :key="index" 
                             class="mr-1 mt-2"
-                            style="font-weight: normal; font-size: 14px;"
+                            :style="data.field.cellStyle"
                             v-b-tooltip.hover 
                             :title='field.key' > 
                             {{ field.abbr }} 
@@ -98,75 +98,26 @@ export default class CriminalParticipants extends Vue {
     participantJson;
     numberOfParticipants = 0;
     sortBy = 'Name';
-    sortDesc = false;    
+    sortDesc = false;
+
+    fields =  
+    [
+        {key:'Name',                    sortable:true,  tdClass: 'border-top',  headerStyle:'text-primary', cellStyle:'transform: translate(-10px,-4px); border:0px; font-size:16px'},
+        {key:'D.O.B.',                  sortable:false, tdClass: 'border-top',  headerStyle:'text',         cellStyle:'font-weight:normal; font-size:16px'},
+        {key:'Status',                  sortable:false, tdClass: 'border-top', headerStyle:'text',          cellStyle:'font-weight: normal; font-size: 14px;'},
+        {key:'Counsel',                 sortable:false, tdClass: 'border-top', headerStyle:'text',          cellStyle:'font-weight:normal; font-size:16px'},
+        {key:'Counsel Designation Filed',sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:'font-weight:normal; font-size:16px'},
+    ];
 
     mounted() {
         this.getParticipants();
     }
 
-    public getParticipants(): void {      
-        const data = this.criminalFileInformation.detailsData;    
-        this.participantJson = data.participant 
-        this.ExtractParticipantInfo();
-        this.isMounted = true;          
-    }    
-
-    fields =  
-    [
-        {key:'Name',                    sortable:true,  tdClass: 'border-top',  headerStyle:'text-primary', cellStyle:''},
-        {key:'D.O.B.',                  sortable:false, tdClass: 'border-top',  headerStyle:'text',         cellStyle:''},
-        {key:'Status',                  sortable:false, tdClass: 'border-top', headerStyle:'text',          cellStyle:''},
-        {key:'Counsel',                 sortable:false, tdClass: 'border-top', headerStyle:'text',          cellStyle:''},
-        {key:'Counsel Designation Filed',sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:''},
-    ];
-
-    statusFields = 
-    [
-        {key:'Warrant Issued',      abbr:'W',   code:'warrantYN'},
-        {key:'In Custody',          abbr:'IC',  code:'inCustodyYN'},
-        {key:'Detention Order',     abbr:'DO',  code:'detainedYN'} , 
-        {key:'Interpreter Required',abbr:'INT', code:'interpreterYN'}
-    ];
-  
-    public ExtractParticipantInfo(): void {
-        
-        for (const fileIndex in this.participantJson) {
-            const fileInfo = {};
-            const jFile = this.participantJson[fileIndex];
-
-            fileInfo["Index"] = fileIndex;
-            fileInfo["First Name"] = jFile.givenNm.trim().length>0 ? jFile.givenNm : "";
-            fileInfo["Last Name"] = jFile.lastNm ? jFile.lastNm : jFile.orgNm;
-            this.UpdateDisplayName({'lastName': fileInfo["Last Name"], 'givenName': fileInfo["First Name"]});
-            fileInfo["Name"] = this.displayName;            
-            fileInfo["D.O.B."] = jFile.birthDt? (new Date(jFile.birthDt.split(' ')[0])).toUTCString().substr(4,12) : '';
-
-            fileInfo["Charges"] = [];         
-            const charges: any[] = [];         
-            for(const charge of jFile.charge)
-            {              
-                    const docInfo = {};                   
-                    docInfo["Description"]= charge.sectionDscTxt
-                    docInfo["Code"]= charge.sectionTxt
-                    charges.push(docInfo);
-            }
-            fileInfo["Charges"] = charges;
-
-            fileInfo["Status"] = [];
-            for (const status of this.statusFields)
-            {
-                if(jFile[status.code] =='Y')
-                    fileInfo["Status"].push(status);
-            }
-
-            this.UpdateDisplayName({'lastName': jFile.counselLastNm? jFile.counselLastNm: '', 'givenName': jFile.counselGivenNm? jFile.counselGivenNm: ''});
-            fileInfo['Counsel'] = this.displayName.trim.length? 'JUSTIN: ' + this.displayName: '';
-            fileInfo['Counsel Designation Filed'] = jFile.designatedCounselYN           
-            this.participantList.push(fileInfo); 
-        }
+    public getParticipants(): void {   
+        this.participantList = this.criminalFileInformation.participantList 
         this.numberOfParticipants = this.participantList.length;
-    }
-
+        this.isMounted = true;          
+    } 
 }
 </script>
 

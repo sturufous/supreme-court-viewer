@@ -2,6 +2,14 @@ import { RouteConfig } from 'vue-router'
 import Home from '@components/Home.vue'
 import CivilCaseDetails from "@components/civil/CivilCaseDetails.vue";
 import CriminalCaseDetails from "@components/criminal/CriminalCaseDetails.vue";
+import CivilFutureAppearances from "@components/civil/CivilFutureAppearances.vue";
+import CriminalFutureAppearances from "@components/criminal/CriminalFutureAppearances.vue";
+import CivilPastAppearances from "@components/civil/CivilPastAppearances.vue";
+import CriminalPastAppearances from "@components/criminal/CriminalPastAppearances.vue";
+import CriminalWitnesses from "@components/criminal/CriminalWitnesses.vue";
+import CriminalSentence from "@components/criminal/CriminalSentence.vue";
+import CriminalDocumentsView from "@components/criminal/CriminalDocumentsView.vue";
+
 
 const routes: Array<RouteConfig> = [
   {
@@ -19,12 +27,8 @@ const routes: Array<RouteConfig> = [
     path: '/criminal-file/:fileNumber',
     name: 'CriminalCaseDetails',
     component: CriminalCaseDetails,
-    props: true,
-    children: [
-
-    ]
+    props: true
   }
 ]
 
 export default routes
-

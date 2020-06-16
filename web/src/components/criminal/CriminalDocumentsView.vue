@@ -126,11 +126,11 @@ export default class CriminalDocumentsView extends Vue {
     public UpdateDisplayName!: (newInputNames: any) => void
 
     participantFiles: any[] = [];
+    participantList: any[] = [];
     ropDocuments: any[] = [];
     categories: any = [];
     /* eslint-enable */    
 
-    participantJson;
     courtLevel;
     courtClass;
 
@@ -150,15 +150,15 @@ export default class CriminalDocumentsView extends Vue {
 
     fields = [ 
         [
-            {key:'Date',  sortable:true,  tdClass: 'border-top',  headerStyle:'text-danger',   cellStyle:'text'},
-            {key:'Document Type',      sortable:true,  tdClass: 'border-top',  headerStyle:'text-primary',  cellStyle:'text-muted'},
-            {key:'Category',           sortable:false,  tdClass: 'border-top', headerStyle:'text',          cellStyle:'text'},
-            {key:'Pages',              sortable:false,  tdClass: 'border-top', headerStyle:'text',          cellStyle:'text'},
+            {key:'Date',               sortable:true,   tdClass: 'border-top',  headerStyle:'text-danger'},
+            {key:'Document Type',      sortable:true,   tdClass: 'border-top',  headerStyle:'text-primary'},
+            {key:'Category',           sortable:false,  tdClass: 'border-top',  headerStyle:'text'},
+            {key:'Pages',              sortable:false,  tdClass: 'border-top',  headerStyle:'text'},
         ],
         [
-            {key:'Document Type',    sortable:false,  tdClass: 'border-top', headerStyle:'text-primary',    cellStyle:'text-info'},
-            {key:'Category',         sortable:true,  tdClass: 'border-top',  headerStyle:'text',            cellStyle:'text'},
-            {key:'Pages',            sortable:false,  tdClass: 'border-top', headerStyle:'text',            cellStyle:'text'},
+            {key:'Document Type',    sortable:false,  tdClass: 'border-top', headerStyle:'text-primary'},
+            {key:'Category',         sortable:true,   tdClass: 'border-top', headerStyle:'text'},
+            {key:'Pages',            sortable:false,  tdClass: 'border-top', headerStyle:'text'},
         ]  
         
     ];
@@ -166,8 +166,7 @@ export default class CriminalDocumentsView extends Vue {
     public getDocuments(): void {
        
         const data = this.criminalFileInformation.detailsData;
-
-        this.participantJson = data.participant 
+        this.participantList = this.criminalFileInformation.participantList 
 
         this.courtLevel = DecodeCourtLevel[data.courtLevelCd];
         this.courtClass = DecodeCourtClass[data.courtClassCd];
@@ -207,25 +206,17 @@ export default class CriminalDocumentsView extends Vue {
     public ExtractDocumentInfo(): void {
         let ropExists = false 
         
-        for(const fileIndex in this.participantJson)
-        {            
-            const fileInfo = {};
-            const jFile =  this.participantJson[fileIndex];
-            fileInfo["Index"] = fileIndex; 
-            fileInfo["Part ID"] = jFile.partId;
-            fileInfo["Prof Seq No"] = jFile.profSeqNo;
-            fileInfo["First Name"] = jFile.givenNm.trim().length>0 ? jFile.givenNm : "";
-            fileInfo["Last Name"] = jFile.lastNm ? jFile.lastNm : jFile.orgNm;            
-            this.UpdateDisplayName({'lastName': fileInfo["Last Name"], 'givenName': fileInfo["First Name"]});
-            fileInfo["Name"] = this.displayName;
-            fileInfo["Documents"] = [];
-            fileInfo["Record of Proceedings"] = [];
+        for(const partIndex in this.participantList)
+        {         
+            const partInfo = this.participantList[partIndex];
+            partInfo["Documents"] = [];
+            partInfo["Record of Proceedings"] = [];
 
             /* eslint-disable */
             const document: any[] = [];
             const rop: any[] = [];
             /* eslint-enable */
-            for(const doc of jFile.document)
+            for(const doc of partInfo.DocumentsJson)
             {
                 if(doc.category != 'rop') {
                     const docInfo = {}; 
@@ -246,15 +237,15 @@ export default class CriminalDocumentsView extends Vue {
                     docInfo["Category"]= "ROP";
                     docInfo["Pages"]= doc.documentPageCount;
                     docInfo["PdfAvail"]= true 
-                    docInfo["Index"] = fileIndex;
+                    docInfo["Index"] = partIndex;
                     rop.push(docInfo);
                     ropExists = true
                 }
             }
-            fileInfo["Documents"] = document;
-            fileInfo["Record of Proceedings"] = rop;
+            partInfo["Documents"] = document;
+            partInfo["Record of Proceedings"] = rop;
                         
-            this.participantFiles.push(fileInfo);
+            this.participantFiles.push(partInfo);
         }
 
          this.categories.sort()
@@ -305,8 +296,7 @@ export default class CriminalDocumentsView extends Vue {
             default:
                 return "Date Sworn/Issued";
         }
-    }
-    
+    }    
 
     get NumberOfDocuments() {       
         if(this.activetab == 'ROP')
