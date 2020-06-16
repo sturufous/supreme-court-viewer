@@ -30,5 +30,6 @@ namespace Scv.Api.Models.Criminal.AppearanceDetail
         public ICollection<CriminalAppearanceMethod> AppearanceMethods { get; set; }
         public string EstimatedTimeHour { get; set; }
         public string EstimatedTimeMin { get; set; }
+        public List<string> InitiatingDocuments { get; set; }
     }
 }
