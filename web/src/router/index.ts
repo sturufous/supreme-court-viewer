@@ -26,12 +26,8 @@ const routes: Array<RouteConfig> = [
     path: '/criminal-file/:fileNumber',
     name: 'CriminalCaseDetails',
     component: CriminalCaseDetails,
-    props: true,
-    children: [
-
-    ]
+    props: true
   }
 ]
 
 export default routes
-

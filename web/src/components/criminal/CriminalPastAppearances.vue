@@ -46,8 +46,8 @@
                 </template>
 
                 <template v-slot:cell(Date)="data" >
-                    <span :class="data.field.cellStyle" style="display: inline-flex;"> 
-                        <b-button style="transform: translate(0,-7px);font-size:16px;" size="sm" @click="OpenDetails(data);data.toggleDetails();" variant="outline-primary border-white text-info" class="mr-2 mt-1">
+                    <span :class="data.field.cellClass" style="display: inline-flex;"> 
+                        <b-button :style="data.field.cellStyle" size="sm" @click="OpenDetails(data);data.toggleDetails();" variant="outline-primary border-white text-info" class="mr-2 mt-1">
                             <b-icon-caret-right-fill v-if="!data.item['_showDetails']"></b-icon-caret-right-fill>
                             <b-icon-caret-down-fill v-if="data.item['_showDetails']"></b-icon-caret-down-fill>
                             {{data.item.FormattedDate}}
@@ -65,7 +65,7 @@
                             variant="secondary"
                             v-b-tooltip.hover.right                            
                             :title="data.item['Reason Description']"
-                            style="margin-top: 10px; font-size: 14px;"> 
+                            :style="data.field.cellStyle"> 
                             {{data.value}}
                     </b-badge>
                 </template>
@@ -76,17 +76,17 @@
                             v-if="data.value"
                             v-b-tooltip.hover.left                           
                             :title="data.item['Judge Full Name']"
-                            style="margin-top: 10px; font-size: 14px;"> 
+                            :style="data.field.cellStyle"> 
                             {{data.value}}
                     </b-badge>
                 </template>
 
                 <template  v-slot:cell(Accused)="data">
-                     <b-badge  variant="white" style=" font-size: 16px;" class = "mt-2"> {{data.value}} </b-badge>
+                     <b-badge  variant="white" :style="data.field.cellStyle" class = "mt-2"> {{data.value}} </b-badge>
                 </template>
 
                 <template  v-slot:cell(Status)="data">
-                    <b :class = "data.item['Status Style']" style="font-weight: normal; font-size: 16px; width:110px"> {{data.value}} </b>
+                    <b :class = "data.item['Status Style']" :style="data.field.cellStyle"> {{data.value}} </b>
                 </template>
                 
             </b-table>
@@ -179,15 +179,15 @@ export default class CriminalPastAppearances extends Vue {
 
     fields =  
     [
-        {key:'Date',       sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'text-info mt-2 d-inline-flex'},
-        {key:'Reason',     sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:''},
-        {key:'Time',       sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:'text'},
-        {key:'Duration',   sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:'text'},
-        {key:'Location',   sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'text'},
-        {key:'Room',       sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:'text'},
-        {key:'Presider',   sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'text'},
-        {key:'Accused',    sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'text'},
-        {key:'Status',     sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'badge'},
+        {key:'Date',       sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'transform: translate(0,-7px); font-size:16px', cellClass:'text-info mt-2 d-inline-flex'},
+        {key:'Reason',     sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'margin-top: 10px; font-size: 14px;'},
+        {key:'Time',       sortable:false, tdClass: 'border-top', headerStyle:'text'},
+        {key:'Duration',   sortable:false, tdClass: 'border-top', headerStyle:'text'},
+        {key:'Location',   sortable:true,  tdClass: 'border-top', headerStyle:'text-primary'},
+        {key:'Room',       sortable:false, tdClass: 'border-top', headerStyle:'text'},
+        {key:'Presider',   sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'margin-top: 10px; font-size: 14px;'},
+        {key:'Accused',    sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'font-size: 16px;'},
+        {key:'Status',     sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'font-weight: normal; font-size: 16px; width:110px'},
     ];    
   
     public ExtractPastAppearancesInfo(): void {
