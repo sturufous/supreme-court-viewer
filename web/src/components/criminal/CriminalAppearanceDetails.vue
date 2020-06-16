@@ -35,6 +35,7 @@
                     <span class="text-muted"> No charges. </span>
                 </b-card>                           
                 <b-table
+                style="max-height: 300px; overflow-y: auto;"
                  v-if="appearanceCharges.length>0"
                 :items="appearanceCharges"
                 :fields="chargesFields"               
@@ -147,6 +148,28 @@
                 
             </b-col>          
         </b-row>
+        <div class="mt-5">
+            <h3 class="mx-2 font-weight-normal">Appearance Information</h3>
+            <hr class="mb-0 bg-light" style="height: 5px;"/> 
+        </div>                           
+        <b-table
+            style="max-height: 200px; overflow-y: auto;"
+            :items="appearanceMethodDetails"
+            :fields="appearanceFields"               
+            borderless
+            striped               
+            responsive="sm"
+            >
+            <template  v-slot:head="data">
+                <b> {{ data.label }}</b>
+            </template>             
+        
+            <template v-slot:cell(Appearance)="data" :style="data.field.cellStyle">                        
+                <span>{{ data.value }}</span>
+                <span><br v-if="data.value.length>0">{{data.item.PartyAppearance}}</span>                      
+            </template>           
+        </b-table>
+
       </b-card>       
     </b-card>
     <b-modal v-if= "isMounted" v-model="showNotes" id="bv-modal-comment" hide-footer>
@@ -186,6 +209,7 @@ export default class CriminalAppearanceDetails extends Vue {
     appearanceAdditionalInfo: any[] = [];
     appearanceCharges: any[] = [];    
     appearanceMethods: any[] = [];
+    appearanceMethodDetails: any[] = [];
     /* eslint-enable */ 
   
     loadingPdf = false;
@@ -217,6 +241,15 @@ export default class CriminalAppearanceDetails extends Vue {
     [
         {key:'Key', cellClass:'text-danger', cellStyle:'white-space: pre'}
     ]
+
+    appearanceFields =  
+    [
+        {key:'Name',             sortable:false, tdClass: 'border-top',  cellStyle: 'font-size: 14px;'},
+        {key:'Role',             sortable:false, tdClass: 'border-top',  cellStyle: 'font-size: 14px; white-space: pre-line;'},
+        {key:'Appearance',       sortable:false, tdClass: 'border-top',  cellStyle: 'display: block; font-size: 14px; white-space: initial;'},
+        {key:'Attendance',       sortable:false, tdClass: 'border-top',  cellStyle: 'display: block; font-size: 14px; white-space: initial;'}
+        
+    ];
     
     mounted() {
         this.getAppearanceInfo();
@@ -258,9 +291,6 @@ export default class CriminalAppearanceDetails extends Vue {
         const judgeRec = this.appearanceDetailsJson.judgesRecommendation? this.appearanceDetailsJson.judgesRecommendation: '';
         const appNote = this.appearanceDetailsJson.appearanceNote? this.appearanceDetailsJson.appearanceNote: '';
         this.notes =  {'judgeRec': judgeRec, 'appNote': appNote}
-        this.notes =  {'judgeRec': 'gfhdf', 'appNote': ''}
-        // this.notes["judgeRec"] = 'judgeRec';
-        // this.notes["appNote"] = 'appNote';              
         for(const charge of this.appearanceDetailsJson.charges)
         {              
             const chargeInfo = {};             
@@ -287,6 +317,57 @@ export default class CriminalAppearanceDetails extends Vue {
             methodInfo["phoneNumber"] = appearanceMethod.phoneNumberTxt? appearanceMethod.phoneNumberTxt: '';
             this.appearanceMethods.push(methodInfo)
         }
+
+        console.log(this.appearanceDetailsJson)
+
+        if (this.appearanceDetailsJson.accused) {
+            const accusedJson = this.appearanceDetailsJson.accused;
+            const accused = {'Name': accusedJson.fullName,
+                            'Role': 'Accused',
+                            'Attendance': accusedJson.attendanceMethodDesc? accusedJson.attendanceMethodDesc: '',
+                            'Appearance': accusedJson.appearanceMethodDesc? accusedJson.appearanceMethodDesc: '',
+                            'PartyAppearance': accusedJson.partyAppearanceMethodDesc? accusedJson.partyAppearanceMethodDesc: ''
+                            }
+            this.appearanceMethodDetails.push(accused)
+        }
+
+        if (this.appearanceDetailsJson.prosecutor) {
+            const prosecutorJson = this.appearanceDetailsJson.prosecutor;
+            const prosecutor = {'Name': prosecutorJson.fullName,
+                                'Role': 'Prosecutor',
+                                'Attendance': prosecutorJson.attendanceMethodDesc? prosecutorJson.attendanceMethodDesc: '',
+                                'Appearance': prosecutorJson.appearanceMethodDesc? prosecutorJson.appearanceMethodDesc: '',
+                                'PartyAppearance': prosecutorJson.partyAppearanceMethodDesc? prosecutorJson.partyAppearanceMethodDesc: ''
+                            }
+            this.appearanceMethodDetails.push(prosecutor)
+        }
+
+        if (this.appearanceDetailsJson.adjudicator) {
+            const adjudicatorJson = this.appearanceDetailsJson.adjudicator;
+            const adjudicator = {'Name': adjudicatorJson.fullName,
+                                'Role': 'Adjudicator',
+                                'Attendance': adjudicatorJson.attendanceMethodDesc? adjudicatorJson.attendanceMethodDesc: '',
+                                'Appearance': adjudicatorJson.appearanceMethodDesc? adjudicatorJson.appearanceMethodDesc: '',
+                                'PartyAppearance': adjudicatorJson.partyAppearanceMethodDesc? adjudicatorJson.partyAppearanceMethodDesc: ''
+                            }
+            this.appearanceMethodDetails.push(adjudicator)
+
+        }
+
+        if (this.appearanceDetailsJson.justinCounsel) {
+            const counselJson = this.appearanceDetailsJson.justinCounsel;
+            const counsel = {'Name': counselJson.fullName,
+                            'Role': 'Counsel',
+                            'Attendance': counselJson.attendanceMethodDesc? counselJson.attendanceMethodDesc: '',
+                            'Appearance': counselJson.appearanceMethodDesc? counselJson.appearanceMethodDesc: '',
+                            'PartyAppearance': counselJson.partyAppearanceMethodDesc? counselJson.partyAppearanceMethodDesc: ''
+                            }
+            this.appearanceMethodDetails.push(counsel)
+        }
+
+        
+        
+                
     }
 
     public OpenNotes() {        
