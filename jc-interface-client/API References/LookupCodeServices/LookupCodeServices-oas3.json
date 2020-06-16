@@ -1804,6 +1804,146 @@
         }
       ]
     },
+    "/codes/civil/document/issueResults": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/lookupCodes"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "No items matching the given criteria were found."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Get a list of available issueResults.\n",
+        "operationId": "GET_codes-civil-document-issueResults"
+      }
+    },
+    "/codes/civil/document/issueResults/{code}": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/lookupCode"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "No items matching the given criteria were found."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Get the specific issueResult.\n",
+        "operationId": "GET_codes-civil-document-issueResults-code"
+      },
+      "parameters": [
+        {
+          "name": "code",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/codes/civil/document/issueTypes": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/lookupCodes"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "No items matching the given criteria were found."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Get a list of available issueTypes.\n",
+        "operationId": "GET_codes-civil-document-issueTypes"
+      }
+    },
+    "/codes/civil/document/issueTypes/{code}": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/lookupCode"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "No items matching the given criteria were found."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Get the specific issueType.\n",
+        "operationId": "GET_codes-civil-document-issueTypes-code"
+      },
+      "parameters": [
+        {
+          "name": "code",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
     "/codes/civil/priority/markers": {
       "get": {
         "responses": {
@@ -1866,6 +2006,146 @@
       "parameters": [
         {
           "name": "markerId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/codes/civil/pastAppearance/partyAppearanceMethod/partyAttendanceTypes": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/lookupCodes"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "No items matching the given criteria were found."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Get a list of available partyAttendanceTypes.\n",
+        "operationId": "GET_codes-civil-pastAppearance-partyAppearanceMethod-partyAttendanceTypes"
+      }
+    },
+    "/codes/civil/pastAppearance/partyAppearanceMethod/partyAttendanceTypes/{partyAppearanceMethod}": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/lookupCode"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "No items matching the given criteria were found."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Get the specific partyAttendanceType.\n",
+        "operationId": "GET_codes-civil-pastAppearance-partyAppearanceMethod-partyAttendanceTypes-partyAppearanceMethod"
+      },
+      "parameters": [
+        {
+          "name": "partyAppearanceMethod",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/codes/civil/pastAppearance/partyAppearanceMethod/counsel": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/lookupCodes"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "No items matching the given criteria were found."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Get a list of available counsel.\n",
+        "operationId": "GET_codes-civil-pastAppearance-partyAppearanceMethod-counsel"
+      }
+    },
+    "/codes/civil/pastAppearance/partyAppearanceMethod/counsel/{partyAppearanceMethod}": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/lookupCode"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "No items matching the given criteria were found."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Get the specific counsel.\n",
+        "operationId": "GET_codes-civil-pastAppearance-partyAppearanceMethod-counsel-partyAppearanceMethod"
+      },
+      "parameters": [
+        {
+          "name": "partyAppearanceMethod",
           "in": "path",
           "required": true,
           "schema": {
@@ -2364,76 +2644,6 @@
         }
       ]
     },
-    "/codes/criminal/appearance/partyAttendanceTypes": {
-      "get": {
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/lookupCodes"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "example": {
-                    "message": "No items matching the given criteria were found."
-                  }
-                }
-              }
-            }
-          }
-        },
-        "description": "Get a list of available partyAttendanceTypes.\n",
-        "operationId": "GET_codes-criminal-appearance-partyAttendanceTypes"
-      }
-    },
-    "/codes/criminal/appearance/partyAttendanceTypes/{partyAttendanceTypeCode}": {
-      "get": {
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/lookupCode"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "example": {
-                    "message": "No items matching the given criteria were found."
-                  }
-                }
-              }
-            }
-          }
-        },
-        "description": "Get the specific partyAttendanceType.\n",
-        "operationId": "GET_codes-criminal-appearance-partyAttendanceTypes-partyAttendanceTypeCode"
-      },
-      "parameters": [
-        {
-          "name": "partyAttendanceTypeCode",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }
-        }
-      ]
-    },
     "/codes/criminal/dateDeclinedBy": {
       "get": {
         "responses": {
@@ -2566,6 +2776,286 @@
       "parameters": [
         {
           "name": "markerId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/codes/criminal/pastAppearance/partyAppearanceMethod/accused": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/lookupCodes"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "No items matching the given criteria were found."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Get a list of available accused.\n",
+        "operationId": "GET_codes-criminal-pastAppearance-partyAppearanceMethod-accused"
+      }
+    },
+    "/codes/criminal/pastAppearance/partyAppearanceMethod/accused/{partyAppearanceMethod}": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/lookupCode"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "No items matching the given criteria were found."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Get the specific accused.\n",
+        "operationId": "GET_codes-criminal-pastAppearance-partyAppearanceMethod-accused-partyAppearanceMethod"
+      },
+      "parameters": [
+        {
+          "name": "partyAppearanceMethod",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/codes/criminal/pastAppearance/partyAppearanceMethod/accusedCounsel": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/lookupCodes"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "No items matching the given criteria were found."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Get a list of available accusedCounsel.\n",
+        "operationId": "GET_codes-criminal-pastAppearance-partyAppearanceMethod-accusedCounsel"
+      }
+    },
+    "/codes/criminal/pastAppearance/partyAppearanceMethod/accusedCounsel/{partyAppearanceMethod}": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/lookupCode"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "No items matching the given criteria were found."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Get the specific accusedCounsel.\n",
+        "operationId": "GET_codes-criminal-pastAppearance-partyAppearanceMethod-accusedCounsel-partyAppearanceMethod"
+      },
+      "parameters": [
+        {
+          "name": "partyAppearanceMethod",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/codes/criminal/pastAppearance/partyAppearanceMethod/adjudicator": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/lookupCodes"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "No items matching the given criteria were found."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Get a list of available adjudicator.\n",
+        "operationId": "GET_codes-criminal-pastAppearance-partyAppearanceMethod-adjudicator"
+      }
+    },
+    "/codes/criminal/pastAppearance/partyAppearanceMethod/adjudicator/{partyAppearanceMethod}": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/lookupCode"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "No items matching the given criteria were found."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Get the specific adjudicator.\n",
+        "operationId": "GET_codes-criminal-pastAppearance-partyAppearanceMethod-adjudicator-partyAppearanceMethod"
+      },
+      "parameters": [
+        {
+          "name": "partyAppearanceMethod",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/codes/criminal/pastAppearance/partyAppearanceMethod/crown": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/lookupCodes"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "No items matching the given criteria were found."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Get a list of available crown.\n",
+        "operationId": "GET_codes-criminal-pastAppearance-partyAppearanceMethod-crown"
+      }
+    },
+    "/codes/criminal/pastAppearance/partyAppearanceMethod/crown/{partyAppearanceMethod}": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/lookupCode"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "No items matching the given criteria were found."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Get the specific crown.\n",
+        "operationId": "GET_codes-criminal-pastAppearance-partyAppearanceMethod-crown-partyAppearanceMethod"
+      },
+      "parameters": [
+        {
+          "name": "partyAppearanceMethod",
           "in": "path",
           "required": true,
           "schema": {
