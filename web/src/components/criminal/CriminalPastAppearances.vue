@@ -206,21 +206,22 @@ export default class CriminalPastAppearances extends Vue {
           
             appInfo["Duration"] = this.getDuration(jApp.estimatedTimeHour, jApp.estimatedTimeMin)           
             appInfo["Location"] = jApp.courtLocation;
-            appInfo["Room"] =jApp.courtRoomCd
+            appInfo["Room"] =jApp.courtRoomCd;
 
             appInfo["First Name"] = jApp.givenNm ? jApp.givenNm : "";
             appInfo["Last Name"] = jApp.lastNm ? jApp.lastNm : jApp.orgNm;
             appInfo["Accused"] = this.getNameOfParticipant(appInfo["Last Name"], appInfo["First Name"]);  
-            appInfo["Status"] = jApp.appearanceStatusCd ? appearanceStatus[jApp.appearanceStatusCd] :''
-            appInfo["Status Style"] = this.getStatusStyle(appInfo["Status"])
-            appInfo["Presider"] =  jApp.judgeInitials ? jApp.judgeInitials :''
-            appInfo["Judge Full Name"] =  jApp.judgeInitials ? jApp.judgeFullNm : ''
+            appInfo["Status"] = jApp.appearanceStatusCd ? appearanceStatus[jApp.appearanceStatusCd] :'';
+            appInfo["Status Style"] = this.getStatusStyle(appInfo["Status"]);
+            appInfo["Presider"] =  jApp.judgeInitials ? jApp.judgeInitials :'';
+            appInfo["Judge Full Name"] =  jApp.judgeInitials ? jApp.judgeFullNm : '';
 
-            appInfo["Appearance ID"] = jApp.appearanceId
-            appInfo["Part ID"] = jApp.partId
-            appInfo["Supplemental Equipment"] = jApp.supplementalEquipmentTxt
-            appInfo["Security Restriction"] = jApp.securityRestrictionTxt
-            appInfo["OutOfTown Judge"] = jApp.outOfTownJudgeTxt
+            appInfo["Appearance ID"] = jApp.appearanceId;
+            appInfo["Part ID"] = jApp.partId;
+            appInfo["Supplemental Equipment"] = jApp.supplementalEquipmentTxt;
+            appInfo["Security Restriction"] = jApp.securityRestrictionTxt;
+            appInfo["OutOfTown Judge"] = jApp.outOfTownJudgeTxt;
+            appInfo["Prof Seq No"] = jApp.profSeqNo;
                        
             this.pastAppearancesList.push(appInfo); 
         }
@@ -251,13 +252,14 @@ export default class CriminalPastAppearances extends Vue {
     {
         if(!data.detailsShowing)
         {
-            this.appearanceInfo.fileNo = this.criminalFileInformation.fileNumber; 
+            this.appearanceInfo.fileNo = this.criminalFileInformation.fileNumber;
             
-            this.appearanceInfo.appearanceId = data.item["Appearance ID"]
-            this.appearanceInfo.partId = data.item["Part ID"]
-            this.appearanceInfo.supplementalEquipmentTxt = data.item["Supplemental Equipment"]
-            this.appearanceInfo.securityRestrictionTxt = data.item["Security Restriction"]
+            this.appearanceInfo.appearanceId = data.item["Appearance ID"];
+            this.appearanceInfo.partId = data.item["Part ID"];
+            this.appearanceInfo.supplementalEquipmentTxt = data.item["Supplemental Equipment"];
+            this.appearanceInfo.securityRestrictionTxt = data.item["Security Restriction"];
             this.appearanceInfo.outOfTownJudgeTxt = data.item["OutOfTown Judge"]
+            this.appearanceInfo.profSeqNo = data.item["Prof Seq No"]
             this.UpdateAppearanceInfo(this.appearanceInfo);
         }
         
