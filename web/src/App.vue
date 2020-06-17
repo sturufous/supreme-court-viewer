@@ -1,5 +1,6 @@
 <template>
-    <div class="app-outer fill-body" id="app" style="overflow:hidden">
+    <!-- <div class="app-outer fill-body" id="app" style="overflow:hidden"> -->
+    <div class="app-outer fill-body" id="app">
         <navigation-topbar />
             <router-view />
         <navigation-footer id="footer" />
@@ -20,3 +21,15 @@
     
     export default class App extends Vue { }
 </script>
+
+<style lang="scss">
+  
+  @import "assets/_custom.scss";
+  @import "~bootstrap/scss/bootstrap.scss";
+  @import '~bootstrap-vue/dist/bootstrap-vue.css';
+
+  body {
+    margin: 0;
+  }
+ 
+</style>
