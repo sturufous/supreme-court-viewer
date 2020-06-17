@@ -222,7 +222,10 @@ export default class CivilCaseDetails extends Vue {
 </script>
 
 <style scoped>
- .card {
+    .card {
         border: white;
+    }
+    body {
+        overflow-x: hidden;
     }
 </style>
