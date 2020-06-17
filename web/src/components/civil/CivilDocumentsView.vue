@@ -1,78 +1,90 @@
 <template>
-<body>
-     <b-card bg-variant="light" v-if= "!isMounted && !isDataValid">
-        <b-overlay :show= "true"> 
-            <b-card style="min-height: 100px;"/>                   
-            <template v-slot:overlay>               
-               <div> 
-                    <loading-spinner/> 
-                    <p id="loading-label">Loading ...</p>
-               </div>                
-            </template> 
-      </b-overlay> 
-    </b-card>
-
-    <b-card bg-variant="light" v-if= "isMounted && !isDataValid">
-        <b-card  style="min-height: 100px;">
-            <span>This <b>File-Number '{{this.civilFileInformation.fileNumber}}'</b> doesn't exist in the <b>civil</b> records. </span>
-        </b-card>
-        <b-card>    
-            <b-button variant="info" @click="navigateToLandingPage">Back to the Landing Page</b-button>
-        </b-card>
-    </b-card>
-
-   <b-card  v-if= "isMounted && isDataValid">  
+<div>
+   <b-card  v-if= "isMounted" no-body>
+        <div>         
+            <h3 class="mx-4 font-weight-normal"> Documents ({{NumberOfDocuments}}) </h3>
+            <hr class="mx-3 bg-light" style="height: 5px;"/>                   
+        </div>
        
-        <b-card bg-variant="white">
-            <b-tabs  nav-wrapper-class = "bg-light text-dark"
-                     active-nav-item-class="text-uppercase font-weight-bold text-white bg-primary"                     
-                     pills >
-                <b-tab 
-                v-for="(tabMapping, index) in categories" 
-                :key="index"                 
-                :title="tabMapping"                 
-                v-on:click="activetab = tabMapping" 
-                v-bind:class="[ activetab === tabMapping ? 'active' : '' ]"
-                ></b-tab>
-            </b-tabs>
-        </b-card>        
-       
-        <b-card/>
- 
+        <b-tabs nav-wrapper-class = "bg-light text-dark"
+                active-nav-item-class="text-uppercase font-weight-bold text-white bg-primary"                     
+                pills
+                no-body
+                class="mx-3"
+                >
+            <b-tab 
+            v-for="(tabMapping, index) in categories" 
+            :key="index"                 
+            :title="tabMapping"                 
+            v-on:click="activetab = tabMapping" 
+            v-bind:class="[ activetab === tabMapping ? 'active mb-3' : 'mb-3' ]"
+            ></b-tab>
+        </b-tabs> 
+        
         <b-overlay :show="loadingPdf" rounded="sm">  
-            <b-card bg-variant="light">           
+            <b-card bg-variant="light" style="max-height: 500px; overflow-y: auto;" no-body class="mx-3 mb-5">           
                 <b-table
                 :items="FilteredDocuments"
                 :fields="fields[fieldsTab]"
-                :sort-by.sync="sortBy"
+                :sort-by="sortBy"
                 :sort-desc.sync="sortDesc"
                 :no-sort-reset="true"
-                @row-hovered="rowHover"
-                striped
                 sort-icon-left
+                small
+                striped
                 responsive="sm"
                 >   
                     <template v-for="(field,index) in fields[fieldsTab]" v-slot:[`head(${field.key})`]="data">
                         <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
                     </template>
-                    <template v-for="(field,index) in fields[fieldsTab]" v-slot:[`cell(${field.key})`]="data" >
-                        <span 
-                            v-bind:key= "index" 
-                            v-b-hover= "colHover" 
-                            v-if="field.key.includes('Date')"                           
-                            v-on:click= "cellClick(index, data)"
-                            :class= "cellClass(field, index, data)"    
-                            style= "white-space: pre-line"> {{data.value|beautify-date}}
+
+                    <template v-slot:[`cell(${fields[fieldsTab][datePlace[fieldsTab]].key})`]="data" >
+                        <span :style="data.field.cellStyle">
+                            {{ data.value | beautify-date}}
                         </span>
-                         <span 
-                            v-bind:key= "index" 
-                            v-b-hover= "colHover" 
-                            v-else                           
-                            v-on:click= "cellClick(index, data)"
-                            :class= "cellClass(field, index, data)"    
-                            style= "white-space: pre-line"> {{data.value}}
+                    </template> 
+
+                    <template v-slot:[`cell(${fields[fieldsTab][documentPlace[fieldsTab]].key})`]="data" >
+                        <b-button 
+                            v-if="data.item.PdfAvail" 
+                            variant="outline-primary text-info" 
+                            :style="data.field.cellStyle"
+                            @click="cellClick(data)"
+                            size="sm">
+                                {{data.value}}
+                        </b-button>
+                        <span class="ml-2" v-else>
+                             {{data.value}}
                         </span>
                     </template>
+
+                    <template v-slot:cell(Act)="data" >
+                        <b-badge 
+                            variant="secondary"
+                            :style="data.field.cellStyle"                     
+                            v-for="(act, actIndex) in data.value"  
+                            v-bind:key="actIndex"                               
+                            v-b-tooltip.hover.left 
+                            :title="act.Description"> 
+                                {{act.Code}}<br> 
+                        </b-badge>
+                    </template>
+
+                    <template v-slot:cell(Issues)="data" >                               
+                        <li 
+                            v-for="(issue, issueIndex) in data.value"  
+                            v-bind:key="issueIndex"
+                            :style="data.field.cellStyle">
+                            {{ issue }}
+                        </li>
+                    </template>
+                    
+                    <template v-slot:cell(Seq.)="data">
+                        <span class="ml-2" :style="data.field.cellStyle"> 
+                            {{data.value}}
+                        </span>
+                    </template>
+
                 </b-table>
             </b-card>
             <template v-slot:overlay>               
@@ -83,7 +95,7 @@
             </template> 
         </b-overlay>
    </b-card> 
-</body>
+</div>
 </template>
 
 <script lang="ts">
@@ -97,28 +109,48 @@ enum fieldTab {Categories=0, Summary}
 @Component
 export default class CivilDocumentsView extends Vue {
 
+    /* eslint-disable */
     @civilState.State
     public civilFileInformation!: any
 
     @civilState.Action
     public UpdateCivilFile!: (newCivilFileInformation: any) => void
 
-    public getDocuments(): void {
+    documents: any[] = [];
+    summaryDocuments: any[] = [];
+    /* eslint-enable */
+
+    documentsDetailsJson;
+    loadingPdf = false;
+    isMounted = false;
+    activetab = 'ALL';
+    sortDesc = false;
+    categories: string[] = []; 
+    fieldsTab = fieldTab.Categories;
+    documentPlace = [1,0]
+    datePlace = [3,1]
+
+    fields = [ 
+        [
+            {key:'Seq.',           sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
+            {key:'Document Type',  sortable:true,  headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 16px;'},
+            {key:'Act',            sortable:false, headerStyle:'text',          cellStyle:'display: block; margin-top: 1px; font-size: 14px; max-width : 50px;'},
+            {key:'Date Filed',     sortable:true,  headerStyle:'text-danger',   cellStyle:'font-size: 16px;'},
+            {key:'Issues',         sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px;'}
+        ],
+        [
+            {key:'Document Type',    sortable:false, headerStyle:'text-primary',    cellStyle:'border:0px; font-size: 16px;'},
+            {key:'Appearance Date',  sortable:true,  headerStyle:'text-danger',     cellStyle:'font-size: 16px;'},
+        ]  
         
-        this.$http.get('/api/files/civil/'+ this.civilFileInformation.fileNumber)
-            .then(Response => Response.json(), err => {console.log(err);}        
-            ).then(data => {
-                if(data)
-                {
-                    this.documentsDetailsJson = data.document
-                    this.ExtractDocumentInfo()
-                    if(this.documents.length)
-                    {                   
-                        this.isDataValid = true;
-                    }
-                }
-                this.isMounted = true;                
-            });
+    ];
+
+    public getDocuments(): void {
+
+        const data = this.civilFileInformation.detailsData;
+        this.documentsDetailsJson = data.document; 
+        this.ExtractDocumentInfo()          
+        this.isMounted = true;
     }
 
     @Watch('$route', { immediate: false, deep: true })
@@ -134,62 +166,12 @@ export default class CivilDocumentsView extends Vue {
         this.getDocuments();        
     }
 
-    documentsDetailsJson;
-    loadingPdf = false;
-    isMounted = false;
-    isDataValid = false
-
-    activetab = 'ALL';            
-    sortBy = 'Seq.';
-    sortDesc = false;
-    hoverRow =-1;
-    hoverCol = 0;
-
-    documents: any[] = [];
-    summaryDocuments: any[] = [];
-    categories: any=[]; 
-
-    fieldsTab = fieldTab.Categories;
-
-    fields = [ 
-        [
-            {key:'Seq.',           sortable:true,  headerStyle:'text-primary',  cellStyle:'text'},
-            {key:'Document Type',  sortable:true,  headerStyle:'text-primary',  cellStyle:'text-muted'},
-            {key:'Act',            sortable:false, headerStyle:'text',          cellStyle:'text-white bg-secondary'},
-            {key:'Date Filed',     sortable:true,  headerStyle:'text-danger',   cellStyle:'text'},
-            {key:'Issues',         sortable:false, headerStyle:'text',          cellStyle:'text-muted'}
-        ],
-        [
-            {key:'Document Type',    sortable:false, headerStyle:'text-primary',    cellStyle:'text-info'},
-            {key:'Appearance Date',  sortable:true, headerStyle:'text-danger',     cellStyle:'text'},
-        ]  
-        
-    ];
-
-    public cellClick(index, data)
-    {
-        if(data.item.PdfAvail && index==1 && this.activetab!='COURT SUMMARY')
-        {
-            this.openDocumentsPdf(data.item['Document ID']);
-        }
-        else if (index==0 && this.activetab=='COURT SUMMARY')
-        {
-            this.openCourtSummaryPdf(data.item['Appearance ID']);
-        }         
-    }
-
-    public cellClass(field, index, data)
-    {
-        if(data.item.PdfAvail && index==1 && this.activetab!='COURT SUMMARY')
-        {
-            if(this.hoverCol==1 && this.hoverRow==data.item.Index) return 'text-white bg-warning'; else return 'text-info';            
-        }
-        else if(index==0 && this.activetab=='COURT SUMMARY')
-        {
-            if(this.hoverCol==0 && this.hoverRow==data.item.Index) return 'text-white bg-warning'; else return 'text-info';   
-        }
-        else 
-            return field.cellStyle;
+    public cellClick(data)
+    {          
+        if(data.value !='CourtSummary')        
+            this.openDocumentsPdf(data.item['Document ID']);        
+        else        
+            this.openCourtSummaryPdf(data.item['Appearance ID'])              
     }
 
     public navigateToLandingPage() {
@@ -214,13 +196,22 @@ export default class CivilDocumentsView extends Vue {
 
                 docInfo["Category"] = jDoc.category? jDoc.category : '';
                 if((this.categories.indexOf(docInfo["Category"]) < 0) && docInfo["Category"].length > 0) this.categories.push(docInfo["Category"])
-                // ensure all documentSupport elements only have one row
-                const docSupport: any = jDoc.documentSupport.length? jDoc.documentSupport[0]:'{}';
-                docInfo["Act"] = (docSupport==={})? '': docSupport.actCd;
+                docInfo["Act"] = [];            
+                if (jDoc.documentSupport && jDoc.documentSupport.length > 0) {
+                    for (const act of jDoc.documentSupport) {
+                        docInfo["Act"].push({'Code': act.actCd, 'Description': act.actDsc})
+                    }
+                }  
+
                 docInfo["Document ID"] = jDoc.civilDocumentId;            
                 docInfo["PdfAvail"] = jDoc.imageId? true : false 
                 docInfo["Date Filed"] = jDoc.filedDt? jDoc.filedDt.split(' ')[0] : '';
-                docInfo["Issues"] = jDoc.issue.length? this.ExtractIssues(jDoc.issue) : ' ';
+                docInfo["Issues"] = [];
+                if (jDoc.issue && jDoc.issue.length > 0) {
+                    for (const issue of jDoc.issue) {
+                        docInfo["Issues"].push(issue.issueDsc)
+                    }
+                } 
                 this.documents.push(docInfo);
 
             } else {                
@@ -280,7 +271,21 @@ export default class CivilDocumentsView extends Vue {
                 }
             }); 
         }       
-    }    
+    }
+    
+    get sortBy()
+    {
+        if(this.activetab == 'COURT SUMMARY')
+        {
+            this.sortDesc = true;
+            return 'Appearance Date';
+        }
+        else
+        {
+           this.sortDesc = false;
+           return 'Seq.'; 
+        }
+    }
 
     public openDocumentsPdf(documentId): void {
         this.loadingPdf = true;
@@ -297,13 +302,15 @@ export default class CivilDocumentsView extends Vue {
         this.loadingPdf = false;
     }
     
-    public colHover(hovered, mouseEvent) {            
-        hovered && mouseEvent.fromElement != null? this.hoverCol = mouseEvent.fromElement.cellIndex: this.hoverCol =-1;
+    get NumberOfDocuments() {       
+        if(this.activetab == 'COURT SUMMARY')
+        {           
+            return(this.summaryDocuments.length)
+        }
+        else{  
+            return(this.documents.length)            
+        }    
     }
-
-    public rowHover(row) {
-        this.hoverRow = row.Index;
-    }    
 }
 </script>
 

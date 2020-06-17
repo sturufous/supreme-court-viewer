@@ -19,7 +19,11 @@
         
             <b-card >
                 <b-button @click="navigateToDocumentsView(fileInformation)">Search</b-button>
-            </b-card>          
+            </b-card> 
+
+            <b-card >
+                <b-button @click="navigateToCourtList()">Court List</b-button>
+            </b-card>            
 
         </b-card>
     </b-card>
@@ -44,28 +48,32 @@
         
         fileInformation = { }
 
+        /* eslint-disable */
         @civilState.Action
         public UpdateCivilFile!: (newCivilFileInformation: any) => void
 
         @criminalState.Action
-        public UpdateCriminalFile!: (newCriminalFileInformation: any) => void           
+        public UpdateCriminalFile!: (newCriminalFileInformation: any) => void
+        /* eslint-enable */           
         
         // TODO: add validation so that the user has to enter values before clicking the search button
         navigateToDocumentsView(fileInformation): void {
 
             if(this.selected == 'civil') {
                 this.UpdateCivilFile(fileInformation)
-                this.$router.push({name:'CivilDocumentsView', params: {fileNumber: fileInformation.fileNumber}})
+                this.$router.push({name:'CivilCaseDetails', params: {fileNumber: fileInformation.fileNumber}})
             } else if(this.selected == 'criminal') {
                 this.UpdateCriminalFile(fileInformation)
                 this.$router.push({name:'CriminalCaseDetails', params: {fileNumber: fileInformation.fileNumber}})
-            }
-            
-        }        
+            }            
+        }    
+        
+        navigateToCourtList(): void {
+            this.$router.push({name:'CourtList'})
+        }
     }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
     button {
         background-color: #036

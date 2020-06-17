@@ -1,15 +1,14 @@
 <template>
-<body>
-   <b-card bg-variant="white">
+   <b-card bg-variant="white" no-body>
         <div>
-            <h3 class="mx-2 font-weight-normal"> Crown Notes to JCM </h3>
-            <hr class="mb-0 bg-light" style="height: 5px;"/> 
+            <h3 class="mx-4 font-weight-normal"> Crown Notes to JCM </h3>
+            <hr class="mx-3 bg-light" style="height: 5px;"/> 
         </div>
-        <b-card v-if="!(crownNotes.length>0)">
-            <span class="text-muted"> No crown notes to JCM. </span>
+        <b-card v-if="!(crownNotes.length>0)" no-body>
+            <span class="text-muted ml-4 mb-5"> No crown notes to JCM. </span>
         </b-card>
 
-        <b-card bg-variant="white" v-if="isMounted && (crownNotes.length>0)">           
+        <b-card bg-variant="white" v-if="isMounted && (crownNotes.length>0)" no-body class="mx-3 mb-5">           
             <b-table        
             borderless
             :items="crownNotes"
@@ -24,11 +23,10 @@
             </b-table>
         </b-card>
     </b-card>
-</body>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
 import '@store/modules/CriminalFileInformation';
 const criminalState = namespace('CriminalFileInformation');
@@ -36,8 +34,14 @@ const criminalState = namespace('CriminalFileInformation');
 @Component
 export default class CriminalCrownNotes extends Vue {
 
+    /* eslint-disable */
     @criminalState.State
     public criminalFileInformation!: any
+
+    crownNotes: any[] = [];
+    /* eslint-enable */
+    
+    isMounted = false
 
     fields = [
         {key:'CrownNotes', label: 'Crown Notes'}
@@ -59,10 +63,7 @@ export default class CriminalCrownNotes extends Vue {
 
     mounted () {              
         this.getCrownNotes();  
-    }
-
-    crownNotes: any[] = [];
-    isMounted = false  
+    }      
 }
 </script>
 
