@@ -230,7 +230,6 @@ namespace Scv.Api.Services
             foreach (var document in documents)
             {
                 document.Category = _lookupService.GetDocumentCategory(document.DocumentTypeCd);
-                document.DocumentTypeCodeDescription = await _lookupService.GetDocumentDescriptionAsync(document.DocumentTypeCd);
             }
             return documents;
         }
