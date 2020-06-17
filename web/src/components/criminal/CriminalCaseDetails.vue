@@ -272,7 +272,11 @@ export default class CriminalCaseDetails extends Vue {
 </script>
 
 <style scoped>
- .card {
+    .card {
         border: white;
+    }
+
+   body {
+        overflow-x: hidden;
     }
 </style>
