@@ -1,17 +1,15 @@
 <template>
-<body>
-
-    <b-card bg-variant="white">
+    <b-card bg-variant="white" no-body>
         <div>
-            <h3 class="mx-2 font-weight-normal"> Adjudicator Restrictions </h3>
-            <hr class="mb-0 bg-light" style="height: 5px;"/> 
+            <h3 class="mx-4 font-weight-normal"> Adjudicator Restrictions </h3>
+            <hr class="mx-3 bg-light" style="height: 5px;"/> 
         </div>
 
-        <b-card v-if="!(adjudicatorRestrictions.length>0)">
-            <span class="text-muted"> No adjudicator restrictions. </span>
+        <b-card v-if="!(adjudicatorRestrictions.length>0)" no-body>
+            <span class="text-muted ml-4 mb-5"> No adjudicator restrictions. </span>
         </b-card>
 
-        <b-card bg-variant="white" v-if="isMounted && (adjudicatorRestrictions.length>0)">           
+        <b-card bg-variant="white" v-if="isMounted && (adjudicatorRestrictions.length>0)" no-body class="mx-3 mb-5">           
             <b-table        
             borderless
             :items="adjudicatorRestrictions"
@@ -19,6 +17,7 @@
             :sort-by.sync="sortBy"
             :sort-desc.sync="sortDesc"
             sort-icon-left
+            small
             responsive="sm"
             >   
                 <template v-for="(field,index) in fields" v-slot:[`head(${field.key})`]="data">
@@ -33,9 +32,7 @@
                 </template>
             </b-table>
         </b-card>
-    </b-card>
-    
-</body>
+    </b-card>    
 </template>
 
 <script lang="ts">
@@ -45,28 +42,18 @@ import "@store/modules/CriminalFileInformation";
 const criminalState = namespace("CriminalFileInformation");
 
 @Component
-export default class  AdjudicatorRestrictions extends Vue {
+export default class  CriminalAdjudicatorRestrictions extends Vue {
 
+  /* eslint-disable */
   @criminalState.State
   public criminalFileInformation!: any;
 
-  mounted() {
-    this.getAdjudicatorRestrictions();
-  }
-
-  public getAdjudicatorRestrictions(): void {      
-      const data = this.criminalFileInformation.detailsData;         
-      this.adjudicatorRestrictionsJson = data.hearingRestriction;
-      this.ExtractAdjudicatorRestrictionsInfo();
-      this.isMounted = true;          
-  } 
-
-  sortBy = 'Adjudicator';
-  sortDesc = false;  
-  adjudicatorRestrictionsJson;
-  isMounted = false;
-
   adjudicatorRestrictions: any[] = [];
+  /* eslint-enable */
+  
+  sortBy = 'Adjudicator';
+  sortDesc = false;
+  isMounted = false;  
 
   fields =  
   [
@@ -76,15 +63,13 @@ export default class  AdjudicatorRestrictions extends Vue {
            
   ];
 
-  public ExtractAdjudicatorRestrictionsInfo(): void {
+  mounted() {
+    this.getAdjudicatorRestrictions();
+  }
 
-    for (const jRestriction of this.adjudicatorRestrictionsJson) {
-      const restrictionInfo = {};     
-      restrictionInfo["Adjudicator"] =   jRestriction.adjInitialsTxt?jRestriction.adjInitialsTxt +" - " + jRestriction.adjFullNm: jRestriction.adjFullNm;
-      restrictionInfo["Status"] = jRestriction.hearingRestrictionTypeDsc + ' ';
-      restrictionInfo["Applies to"] = jRestriction.partNm ? jRestriction.partNm: 'All participants on file' 
-      this.adjudicatorRestrictions.push(restrictionInfo);      
-    }
+  public getAdjudicatorRestrictions(): void {         
+      this.adjudicatorRestrictions = this.criminalFileInformation.adjudicatorRestrictionsInfo;
+      this.isMounted = true;          
   }
   
 }

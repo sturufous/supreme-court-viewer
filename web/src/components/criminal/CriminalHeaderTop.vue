@@ -1,7 +1,6 @@
 <template>
-<body>
-  
-    <b-navbar type="white" variant="white" v-if="isMounted">
+
+    <b-navbar type="white" variant="white" v-if="isMounted" style="height:30px">
       <b-navbar-nav>
             <b-nav-text style="font-size: 14px;" variant="white">
                 <b-badge class="mr-1" variant="primary">{{courtClassDescription}}</b-badge>
@@ -13,7 +12,6 @@
       </b-navbar-nav>
     </b-navbar>
 
-</body>
 </template>
 
 <script lang="ts">
@@ -23,10 +21,13 @@ import "@store/modules/CriminalFileInformation";
 const criminalState = namespace("CriminalFileInformation");
 
 @Component
-export default class CriminalHeader extends Vue {
+export default class CriminalHeaderTop extends Vue {
   
+  /* eslint-disable */
   @criminalState.State
   public criminalFileInformation!: any;
+  /* eslint-enable */ 
+
 
   mounted() {
     this.getFileDescription();

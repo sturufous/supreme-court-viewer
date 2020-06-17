@@ -19,22 +19,22 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
-import '@store/modules/CriminalFileInformation';
-const criminalState = namespace('CriminalFileInformation');
+import '@store/modules/CivilFileInformation';
+const civilState = namespace('CivilFileInformation');
 
 @Component
-export default class CriminalSidePanel extends Vue {
+export default class CivilSidePanel extends Vue {
 
-    @criminalState.State
-    public showSections
+    @civilState.State
+    public showSections 
     
     /* eslint-disable */
-    @criminalState.Action
+    @civilState.Action
     public UpdateShowSections!: (newShowSections: any) => void
     /* eslint-enable */
-
+    
     panelItems = [ 
-       'Case Details', 'Future Appearances', 'Past Appearances', 'Witnesses', 'Documents', 'Sentence/Order Details'    
+       'Case Details', 'Future Appearances', 'Past Appearances'    
     ];
 
     public SelectPanelItem(panelItem) {

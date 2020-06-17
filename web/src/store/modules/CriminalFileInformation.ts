@@ -8,16 +8,18 @@ class CriminalFileInformation extends VuexModule {
   public criminalFileInfoLoaded = false
   public activeCriminalParticipantIndex = 0
 
+  public criminalParticipantSentenceInformation = { }
+
   public showSections = {
     'Case Details': true,
     'Future Appearances': false,
     'Past Appearances': false, 
     'Witnesses': false,
-    'Criminal Documents': false,
+    'Documents': false,
     'Sentence/Order Details': false
   }
 
-  public pastAppearanceInfo = {}
+  public appearanceInfo = {}
 
   @Mutation
   public setCriminalFile(criminalFileInformation): void {
@@ -28,6 +30,17 @@ class CriminalFileInformation extends VuexModule {
   public UpdateCriminalFile(newCriminalFileInformation): void {
     this.context.commit('setCriminalFile', newCriminalFileInformation)
   }
+
+  @Mutation
+  public setCriminalParticipantSentenceInformation(criminalParticipantSentenceInformation): void {
+    this.criminalParticipantSentenceInformation = criminalParticipantSentenceInformation
+  }
+
+  @Action
+  public UpdateCriminalParticipantSentenceInformation(newCriminalParticipantSentenceInformation): void {
+    this.context.commit('setCriminalParticipantSentenceInformation', newCriminalParticipantSentenceInformation)
+  }
+
 
   @Mutation
   public setCriminalFileInfoLoaded(criminalFileInfoLoaded): void {
@@ -60,13 +73,13 @@ class CriminalFileInformation extends VuexModule {
   }
 
   @Mutation
-  public setPastAppearanceInfo(pastAppearanceInfo): void {
-    this.pastAppearanceInfo = pastAppearanceInfo
+  public setAppearanceInfo(appearanceInfo): void {
+    this.appearanceInfo = appearanceInfo
   }
 
   @Action
-  public UpdatePastAppearanceInfo(newPastAppearanceInfo): void {
-    this.context.commit('setPastAppearanceInfo', newPastAppearanceInfo)
+  public UpdateAppearanceInfo(newAppearanceInfo): void {
+    this.context.commit('setAppearanceInfo', newAppearanceInfo)
   }
 
 

@@ -1,5 +1,5 @@
 <template>
-<body>
+
     <b-card bg-variant="white">
         <b-card style="height: 50px; background-color:#f0f0f0">
             <b-dropdown variant="light" :text="selectedType" style="position: absolute; top: 6px; bottom: 6px; left: 6px;" >    
@@ -16,7 +16,7 @@
                 <span class="text-muted" v-if="!(witnessList.length>0)"> No witnesses. </span>
                 <span class="text-muted" v-if="(witnessList.length>0) && !(filteredWitnessList.length>0)"> No witnesses in this category. </span>
             </b-col>            
-            <b-col class="mt-4" md="8" cols="8" style="overflow: auto;" v-if="(filteredWitnessList.length>0)">
+            <b-col class="mt-3" md="8" cols="8" style="overflow: auto;" v-if="(filteredWitnessList.length>0)">
                 <b-table
                 :items="filteredWitnessList"
                 :fields="witnessFields"
@@ -36,14 +36,14 @@
                     </template>
 
                     <template v-slot:cell(Required)="data" >                        
-                        <b-badge :class="data.field.cellStyle" >  {{ data.value }} </b-badge>                    
+                        <b-badge :class="data.field.cellStyle" style="font-weight: normal; font-size:16px" >  {{ data.value }} </b-badge>                    
                     </template>
 
                 </b-table>
             </b-col>
-            <b-col col md="4" cols="4" style="overflow: auto;">
+            <b-col class="mt-4" col md="4" cols="4" style="overflow: auto;">
                 
-                    <h4 class="mt-5 font-weight-bold"> Witness Counts </h4>
+                    <h4 class="font-weight-bold"> Witness Counts </h4>
                   
                 <b-table
                 :items="witnessCounts"
@@ -64,31 +64,32 @@
         </b-row>       
     </b-card> 
 
-</body>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import "@store/modules/CriminalFileInformation";
+import "@store/modules/CommonInformation";
 const criminalState = namespace("CriminalFileInformation");
+const commonState = namespace("CommonInformation");
 
 @Component
 export default class CriminalWitnesses extends Vue {
 
+    @commonState.State
+    public displayName!: string;    
+    
+    /* eslint-disable */
     @criminalState.State
-    public criminalFileInformation!: any;
+    public criminalFileInformation!: any;      
 
-    mounted() {
-        this.getWitnesses();
-    }
+    @commonState.Action
+    public UpdateDisplayName!: (newInputNames: any) => void
 
-    public getWitnesses(): void {      
-        const data = this.criminalFileInformation.detailsData;    
-        this.witnessesJson = data.witness 
-        this.ExtractWitnessInfo();
-        this.isMounted = true;          
-    } 
+    witnessList: any[] = [];
+    witnessCounts: any[] = [];
+    /* eslint-enable */    
   
     isMounted = false;
     witnessesJson;
@@ -97,9 +98,7 @@ export default class CriminalWitnesses extends Vue {
     numberOfCivilianWitnesses = 0;
     numberOfExpertWitnesses = 0;
     sortBy = 'Name';
-    sortDesc = false;
-    witnessList: any[] = [];
-    witnessCounts: any[] = [];
+    sortDesc = false;   
     selectedType = 'Required Only';
 
     witnessFields = [
@@ -114,6 +113,17 @@ export default class CriminalWitnesses extends Vue {
     ];
 
     witnessDropDownFields = ['All Witnesses', 'Required Only', 'Personnel Only', 'Civilian Only', 'Expert Only']
+
+    mounted() {
+        this.getWitnesses();
+    }
+
+    public getWitnesses(): void {      
+        const data = this.criminalFileInformation.detailsData;    
+        this.witnessesJson = data.witness 
+        this.ExtractWitnessInfo();
+        this.isMounted = true;          
+    } 
   
     public ExtractWitnessInfo(): void {
         
@@ -123,7 +133,8 @@ export default class CriminalWitnesses extends Vue {
             
             witnessInfo["First Name"] = jWitness.givenNm ? jWitness.givenNm : '';
             witnessInfo["Last Name"] = jWitness.lastNm ? jWitness.lastNm : '';
-            witnessInfo["Name"] = this.getNameOfWitness(witnessInfo["Last Name"], witnessInfo["First Name"]);            
+            this.UpdateDisplayName({'lastName': witnessInfo["Last Name"], 'givenName': witnessInfo["First Name"]});
+            witnessInfo["Name"] = this.displayName;            
             witnessInfo["Type"] = jWitness.witnessTypeDsc? jWitness.witnessTypeDsc : '';
             witnessInfo["Required"] = jWitness.requiredYN == "Y"? 'Required': '';
             witnessInfo["Agency"] = jWitness.agencyDsc? jWitness.agencyDsc: '';
@@ -161,15 +172,7 @@ export default class CriminalWitnesses extends Vue {
         this.witnessCounts.push(countInfo);
     }
 
-    public getNameOfWitness(lastName, givenName) {
-        return ( this.formatNames(lastName) + ", " + this.formatNames(givenName) );
-    }
-
-    public formatNames (name: string): string {
-        return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
-    }
-
-    public totalBackground(item, type){
+    public totalBackground(item){
         if (item.WitnessCountFieldName == 'Total') {
             return 'table-warning'
         }
