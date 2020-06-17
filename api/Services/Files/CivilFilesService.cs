@@ -348,16 +348,20 @@ namespace Scv.Api.Services.Files
                     party.PartyAppearanceMethodDesc = await _lookupService.GetCivilPartyAttendanceType(targetParticipant.PartyAppearanceMethod);
 
                     //Update the counsel with their appearanceMethod.
-                    foreach (var counsel in targetParticipant.Counsel.Where(coun => coun.FullNm != null || coun.CounselId != null))
+                    foreach (var counsel in targetParticipant.Counsel)
                     {
-                        //TODO: Not seeing any data for CounselId in DEV.
-                        //Matching on name doesn't seem like a good idea.
-                        var targetCounsel = party.Counsel?.FirstOrDefault(c => c.CounselId == counsel.CounselId);
+                        //We match on counselName. 
+                        //Not the best idea of matching data, but we aren't provided a counselId for Civil FileContent.  Although we are provided a counselId in FileDetails, CourtList. 
+                        //TEST Environment - Civil Case 2151 - Appearance 9042, demonstrates this.
+
+                        if (!counsel.AdditionalProperties.ContainsKey("counselName"))
+                            continue;
+                  
+                        var targetCounsel = party.Counsel?.FirstOrDefault(c => c.CounselFullName == counsel.AdditionalProperties["counselName"]?.ToString());
                         if (targetCounsel == null)
                             continue;
 
-                        //I think one of the definitions for cvfcCounsel inside of the RAML is bad for this. I'd change it but not sure the impact on other systems.
-                        targetCounsel.CounselAppearanceMethod = counsel.AdditionalProperties.ContainsKey("counselAppearanceMethod") ? counsel.AdditionalProperties["counselAppearanceMethod"].ToString() : null;
+                        targetCounsel.CounselAppearanceMethod = counsel.AdditionalProperties.ContainsKey("counselAppearanceMethod") ? counsel.AdditionalProperties["counselAppearanceMethod"]?.ToString() : null;
                         targetCounsel.CounselAppearanceMethodDesc = await _lookupService.GetCivilCounselAttendanceType(targetCounsel.CounselAppearanceMethod);
                     }
                 }
