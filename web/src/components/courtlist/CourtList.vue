@@ -38,7 +38,7 @@
                     variant="primary" 
                     class="ml-2 my-2 my-sm-0">
                         Jump to Next Day
-                        <b-icon icon="arrow-right-short"></b-icon>
+                        <b-icon icon="chevron-right"></b-icon>
                 </b-button>
             </b-navbar-nav>    
         </b-navbar>

@@ -24,7 +24,7 @@
 
         <b-card bg-variant="white" v-if="isDataReady" no-body class="mx-3" style="overflow:auto">           
             <b-table
-            :items="criminalList"
+            :items="SortedCriminalList"
             :fields="fields"            
             borderless
             small
@@ -43,7 +43,7 @@
                     </b-badge>
                 </template>
 
-                <template v-slot:[`cell(${fields[0].key})`]="data" >                     
+                <template v-slot:[`cell(${fields[1].key})`]="data" >                     
                     <b-button  
                         size="sm" 
                         style=" font-size:16px"
@@ -89,7 +89,7 @@
                 </template>
                 
 
-                <template v-slot:[`cell(${fields[7].key})`]="data" >
+                <template v-slot:[`cell(${fields[8].key})`]="data" >
                         <b-badge  
                             v-for="(field,index) in data.value"
                             :key="index" 
@@ -101,7 +101,7 @@
                         </b-badge>
                 </template>
 
-                <template v-slot:[`cell(${fields[9].key})`]="data" >                     
+                <template v-slot:[`cell(${fields[10].key})`]="data" >                     
                     <b-badge variant="white" style="margin-top: 5px; font-weight: normal;font-size:16px">{{data.value}}
                     <span class="text-muted" style="font-weight: normal; font-size:14px">d</span>  </b-badge>                
                 </template>
@@ -118,6 +118,7 @@
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import CriminalAppearanceDetails from '@components/criminal/CriminalAppearanceDetails.vue';
+import * as _ from 'underscore';
 
 import "@store/modules/CommonInformation";
 const commonState = namespace("CommonInformation");
@@ -193,6 +194,7 @@ export default class CriminalList extends Vue {
     
     fields =  
     [
+        {key:'Seq.',        tdClass: 'border-top', headerStyle:'', cellStyle:'text-criminal'},
         {key:'File Number', tdClass: 'border-top', headerStyle:'', cellStyle:''},
         {key:'Accused',     tdClass: 'border-top', headerStyle:'', cellStyle:'text-primary'},
         {key:'Time',        tdClass: 'border-top', headerStyle:'', cellStyle:''},
@@ -217,6 +219,8 @@ export default class CriminalList extends Vue {
             const jcriminalList = this.criminalCourtListJson[criminalListIndex];
 
             criminalListInfo["Index"] = criminalListIndex;
+
+            criminalListInfo['Seq.']=jcriminalList.appearanceSequenceNumber
             criminalListInfo['File Number']=jcriminalList.fileNumberText
             criminalListInfo['Case Age']= jcriminalList.caseAgeDaysNumber? jcriminalList.caseAgeDaysNumber: ''
             criminalListInfo["Time"] = this.getTime(jcriminalList.appearanceTime.split(' ')[1].substr(0,5));
@@ -313,8 +317,8 @@ export default class CriminalList extends Vue {
     }
 
     get SortedCriminalList()
-    {           
-        return 0       
+    {                
+        return  _.sortBy(this.criminalList, 'Seq.')
     }
 }
 </script>
