@@ -193,7 +193,7 @@ namespace Scv.Api.Services
                 {
                     courtListFile.AppearanceReasonCd = targetAppearance?.AppearanceReasonCd;
                     courtListFile.AppearanceReasonDesc =
-                        await _lookupService.GetCivilAppearanceReasonsDescription(targetAppearance?.AppearanceReasonCd);
+                        await _lookupService.GetCriminalAppearanceReasonsDescription(targetAppearance?.AppearanceReasonCd);
                     courtListFile.OutOfTownJudge = targetAppearance.OutOfTownJudgeTxt;
                     courtListFile.SecurityRestriction = targetAppearance.SecurityRestrictionTxt;
                     courtListFile.SupplementalEquipment = targetAppearance.SupplementalEquipmentTxt;
