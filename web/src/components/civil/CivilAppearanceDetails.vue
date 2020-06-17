@@ -329,7 +329,7 @@ export default class CivilAppearanceDetails extends Vue {
 
     public getAppearanceDetails(): void {      
     
-        this.$http.get('/api/files/civil/'+ this.additionalInfo["File Number"]+'/appearance-detail/'+this.additionalInfo["Appearance ID"])
+        this.$http.get('/api/files/civil/'+ this.appearanceInfo.fileNo +'/appearance-detail/'+this.appearanceInfo.appearanceId)
             .then(Response => Response.json(), err => {console.log(err);} )        
             .then(data => {
                 if(data){ 
@@ -348,10 +348,7 @@ export default class CivilAppearanceDetails extends Vue {
 
         for(const info in this.additionalInfo)
             if(this.additionalInfo[info].length>0)
-            this.appearanceAdditionalInfo.push({'key':info,'value':this.additionalInfo[info]});
-
-        this.additionalInfo["File Number"] = this.appearanceInfo.fileNo; 
-        this.additionalInfo["Appearance ID"] = this.appearanceInfo.appearanceId;                  
+            this.appearanceAdditionalInfo.push({'key':info,'value':this.additionalInfo[info]});                      
     }
 
     public ExtractAppearanceDetailsInfo()
@@ -479,7 +476,7 @@ export default class CivilAppearanceDetails extends Vue {
         if(document.item.DocTypeCd != "CSR") {
             this.openDocumentsPdf(document.item['ID']);
         } else if (document.item.DocTypeCd == "CSR") {
-            this.openCourtSummaryPdf(this.additionalInfo["Appearance ID"]);
+            this.openCourtSummaryPdf(this.appearanceInfo.appearanceId);
         }
     }
 

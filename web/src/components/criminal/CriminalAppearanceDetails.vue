@@ -148,11 +148,29 @@
                 
             </b-col>          
         </b-row>
+        <b-overlay :show="loadingPdf" rounded="sm">
         <div class="mt-5">
-            <h3 class="mx-2 font-weight-normal">Appearance Information</h3>
+            <b-button-group><h3 class="mx-2 mt-1 font-weight-normal" style="height: 10px;">Appearance Information</h3>
+                <b-button
+                    v-if="informationsFileExists"                                     
+                    variant="outline-primary text-info" 
+                    style="border:0px;"
+                    class="mt-1"
+                    v-b-tooltip.hover.right
+                    title="Download Information File"
+                    @click="openDocumentsPdf()"
+                    size="sm">
+                    <b-icon icon="file-earmark-arrow-down"></b-icon>
+                </b-button>
+            </b-button-group>
+            <!-- <h3 class="mx-2 font-weight-normal" v-if="!informationsFileExists">Appearance Information</h3> -->
             <hr class="mb-0 bg-light" style="height: 5px;"/> 
-        </div>                           
+        </div>
+        <b-card v-if="!(appearanceMethodDetails.length> 0)" style="border: white;">
+            <span class="text-muted"> No appearance information. </span>
+        </b-card>                           
         <b-table
+            v-if="appearanceMethodDetails.length> 0"
             style="max-height: 200px; overflow-y: auto;"
             :items="appearanceMethodDetails"
             :fields="appearanceFields"               
@@ -169,6 +187,15 @@
                 <span><br v-if="data.value.length>0">{{data.item.PartyAppearance}}</span>                      
             </template>           
         </b-table>
+        <template v-slot:overlay>               
+            <div style="text-align: center"> 
+                    <loading-spinner/> 
+                    <p id="Downloading-label">Downloading PDF file ...</p>
+            </div>                
+        </template>
+        </b-overlay>
+        
+
 
       </b-card>       
     </b-card>
@@ -219,8 +246,10 @@ export default class CriminalAppearanceDetails extends Vue {
     sortBy = 'Date';
     sortDesc = true;
     showNotes = false;
+    informationsFileExists = false;
     notes = {};       
-    appearanceDetailsInfo = {};    
+    appearanceDetailsInfo = {};
+    initiatingDocuments: string[] = [];    
 
     addInfoFields =  
     [
@@ -258,7 +287,7 @@ export default class CriminalAppearanceDetails extends Vue {
 
     public getAppearanceDetails(): void {      
     
-        this.$http.get('/api/files/criminal/'+ this.appearanceDetailsInfo["File Number"]+'/appearance-detail/'+this.appearanceDetailsInfo["Appearance ID"]+ '/'+this.appearanceDetailsInfo["Part ID"])
+        this.$http.get('/api/files/criminal/'+ this.appearanceInfo.fileNo+'/appearance-detail/'+this.appearanceInfo.appearanceId+ '/'+this.appearanceInfo.partId)
             .then(Response => Response.json(), err => {console.log(err);} )        
             .then(data => {
                 if(data){  
@@ -279,18 +308,18 @@ export default class CriminalAppearanceDetails extends Vue {
             if(this.appearanceDetailsInfo[info].length>0)
             this.appearanceAdditionalInfo.push({'key':info,'value':this.appearanceDetailsInfo[info]});
         }
-        
-        this.appearanceDetailsInfo["File Number"] = this.appearanceInfo.fileNo; 
-        this.appearanceDetailsInfo["Appearance ID"] = this.appearanceInfo.appearanceId;
-        this.appearanceDetailsInfo["Part ID"] = this.appearanceInfo.partId;
-        this.appearanceDetailsInfo["Prof Seq No"] = this.appearanceInfo.profSeqNo;
     }
 
     public ExtractAppearanceDetailsInfo()
     {
         const judgeRec = this.appearanceDetailsJson.judgesRecommendation? this.appearanceDetailsJson.judgesRecommendation: '';
         const appNote = this.appearanceDetailsJson.appearanceNote? this.appearanceDetailsJson.appearanceNote: '';
-        this.notes =  {'judgeRec': judgeRec, 'appNote': appNote}
+        this.notes =  {'judgeRec': judgeRec, 'appNote': appNote}        
+        if (this.appearanceDetailsJson.initiatingDocuments && this.appearanceDetailsJson.initiatingDocuments.length>0) {
+            this.initiatingDocuments.push(this.appearanceDetailsJson.initiatingDocuments[0])
+            this.informationsFileExists = true;
+        }
+             
         for(const charge of this.appearanceDetailsJson.charges)
         {              
             const chargeInfo = {};             
@@ -316,9 +345,7 @@ export default class CriminalAppearanceDetails extends Vue {
             methodInfo["instruction"] = appearanceMethod.instructionTxt? appearanceMethod.instructionTxt: '';
             methodInfo["phoneNumber"] = appearanceMethod.phoneNumberTxt? appearanceMethod.phoneNumberTxt: '';
             this.appearanceMethods.push(methodInfo)
-        }
-
-        console.log(this.appearanceDetailsJson)
+        }        
 
         if (this.appearanceDetailsJson.accused) {
             const accusedJson = this.appearanceDetailsJson.accused;
@@ -363,31 +390,29 @@ export default class CriminalAppearanceDetails extends Vue {
                             'PartyAppearance': counselJson.partyAppearanceMethodDesc? counselJson.partyAppearanceMethodDesc: ''
                             }
             this.appearanceMethodDetails.push(counsel)
-        }
-
-        
-        
-                
+        }                
     }
 
     public OpenNotes() {        
         this.showNotes=true;           
     }
 
-    // public openDocumentsPdf(): void {
-    //     this.loadingPdf = true;
-    //     const filename = 'doc'+imageId+'.pdf';
-    //     window.open(`/api/files/document/${imageId}/${filename}?isCriminal=true`)
-    //     this.loadingPdf = false;
-    // }
+    public openDocumentsPdf(): void {
+        this.loadingPdf = true;
+        const imageId = this.initiatingDocuments[0]
+        console.log(imageId)
+        const filename = 'doc'+imageId+'.pdf';
+        window.open(`/api/files/document/${imageId}/${filename}?isCriminal=true`)
+        this.loadingPdf = false;
+    }
 
     public openRopPdf(): void {
         this.loadingPdf = true;         
-        const partID = this.appearanceDetailsInfo["Part ID"];
-        const profSeqNo = this.appearanceDetailsInfo["Prof Seq No"];      
+        const partID = this.appearanceInfo.partId;
+        const profSeqNo = this.appearanceInfo.profSeqNo;      
         const filename = 'ROP_'+partID+'.pdf';
-        const courtLevel = this.criminalFileInformation.courtLevel;
-        const courtClass = this.criminalFileInformation.courtClass;
+        const courtLevel = this.appearanceInfo.courtLevel;
+        const courtClass = this.appearanceInfo.courtClass;
       
         const url =`/api/files/criminal/record-of-proceedings/${partID}/${filename}?profSequenceNumber=${profSeqNo}&courtLevelCode=${courtLevel}&courtClassCode=${courtClass}`;
 
