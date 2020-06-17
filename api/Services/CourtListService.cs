@@ -88,15 +88,15 @@ namespace Scv.Api.Services
             var lookForPastAppearances = targetDateInPast ? HistoryYN2.Y : HistoryYN2.N;
             var lookForFutureAppearances = targetDateInPast ? FutureYN2.N : FutureYN2.Y;
 
-            var civilAppearanceTasks = new List<Task<CivilFileAppearancesResponse>>();
+            var appearanceTasks = new List<Task<CivilFileAppearancesResponse>>();
             foreach (var fileId in courtList.CivilCourtList.Select(ccl => ccl.PhysicalFile.PhysicalFileID))
             {
                 async Task<CivilFileAppearancesResponse> Appearances() => await _filesClient.FilesCivilFileIdAppearancesAsync(_requestAgencyIdentifierId, _requestPartId, lookForFutureAppearances,
                     lookForPastAppearances, fileId);
-                civilAppearanceTasks.Add(_cache.GetOrAddAsync($"CivilAppearances-{fileId}", Appearances));
+                appearanceTasks.Add(_cache.GetOrAddAsync($"CivilAppearances-{fileId}", Appearances));
             }
 
-            return civilAppearanceTasks;
+            return appearanceTasks;
         }
 
         private List<Task<CriminalFileAppearancesResponse>> CriminalAppearancesTasks(DateTime? proceeding, Models.CourtList.CourtList courtList)
@@ -105,42 +105,42 @@ namespace Scv.Api.Services
             var lookForPastAppearances = targetDateInPast ? HistoryYN.Y : HistoryYN.N;
             var lookForFutureAppearances = targetDateInPast ? FutureYN.N : FutureYN.Y;
 
-            var criminalAppearanceTasks = new List<Task<CriminalFileAppearancesResponse>>();
+            var appearanceTasks = new List<Task<CriminalFileAppearancesResponse>>();
             foreach (var fileId in courtList.CriminalCourtList.Select(ccl => ccl.FileInformation.MdocJustinNo))
             {
                 async Task<CriminalFileAppearancesResponse> Appearances() => await _filesClient.FilesCriminalFileIdAppearancesAsync(
                     _requestAgencyIdentifierId, _requestPartId, lookForFutureAppearances,
                     lookForPastAppearances, fileId);
-                criminalAppearanceTasks.Add(_cache.GetOrAddAsync($"CriminalAppearances-{fileId}", Appearances));
+                appearanceTasks.Add(_cache.GetOrAddAsync($"CriminalAppearances-{fileId}", Appearances));
             }
 
-            return criminalAppearanceTasks;
+            return appearanceTasks;
         }
 
         private List<Task<CriminalFileDetailResponse>> CriminalFileDetailTasks(Models.CourtList.CourtList courtList)
         {
-            var criminalFileDetailTasks = new List<Task<CriminalFileDetailResponse>>();
+            var fileDetailTasks = new List<Task<CriminalFileDetailResponse>>();
             foreach (var fileId in courtList.CriminalCourtList.Select(ccl => ccl.FileInformation.MdocJustinNo))
             {
-                async Task<CriminalFileDetailResponse> CriminalFileDetails() =>
+                async Task<CriminalFileDetailResponse> FileDetails() =>
                     await _filesClient.FilesCriminalFileIdAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode,
                         fileId);
-                criminalFileDetailTasks.Add(_cache.GetOrAddAsync($"CriminalFileDetail-{fileId}", CriminalFileDetails));
+                fileDetailTasks.Add(_cache.GetOrAddAsync($"CriminalFileDetail-{fileId}", FileDetails));
             }
 
-            return criminalFileDetailTasks;
+            return fileDetailTasks;
         }
 
         private List<Task<CivilFileDetailResponse>> CivilFileDetailTasks(Models.CourtList.CourtList courtList)
         {
-            var civilFileDetailTasks = new List<Task<CivilFileDetailResponse>>();
+            var fileDetailTasks = new List<Task<CivilFileDetailResponse>>();
             foreach (var fileId in courtList.CivilCourtList.Select(ccl => ccl.PhysicalFile.PhysicalFileID))
             {
-                async Task<CivilFileDetailResponse> CivilFileDetails() => await _filesClient.FilesCivilFileIdAsync(_requestAgencyIdentifierId, _requestPartId, fileId);
-                civilFileDetailTasks.Add(_cache.GetOrAddAsync($"CivilFileDetail-{fileId}", CivilFileDetails));
+                async Task<CivilFileDetailResponse> FileDetails() => await _filesClient.FilesCivilFileIdAsync(_requestAgencyIdentifierId, _requestPartId, fileId);
+                fileDetailTasks.Add(_cache.GetOrAddAsync($"CivilFileDetail-{fileId}", FileDetails));
             }
 
-            return civilFileDetailTasks;
+            return fileDetailTasks;
         }
 
         private async Task<ICollection<CivilCourtList>> PopulateCivilFiles(List<CivilFileDetailResponse> civilFileDetails, ICollection<CivilCourtList> courtList, ICollection<CivilFileAppearancesResponse> civilAppearances)
