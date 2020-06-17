@@ -26,7 +26,7 @@
                 <template v-slot:cell(Status)="data" >                   
                     <b-badge 
                         variant="primary" 
-                        style="font-weight: normal; font-size: 14px;"> 
+                        style="font-weight: normal; font-size: 16px;"> 
                         {{ data.value }}
                     </b-badge>
                 </template>
@@ -52,8 +52,7 @@ export default class  CriminalAdjudicatorRestrictions extends Vue {
   /* eslint-enable */
   
   sortBy = 'Adjudicator';
-  sortDesc = false;  
-  adjudicatorRestrictionsJson;
+  sortDesc = false;
   isMounted = false;  
 
   fields =  
@@ -68,22 +67,9 @@ export default class  CriminalAdjudicatorRestrictions extends Vue {
     this.getAdjudicatorRestrictions();
   }
 
-  public getAdjudicatorRestrictions(): void {      
-      const data = this.criminalFileInformation.detailsData;         
-      this.adjudicatorRestrictionsJson = data.hearingRestriction;
-      this.ExtractAdjudicatorRestrictionsInfo();
+  public getAdjudicatorRestrictions(): void {         
+      this.adjudicatorRestrictions = this.criminalFileInformation.adjudicatorRestrictionsInfo;
       this.isMounted = true;          
-  } 
-
-  public ExtractAdjudicatorRestrictionsInfo(): void {
-
-    for (const jRestriction of this.adjudicatorRestrictionsJson) {
-      const restrictionInfo = {};     
-      restrictionInfo["Adjudicator"] =   jRestriction.adjInitialsTxt?jRestriction.adjInitialsTxt +" - " + jRestriction.adjFullNm: jRestriction.adjFullNm;
-      restrictionInfo["Status"] = jRestriction.hearingRestrictionTypeDsc + ' ';
-      restrictionInfo["Applies to"] = jRestriction.partNm ? jRestriction.partNm: 'All participants on file' 
-      this.adjudicatorRestrictions.push(restrictionInfo);      
-    }
   }
   
 }

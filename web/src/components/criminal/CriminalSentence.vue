@@ -13,14 +13,11 @@
             borderless
             small
             responsive="sm"
-            >   
-                <template v-for="(field,index) in fields" v-slot:[`head(${field.key})`]="data">
-                    <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
-                </template>
-
+            >
                 <template v-slot:cell(Name)="data" >
                     <b-button   
                         size="sm" 
+                        :style="data.field.cellStyle"
                         @click="OpenDetails(data);data.toggleDetails();" 
                         :variant="!data.item.CountsDisable ? 'outline-primary border-white text-info' :'text-muted'"
                         :disabled="data.item.CountsDisable">
@@ -32,7 +29,8 @@
 
                 <template v-slot:cell(Judge)="data" >
                     <b-button 
-                        size="sm" 
+                        size="sm"
+                        :style="data.field.cellStyle" 
                         @click="OpenOrderMadeDetails(data)"
                         :variant="!data.item.OrderMadeDisable ? 'outline-primary border-white text-info' :'text-muted'"
                         :disabled="data.item.OrderMadeDisable" 
@@ -40,7 +38,8 @@
                             Order Made Details
                     </b-button>
                     <b-button 
-                        size="sm" 
+                        size="sm"
+                        :style="data.field.cellStyle" 
                         @click="OpenJudgeRecommendation(data)"
                         :variant="!data.item.RecommendationDisable ? 'outline-primary border-white text-info' :'text-muted'"
                         :disabled="data.item.RecommendationDisable" 
@@ -78,7 +77,8 @@
                 > 
                 <template v-slot:cell(Date)="data" >
                     <b-button                        
-                        @click="data.toggleDetails();" 
+                        @click="data.toggleDetails();"
+                        :style="data.field.cellStyle" 
                         variant="outline-primary border-white text-info"
                         size="sm">
                             <b-icon-caret-right-fill v-if="!data.item['_showDetails']"></b-icon-caret-right-fill>
@@ -110,7 +110,8 @@
                 > 
                 <template v-slot:cell(Date)="data" >
                     <b-button                        
-                        @click="data.toggleDetails();" 
+                        @click="data.toggleDetails();"
+                        :style="data.field.cellStyle"
                         variant="outline-primary border-white text-info"
                         size="sm">
                             <b-icon-caret-right-fill v-if="!data.item['_showDetails']"></b-icon-caret-right-fill>
@@ -171,6 +172,7 @@ export default class CriminalSentence extends Vue {
     public UpdateDisplayName!: (newInputNames: any) => void
 
     participantFiles: any[] = [];
+    participantList: any[] = [];
     /* eslint-enable */
     
     participantJson;   
@@ -179,19 +181,20 @@ export default class CriminalSentence extends Vue {
     judgeRecomClickedParticipant =0;    
 
     fields = [        
-        {key:'Name',  tdClass: 'border-bottom', headerStyle:'text-primary',  cellStyle:'text-info'},
-        {key:'Count', tdClass: 'border-bottom', headerStyle:'text-primary',  cellStyle:'text-info'},
-        {key:'Judge', tdClass: 'border-bottom', headerStyle:'text-primary',  cellStyle:'text-info'},
+        {key:'Name',  tdClass: 'border-bottom', cellStyle:'font-size:16px'},
+        {key:'Count', tdClass: 'border-bottom'},
+        {key:'Judge', tdClass: 'border-bottom',  cellStyle:'font-size:16px'},
     ]; 
     
     orderMadeFields = [
-        {key:'Date',  tdClass: 'border-top', headerStyle:'text-primary',  cellStyle:'text'},
+        {key:'Date',  tdClass: 'border-top', headerStyle:'text-primary',  cellStyle:'font-size:16px'},
         {key:'Count', tdClass: 'border-top', headerStyle:'text',          cellStyle:'text'},
     ]
 
     public getParticipants(): void {       
         const data = this.criminalFileInformation.detailsData;
         this.participantJson = data.participant
+        this.participantList = this.criminalFileInformation.participantList
         this.ExtractParticipantInfo()          
         this.isMounted = true;
     }
@@ -202,28 +205,21 @@ export default class CriminalSentence extends Vue {
     
     public ExtractParticipantInfo(): void {        
         
-        for(const fileIndex in this.participantJson)
-        {            
-            const fileInfo = {};
-            const jFile =  this.participantJson[fileIndex];
-            fileInfo["Index"] = fileIndex; 
-            fileInfo["Part ID"] = jFile.partId;
-            fileInfo["First Name"] = jFile.givenNm.trim().length>0 ? jFile.givenNm : "";
-            fileInfo["Last Name"] = jFile.lastNm ? jFile.lastNm : jFile.orgNm;
-            this.UpdateDisplayName({'lastName': fileInfo["Last Name"], 'givenName': fileInfo["First Name"]});
-            fileInfo["Name"] = this.displayName;
+        for(const partIndex in this.participantList)
+        {
+            const partInfo = this.participantList[partIndex];
 
-            fileInfo["Counts"] = [];
+            partInfo["Counts"] = [];
             /* eslint-disable */
             const counts: any[] = [];
              /* eslint-enable */ 
             
-            fileInfo["OrderMade"] = [];
-            fileInfo["OrderMadeDisable"] =  true;
-            fileInfo["JudgesRecommendation"] = [];
-            fileInfo["RecommendationDisable"] =  true;
+            partInfo["OrderMade"] = [];
+            partInfo["OrderMadeDisable"] =  true;
+            partInfo["JudgesRecommendation"] = [];
+            partInfo["RecommendationDisable"] =  true;
               
-            for(const cnt of this.mergeSentences(jFile.count))           
+            for(const cnt of this.mergeSentences(partInfo.CountsJson))           
             {                
                 const countInfo = {}; 
                
@@ -297,21 +293,21 @@ export default class CriminalSentence extends Vue {
                 counts.push(countInfo);
                 if(countInfo["OrderMade"].length>0)
                 {
-                    fileInfo["OrderMade"].push(countInfo)
-                    fileInfo["OrderMadeDisable"] =  false;
+                    partInfo["OrderMade"].push(countInfo)
+                    partInfo["OrderMadeDisable"] =  false;
                 }
 
                  if(countInfo["JudgeRecommendation"].length>0)
                 {
-                    fileInfo["JudgesRecommendation"].push(countInfo)
-                    fileInfo["RecommendationDisable"] =  false;
+                    partInfo["JudgesRecommendation"].push(countInfo)
+                    partInfo["RecommendationDisable"] =  false;
                 }
             }
-            fileInfo["Counts"] = counts;
-            fileInfo["CountsDisable"] = counts.length>0 ? false: true;
+            partInfo["Counts"] = counts;
+            partInfo["CountsDisable"] = counts.length>0 ? false: true;
             
             
-            this.participantFiles.push(fileInfo);
+            this.participantFiles.push(partInfo);
         } 
         const participantInfo = {participantFiles:{}, selectedParticipant:0}
         participantInfo.participantFiles = this.participantFiles;

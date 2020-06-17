@@ -31,8 +31,9 @@
         </b-card>
 
         <b-overlay :show="loadingPdf" rounded="sm">  
-            <b-card class="mx-3" bg-variant="light">           
+            <b-card class="mx-3" bg-variant="light">                          
                 <b-table
+                v-if="FilteredDocuments.length>0"
                 :items="FilteredDocuments"
                 :fields="fields[fieldsTab]"
                 :sort-by.sync="sortBy"
@@ -45,8 +46,12 @@
                 responsive="sm"
                 >   
                     <template v-for="(field, index) in fields[fieldsTab]" v-slot:[`head(${field.key})`]="data">
-                    <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
+                        <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
                     </template>
+
+                    <template  v-slot:head(Date) > 
+                         <b class="text-danger" >{{getNameOfDateInTabs}}</b>
+                    </template> 
 
                     <template v-slot:[`cell(${fields[0][0].key})`]="data" >
                          {{ data.value | beautify-date}}
@@ -56,7 +61,7 @@
                         <b-button 
                             v-if="data.item.PdfAvail" 
                             variant="outline-primary text-info" 
-                            style="border:0px;"
+                            style="border:0px; font-size:16px"
                             @click="cellClick(data)"
                             size="sm">
                                 {{data.value}}
@@ -67,6 +72,7 @@
                     </template>
 
                 </b-table>
+                <span v-else class="text-muted ml-4 mb-5"> No document with label <b> {{activetab}} </b> . </span>
             </b-card>
             <template v-slot:overlay>               
                <div style="text-align: center"> 
@@ -120,11 +126,11 @@ export default class CriminalDocumentsView extends Vue {
     public UpdateDisplayName!: (newInputNames: any) => void
 
     participantFiles: any[] = [];
+    participantList: any[] = [];
     ropDocuments: any[] = [];
     categories: any = [];
     /* eslint-enable */    
 
-    participantJson;
     courtLevel;
     courtClass;
 
@@ -132,7 +138,7 @@ export default class CriminalDocumentsView extends Vue {
     loadingPdf = false;    
     activetab = 'ALL';
     tabIndex = 0;              
-    sortBy = 'Date Filed/Issued';
+    sortBy = 'Date';
     sortDesc = true;
     hoverRow =-1;
     hoverCol = 0;
@@ -144,15 +150,15 @@ export default class CriminalDocumentsView extends Vue {
 
     fields = [ 
         [
-            {key:'Date Filed/Issued',  sortable:true,  tdClass: 'border-top',  headerStyle:'text-danger',   cellStyle:'text'},
-            {key:'Document Type',      sortable:true,  tdClass: 'border-top',  headerStyle:'text-primary',  cellStyle:'text-muted'},
-            {key:'Category',           sortable:false,  tdClass: 'border-top', headerStyle:'text',          cellStyle:'text'},
-            {key:'Pages',              sortable:false,  tdClass: 'border-top', headerStyle:'text',          cellStyle:'text'},
+            {key:'Date',               sortable:true,   tdClass: 'border-top',  headerStyle:'text-danger'},
+            {key:'Document Type',      sortable:true,   tdClass: 'border-top',  headerStyle:'text-primary'},
+            {key:'Category',           sortable:false,  tdClass: 'border-top',  headerStyle:'text'},
+            {key:'Pages',              sortable:false,  tdClass: 'border-top',  headerStyle:'text'},
         ],
         [
-            {key:'Document Type',    sortable:false,  tdClass: 'border-top', headerStyle:'text-primary',    cellStyle:'text-info'},
-            {key:'Category',         sortable:true,  tdClass: 'border-top',  headerStyle:'text',            cellStyle:'text'},
-            {key:'Pages',            sortable:false,  tdClass: 'border-top', headerStyle:'text',            cellStyle:'text'},
+            {key:'Document Type',    sortable:false,  tdClass: 'border-top', headerStyle:'text-primary'},
+            {key:'Category',         sortable:true,   tdClass: 'border-top', headerStyle:'text'},
+            {key:'Pages',            sortable:false,  tdClass: 'border-top', headerStyle:'text'},
         ]  
         
     ];
@@ -160,8 +166,7 @@ export default class CriminalDocumentsView extends Vue {
     public getDocuments(): void {
        
         const data = this.criminalFileInformation.detailsData;
-
-        this.participantJson = data.participant 
+        this.participantList = this.criminalFileInformation.participantList 
 
         this.courtLevel = DecodeCourtLevel[data.courtLevelCd];
         this.courtClass = DecodeCourtClass[data.courtClassCd];
@@ -201,29 +206,21 @@ export default class CriminalDocumentsView extends Vue {
     public ExtractDocumentInfo(): void {
         let ropExists = false 
         
-        for(const fileIndex in this.participantJson)
-        {            
-            const fileInfo = {};
-            const jFile =  this.participantJson[fileIndex];
-            fileInfo["Index"] = fileIndex; 
-            fileInfo["Part ID"] = jFile.partId;
-            fileInfo["Prof Seq No"] = jFile.profSeqNo;
-            fileInfo["First Name"] = jFile.givenNm.trim().length>0 ? jFile.givenNm : "";
-            fileInfo["Last Name"] = jFile.lastNm ? jFile.lastNm : jFile.orgNm;            
-            this.UpdateDisplayName({'lastName': fileInfo["Last Name"], 'givenName': fileInfo["First Name"]});
-            fileInfo["Name"] = this.displayName;
-            fileInfo["Documents"] = [];
-            fileInfo["Record of Proceedings"] = [];
+        for(const partIndex in this.participantList)
+        {         
+            const partInfo = this.participantList[partIndex];
+            partInfo["Documents"] = [];
+            partInfo["Record of Proceedings"] = [];
 
             /* eslint-disable */
             const document: any[] = [];
             const rop: any[] = [];
             /* eslint-enable */
-            for(const doc of jFile.document)
+            for(const doc of partInfo.DocumentsJson)
             {
                 if(doc.category != 'rop') {
                     const docInfo = {}; 
-                    docInfo["Date Filed/Issued"]= doc.issueDate? doc.issueDate.split(' ')[0] : ''; 
+                    docInfo["Date"]= doc.issueDate? doc.issueDate.split(' ')[0] : ''; 
                     docInfo["Document Type"]= doc.docmFormDsc;
                     docInfo["Category"]= doc.docmClassification;
                     docInfo["Pages"]= doc.documentPageCount;
@@ -240,15 +237,15 @@ export default class CriminalDocumentsView extends Vue {
                     docInfo["Category"]= "ROP";
                     docInfo["Pages"]= doc.documentPageCount;
                     docInfo["PdfAvail"]= true 
-                    docInfo["Index"] = fileIndex;
+                    docInfo["Index"] = partIndex;
                     rop.push(docInfo);
                     ropExists = true
                 }
             }
-            fileInfo["Documents"] = document;
-            fileInfo["Record of Proceedings"] = rop;
+            partInfo["Documents"] = document;
+            partInfo["Record of Proceedings"] = rop;
                         
-            this.participantFiles.push(fileInfo);
+            this.participantFiles.push(partInfo);
         }
 
          this.categories.sort()
@@ -283,7 +280,23 @@ export default class CriminalDocumentsView extends Vue {
             }); 
         }    
     }
-    
+
+    get getNameOfDateInTabs()
+    {
+        switch(this.activetab.toLowerCase())
+        {
+            case ("all"):
+                return "Date Filed/Issued";
+            case ("scheduled"):
+                return "Date Sworn/Filed";
+            case ("bail"):
+                return "Date Ordered";
+            case ("psr"):
+                return "Date Filed";
+            default:
+                return "Date Sworn/Issued";
+        }
+    }    
 
     get NumberOfDocuments() {       
         if(this.activetab == 'ROP')

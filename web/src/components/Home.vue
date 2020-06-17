@@ -19,7 +19,11 @@
         
             <b-card >
                 <b-button @click="navigateToDocumentsView(fileInformation)">Search</b-button>
-            </b-card>          
+            </b-card> 
+
+            <b-card >
+                <b-button @click="navigateToCourtList()">Court List</b-button>
+            </b-card>            
 
         </b-card>
     </b-card>
@@ -61,9 +65,12 @@
             } else if(this.selected == 'criminal') {
                 this.UpdateCriminalFile(fileInformation)
                 this.$router.push({name:'CriminalCaseDetails', params: {fileNumber: fileInformation.fileNumber}})
-            }
-            
-        }        
+            }            
+        }    
+        
+        navigateToCourtList(): void {
+            this.$router.push({name:'CourtList'})
+        }
     }
 </script>
 

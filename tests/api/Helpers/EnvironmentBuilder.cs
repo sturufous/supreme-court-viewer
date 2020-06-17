@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Net.Http;
 using Scv.Api.Helpers;
+using Scv.Api.Helpers.Extensions;
 using tests.api.Controllers;
 
 namespace tests.api.Helpers
@@ -44,4 +45,5 @@ namespace tests.api.Helpers
             });
         }
     }
+
 }

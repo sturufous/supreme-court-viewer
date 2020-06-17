@@ -23,27 +23,29 @@
         </b-card>
     </b-card>
 
-    <b-row cols="2" >            
-        <b-col md="2" cols="2" style="overflow: auto;">
-            <civil-side-panel v-if="isDataReady"/> 
-        </b-col>
-        <b-col col md="10" cols="10" style="overflow: auto;">
+    <b-card no-body>
+        <b-row cols="2" >            
+            <b-col md="2" cols="2" style="overflow: auto;">
+                <civil-side-panel v-if="isDataReady"/> 
+            </b-col>
+            <b-col col md="10" cols="10" style="overflow: auto;">
 
-            <civil-header-top v-if="isDataReady"/> 
-            <civil-header v-if="isDataReady"/> 
+                <civil-header-top v-if="isDataReady"/> 
+                <civil-header v-if="isDataReady"/> 
 
-            <h2 style= "white-space: pre" v-if="isDataReady">
-                {{selectedSideBar}}
-            </h2>
+                <h2 style= "white-space: pre" v-if="isDataReady">
+                    {{selectedSideBar}}
+                </h2>
 
-            <civil-parties v-if="showCaseDetails"/>
-            <civil-adjudicator-restrictions v-if="showCaseDetails"/>
-            <civil-documents-view v-if="showCaseDetails"/>            
-            <civil-past-appearances v-if="showPastAppearances" />
-            <civil-future-appearances v-if="showFutureAppearances" />
-            <b-card><br></b-card>  
-        </b-col>
-    </b-row>
+                <civil-parties v-if="showCaseDetails"/>
+                <civil-adjudicator-restrictions v-if="showCaseDetails"/>
+                <civil-documents-view v-if="showCaseDetails"/>            
+                <civil-past-appearances v-if="showPastAppearances" />
+                <civil-future-appearances v-if="showFutureAppearances" />
+                <b-card><br></b-card>  
+            </b-col>
+        </b-row>
+    </b-card>
 </body>
 </template>
 
@@ -220,7 +222,10 @@ export default class CivilCaseDetails extends Vue {
 </script>
 
 <style scoped>
- .card {
+    .card {
         border: white;
+    }
+    body {
+        overflow-x: hidden;
     }
 </style>

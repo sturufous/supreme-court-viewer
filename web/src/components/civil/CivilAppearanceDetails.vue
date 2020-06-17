@@ -17,40 +17,57 @@
         <b-row cols="2">            
             <b-col md="8" cols="8" style="overflow: auto;">
                 <b-overlay :show="loadingPdf" rounded="sm">
-                    <div>
-                        <h3 class="mx-2 font-weight-normal"> Document Summary</h3>
+                    <div>                        
+                        <b-button-group><h3 class="mx-2 mt-2 font-weight-normal" style="height: 10px;"> Document Summary</h3> 
+                           <b-button                                     
+                                    variant="outline-primary text-info" 
+                                    style="border:0px;"
+                                    class="mt-1"
+                                    v-b-tooltip.hover.right
+                                    title="Download Court Summary"
+                                    @click="openCourtSummaryPdf(appearanceInfo.appearanceId)"
+                                    size="sm">
+                                    <b-icon icon="file-earmark-arrow-down"></b-icon>
+                           </b-button>
+                        </b-button-group>                        
                         <hr class="mb-0 bg-light" style="height: 5px;"/> 
                     </div>
                     <b-card v-if="!(appearanceDocuments.length>0)" style="border: white;">
                         <span class="text-muted"> No documents. </span>
                     </b-card>                           
                     <b-table
+                        style="max-height: 300px; overflow-y: auto;"
                         v-if="appearanceDocuments.length > 0"
                         :items="appearanceDocuments"
                         :fields="documentFields"               
-                        borderless
-                        striped 
+                        borderless                     
                         small               
                         responsive="sm"
-                        >   
+                        >
+                            <template v-slot:head(Result)>
+                                <b>Result</b><b style="margin-left: 10px">Issues</b>
+                            </template>   
                             <template v-slot:[`cell(${documentFields[1].key})`]="data" >
                                 <b-button 
                                     v-if="data.item.PdfAvail" 
                                     variant="outline-primary text-info" 
-                                    style="border:0px;"
+                                    :style="data.field.cellStyle"
                                     @click="documentClick(data)"
                                     size="sm">
                                         {{data.value}}
                                 </b-button>
-                                <span class="ml-2" v-else>
-                                    {{data.value}}
+                                <span
+                                    class="ml-2"
+                                    :style="data.field.cellLabelStyle"
+                                    v-else>
+                                        {{data.value}}
                                 </span>
                             </template>
 
                             <template v-slot:cell(Act)="data" >
                                 <b-badge 
                                     variant="secondary"
-                                    style="display: block; margin-top: 1px; font-size: 14px; max-width : 50px;"                     
+                                    :style="data.field.cellStyle"                     
                                     v-for="(act, actIndex) in data.value"  
                                     v-bind:key="actIndex"                               
                                     v-b-tooltip.hover.left
@@ -60,27 +77,39 @@
                             </template>                            
 
                             <template v-slot:[`cell(${documentFields[3].key})`]="data" >
-                                {{ data.value | beautify-date}}
+                                <span :style="data.field.cellStyle">
+                                    {{ data.value | beautify-date}}
+                                </span>
                             </template>
 
-                             <template v-slot:cell(Result)="data" >
-                                <b-badge
-                                    v-if="data.value"  
-                                    variant="secondary"
-                                    v-b-tooltip.hover.left                            
-                                    :title="data.item['Result Description']">
-                                        {{data.value}}                                 
-                                </b-badge>
-                             </template>
+                            <template v-slot:cell(Result)="data" >
+                                <b-table
+                                    :items="data.item.Issues"
+                                    :fields="issueFields"
+                                    thead-class="d-none"
+                                    :striped="stripedStyle"
+                                    borderless
+                                    small               
+                                    responsive="sm">
+                                    <template v-slot:cell(Issue)="data" >                               
+                                        <li :style="data.field.cellStyle">
+                                            {{ data.item.Issue }}
+                                        </li>
+                                    </template>
+                                    <template v-slot:cell(Result)="data" >
+                                        <span :style="data.field.cellStyle">                               
+                                            <b-badge
+                                                v-if="data.value"                                     
+                                                variant="secondary"
+                                                v-b-tooltip.hover.left
+                                                :title="data.item['ResultDsc']">
+                                                    {{data.value}}                                 
+                                            </b-badge>
+                                        </span>
+                                    </template>
+                                </b-table>     
 
-                            <template v-slot:cell(Issues)="data" >                               
-                                <li 
-                                    v-for="(issue, issueIndex) in data.value"  
-                                    v-bind:key="issueIndex"
-                                    style="line-height: 100%;">
-                                        {{ issue }}
-                                </li>
-                            </template>           
+                            </template> 
                     </b-table>
                     <template v-slot:overlay>               
                         <div style="text-align: center"> 
@@ -88,39 +117,25 @@
                                 <p id="Downloading-label">Downloading PDF file ...</p>
                         </div>                
                     </template>
-                </b-overlay>
-
-                <div class="mt-5">
-                    <h3 class="mx-2 font-weight-normal"> Scheduled Parties</h3>
-                    <hr class="mb-0 bg-light" style="height: 5px;"/> 
-                </div>                           
-                <b-table
-                    :items="appearanceParties"
-                    :fields="partyFields"               
-                    borderless
-                    striped               
-                    responsive="sm"
-                    >   
-                        <template v-for="(field,index) in partyFields" v-slot:[`head(${field.key})`]="data">
-                            <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
-                        </template>                
-                        <template v-for="(field,index) in partyFields" v-slot:[`cell(${field.key})`]="data" >                                                        
-                            <span v-bind:key="index" :style="field.cellStyle" v-if="data.field.key == 'Current Counsel' && data.value.length>0">
-                                <span v-for="(counsel, counselIndex) in data.value"  v-bind:key="counselIndex" style= "white-space: pre-line" >CEIS: {{ counsel }}<br></span>
-                            </span>
-                            <span v-bind:key="index" :style="field.cellStyle" v-else-if="data.field.key == 'Role' && data.value.length>0">
-                                <span v-for="(role, roleIndex) in data.value"  v-bind:key="roleIndex" style= "white-space: pre-line" >{{ role }}<br></span>
-                            </span>
-                            <span v-bind:key="index" :style="field.cellStyle" v-else-if="data.field.key == 'Name'">  {{ data.value }} </span> 
-                        </template>
-                </b-table>                 
+                </b-overlay>                                 
             </b-col>
             <b-col col md="4" cols="4" style="overflow: auto;">
-                 <div>
-                    <h3 class="mx-2 font-weight-normal"> Additional Info</h3>
+                <div>
+                    <b-button-group><h3 class="mx-2 mt-2 font-weight-normal" style="height: 10px;"> Additional Info</h3>
+                        <b-button 
+                            size="sm"
+                            style=" font-size:12px; border:0px;" 
+                            @click="OpenAdjudicatorComment()"
+                            variant="outline-primary text-info"
+                            v-if="adjudicatorComment.length> 0" 
+                            class="mt-1"
+                            v-b-tooltip.hover.right
+                            title="Adjudicator Comment">
+                            <b-icon icon="chat-square-fill"></b-icon>                                
+                        </b-button>
+                    </b-button-group>
                     <hr class="mb-0 bg-light" style="height: 5px;"/> 
-                </div>
-                           
+                </div>                           
                 <b-table
                     :items="appearanceAdditionalInfo"
                     :fields="addInfoFields"
@@ -131,11 +146,98 @@
                         <template  v-slot:cell(key)="data">                           
                             <b > {{ data.value }}</b>                                               
                         </template>
-                </b-table>                
+                </b-table>
+
+                <div v-if="appearanceMethods.length> 0">
+                    <h3 class="mx-2 font-weight-normal"> Appearance Methods</h3>
+                    <hr class="mb-0 bg-light" style="height: 5px;"/> 
+                </div>                           
+                <b-table
+                    v-if="appearanceMethods.length> 0"
+                    :items="appearanceMethods"
+                    :fields="appearanceMethodsField"
+                    thead-class="d-none"               
+                    borderless                              
+                    responsive="sm"
+                    >
+                        <template v-for="(field,index) in appearanceMethodsField" v-slot:[`cell(${field.key})`]="data" >                   
+                            <span v-bind:key="index" :class="data.field.cellClass" :style="data.field.cellStyle"><b>{{ data.item.role }}</b> is appearing by {{data.item.method}}. </span>
+                        </template>
+                </b-table>                                       
             </b-col>          
         </b-row>
+        <div class="mt-5">
+            <h3 class="mx-2 font-weight-normal"> Scheduled Parties</h3>
+            <hr class="mb-0 bg-light" style="height: 5px;"/> 
+        </div>                           
+        <b-table
+            style="max-height: 200px; overflow-y: auto;"
+            :items="appearanceParties"
+            :fields="partyFields"               
+            borderless
+            striped               
+            responsive="sm"
+            >   
+            <template v-for="(field,index) in partyFields" v-slot:[`head(${field.key})`]="data">
+                <b v-bind:key="index"> {{ data.label }}</b>
+            </template>                
+            <template v-for="(field,index) in partyFields" v-slot:[`cell(${field.key})`]="data" >                                                        
+                <span v-bind:key="index" :style="field.cellStyle" v-if="data.field.key == 'Current Counsel' && data.value.length>0">
+                    <span v-for="(counsel, counselIndex) in data.value" v-bind:key="counselIndex">
+                        <span v-if="counsel.Info.length == 0">CEIS: {{ counsel.Name }}<br></span>
+                        <span
+                            class="text-success"  
+                            v-bind:key="index"
+                            v-else-if="counsel.Info.length > 0"
+                            v-b-tooltip.hover.left
+                            v-b-tooltip.hover.html="counsel.Info"> 
+                                CEIS: {{ counsel.Name }} 
+                        <br></span>
+                    </span>
+                </span>
+                <span v-bind:key="index" :style="field.cellStyle" v-else-if="data.field.key == 'Role' && data.value.length>0">
+                    <span v-for="(role, roleIndex) in data.value"  v-bind:key="roleIndex">{{ role }}<br></span>
+                </span>
+                <span v-bind:key="index" :style="field.cellStyle" v-else-if="data.field.key == 'Name' && data.item.Info.length == 0">  {{ data.value }} </span>
+                <span
+                    class="text-success"  
+                    v-bind:key="index"
+                    :style="field.cellStyle"
+                    v-else-if="data.field.key == 'Name' && data.item.Info.length > 0"
+                    v-b-tooltip.hover.left
+                    v-b-tooltip.hover.html="data.item.Info"
+                    >
+                    {{ data.value }} 
+                </span>
+                <span v-bind:key="index" :style="field.cellStyle" v-else-if="data.field.key == 'Representative' && data.value.length>0">
+                    <span v-for="(rep, repIndex) in data.value" v-bind:key="repIndex">
+                        <span v-if="rep.Info.length == 0">{{ rep.Name }}<br></span>
+                        <span
+                            class="text-success"  
+                            v-bind:key="index"
+                            v-else-if="rep.Info.length > 0"
+                            v-b-tooltip.hover.left
+                            v-b-tooltip.hover.html="rep.Info">
+                            {{ rep.Name }} 
+                        <br></span>
+                    </span>
+                </span>
+                <span v-bind:key="index" :style="field.cellStyle" v-else-if="data.field.key == 'Legal Representative' && data.value.length>0">
+                    <span v-for="(legalRep, legalRepIndex) in data.value"  v-bind:key="legalRepIndex"><b>{{ legalRep.Type }}</b>-{{legalRep.Name}}<br></span>
+                </span>
+
+            </template>
+        </b-table>
       </b-card>  
-    </b-card> 
+    </b-card>
+
+    <b-modal v-model="showAdjudicatorComment" id="bv-modal-comment" hide-footer>
+        <template v-slot:modal-title>
+                <h2 class="mb-0"> Adjudicator Comment </h2>
+        </template>
+        <b-card border-variant="white">{{adjudicatorComment}}</b-card>            
+        <b-button class="mt-3 bg-info" @click="$bvModal.hide('bv-modal-comment')">Close</b-button>
+    </b-modal> 
 
 </div>
 </template>
@@ -167,13 +269,17 @@ export default class CivilAppearanceDetails extends Vue {
     appearanceAdditionalInfo: any[] = [];
     appearanceDocuments: any[] = [];
     appearanceParties: any[] = [];
+    appearanceMethods: any[] = [];
     /* eslint-enable */
     
     loadingPdf = false;  
     isMounted = false;
     isDataReady = false;
+    stripedStyle = false;
     appearanceDetailsJson; 
     additionalInfo = {};
+    adjudicatorComment = '';
+    showAdjudicatorComment = false;
 
     addInfoFields =  
     [
@@ -181,22 +287,36 @@ export default class CivilAppearanceDetails extends Vue {
         {key:'value',  sortable:false},
     ];   
 
+    issueFields =
+    [
+        {key:'Result',        sortable:false,  tdClass: '', cellClass:'badge badge-dark mt-2', cellStyle: 'display: block; margin-top: 1px; font-size: 14px; width: 60px;'},
+        {key:'Issue',         sortable:false,  tdClass: '', cellClass:'text',                  cellStyle: 'font-weight: normal; font-size: 14px; padding-top:6px; line-height: 100%;'}
+    ]
+
     documentFields =  
     [
-        {key:'Seq.',           sortable:false,  tdClass: 'border-top', headerStyle:'text', cellClass:'text',                  cellStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
-        {key:'Document Type',  sortable:false,  tdClass: 'border-top', headerStyle:'text', cellClass:'text',                  cellStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
-        {key:'Act',            sortable:false,  tdClass: 'border-top', headerStyle:'text', cellClass:'badge badge-dark mt-2', cellStyle: 'display: block; margin-top: 1px; font-size: 14px;'},
-        {key:'Date Filed',     sortable:false,  tdClass: 'border-top', headerStyle:'text', cellClass:'text',                  cellStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
-        {key:'Result',         sortable:false,  tdClass: 'border-top', headerStyle:'text', cellClass:'badge badge-dark mt-2', cellStyle: 'display: block; margin-top: 1px; font-size: 14px;'},
-        {key:'Issues',          sortable:false,  tdClass: 'border-top', headerStyle:'text', cellClass:'text',                 cellStyle: 'font-weight: normal; font-size: 14px; padding-top:6px'}
+        {key:'Seq.',           sortable:false,  tdClass: 'border-top', cellClass:'text',                  cellStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
+        {key:'Document Type',  sortable:false,  tdClass: 'border-top', cellClass:'text',                  cellStyle: 'border:0px; font-size: 14px;', cellLabelStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
+        {key:'Act',            sortable:false,  tdClass: 'border-top', cellClass:'badge badge-dark mt-2', cellStyle: 'display: block; margin-top: 1px; font-size: 12px; max-width : 50px;'},
+        {key:'Date Filed',     sortable:false,  tdClass: 'border-top', cellClass:'text',                  cellStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
+        {key:'Result',         sortable:false,  tdClass: 'border-top', cellClass:'badge badge-dark mt-2', cellStyle: 'display: block; margin-top: 1px; font-size: 14px;'}
     ];
     
     partyFields =  
     [
-        {key:'Name',                  sortable:false, tdClass: 'border-top',  headerStyle:'text',   cellStyle:'font-weight: bold; font-size: 14px;'},
-        {key:'Role',                  sortable:false, tdClass: 'border-top',  headerStyle:'text',   cellStyle:'font-size: 14px;'},
-        {key:'Current Counsel',       sortable:false, tdClass: 'border-top', headerStyle:'text',    cellStyle:'font-size: 14px;'}
+        {key:'Name',                  sortable:false, tdClass: 'border-top',  cellStyle:'font-weight: bold; font-size: 14px;'},
+        {key:'Role',                  sortable:false, tdClass: 'border-top',  cellStyle:'font-size: 14px; white-space: pre-line;'},
+        {key:'Current Counsel',       sortable:false, tdClass: 'border-top',  cellStyle: 'display: block; font-size: 14px; white-space: initial;'},
+        {key:'Legal Representative',  sortable:false, tdClass: 'border-top',  cellStyle:'font-size: 14px; white-space: pre-line;'},
+        {key:'Representative',        sortable:false, tdClass: 'border-top',  cellStyle: 'display: block; font-size: 14px; white-space: initial;'}
+        
     ];
+
+    appearanceMethodsField = 
+    [
+        {key:'Key', cellClass:'text-danger', cellStyle:'white-space: pre'}
+    ]
+
 
     mounted() {
         this.getAdditionalInfo();
@@ -208,7 +328,7 @@ export default class CivilAppearanceDetails extends Vue {
         this.$http.get('/api/files/civil/'+ this.additionalInfo["File Number"]+'/appearance-detail/'+this.additionalInfo["Appearance ID"])
             .then(Response => Response.json(), err => {console.log(err);} )        
             .then(data => {
-                if(data){  
+                if(data){ 
                     this.appearanceDetailsJson = data;              
                     this.ExtractAppearanceDetailsInfo();
                 }
@@ -230,7 +350,8 @@ export default class CivilAppearanceDetails extends Vue {
     }
 
     public ExtractAppearanceDetailsInfo()
-    {               
+    {
+        this.adjudicatorComment = this.appearanceDetailsJson.adjudicatorComment? this.appearanceDetailsJson.adjudicatorComment: '';
         for(const documentIndex in this.appearanceDetailsJson.document)
         {              
             const docInfo = {};
@@ -249,12 +370,12 @@ export default class CivilAppearanceDetails extends Vue {
             
             docInfo["Date Filed"]= document.filedDt? document.filedDt.split(' ')[0] : '';
             docInfo["Result"]= document.appearanceResultCd
-            docInfo["Result Description"]= document.appearanceResultDesc          
+            docInfo["Result Description"]= document.appearanceResultDesc
             docInfo["Issues"] = [];
             docInfo["Index"] = documentIndex;
             if (document.issue && document.issue.length > 0) {
                 for (const issue of document.issue) {
-                    docInfo["Issues"].push(issue.issueDsc)
+                    docInfo["Issues"].push({'Issue': issue.issueDsc, 'Result': issue.issueResultCd, 'ResultDsc': issue.issueResultDsc})
                 }
             }    
 
@@ -268,10 +389,66 @@ export default class CivilAppearanceDetails extends Vue {
             partyInfo["Last Name"] =  party.lastNm? party.lastNm: party.orgNm ;
             this.UpdateDisplayName({'lastName': partyInfo["Last Name"], 'givenName': partyInfo["First Name"]});
             partyInfo["Name"] = this.displayName
+            partyInfo["Info"] = '';
+            if (party.appearanceMethodDesc) {
+                partyInfo["Info"] = 'Appeared by ' + party.appearanceMethodDesc;
+            }
+            if (party.partyAppearanceMethodDesc) {
+                if (partyInfo["Info"].length > 0) {
+                    partyInfo["Info"] += '<br>'
+                }
+                //TODO: remove the pre-text when the longDesc is passed through the api
+                partyInfo["Info"]+= 'Appearance: ' + party.partyAppearanceMethodDesc;
+            }
+            if (party.attendanceMethodDesc) {
+                if (partyInfo["Info"].length > 0) {
+                    partyInfo["Info"] += '<br>'
+                }
+                partyInfo["Info"]+= 'Attendance: ' + party.attendanceMethodDesc;
+            }
             partyInfo["Current Counsel"] = [];
             if (party.counsel && party.counsel.length > 0) {
                 for (const counsel of party.counsel) {
-                    partyInfo["Current Counsel"].push(counsel.counselFullName)
+                    let info = '';
+                    if (counsel.phoneNumber) {
+                        info = "Phone Number: " + counsel.phoneNumber
+                    }
+                    if (counsel.counselAppearanceMethodDesc) {
+                        if (info.length > 0) {
+                            info += '\n'
+                        }
+                        info+= "Appeared by " + counsel.counselAppearanceMethodDesc
+                    }
+                    partyInfo["Current Counsel"].push({"Name": counsel.counselFullName, "Info": info})
+                }
+            }
+            partyInfo["Representative"] = [];
+            if (party.representative && party.representative.length > 0) {
+                for (const rep of party.representative) {
+                    let info = '';
+                    if (rep.phoneNumber) {
+                        info = "Phone Number: " + rep.phoneNumber
+                    }                    
+                    if (rep.attendenceMethodDsc) {
+                        if (info.length > 0) {
+                            info += '<br>'
+                        }
+                        info+= "Attended by " + rep.attendanceMethodDesc
+                    }
+                    if (rep.instruction) {
+                        if (info.length > 0) {
+                            info += '<br>'
+                        }
+                        info+= "Instruction: " + rep.instruction
+                    }
+                    partyInfo["Representative"].push({"Name": rep.repFullName,
+                                                      "Info": info})
+                }
+            }
+            partyInfo["Legal Representative"] = [];
+            if (party.legalRepresentative && party.legalRepresentative.length > 0) {
+                for (const legalRep of party.legalRepresentative) {
+                    partyInfo["Legal Representative"].push({"Name": legalRep.legalRepFullName, "Type": legalRep.legalRepTypeDsc})
                 }
             }
             partyInfo["Role"] = [];
@@ -281,6 +458,14 @@ export default class CivilAppearanceDetails extends Vue {
                 }
             }
             this.appearanceParties.push(partyInfo);
+        }       
+        
+        for(const appearanceMethod of this.appearanceDetailsJson.appearanceMethod)
+        {              
+            const methodInfo = {};             
+            methodInfo["role"] = appearanceMethod.roleTypeDesc;
+            methodInfo["method"] = appearanceMethod.appearanceMethodDesc;
+            this.appearanceMethods.push(methodInfo)
         }
     }
 
@@ -308,6 +493,8 @@ export default class CivilAppearanceDetails extends Vue {
         this.loadingPdf = false;
     }
 
-
+    public OpenAdjudicatorComment() {        
+        this.showAdjudicatorComment=true;           
+    }
 }
 </script>

@@ -98,15 +98,15 @@ export default class CriminalSentenceDetails extends Vue {
     /* eslint-enable */
 
     fields = [        
-        {key:'Date',                     sortable:true,   tdClass: 'border-top', headerStyle:'text-primary',  cellStyle:'text'},
-        {key:'Count',                    sortable:true,   tdClass: 'border-top', headerStyle:'text-primary',  cellStyle:'text-muted'},
-        {key:'Charge/Issue',             sortable:false,  tdClass: 'border-top', headerStyle:'text',          cellStyle:'text'},
-        {key:'Finding',                  sortable:true,   tdClass: 'border-top', headerStyle:'text-danger',   cellStyle:'text'},        
-        {key:'Sentence/ Disposition Type',sortable:false, tdClass: 'border-top', headerStyle:'text',          cellStyle:'text'},   
-        {key:'Term',                     sortable:false,  tdClass: 'border-top', headerStyle:'text',          cellStyle:'text'},
-        {key:'Amount',                   sortable:false,  tdClass: 'border-top', headerStyle:'text',          cellStyle:'text'},
-        {key:'Due Date/ Until',          sortable:false,  tdClass: 'border-top', headerStyle:'text',          cellStyle:'text'},
-        {key:'Effective Date',           sortable:false,  tdClass: 'border-top', headerStyle:'text',          cellStyle:'text'},
+        {key:'Date',                     sortable:true,   tdClass: 'border-top', headerStyle:'text-primary'},
+        {key:'Count',                    sortable:true,   tdClass: 'border-top', headerStyle:'text-primary'},
+        {key:'Charge/Issue',             sortable:false,  tdClass: 'border-top', headerStyle:'text'},
+        {key:'Finding',                  sortable:true,   tdClass: 'border-top', headerStyle:'text-danger'},        
+        {key:'Sentence/ Disposition Type',sortable:false, tdClass: 'border-top', headerStyle:'text'},   
+        {key:'Term',                     sortable:false,  tdClass: 'border-top', headerStyle:'text'},
+        {key:'Amount',                   sortable:false,  tdClass: 'border-top', headerStyle:'text'},
+        {key:'Due Date/ Until',          sortable:false,  tdClass: 'border-top', headerStyle:'text'},
+        {key:'Effective Date',           sortable:false,  tdClass: 'border-top', headerStyle:'text'},
     ];   
     
     get SortedParticipantFilesCounts()
