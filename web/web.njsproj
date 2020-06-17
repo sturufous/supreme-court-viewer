@@ -56,12 +56,24 @@
     <Content Include="public\index.html" />
     <Content Include="src\App.vue" />
     <Content Include="src\assets\bc-logo.svg" />
-    <Content Include="src\assets\data.json" />
     <Content Include="src\assets\landing.jpg" />
     <Content Include="src\assets\logo.png" />
-    <Content Include="src\assets\lookup\documentTypeCodes.json" />
-    <Content Include="src\components\CivilDocumentsView.vue" />
+    <Content Include="src\components\civil\CivilDocumentsView.vue" />
+    <Content Include="src\components\criminal\AdjudicatorRestrictions.vue" />
+    <Content Include="src\components\criminal\AppearanceDetails.vue" />
+    <Content Include="src\components\criminal\CriminalCaseDetails.vue" />
+    <Content Include="src\components\criminal\CriminalCrownInformation.vue" />
+    <Content Include="src\components\criminal\CriminalCrownNotes.vue" />
+    <Content Include="src\components\criminal\CriminalDocumentsView.vue" />
+    <Content Include="src\components\criminal\CriminalHeader.vue" />
+    <Content Include="src\components\criminal\CriminalHeaderTop.vue" />
+    <Content Include="src\components\criminal\CriminalParticipants.vue" />
+    <Content Include="src\components\criminal\CriminalSidePanel.vue" />
+    <Content Include="src\components\criminal\CriminalWitnesses.vue" />
+    <Content Include="src\components\criminal\FutureAppearances.vue" />
+    <Content Include="src\components\criminal\PastAppearances.vue" />
     <Content Include="src\components\Home.vue" />
+    <Content Include="src\components\LoadingSpinner.vue" />
     <Content Include="src\components\NavigationFooter.vue" />
     <Content Include="src\components\NavigationTopbar.vue" />
     <Content Include="src\styles\index.scss" />
@@ -79,13 +91,13 @@
     <Folder Include="public\images\" />
     <Folder Include="src\" />
     <Folder Include="src\assets\" />
-    <Folder Include="src\assets\lookup\" />
     <Folder Include="src\components\" />
+    <Folder Include="src\components\civil\" />
+    <Folder Include="src\components\criminal\" />
     <Folder Include="src\constants\" />
     <Folder Include="src\router\" />
     <Folder Include="src\store\" />
     <Folder Include="src\store\modules\" />
-    <Folder Include="src\views\" />
     <Folder Include="src\styles\" />
   </ItemGroup>
   <ItemGroup>
@@ -99,7 +111,8 @@
   <ItemGroup>
     <TypeScriptCompile Include="src\router\index.ts" />
     <TypeScriptCompile Include="src\store\index.ts" />
-    <TypeScriptCompile Include="src\store\modules\CivilFileDocuments.ts" />
+    <TypeScriptCompile Include="src\store\modules\CivilFileInformation.ts" />
+    <TypeScriptCompile Include="src\store\modules\CriminalFileInformation.ts" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />
   <Target Name="BeforeBuild" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

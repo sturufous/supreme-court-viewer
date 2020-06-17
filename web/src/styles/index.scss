@@ -2,6 +2,11 @@
 /* You can add global styles to this file, and also import other style files */
 $bcgov-font-path: "../../node_modules/@bcgov/bootstrap-theme/dist/fonts/";
 @import "~@bcgov/bootstrap-theme/dist/scss/bootstrap-theme";
+
+@import "../assets/_custom.scss";
+@import "~bootstrap/scss/bootstrap.scss";
+@import '~bootstrap-vue/dist/bootstrap-vue.css';
+
 @import "~bootstrap-vue/src/index.scss";
 
 .breadcrumb {
