@@ -7,7 +7,7 @@
         </div>
 
         <b-card v-if="!isDataReady && isMounted" no-body>
-            <span class="text-muted ml-4 mb-5"> No Civil List has been found. </span>
+            <span class="text-muted ml-4 mb-5"> No {{getClassName}} List has been found. </span>
         </b-card>
 
         <b-card bg-variant="light" v-if= "!isMounted && !isDataReady" >
