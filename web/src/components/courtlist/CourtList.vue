@@ -201,8 +201,18 @@ export default class CourtList extends Vue {
     @courtListState.Action
     public UpdateCourtList!: (newCourtListInformation: any) => void 
 
-    mounted () {                 
+    mounted () { 
         this.getListOfAvailableCourts();
+    }
+
+    public getCourtNameById(locationId) {        
+        return this.courtRoomsAndLocations.filter(location => {                
+            if (location.value.LocationID == locationId) {
+                return true;
+            } else {
+                return false;
+            }
+        });
     }
 
     public getListOfAvailableCourts(): void 
@@ -216,6 +226,20 @@ export default class CourtList extends Vue {
                     if(this.courtRoomsAndLocations.length>0)
                     {                    
                         this.isLocationDataReady = true;
+                        if (this.$route.params.location && this.$route.params.room && this.$route.params.date) {
+                            this.courtListLocationID = this.$route.params.location;
+                            this.courtListRoom = this.$route.params.room;
+                            this.validSelectedDate = this.$route.params.date;                    
+
+                        
+                            this.selectedCourtLocation = this.getCourtNameById(this.courtListLocationID)[0]['text'];
+                            console.log(this.selectedCourtLocation);
+                            this.selectedDate = this.validSelectedDate;
+                            this.selectedCourtRoom = this.courtListRoom;                            
+                            console.log(this.selectedCourtRoom)
+                            // setTimeout(() => { this.searchForCourtList();}, 500);
+                            
+                        } 
                     }
                 }
                 this.isLocationDataMounted = true;
@@ -227,21 +251,16 @@ export default class CourtList extends Vue {
         this.isDataReady = false;
         this.isMounted = false;
         this.searchingRequest = true;
-        //console.log('before call')
-        //console.log(this.searchingRequest)
         this.totalCases = 0;
         this.criminalCases = 0;
         this.familyCases = 0;
-        this.civilCases = 0;        
+        this.civilCases = 0;
        
         this.$http.get('/api/courtlist/court-list?agencyId='+ this.courtListLocationID +'&roomCode='+ this.courtListRoom+'&proceeding=' +this.validSelectedDate)
             .then(Response => Response.json(), err => {this.errorCode= err.status;this.errorText= err.statusText;console.log(err);}        
             ).then(data => {
-                if(data){
-
-                    //console.log(data)
-                    this.courtListInformation.detailsData = data; 
-
+                if(data){                    
+                    this.courtListInformation.detailsData = data;
                     this.totalCases = data.civilCourtList.length+data.criminalCourtList.length;
                     this.criminalCases = data.criminalCourtList.length;                    
                     for(const civil of data.civilCourtList)
@@ -251,8 +270,9 @@ export default class CourtList extends Vue {
                     
                     if((data.civilCourtList.length>0) || (data.criminalCourtList.length>0))
                     {                    
-                        this.isDataReady = true;
+                        this.isDataReady = true;                        
                     }
+                    
                 }
                 this.isMounted = true;
                 this.searchAllowed = true;
@@ -318,27 +338,21 @@ export default class CourtList extends Vue {
                     "LocationID": jroomAndLocation.locationId,
                     "Rooms" : rooms
                 };
-
-               // console.log(locationInfo)
                 this.courtRoomsAndLocations.push(locationInfo);
             }                
         }
         this.courtRoomsAndLocations =  _.sortBy(this.courtRoomsAndLocations, 'text')
-        this.selectedCourtLocation = this.courtRoomsAndLocations[0].value;       
-        //console.log(this.courtRoomsAndLocations)
+        this.selectedCourtLocation = this.courtRoomsAndLocations[0].value; 
     }
 
     public onCalenderContext(datePicked) {
-        
-        //console.log(datePicked.selectedFormatted)        
-        //console.log(datePicked.selectedYMD)
+       
         this.searchingRequest = false
         
         if(datePicked.selectedYMD)
         {
             this.validSelectedDate = datePicked.selectedYMD
             this.fullSelectedDate = datePicked.selectedFormatted
-            //console.log('Date OK')
         } 
     }
 
@@ -350,15 +364,13 @@ export default class CourtList extends Vue {
             const date=new Date(this.selectedDate)
             date.setDate(date.getDate() - 1)
             this.selectedDate = date.toISOString().substring(0,10)
-            //console.log( this.selectedDate)
-            // console.log('pre day')
-            //console.log(this.searchingRequest)
+            
             setTimeout(() => { this.searchForCourtList(); }, 500);
         }
     }
 
     public JumpToNextDay()
-    {
+    {        
         if(!this.checkDateInValid())
         {
             this.searchAllowed = false;   
