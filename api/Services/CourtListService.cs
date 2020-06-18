@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Scv.Api.Models.Civil.Detail;
 
 namespace Scv.Api.Services
 {
@@ -169,6 +170,8 @@ namespace Scv.Api.Services
                     courtListFile.EstimatedTimeHour = targetAppearance.EstimatedTimeHour?.ReturnNullIfEmpty();
                     courtListFile.EstimatedTimeMin = targetAppearance.EstimatedTimeMin?.ReturnNullIfEmpty();
                 }
+
+                courtListFile.Document = await PopulateCivilDocuments(courtListFile.Document);
             }
 
             return courtList;
@@ -220,6 +223,16 @@ namespace Scv.Api.Services
             }
 
             return crown;
+        }
+
+        private async Task<ICollection<CivilClDocument>> PopulateCivilDocuments(ICollection<CivilClDocument> documents)
+        {
+            foreach (var document in documents)
+            {
+                document.Category = _lookupService.GetDocumentCategory(document.DocumentTypeCd);
+                document.DocumentTypeCodeDescription = await _lookupService.GetDocumentDescriptionAsync(document.DocumentTypeCd);
+            }
+            return documents;
         }
 
         #endregion Helpers
