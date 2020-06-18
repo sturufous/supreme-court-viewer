@@ -9,6 +9,7 @@ namespace Scv.Api.Models.Civil.Detail
     {
         public string Category { get; set; }
         public string DocumentTypeDescription { get; set; }
+        public string NextAppearanceDt { get; set; }
 
         /// <summary>
         /// Hides fields for issue. 

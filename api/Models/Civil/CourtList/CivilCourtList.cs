@@ -20,5 +20,6 @@ namespace Scv.Api.Models.Civil.CourtList
         public string JudgeInitials { get; set; }
         public new ICollection<ScheduledAppearance> ScheduledAppearance { get; set; }
         public new ICollection<HearingRestriction> HearingRestriction { get; set; }
+        public new ICollection<CivilClDocument> Document { get; set; }
     }
 }
