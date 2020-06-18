@@ -106,7 +106,7 @@
                             :key="index" 
                             class="mr-1"
                             style="font-weight: normal;margin-top: 6px; font-size: 14px;"
-                            v-b-tooltip.hover 
+                            v-b-tooltip.hover.right 
                             :title='field.key' > 
                             {{ field.abbr }} 
                         </b-badge>
@@ -233,7 +233,7 @@ export default class CriminalList extends Vue {
 
             criminalListInfo["Index"] = criminalListIndex;
 
-            criminalListInfo['Seq.']=jcriminalList.appearanceSequenceNumber
+            criminalListInfo['Seq.']=jcriminalList.appearanceSequenceNumber?parseInt(jcriminalList.appearanceSequenceNumber):''
             criminalListInfo['File Number']=jcriminalList.fileNumberText
             criminalListInfo['Case Age']= jcriminalList.caseAgeDaysNumber? jcriminalList.caseAgeDaysNumber: ''
             criminalListInfo["Time"] = this.getTime(jcriminalList.appearanceTime.split(' ')[1].substr(0,5));

@@ -116,26 +116,35 @@
         <b-card bg-variant="light" v-if= "searchingRequest">
             <b-card class="mb-2">
                 <b-navbar type="white" variant="white" style="height:40px;" >
+                    <b-navbar-nav>
                     <b-nav-text class="text-primary mt-3">               
                         <h2>{{fullSelectedDate}}</h2>                
                     </b-nav-text>
 
-                    <b-nav-text class="text-muted ml-5 mt-3">               
-                        <h3>{{courtListLocation}}</h3>               
+                    <b-nav-text class="text-muted ml-4" style="padding-top:28px">               
+                        <h4>{{courtListLocation}}</h4>               
                     </b-nav-text>
-                    <b-nav-text class="text-muted ml-1" style="padding-top:25px">               
-                        <h4>({{courtListLocationID}})</h4>               
+                    <b-nav-text class="text-muted ml-1" style="padding-top:29px">               
+                        <h5>({{courtListLocationID}})</h5>               
                     </b-nav-text>
 
-                    <b-nav-text class=" ml-5 mt-3">               
+                    <b-nav-text class=" ml-4 mt-3">               
                         <h3> CourtRoom: </h3>                
                     </b-nav-text>            
                     <b-nav-text class=" ml-1 mt-3 ">               
                         <h3>{{courtListRoom}}</h3>                
                     </b-nav-text>
+
+                    </b-navbar-nav>
                     <b-navbar-nav class="ml-auto">
+                        
                         <b-nav-text class=" mr-1" style="font-size:12px; line-height: 1.4;"> 
-                            <b-row class="text-primary"> Total Cases (<b>{{totalCases}}</b>) </b-row> 
+                            <b-row class="text-primary"> 
+                                Total Cases (<b>{{totalCases}}</b>) 
+                                <span style="transform: translate(0,-1px);" class="border text-muted ml-3"> 
+                                    <b> {{totalTime}}</b> {{totalTimeUnit}} 
+                                </span>
+                            </b-row> 
                             <b-row class="text-criminal"> Criminal (<b>{{criminalCases}}</b>) </b-row>
                             <b-row class="text-family"> Family (<b>{{familyCases}}</b>) </b-row>
                             <b-row class="text-civil"> Civil (<b>{{civilCases}}</b>) </b-row>
@@ -232,7 +241,9 @@ export default class CourtList extends Vue {
         this.totalCases = 0;
         this.criminalCases = 0;
         this.familyCases = 0;
-        this.civilCases = 0;        
+        this.civilCases = 0;
+        this.totalHours = 0;
+        this.totalMins = 0;        
        
         this.$http.get('/api/courtlist/court-list?agencyId='+ this.courtListLocationID +'&roomCode='+ this.courtListRoom+'&proceeding=' +this.validSelectedDate)
             .then(Response => Response.json(), err => {this.errorCode= err.status;this.errorText= err.statusText;console.log(err);}        
@@ -245,7 +256,15 @@ export default class CourtList extends Vue {
                     this.totalCases = data.civilCourtList.length+data.criminalCourtList.length;
                     this.criminalCases = data.criminalCourtList.length;                    
                     for(const civil of data.civilCourtList)
+                    {
                         if(civil.activityClassCd == 'F') this.familyCases++;else this.civilCases ++;
+                        this.setTotalTimeForRoom(civil.estimatedTimeHour,civil.estimatedTimeMin)
+                    }
+
+                    for(const criminal of data.criminalCourtList)
+                    { 
+                        this.setTotalTimeForRoom(criminal.estimatedTimeHour,criminal.estimatedTimeMin)
+                    }
 
                     this.UpdateCourtList(this.courtListInformation);              
                     
@@ -253,6 +272,24 @@ export default class CourtList extends Vue {
                     {                    
                         this.isDataReady = true;
                     }
+
+                    if(this.totalMins>0 && this.totalHours>0)
+                    {
+                         this.totalTime = (this.totalHours + (this.totalMins)/60).toFixed(1)
+                         this.totalTimeUnit = 'Hours';
+                    }
+                    else if(this.totalMins>0 && this.totalHours==0)
+                    {
+                        this.totalTime = (this.totalMins).toString() ;
+                        this.totalTimeUnit = 'Mins';
+                    }
+                    else
+                    {
+                        this.totalTime = (this.totalHours).toString() ;
+                        this.totalTimeUnit = 'Hours';
+                    }
+
+                    
                 }
                 this.isMounted = true;
                 this.searchAllowed = true;
@@ -275,6 +312,11 @@ export default class CourtList extends Vue {
     criminalCases = 0;
     familyCases = 0;
     civilCases = 0;
+
+    totalHours =0;
+    totalMins =0;
+    totalTime = '';
+    totalTimeUnit = 'Hours';
 
 
     courtRoomsAndLocationsJson;
@@ -470,8 +512,19 @@ export default class CourtList extends Vue {
         this.selectedCourtRoomState=true;        
     }
 
-}
+    public setTotalTimeForRoom(hrs,mins)
+    {
+        if(!mins) mins ='0';
+        if(!hrs) hrs ='0';
+        this.totalMins += parseInt(mins);        
+        this.totalHours += (Math.floor(this.totalMins/60) +parseInt(hrs));
+        this.totalMins %= 60;
+        console.log(this.totalMins)
+        console.log(this.totalHours)
+    }
 
+}
+ 
 </script>
 
 <style scoped>
