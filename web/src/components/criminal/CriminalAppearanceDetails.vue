@@ -15,10 +15,11 @@
       <b-card bg-variant="white">
         <b-row cols="2">            
             <b-col md="8" cols="8" style="overflow: auto;">
-              <b-overlay :show="loadingPdf" rounded="sm">
+              <b-overlay :show="loadingROP" rounded="sm">
                 <div>
                     <b-button-group><h3 class="mx-2 mt-1 font-weight-normal" style="height: 10px;">Charges</h3>
-                        <b-button                                     
+                        <b-button
+                            v-if="ropExists"                                     
                             variant="outline-primary text-info" 
                             style="border:0px;"
                             class="mt-1"
@@ -162,8 +163,7 @@
                     size="sm">
                     <b-icon icon="file-earmark-arrow-down"></b-icon>
                 </b-button>
-            </b-button-group>
-            <!-- <h3 class="mx-2 font-weight-normal" v-if="!informationsFileExists">Appearance Information</h3> -->
+            </b-button-group>            
             <hr class="mb-0 bg-light" style="height: 5px;"/> 
         </div>
         <b-card v-if="!(appearanceMethodDetails.length> 0)" style="border: white;">
@@ -240,6 +240,7 @@ export default class CriminalAppearanceDetails extends Vue {
     /* eslint-enable */ 
   
     loadingPdf = false;
+    loadingROP = false;
     isMounted = false;
     isDataReady = false;
     appearanceDetailsJson;    
@@ -247,6 +248,7 @@ export default class CriminalAppearanceDetails extends Vue {
     sortDesc = true;
     showNotes = false;
     informationsFileExists = false;
+    ropExists = false;
     notes = {};       
     appearanceDetailsInfo = {};
     initiatingDocuments: string[] = [];    
@@ -299,7 +301,11 @@ export default class CriminalAppearanceDetails extends Vue {
     }    
     
     public getAppearanceInfo()
-    {       
+    {
+        //TODO: remove this once integrated with courtlist
+        if (this.appearanceInfo.courtLevel == '') {
+            this.ropExists = true;
+        }               
         this.appearanceDetailsInfo["Supplemental Equipment"] = this.appearanceInfo.supplementalEquipmentTxt? this.appearanceInfo.supplementalEquipmentTxt: '';
         this.appearanceDetailsInfo["Security Restriction"] = this.appearanceInfo.securityRestrictionTxt? this.appearanceInfo.securityRestrictionTxt: '';
         this.appearanceDetailsInfo["Out-Of-Town Judge"] =  this.appearanceInfo.outOfTownJudgeTxt? this.appearanceInfo.outOfTownJudgeTxt: '';
@@ -407,7 +413,7 @@ export default class CriminalAppearanceDetails extends Vue {
     }
 
     public openRopPdf(): void {
-        this.loadingPdf = true;         
+        this.loadingROP = true;         
         const partID = this.appearanceInfo.partId;
         const profSeqNo = this.appearanceInfo.profSeqNo;      
         const filename = 'ROP_'+partID+'.pdf';
@@ -419,11 +425,11 @@ export default class CriminalAppearanceDetails extends Vue {
         this.$http.get(url)
             .then(Response => {
                 window.open(url);
-                this.loadingPdf = false;},
+                this.loadingROP = false;},
               err => {
                 console.log(err); 
                 window.alert("Broken PDF File");
-                this.loadingPdf = false;}
+                this.loadingROP = false;}
             );        
     }
 

@@ -276,7 +276,7 @@ export default class CivilAppearanceDetails extends Vue {
     appearanceMethods: any[] = [];
     /* eslint-enable */
     
-    loadingPdf = false;  
+    loadingPdf = false; 
     isMounted = false;
     isDataReady = false;
     stripedStyle = false;
