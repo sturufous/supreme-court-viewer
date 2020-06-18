@@ -48,7 +48,7 @@
                         style=" font-size:16px" 
                         size="sm" 
                         @click="OpenDetails(data); data.toggleDetails();" 
-                        variant="outline-primary border-white text-info" 
+                        :variant="'outline-primary border-white text-'+civilClass" 
                         class="mr-2">
                             <b-icon-caret-right-fill :variant="civilClass" v-if="!data.item['_showDetails']"></b-icon-caret-right-fill>
                             <b-icon-caret-down-fill :variant="civilClass" v-if="data.item['_showDetails']"></b-icon-caret-down-fill>
@@ -73,26 +73,22 @@
                 </template>
 
                 <template  v-slot:cell(Parties)="data">
-                    <b-badge
-                        v-if="data.item['PartiesTruncApplied']"
-                        variant="white text-success"                        
+                    <b-button
+                        style=" font-size:16px" 
+                        size="sm" 
+                        @click="OpenCivilFilePage(data)" 
                         v-b-tooltip.hover.right                            
-                        :title="data.item['PartiesDesc']"
-                        style="margin-top: 5px; font-size: 16px; font-weight:normal"> 
+                        :title="data.item['PartiesTruncApplied']?data.item['PartiesDesc']:null"
+                        :variant="'outline-primary border-white text-'+civilClass" 
+                        class="mr-2">                            
                             {{data.value}}
-                    </b-badge>
-                     <b-badge
-                        variant="white"
-                        style="margin-top: 5px; font-size: 16px; font-weight:normal" v-else>
-                            {{data.value}}
-                    </b-badge>
+                    </b-button>                                 
                 </template>
                 <template  v-slot:cell(Counsel)="data">
                     <b-badge
                         v-if="data.item['CounselDesc']"
                         variant="white text-success"                        
-                        v-b-tooltip.hover.left                           
-                        :title="data.item['CounselDesc']"
+                        v-b-tooltip.hover.left.html = "getFullCounsel(data.item['CounselDesc'])"
                         style="margin-top: 4px; font-size: 16px; font-weight:normal"> 
                             {{data.value}}
                     </b-badge>
@@ -102,8 +98,6 @@
                             {{data.value}}
                     </b-badge>
                 </template>
-                 
-            
 
                 <template v-slot:[`cell(${fields[8].key})`]="data" >
                         <b-badge  
@@ -153,7 +147,10 @@ export default class CivilList extends Vue {
     public appearanceInfo!: any;
 
     @civilState.Action
-    public UpdateAppearanceInfo!: (newAppearanceInfo: any) => void    
+    public UpdateAppearanceInfo!: (newAppearanceInfo: any) => void 
+    
+    @civilState.Action
+    public UpdateCivilFile!: (newCivilFileInformation: any) => void   
 
     @commonState.State
     public displayName!: string;    
@@ -205,7 +202,7 @@ export default class CivilList extends Vue {
     
     fields =  
     [
-        {key:'Seq.',        tdClass: 'border-top', headerStyle:'', cellStyle:'text-'+this.civilClass},
+        {key:'Seq.',        tdClass: 'border-top', headerStyle:'', cellStyle:''},
         {key:'File Number', tdClass: 'border-top', headerStyle:'', cellStyle:''},
         {key:'Parties',     tdClass: 'border-top', headerStyle:'', cellStyle:'text-primary'},
         {key:'Time',        tdClass: 'border-top', headerStyle:'', cellStyle:''},
@@ -247,8 +244,7 @@ export default class CivilList extends Vue {
             civilListInfo["Security Restriction"] = jcivilList.securityRestriction
             civilListInfo["OutOfTown Judge"] = jcivilList.outOfTownJudge
 
-
-            
+                        
             civilListInfo['Counsel'] = ''          
             civilListInfo['CounselDesc'] =''
 
@@ -265,7 +261,7 @@ export default class CivilList extends Vue {
                     }
                     else
                     {
-                        civilListInfo['CounselDesc'] += counsel.counselFullName +', ';
+                        civilListInfo['CounselDesc'] += counsel.counselFullName +',\n ';
                     }                    
                 }
             }
@@ -333,10 +329,11 @@ export default class CivilList extends Vue {
         return this.duration;
     }
 
+    
     public OpenDetails(data)
     {
         if(!data.detailsShowing)
-        {
+        {            
             this.appearanceInfo.fileNo = data.item['FileID']
             this.appearanceInfo.appearanceId = data.item["AppearanceID"]            
             this.appearanceInfo.supplementalEquipmentTxt = data.item["Supplemental Equipment"]
@@ -345,6 +342,21 @@ export default class CivilList extends Vue {
             
             this.UpdateAppearanceInfo(this.appearanceInfo);
         }        
+    }
+
+    public OpenCivilFilePage(data)
+    {
+        const fileInformation = { }
+        fileInformation['fileNumber'] = data.item['FileID']
+        this.UpdateCivilFile(fileInformation)
+        const routeData = this.$router.resolve({name:'CivilCaseDetails', params: {fileNumber: fileInformation['fileNumber']}})
+        window.open(routeData.href, '_blank');
+    }
+
+    
+    public getFullCounsel(counselDesc)
+    {
+        return '<b style="white-space: pre-line;">'+ counselDesc+ '</b>'
     }
 
     get getClassName()

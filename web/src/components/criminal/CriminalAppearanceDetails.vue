@@ -130,11 +130,14 @@ export default class CriminalAppearanceDetails extends Vue {
     public getAppearanceDetails(): void {      
     
         this.$http.get('/api/files/criminal/'+ this.appearanceDetailsInfo["File Number"]+'/appearance-detail/'+this.appearanceDetailsInfo["Appearance ID"]+ '/'+this.appearanceDetailsInfo["Part ID"])
-            .then(Response => Response.json(), err => {console.log(err);} )        
+            .then(Response => Response.json(), err => {console.log(err);window.alert("bad data!");} )        
             .then(data => {
                 if(data){  
                     this.appearanceDetailsJson = data;              
                     this.ExtractAppearanceDetailsInfo();
+                }
+                else{
+                    window.alert("bad data!");
                 }
                 this.isMounted = true;                       
             }); 

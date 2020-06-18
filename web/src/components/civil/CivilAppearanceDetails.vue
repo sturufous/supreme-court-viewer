@@ -326,11 +326,14 @@ export default class CivilAppearanceDetails extends Vue {
     public getAppearanceDetails(): void {      
     
         this.$http.get('/api/files/civil/'+ this.additionalInfo["File Number"]+'/appearance-detail/'+this.additionalInfo["Appearance ID"])
-            .then(Response => Response.json(), err => {console.log(err);} )        
+            .then(Response => Response.json(), err => {console.log(err);window.alert("bad data!");} )        
             .then(data => {
                 if(data){ 
                     this.appearanceDetailsJson = data;              
                     this.ExtractAppearanceDetailsInfo();
+                }
+                else{
+                    window.alert("bad data!");
                 }
                 this.isMounted = true;                       
             }); 

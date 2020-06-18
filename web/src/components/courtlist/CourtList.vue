@@ -46,7 +46,7 @@
         <b-row class = "mt-2 ml-2">
             <b-col md="4">          
                 <b-form-group>
-                    <label for="locationSelect">Location*</label>
+                    <label for="locationSelect">Location<span class="text-danger">*</span></label>
                     <b-form-select
                         v-model="selectedCourtLocation"
                         id="locationSelect"
@@ -59,7 +59,7 @@
                 </b-form-group>
             </b-col>
             <b-col md="3">
-                <label for="datepicker">Date* (YYYY-MM-DD)</label>
+                <label for="datepicker">Date<span class="text-danger">*</span> (YYYY-MM-DD)</label>
                
                 <b-input-group class="mb-3">
                     <b-form-input
@@ -85,7 +85,7 @@
             </b-col>
             <b-col md="2">
                 <b-form-group class = "mr-3"> 
-                    <label for="roomSelect">Room*</label>
+                    <label for="roomSelect">Room<span class="text-danger">*</span></label>
                     <b-form-select
                         v-if="syncFlag"
                         v-model="selectedCourtRoom"
@@ -116,23 +116,31 @@
         <b-card bg-variant="light" v-if= "searchingRequest">
             <b-card class="mb-2">
                 <b-navbar type="white" variant="white" style="height:40px;" >
-                    <b-nav-text class="text-primary mr-2 mt-2">               
+                    <b-nav-text class="text-primary mt-3">               
                         <h2>{{fullSelectedDate}}</h2>                
                     </b-nav-text>
 
-                    <b-nav-text class="text-muted ml-5 mt-2">               
+                    <b-nav-text class="text-muted ml-5 mt-3">               
                         <h3>{{courtListLocation}}</h3>               
                     </b-nav-text>
-                    <b-nav-text class="text-muted ml-1" style="padding-top:18px">               
+                    <b-nav-text class="text-muted ml-1" style="padding-top:25px">               
                         <h4>({{courtListLocationID}})</h4>               
                     </b-nav-text>
 
-                    <b-nav-text class=" ml-5 mt-2">               
+                    <b-nav-text class=" ml-5 mt-3">               
                         <h3> CourtRoom: </h3>                
                     </b-nav-text>            
-                    <b-nav-text class=" ml-1 mt-2 ">               
+                    <b-nav-text class=" ml-1 mt-3 ">               
                         <h3>{{courtListRoom}}</h3>                
                     </b-nav-text>
+                    <b-navbar-nav class="ml-auto">
+                        <b-nav-text class=" mr-1" style="font-size:12px; line-height: 1.4;"> 
+                            <b-row class="text-primary"> Total Cases (<b>{{totalCases}}</b>) </b-row> 
+                            <b-row class="text-criminal"> Criminal (<b>{{criminalCases}}</b>) </b-row>
+                            <b-row class="text-family"> Family (<b>{{familyCases}}</b>) </b-row>
+                            <b-row class="text-civil"> Civil (<b>{{civilCases}}</b>) </b-row>
+                        </b-nav-text>
+                    </b-navbar-nav>
                 </b-navbar>
             </b-card>      
 
@@ -221,17 +229,26 @@ export default class CourtList extends Vue {
         this.searchingRequest = true;
         //console.log('before call')
         //console.log(this.searchingRequest)
+        this.totalCases = 0;
+        this.criminalCases = 0;
+        this.familyCases = 0;
+        this.civilCases = 0;        
        
         this.$http.get('/api/courtlist/court-list?agencyId='+ this.courtListLocationID +'&roomCode='+ this.courtListRoom+'&proceeding=' +this.validSelectedDate)
             .then(Response => Response.json(), err => {this.errorCode= err.status;this.errorText= err.statusText;console.log(err);}        
             ).then(data => {
                 if(data){
 
-                   // console.log(data)
+                    //console.log(data)
                     this.courtListInformation.detailsData = data; 
-                    // this.participantJson = data.participant                
-                    this.UpdateCourtList(this.courtListInformation);               
-                    // this.ExtractFileInfo()
+
+                    this.totalCases = data.civilCourtList.length+data.criminalCourtList.length;
+                    this.criminalCases = data.criminalCourtList.length;                    
+                    for(const civil of data.civilCourtList)
+                        if(civil.activityClassCd == 'F') this.familyCases++;else this.civilCases ++;
+
+                    this.UpdateCourtList(this.courtListInformation);              
+                    
                     if((data.civilCourtList.length>0) || (data.criminalCourtList.length>0))
                     {                    
                         this.isDataReady = true;
@@ -252,6 +269,12 @@ export default class CourtList extends Vue {
     isLocationDataMounted = false;
     searchAllowed = true;
     syncFlag = true
+
+
+    totalCases = 0;
+    criminalCases = 0;
+    familyCases = 0;
+    civilCases = 0;
 
 
     courtRoomsAndLocationsJson;
@@ -424,8 +447,9 @@ export default class CourtList extends Vue {
                     this.courtListRoom = this.selectedCourtRoom;
                     // console.log('search')
                     //console.log(this.searchingRequest)
-                    this.searchAllowed = false;   
-                    this.getCourtListDetails();
+                    this.searchAllowed = false; 
+                    setTimeout(() => { this.getCourtListDetails();}, 50);  
+                    
                 }
             }
         }
