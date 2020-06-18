@@ -16,6 +16,7 @@ namespace Scv.Api.Models.Criminal.CourtList
         public string EstimatedTimeHour { get; set; }
         public string EstimatedTimeMin { get; set; }
         public string ActivityClassCd { get; set; }
+        public string ActivityClassDesc { get; set; }
         public string OutOfTownJudge { get; set; }
         public string SupplementalEquipment { get; set; }
         public string SecurityRestriction { get; set; }

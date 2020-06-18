@@ -149,7 +149,8 @@ namespace Scv.Api.Services
             foreach (var courtListFile in courtList)
             {
                 var fileDetail = civilFileDetails.FirstOrDefault(x => x.PhysicalFileId == courtListFile.PhysicalFile.PhysicalFileID);
-                courtListFile.ActivityClassCd = await _lookupService.GetActivityClassCd(fileDetail?.CourtClassCd.ToString());
+                courtListFile.ActivityClassCd = await _lookupService.GetActivityClassCdLong(fileDetail?.CourtClassCd.ToString());
+                courtListFile.ActivityClassDesc = await _lookupService.GetActivityClassCdShort(fileDetail?.CourtClassCd.ToString());
 
                 foreach (var hearingRestriction in courtListFile.HearingRestriction)
                 {
@@ -171,7 +172,7 @@ namespace Scv.Api.Services
                     courtListFile.EstimatedTimeMin = targetAppearance.EstimatedTimeMin?.ReturnNullIfEmpty();
                 }
 
-                courtListFile.Document = await PopulateCivilDocuments(courtListFile.Document);
+                courtListFile.Document = PopulateCivilDocuments(courtListFile.Document);
             }
 
             return courtList;
@@ -182,7 +183,8 @@ namespace Scv.Api.Services
             foreach (var courtListFile in courtList)
             {
                 var fileDetail = criminalFileDetails.FirstOrDefault(x => x.JustinNo == courtListFile.FileInformation.MdocJustinNo);
-                courtListFile.ActivityClassCd = await _lookupService.GetActivityClassCd(fileDetail?.CourtClassCd.ToString());
+                courtListFile.ActivityClassCd = await _lookupService.GetActivityClassCdLong(fileDetail?.CourtClassCd.ToString());
+                courtListFile.ActivityClassDesc = await _lookupService.GetActivityClassCdShort(fileDetail?.CourtClassCd.ToString());
                 courtListFile.Crown = PopulateCrown(fileDetail);
             
                 foreach (var hearingRestriction in courtListFile.HearingRestriction)
@@ -225,7 +227,7 @@ namespace Scv.Api.Services
             return crown;
         }
 
-        private async Task<ICollection<CivilClDocument>> PopulateCivilDocuments(ICollection<CivilClDocument> documents)
+        private ICollection<CivilClDocument> PopulateCivilDocuments(ICollection<CivilClDocument> documents)
         {
             foreach (var document in documents)
             {
