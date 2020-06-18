@@ -105,7 +105,7 @@
                             :key="index" 
                             class="mr-1"
                             style="margin-top: 6px; font-weight: normal; font-size: 14px;"
-                            v-b-tooltip.hover 
+                            v-b-tooltip.hover.right 
                             :title='field.key' > 
                             {{ field.abbr }} 
                         </b-badge>
@@ -224,7 +224,7 @@ export default class CivilList extends Vue {
             civilListInfo["Index"] = civilListIndex;
             if(jcivilList.activityClassCd != listClass) continue;
 
-            civilListInfo['Seq.']=jcivilList.courtListPrintSortNumber
+            civilListInfo['Seq.']=jcivilList.courtListPrintSortNumber? parseInt(jcivilList.courtListPrintSortNumber):''
 
             civilListInfo['File Number']=jcivilList.physicalFile.fileNumber           
             civilListInfo["Time"] = this.getTime(jcivilList.appearanceTime.substr(0,5));
