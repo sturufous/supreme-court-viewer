@@ -18,8 +18,7 @@
               <b-overlay :show="loadingROP" rounded="sm">
                 <div>
                     <b-button-group><h3 class="mx-2 mt-1 font-weight-normal" style="height: 10px;">Charges</h3>
-                        <b-button
-                            v-if="ropExists"                                     
+                        <b-button                                     
                             variant="outline-primary text-info" 
                             style="border:0px;"
                             class="mt-1"
@@ -248,7 +247,6 @@ export default class CriminalAppearanceDetails extends Vue {
     sortDesc = true;
     showNotes = false;
     informationsFileExists = false;
-    ropExists = false;
     notes = {};       
     appearanceDetailsInfo = {};
     initiatingDocuments: string[] = [];    
@@ -304,11 +302,7 @@ export default class CriminalAppearanceDetails extends Vue {
     }    
     
     public getAppearanceInfo()
-    {
-        //TODO: remove this once integrated with courtlist
-        if (this.appearanceInfo.courtLevel == '') {
-            this.ropExists = true;
-        }               
+    {                      
         this.appearanceDetailsInfo["Supplemental Equipment"] = this.appearanceInfo.supplementalEquipmentTxt? this.appearanceInfo.supplementalEquipmentTxt: '';
         this.appearanceDetailsInfo["Security Restriction"] = this.appearanceInfo.securityRestrictionTxt? this.appearanceInfo.securityRestrictionTxt: '';
         this.appearanceDetailsInfo["Out-Of-Town Judge"] =  this.appearanceInfo.outOfTownJudgeTxt? this.appearanceInfo.outOfTownJudgeTxt: '';

@@ -333,7 +333,6 @@ export default class CriminalList extends Vue {
             this.appearanceInfo.courtLevel = data.item['Court Level']
             this.appearanceInfo.courtClass = data.item['Court Class']
             this.appearanceInfo.profSeqNo = data.item['Prof SeqNo']
-
             this.UpdateAppearanceInfo(this.appearanceInfo);
         }        
     }
