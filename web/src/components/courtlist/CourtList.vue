@@ -1,5 +1,5 @@
 <template>
-<body>
+<div>
     <b-card bg-variant="light" v-if= "!isLocationDataMounted && !isLocationDataReady">
         <b-overlay :show= "true"> 
             <b-card  style="min-height: 100px;"/>                   
@@ -171,7 +171,7 @@
         </b-card> 
 
     </b-card>
-</body>
+</div>
 </template>
 
 

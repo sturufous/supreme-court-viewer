@@ -1,5 +1,5 @@
 <template>
-<body> 
+<div style="overflow:hidden"> 
     <b-card bg-variant="light" v-if= "!isMounted && !isDataReady">
         <b-overlay :show= "true"> 
             <b-card  style="min-height: 100px;"/>                   
@@ -46,7 +46,7 @@
             </b-col>
         </b-row>
     </b-card>
-</body>
+</div>
 </template>
 
 <script lang="ts">
