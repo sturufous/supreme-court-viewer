@@ -146,10 +146,13 @@ export default class CivilDocumentsView extends Vue {
     ];
 
     public getDocuments(): void {
-
-        const data = this.civilFileInformation.detailsData;
-        this.documentsDetailsJson = data.document; 
-        this.ExtractDocumentInfo()          
+        
+        this.documents = this.civilFileInformation.documentsInfo;
+        this.summaryDocuments = this.civilFileInformation.summaryDocumentsInfo;
+        this.categories = this.civilFileInformation.categories;
+        this.categories.sort()
+        if(this.summaryDocuments.length > 0) this.categories.push("COURT SUMMARY")
+        this.categories.unshift("ALL")        
         this.isMounted = true;
     }
 
@@ -176,58 +179,7 @@ export default class CivilDocumentsView extends Vue {
 
     public navigateToLandingPage() {
         this.$router.push({name:'Home'})
-    }
-    
-    public ExtractDocumentInfo(): void {
-        
-        let courtSummaryExists = false 
-        for(const docIndex in this.documentsDetailsJson)
-        {
-            const docInfo = {}; 
-            const jDoc =  this.documentsDetailsJson[docIndex];
-            docInfo["Index"] = docIndex;
-            if(jDoc.documentTypeCd != 'CSR') {
-                docInfo["Seq."] = jDoc.fileSeqNo;
-                docInfo["Document Type"] = jDoc.documentTypeDescription;
-                docInfo["Concluded"] = jDoc.concludedYn;
-                if((this.categories.indexOf("CONCLUDED") < 0) && docInfo["Concluded"].toUpperCase() =="Y") this.categories.push("CONCLUDED")        
-                docInfo["Appearance Date"] = jDoc.lastAppearanceDt? jDoc.lastAppearanceDt.split(' ')[0] : ''; 
-                if(new Date(docInfo["Appearance Date"]) > new Date() && this.categories.indexOf("SCHEDULED") < 0) this.categories.push("SCHEDULED")   
-
-                docInfo["Category"] = jDoc.category? jDoc.category : '';
-                if((this.categories.indexOf(docInfo["Category"]) < 0) && docInfo["Category"].length > 0) this.categories.push(docInfo["Category"])
-                docInfo["Act"] = [];            
-                if (jDoc.documentSupport && jDoc.documentSupport.length > 0) {
-                    for (const act of jDoc.documentSupport) {
-                        docInfo["Act"].push({'Code': act.actCd, 'Description': act.actDsc})
-                    }
-                }  
-
-                docInfo["Document ID"] = jDoc.civilDocumentId;            
-                docInfo["PdfAvail"] = jDoc.imageId? true : false 
-                docInfo["Date Filed"] = jDoc.filedDt? jDoc.filedDt.split(' ')[0] : '';
-                docInfo["Issues"] = [];
-                if (jDoc.issue && jDoc.issue.length > 0) {
-                    for (const issue of jDoc.issue) {
-                        docInfo["Issues"].push(issue.issueDsc)
-                    }
-                } 
-                this.documents.push(docInfo);
-
-            } else {                
-                docInfo["Document Type"] = 'CourtSummary';
-                docInfo["Appearance Date"] = jDoc.lastAppearanceDt.split(' ')[0];
-                docInfo["Appearance ID"] = jDoc.imageId;
-                docInfo["PdfAvail"] = jDoc.imageId? true : false
-                this.summaryDocuments.push(docInfo);
-                courtSummaryExists = true;
-            }
-        } 
-        
-        this.categories.sort()
-        if(courtSummaryExists) this.categories.push("COURT SUMMARY")
-        this.categories.unshift("ALL")  
-    }
+    } 
 
     public ExtractIssues(issues) {
         let issueString =''; 

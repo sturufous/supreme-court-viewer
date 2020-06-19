@@ -76,6 +76,10 @@
             </b-dropdown-item-button>
         </b-nav-item-dropdown>
 
+        <b-nav-text style="margin-top: 4px;font-size: 14px;" variant="white">
+            <b-badge v-if="isSealed" variant="danger">Sealed</b-badge>
+        </b-nav-text>    
+
       </b-navbar-nav>
     </b-navbar>
     <hr class="mx-1 bg-warning" style="border-top: 2px double #FCBA19"/>      
@@ -102,6 +106,7 @@ export default class CivilHeader extends Vue {
   activityClassCode;
   agencyLocation = {Name:'', Code:0, Region:'' };
   isMounted = false;
+  isSealed = false;
   partyDisplayedTxt;
   leftPartiesInfo;
   rightPartiesInfo; 
@@ -128,6 +133,7 @@ export default class CivilHeader extends Vue {
       this.agencyLocation.Code = data.homeLocationAgencyCode;
       this.agencyLocation.Region = data.homeLocationRegionName;
       this.partyDisplayedTxt = data.socTxt;
+      this.isSealed = this.civilFileInformation.isSealed;
       this.leftPartiesInfo = this.civilFileInformation.leftPartiesInfo;
       this.rightPartiesInfo = this.civilFileInformation.rightPartiesInfo; 
       this.adjudicatorRestrictionsInfo = this.civilFileInformation.adjudicatorRestrictionsInfo;
