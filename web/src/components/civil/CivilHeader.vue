@@ -76,6 +76,27 @@
             </b-dropdown-item-button>
         </b-nav-item-dropdown>
 
+        <b-nav-text v-if="sheriffComment.length>0" style="margin-top: 4px;font-size: 14px;" variant="white">
+            <b-badge pill variant="danger">1</b-badge>
+        </b-nav-text>
+        <b-nav-item-dropdown v-if="sheriffComment.length>0" right no-caret > 
+            <template v-slot:button-content>
+                <b-button
+                    variant="outline-primary text-info"                    
+                    style="transform: translate(-5px,0); border:0px; font-size:14px;text-overflow: ellipsis;"                    
+                    size="sm">                    
+                    Sheriff Comments
+                    <b-icon class="ml-1" icon="caret-down-fill" font-scale="1"></b-icon>
+                </b-button>
+            </template>       
+
+            <b-dropdown-item-button>
+                <b-card bg-variant="white" no-body border-variant="white">
+                    {{sheriffComment}}
+                </b-card>                  
+            </b-dropdown-item-button>
+        </b-nav-item-dropdown>
+
         <b-nav-text style="margin-top: 4px;font-size: 14px;" variant="white">
             <b-badge v-if="isSealed" variant="danger">Sealed</b-badge>
         </b-nav-text>    
@@ -103,6 +124,7 @@ export default class CivilHeader extends Vue {
   maximumFullNameLength = 15;
   activeParty = 0;
   fileNumberText;
+  sheriffComment;
   activityClassCode;
   agencyLocation = {Name:'', Code:0, Region:'' };
   isMounted = false;
@@ -133,6 +155,7 @@ export default class CivilHeader extends Vue {
       this.agencyLocation.Code = data.homeLocationAgencyCode;
       this.agencyLocation.Region = data.homeLocationRegionName;
       this.partyDisplayedTxt = data.socTxt;
+      this.sheriffComment = data.sheriffCommentText? data.sheriffCommentText: '';
       this.isSealed = this.civilFileInformation.isSealed;
       this.leftPartiesInfo = this.civilFileInformation.leftPartiesInfo;
       this.rightPartiesInfo = this.civilFileInformation.rightPartiesInfo; 
