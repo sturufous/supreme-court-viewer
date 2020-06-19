@@ -49,6 +49,14 @@
             <b-card><br></b-card>  
         </b-col>
     </b-row>
+
+    <b-modal v-if= "isMounted" v-model="banExists" id="bv-modal-ban" hide-header hide-footer>        
+        <b-card> 
+            A Ban has been ordered on at least one participant in this case. 
+            Please check Ban Details before giving out sensitive details.
+        </b-card>                     
+        <b-button class="mt-3 bg-primary" @click="$bvModal.hide('bv-modal-ban')">Continue</b-button>
+    </b-modal>
 </div>
 </template>
 
@@ -115,10 +123,12 @@ export default class CriminalCaseDetails extends Vue {
    
     participantList: any[] = [];
     adjudicatorRestrictionsInfo: any[] = [];
+    bans: any[] = [];
     /* eslint-enable */
 
     isDataReady = false
     isMounted = false
+    banExists = false
     errorCode =0;
     errorText ='';
     
@@ -162,6 +172,10 @@ export default class CriminalCaseDetails extends Vue {
                     {
                         this.criminalFileInformation.participantList = this.participantList;
                         this.criminalFileInformation.adjudicatorRestrictionsInfo = this.adjudicatorRestrictionsInfo;
+                        if (this.bans.length > 0) {
+                            this.banExists = true;
+                        }
+                        this.criminalFileInformation.bans = this.bans;
                         this.criminalFileInformation.courtLevel = courtLevel;
                         this.criminalFileInformation.courtClass = courtClass;
                         this.UpdateCriminalFile(this.criminalFileInformation);
@@ -236,10 +250,10 @@ export default class CriminalCaseDetails extends Vue {
             const charges: any[] = [];         
             for(const charge of jParticipant.charge)
             {              
-                    const chargeInfo = {};                   
-                    chargeInfo["Description"]= charge.sectionDscTxt
-                    chargeInfo["Code"]= charge.sectionTxt
-                    charges.push(chargeInfo);
+                const chargeInfo = {};                   
+                chargeInfo["Description"]= charge.sectionDscTxt
+                chargeInfo["Code"]= charge.sectionTxt
+                charges.push(chargeInfo);
             }
             participantInfo["Charges"] = charges;
 
@@ -249,10 +263,23 @@ export default class CriminalCaseDetails extends Vue {
                 if(jParticipant[status.code] =='Y')
                     participantInfo["Status"].push(status);
             }
+            
+            for(const ban of jParticipant.ban)
+            {              
+                const banInfo = {};
+                banInfo["Ban Participant"] = participantInfo["Name"];                   
+                banInfo["Ban Type"] = ban.banTypeDescription;
+                banInfo["Order Date"] = ban.banOrderedDate;                   
+                banInfo["Act"] = ban.banTypeAct;
+                banInfo["Sect."] = ban.banTypeSection;                   
+                banInfo["Sub"] = ban.banTypeSubSection;
+                banInfo["Description"] = ban.banStatuteId;                   
+                banInfo["Comment"] = ban.banCommentText;                  
+                this.bans.push(banInfo);
+            }                      
 
             participantInfo['DocumentsJson'] = jParticipant.document;
             participantInfo['CountsJson'] = jParticipant.count;
-
 
             this.UpdateDisplayName({'lastName': jParticipant.counselLastNm? jParticipant.counselLastNm: '', 'givenName': jParticipant.counselGivenNm? jParticipant.counselGivenNm: ''});
             participantInfo['Counsel'] = this.displayName.trim.length? 'JUSTIN: ' + this.displayName: '';

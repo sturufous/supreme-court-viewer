@@ -66,6 +66,48 @@
                   </b-button>
             </b-dropdown-item-button>
         </b-nav-item-dropdown>
+
+        <b-nav-text style="margin-top: 4px;font-size: 14px;" variant="white">
+            <b-badge pill variant="danger">{{bans.length}}</b-badge>
+        </b-nav-text>
+
+        <b-nav-item-dropdown right no-caret > 
+            <template v-slot:button-content>
+                <b-button
+                    :variant="(bans.length>0)? 'outline-primary text-info':'white'" 
+                    :disabled="bans.length==0"
+                    style="transform: translate(-5px,0); border:0px; font-size:14px;text-overflow: ellipsis;"                    
+                    size="sm">                    
+                    Ban Details
+                    <b-icon v-if="(bans.length>0)" class="ml-1" icon="caret-down-fill" font-scale="1"></b-icon>
+                </b-button>
+            </template>       
+
+            <b-dropdown-item-button>
+                <b-card bg-variant="white" v-if="(bans.length>0)" no-body border-variant="white">           
+                    <b-table        
+                    borderless
+                    striped
+                    :items="bans"
+                    :fields="fields"
+                    small
+                    responsive="sm"
+                    >
+                    <template v-slot:[`cell(${fields[0].key})`]="data" >
+                        <span v-if="data.item.Comment.length == 0">{{ data.value }}</span>
+                        <span
+                            class="text-success"
+                            v-else
+                            v-b-tooltip.hover.left
+                            v-b-tooltip.hover.html="data.item.Comment"> 
+                                {{ data.value }} 
+                        </span>
+                    </template>
+                    </b-table>
+                </b-card>                  
+            </b-dropdown-item-button>
+        </b-nav-item-dropdown>
+
       </b-navbar-nav>
     </b-navbar>
 
@@ -104,6 +146,7 @@ export default class CriminalHeader extends Vue {
 
   participantList: any[] = [];
   adjudicatorRestrictions: any[] = [];
+  bans: any[] = [];
   /* eslint-enable */
 
   maximumFullNameLength = 15;
@@ -112,7 +155,18 @@ export default class CriminalHeader extends Vue {
   agencyLocation = {Name:'', Code:0, Region:'' };
   adjudicatorRestrictionsJson;
   isMounted = false;
-  participantJson;  
+  participantJson;
+  
+  fields =  
+  [
+      {key:'Ban Participant', sortable:false, tdClass: 'border-top',  headerStyle:'table-borderless text-primary'},       
+      {key:'Ban Type',        sortable:false, tdClass: 'border-top',  headerStyle:'text-primary'},
+      {key:'Order Date',      sortable:false, tdClass: 'border-top',  headerStyle:'text-primary'},
+      {key:'Act',             sortable:false, tdClass: 'border-top',  headerStyle:'text-primary'},       
+      {key:'Sub',             sortable:false, tdClass: 'border-top',  headerStyle:'text-primary'},
+      {key:'Description',     sortable:false, tdClass: 'border-top',  headerStyle:'text-primary'},
+           
+  ];
 
   mounted() {
     this.getHeaderInfo();
@@ -126,6 +180,7 @@ export default class CriminalHeader extends Vue {
       this.agencyLocation.Region = data.homeLocationRegionName;
       this.adjudicatorRestrictions = this.criminalFileInformation.adjudicatorRestrictionsInfo;
       this.participantList = this.criminalFileInformation.participantList
+      this.bans = this.criminalFileInformation.bans
       this.numberOfParticipants = this.participantList.length - 1;
       this.isMounted = true; 
       this.setActiveParticipantIndex(this.SortedParticipants[0].Index)
