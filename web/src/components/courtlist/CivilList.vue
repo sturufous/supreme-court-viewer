@@ -46,19 +46,21 @@
                 <template v-slot:[`cell(${fields[1].key})`]="data" >                     
                     <b-button 
                         style=" font-size:16px" 
-                        size="sm" 
+                        size="sm"
+                        :id="civilClass+'case'+data.item.Index"
+                        :href="'#'+civilClass+'case'+data.item.Index"
                         @click="OpenDetails(data); data.toggleDetails();" 
                         :variant="'outline-primary border-white text-'+civilClass" 
                         class="mr-2">
                             <b-icon-caret-right-fill :variant="civilClass" v-if="!data.item['_showDetails']"></b-icon-caret-right-fill>
                             <b-icon-caret-down-fill :variant="civilClass" v-if="data.item['_showDetails']"></b-icon-caret-down-fill>
                             {{data.value}}
-                    </b-button>                   
+                    </b-button>                  
                 </template>
 
                 <template v-slot:row-details>
                     <b-card no-body bg-border="dark"> 
-                        <civil-appearance-details/>
+                        <civil-appearance-details />
                     </b-card>
                 </template> 
                 

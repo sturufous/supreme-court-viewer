@@ -47,6 +47,8 @@
                     <b-button  
                         size="sm" 
                         style=" font-size:16px"
+                        :id="'criminalcase'+data.item.Index"
+                        :href="'#criminalcase'+data.item.Index"
                         @click="OpenDetails(data); data.toggleDetails();" 
                         variant="outline-primary border-white text-criminal" 
                         class="mr-2">
@@ -75,6 +77,7 @@
 
                 <template  v-slot:cell(Reason)="data">
                     <b-badge
+                        v-if="data.item['Reason']"
                         variant="secondary"
                         v-b-tooltip.hover.right                            
                         :title="data.item['ReasonDesc']"
@@ -187,7 +190,7 @@ export default class CriminalList extends Vue {
        
         this.criminalCourtListJson = data.criminalCourtList
 
-        console.log(this.criminalCourtListJson)
+        ///console.log(this.criminalCourtListJson)
         this.courtRoom = data.courtRoomCode    
         this.ExtractCriminalListInfo()
         if(this.criminalList.length)
