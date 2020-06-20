@@ -135,8 +135,12 @@
                         </b-button>
                     </b-button-group>
                     <hr class="mb-0 bg-light" style="height: 5px;"/> 
-                </div>                           
+                </div>
+                <b-card v-if="!(appearanceAdditionalInfo.length>0)" style="border: white;">
+                    <span class="text-muted"> No additional information. </span>
+                </b-card>                           
                 <b-table
+                    v-if="appearanceAdditionalInfo.length> 0"
                     :items="appearanceAdditionalInfo"
                     :fields="addInfoFields"
                     thead-class="d-none"               
@@ -231,7 +235,7 @@
       </b-card>  
     </b-card>
 
-    <b-modal v-model="showAdjudicatorComment" id="bv-modal-comment" hide-footer>
+    <b-modal v-if= "isMounted" v-model="showAdjudicatorComment" id="bv-modal-comment" hide-footer>
         <template v-slot:modal-title>
                 <h2 class="mb-0"> Adjudicator Comment </h2>
         </template>
@@ -272,7 +276,7 @@ export default class CivilAppearanceDetails extends Vue {
     appearanceMethods: any[] = [];
     /* eslint-enable */
     
-    loadingPdf = false;  
+    loadingPdf = false; 
     isMounted = false;
     isDataReady = false;
     stripedStyle = false;
@@ -325,7 +329,7 @@ export default class CivilAppearanceDetails extends Vue {
 
     public getAppearanceDetails(): void {      
     
-        this.$http.get('/api/files/civil/'+ this.additionalInfo["File Number"]+'/appearance-detail/'+this.additionalInfo["Appearance ID"])
+        this.$http.get('/api/files/civil/'+ this.appearanceInfo.fileNo +'/appearance-detail/'+this.appearanceInfo.appearanceId)
             .then(Response => Response.json(), err => {console.log(err);} )        
             .then(data => {
                 if(data){ 
@@ -337,16 +341,14 @@ export default class CivilAppearanceDetails extends Vue {
     }    
     
     public getAdditionalInfo()
-    {
-        this.additionalInfo["Supplemental Equipment"] = this.appearanceInfo.supplementalEquipmentTxt;
-        this.additionalInfo["Security Restriction"] = this.appearanceInfo.securityRestrictionTxt;
-        this.additionalInfo["Out-Of-Town Judge"] =  this.appearanceInfo.outOfTownJudgeTxt;
+    {   
+        this.additionalInfo["Supplemental Equipment"] = this.appearanceInfo.supplementalEquipmentTxt? this.appearanceInfo.supplementalEquipmentTxt: '';
+        this.additionalInfo["Security Restriction"] = this.appearanceInfo.securityRestrictionTxt? this.appearanceInfo.securityRestrictionTxt: '';
+        this.additionalInfo["Out-Of-Town Judge"] =  this.appearanceInfo.outOfTownJudgeTxt? this.appearanceInfo.outOfTownJudgeTxt: '';
 
         for(const info in this.additionalInfo)
-            this.appearanceAdditionalInfo.push({'key':info,'value':this.additionalInfo[info]});
-
-        this.additionalInfo["File Number"] = this.appearanceInfo.fileNo; 
-        this.additionalInfo["Appearance ID"] = this.appearanceInfo.appearanceId;                  
+            if(this.additionalInfo[info].length>0)
+            this.appearanceAdditionalInfo.push({'key':info,'value':this.additionalInfo[info]});                      
     }
 
     public ExtractAppearanceDetailsInfo()
@@ -474,7 +476,7 @@ export default class CivilAppearanceDetails extends Vue {
         if(document.item.DocTypeCd != "CSR") {
             this.openDocumentsPdf(document.item['ID']);
         } else if (document.item.DocTypeCd == "CSR") {
-            this.openCourtSummaryPdf(this.additionalInfo["Appearance ID"]);
+            this.openCourtSummaryPdf(this.appearanceInfo.appearanceId);
         }
     }
 
