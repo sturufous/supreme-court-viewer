@@ -85,22 +85,24 @@
             <b-dropdown-item-button>
                 <b-card bg-variant="white" no-body border-variant="white">           
                     <b-table        
-                    borderless
-                    striped
+                    borderless                    
                     :items="bans"
                     :fields="fields"
                     small
                     responsive="sm"
                     >
+                    <template v-slot:cell()="data">
+                        <span style="transform: translate(0, +6px)">{{ data.value }}</span>
+                    </template>    
                     <template v-slot:[`cell(${fields[0].key})`]="data" >
-                        <span v-if="data.item.Comment.length == 0">{{ data.value }}</span>
-                        <span
-                            class="text-success"
+                        <span style="transform: translate(0, +5px)" v-if="data.item.Comment.length == 0">{{ data.value }}</span>
+                        <b-button
+                            class="text-success bg-white border-white"
                             v-else
                             v-b-tooltip.hover.left
                             v-b-tooltip.hover.html="data.item.Comment"> 
                                 {{ data.value }} 
-                        </span>
+                        </b-button>
                     </template>
                     </b-table>
                 </b-card>                  
