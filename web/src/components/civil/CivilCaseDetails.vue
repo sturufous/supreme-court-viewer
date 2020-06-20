@@ -39,6 +39,7 @@
 
                 <civil-parties v-if="showCaseDetails"/>
                 <civil-adjudicator-restrictions v-if="showCaseDetails"/>
+                <civil-comment-notes v-if="showCaseDetails"/>
                 <civil-documents-view v-if="showCaseDetails"/>            
                 <civil-past-appearances v-if="showPastAppearances" />
                 <civil-future-appearances v-if="showFutureAppearances" />
@@ -65,6 +66,7 @@ import CivilDocumentsView from '@components/civil/CivilDocumentsView.vue';
 import CivilPastAppearances from '@components/civil/CivilPastAppearances.vue';
 import CivilFutureAppearances from '@components/civil/CivilFutureAppearances.vue';
 import CivilAdjudicatorRestrictions from '@components/civil/CivilAdjudicatorRestrictions.vue';
+import CivilCommentNotes from '@components/civil/CivilCommentNotes.vue'; 
 import CivilParties from '@components/civil/CivilParties.vue';
 import CivilHeaderTop from '@components/civil/CivilHeaderTop.vue';
 import CivilHeader from '@components/civil/CivilHeader.vue';
@@ -77,6 +79,7 @@ const commonState = namespace("CommonInformation");
 @Component({
     components: {
         CivilAdjudicatorRestrictions,
+        CivilCommentNotes,
         CivilDocumentsView,
         CivilPastAppearances,
         CivilFutureAppearances,
