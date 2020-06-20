@@ -1,5 +1,4 @@
-<template>
-    <!-- <div class="app-outer fill-body" id="app" style="overflow:hidden"> -->
+<template>    
     <div class="app-outer fill-body" id="app">
         <navigation-topbar />
             <router-view />

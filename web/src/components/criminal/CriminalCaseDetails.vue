@@ -1,5 +1,5 @@
 <template>
-<body> 
+<div style="overflow:hidden"> 
 
     <b-card bg-variant="light" v-if= "!isMounted && !isDataReady">
         <b-overlay :show= "true"> 
@@ -48,7 +48,7 @@
             <b-card><br></b-card>  
         </b-col>
     </b-row>
-</body>
+</div>
 </template>
 
 <script lang="ts">
@@ -70,6 +70,13 @@ import '@store/modules/CriminalFileInformation';
 import "@store/modules/CommonInformation";
 const criminalState = namespace('CriminalFileInformation');
 const commonState = namespace("CommonInformation");
+
+enum DecodeCourtLevel {'P'= 0, 'S' = 1, 'A' = 2 }
+enum DecodeCourtClass {
+    'A' = 0, 'Y' = 1, 'T' = 2, 'F' = 3, 'C' = 4, 'M' = 5,        
+    'L' = 6, 'R' = 7, 'B' = 8, 'D' = 9, 'E' = 10, 'G' = 11,        
+    'H' = 12, 'N' = 13, 'O' = 14, 'P' = 15, 'S' = 16, 'V' = 17,
+}
 
 @Component({
     components: {
@@ -147,11 +154,15 @@ export default class CriminalCaseDetails extends Vue {
                     this.criminalFileInformation.detailsData = data; 
                     this.participantJson = data.participant
                     this.adjudicatorRestrictionsJson = data.hearingRestriction;
+                    const courtLevel = DecodeCourtLevel[data.courtLevelCd];
+                    const courtClass = DecodeCourtClass[data.courtClassCd];
                     this.ExtractFileInfo()
                     if(this.participantList.length)
                     {
                         this.criminalFileInformation.participantList = this.participantList;
                         this.criminalFileInformation.adjudicatorRestrictionsInfo = this.adjudicatorRestrictionsInfo;
+                        this.criminalFileInformation.courtLevel = courtLevel;
+                        this.criminalFileInformation.courtClass = courtClass;
                         this.UpdateCriminalFile(this.criminalFileInformation);
                         this.isDataReady = true;
                     }
