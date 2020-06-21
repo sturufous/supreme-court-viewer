@@ -248,8 +248,8 @@ export default class CivilCaseDetails extends Vue {
                 docInfo["Document Type"] = jDoc.documentTypeDescription;
                 docInfo["Concluded"] = jDoc.concludedYn;
                 if((this.categories.indexOf("CONCLUDED") < 0) && docInfo["Concluded"].toUpperCase() =="Y") this.categories.push("CONCLUDED")        
-                docInfo["Appearance Date"] = jDoc.lastAppearanceDt? jDoc.lastAppearanceDt.split(' ')[0] : ''; 
-                if(new Date(docInfo["Appearance Date"]) > new Date() && this.categories.indexOf("SCHEDULED") < 0) this.categories.push("SCHEDULED")   
+                docInfo["Next Appearance Date"] = jDoc.nextAppearanceDt? jDoc.nextAppearanceDt : ''; 
+                if(docInfo["Next Appearance Date"].length > 0 && this.categories.indexOf("SCHEDULED") < 0) this.categories.push("SCHEDULED")   
 
                 docInfo["Category"] = jDoc.category? jDoc.category : '';
                 if((this.categories.indexOf(docInfo["Category"]) < 0) && docInfo["Category"].length > 0) this.categories.push(docInfo["Category"])
@@ -258,8 +258,7 @@ export default class CivilCaseDetails extends Vue {
                     for (const act of jDoc.documentSupport) {
                         docInfo["Act"].push({'Code': act.actCd, 'Description': act.actDsc})
                     }
-                }
-                
+                }                
                 if (jDoc.sealedYN == "Y") {
                     this.docIsSealed = true;
                 }
@@ -271,8 +270,11 @@ export default class CivilCaseDetails extends Vue {
                     for (const issue of jDoc.issue) {
                         docInfo["Issues"].push(issue.issueDsc)
                     }
-                } 
-                this.documentsInfo.push(docInfo);
+                }
+                docInfo["Comment"] = jDoc.commentTxt? jDoc.commentTxt : '';
+                docInfo["filedByName"] = jDoc.filedByName? jDoc.filedByName : '';
+                docInfo["Date Granted"] = jDoc.DateGranted? jDoc.DateGranted : ''; 
+                this.documentsInfo.push(docInfo);                
 
             } else {                
                 docInfo["Document Type"] = 'CourtSummary';
@@ -280,7 +282,6 @@ export default class CivilCaseDetails extends Vue {
                 docInfo["Appearance ID"] = jDoc.imageId;
                 docInfo["PdfAvail"] = jDoc.imageId? true : false
                 this.summaryDocumentsInfo.push(docInfo);
-                // courtSummaryExists = true;
             }
         } 
     }

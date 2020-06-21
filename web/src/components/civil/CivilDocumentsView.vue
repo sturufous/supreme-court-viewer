@@ -99,7 +99,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch} from 'vue-property-decorator';
+import { Component, Vue} from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
 import '@store/modules/CivilFileInformation';
 const civilState = namespace('CivilFileInformation');
@@ -156,13 +156,6 @@ export default class CivilDocumentsView extends Vue {
         this.isMounted = true;
     }
 
-    @Watch('$route', { immediate: false, deep: true })
-    onUrlChange() {
-        this.civilFileInformation.fileNumber = this.$route.params.fileNumber;
-        this.UpdateCivilFile(this.civilFileInformation);
-        location.reload();
-    }
-
     mounted () { 
         this.civilFileInformation.fileNumber = this.$route.params.fileNumber
         this.UpdateCivilFile(this.civilFileInformation);        
@@ -204,8 +197,8 @@ export default class CivilDocumentsView extends Vue {
                     if(doc["Concluded"] === "Y") return true; else return false;
                 
                 } else if(this.activetab == 'SCHEDULED') {
-                    if(doc["Appearance Date"]){        
-                        if(new Date(doc["Appearance Date"]) > new Date()) return true; else return false;
+                    if(doc["Next Appearance Date"]){        
+                        return true;
                     
                     } else {
                         return false
