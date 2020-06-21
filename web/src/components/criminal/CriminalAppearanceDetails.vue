@@ -17,7 +17,7 @@
             <b-col md="8" cols="8" style="overflow: auto;">
               <b-overlay :show="loadingROP" rounded="sm">
                 <div>
-                    <b-button-group><h3 class="mx-2 mt-1 font-weight-normal" style="height: 10px;">Charges</h3>
+                    <b-button-group><h3 class="mx-2 mt-2 font-weight-normal" style="height: 10px;">Charges</h3>
                         <b-button                                     
                             variant="outline-primary text-info" 
                             style="border:0px;"
@@ -26,7 +26,7 @@
                             title="Download Record Of Proceeding"
                             @click="openRopPdf()"
                             size="sm">
-                            <b-icon icon="file-earmark-arrow-down"></b-icon>
+                            <b-icon icon="file-earmark-arrow-down" font-scale="2"></b-icon>
                         </b-button>
                     </b-button-group>
                     <hr class="mb-0 bg-light" style="height: 5px;"/> 
@@ -77,7 +77,8 @@
             </b-col>
             <b-col col md="4" cols="4" style="overflow: auto;">
                  <div>
-                     <b-button-group><h3 class="mx-2 mt-1 font-weight-normal" style="height: 10px;">Additional Info</h3>
+                     <b-button-group>
+                         <h3 class="mx-2 font-weight-normal" style="margin-top:8px; height:12px">Additional Info</h3>
                         <b-button 
                             size="sm"
                             style=" font-size:12px; border:0px;" 
@@ -87,7 +88,7 @@
                             class="mt-1"
                             v-b-tooltip.hover
                             title="Notes">
-                            <b-icon icon="chat-square-fill"></b-icon>                                
+                            <b-icon icon="chat-square-fill" font-scale="2"></b-icon>                                
                         </b-button>
                     </b-button-group>
                     <hr class="mb-0 bg-light" style="height: 5px;"/>
@@ -150,7 +151,8 @@
         </b-row>
         <b-overlay :show="loadingPdf" rounded="sm">
         <div class="mt-5">
-            <b-button-group><h3 class="mx-2 mt-1 font-weight-normal" style="height: 10px;">Appearance Information</h3>
+            <b-button-group>
+                <h3 class="mx-2 mt-2 font-weight-normal" style="height: 10px;">Appearance Information</h3>
                 <b-button
                     v-if="informationsFileExists"                                     
                     variant="outline-primary text-info" 
@@ -160,7 +162,7 @@
                     title="Download Information File"
                     @click="openDocumentsPdf()"
                     size="sm">
-                    <b-icon icon="file-earmark-arrow-down"></b-icon>
+                    <b-icon icon="file-earmark-arrow-down" font-scale="2"></b-icon>
                 </b-button>
             </b-button-group>            
             <hr class="mb-0 bg-light" style="height: 5px;"/> 
