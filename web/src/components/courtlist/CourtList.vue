@@ -128,12 +128,9 @@
                         <h5>({{courtListLocationID}})</h5>               
                     </b-nav-text>
 
-                    <b-nav-text class=" ml-4 mt-3">               
-                        <h3> CourtRoom: </h3>                
+                    <b-nav-text class=" ml-4" style="padding-top:25px">               
+                        <h3> CourtRoom: {{courtListRoom}}</h3>                
                     </b-nav-text>            
-                    <b-nav-text class=" ml-1 mt-3 ">               
-                        <h3>{{courtListRoom}}</h3>                
-                    </b-nav-text>
 
                     </b-navbar-nav>
                     <b-navbar-nav class="ml-auto">
@@ -174,6 +171,7 @@
                     <criminal-list/>
                     <civil-list civilClass='family'/>
                     <civil-list civilClass='civil'/>
+                    <b-card class="mb-5"/>
                     
                 </b-row> 
             </b-card>
@@ -214,16 +212,6 @@ export default class CourtList extends Vue {
         this.getListOfAvailableCourts();
     }
 
-    public getCourtNameById(locationId) {        
-        return this.courtRoomsAndLocations.filter(location => {                
-            if (location.value.LocationID == locationId) {
-                return true;
-            } else {
-                return false;
-            }
-        });
-    }
-
     public getListOfAvailableCourts(): void 
     {
         this.$http.get('/api/location/court-rooms')
@@ -235,20 +223,7 @@ export default class CourtList extends Vue {
                     if(this.courtRoomsAndLocations.length>0)
                     {                    
                         this.isLocationDataReady = true;
-                        if (this.$route.params.location && this.$route.params.room && this.$route.params.date) {
-                            this.courtListLocationID = this.$route.params.location;
-                            this.courtListRoom = this.$route.params.room;
-                            this.validSelectedDate = this.$route.params.date;                    
-
-                        
-                            this.selectedCourtLocation = this.getCourtNameById(this.courtListLocationID)[0]['text'];
-                            console.log(this.selectedCourtLocation);
-                            this.selectedDate = this.validSelectedDate;
-                            this.selectedCourtRoom = this.courtListRoom;                            
-                            console.log(this.selectedCourtRoom)
-                            // setTimeout(() => { this.searchForCourtList();}, 500);
-                            
-                        } 
+                        this.searchByRouterParams();                        
                     }
                 }
                 this.isLocationDataMounted = true;
@@ -265,7 +240,9 @@ export default class CourtList extends Vue {
         this.familyCases = 0;
         this.civilCases = 0;
         this.totalHours = 0;
-        this.totalMins = 0;        
+        this.totalMins = 0;
+        this.totalTime = '0' ;
+        this.totalTimeUnit = 'Hours';        
        
         this.$http.get('/api/courtlist/court-list?agencyId='+ this.courtListLocationID +'&roomCode='+ this.courtListRoom+'&proceeding=' +this.validSelectedDate)
             .then(Response => Response.json(), err => {this.errorCode= err.status;this.errorText= err.statusText;console.log(err);}        
@@ -307,7 +284,6 @@ export default class CourtList extends Vue {
                         this.totalTime = (this.totalHours).toString() ;
                         this.totalTimeUnit = 'Hours';
                     }
-
                     
                 }
                 this.isMounted = true;
@@ -326,7 +302,6 @@ export default class CourtList extends Vue {
     searchAllowed = true;
     syncFlag = true
 
-
     totalCases = 0;
     criminalCases = 0;
     familyCases = 0;
@@ -337,9 +312,10 @@ export default class CourtList extends Vue {
     totalTime = '';
     totalTimeUnit = 'Hours';
 
-
     courtRoomsAndLocationsJson;
-    courtRoomsAndLocations: any[] = [];
+    courtRoomsAndLocations= [
+        {text:'', value:{}}
+    ]
 
     selectedDate = (new Date).toISOString().substring(0,10);
     validSelectedDate = this.selectedDate;
@@ -362,7 +338,7 @@ export default class CourtList extends Vue {
         {            
             if(jroomAndLocation.courtRooms.length>0)
             {
-                const locationInfo = {};
+                const locationInfo = {text:'', value:{}};
                 locationInfo["text"]= jroomAndLocation.name + ' (' +jroomAndLocation.locationId+')';             
                         
                 const rooms: any[] = [];         
@@ -380,10 +356,83 @@ export default class CourtList extends Vue {
                     "Rooms" : rooms
                 };
                 this.courtRoomsAndLocations.push(locationInfo);
+                //console.log(locationInfo)
             }                
         }
         this.courtRoomsAndLocations =  _.sortBy(this.courtRoomsAndLocations, 'text')
         this.selectedCourtLocation = this.courtRoomsAndLocations[0].value; 
+    }
+
+    public getCourtNameById(locationId) 
+    {        
+        return this.courtRoomsAndLocations.filter(location => {                
+            if (location.value['LocationID'] == locationId) 
+                return true;
+            else 
+                return false;
+            
+        });
+    }
+
+    public getRoomInLocationByRoomNo(location, roomNo)
+    {
+        return location.value['Rooms'].filter(room=>{
+            if(room.value==roomNo)
+                return true;
+            else 
+                return false;
+        })
+    }
+
+    public searchByRouterParams()
+    {
+        //http://localhost:8080/court-list/location/4801/room/101/date/2020-06-15
+
+        if (this.$route.params.location && this.$route.params.room && this.$route.params.date) 
+        {
+            const location = this.getCourtNameById(this.$route.params.location)[0];
+            //console.log(location)
+            if(location)
+            {
+                this.selectedCourtLocation = location.value;
+                this.selectedCourtLocationState=true;
+                this.selectedDate = this.$route.params.date;
+                const room = this.getRoomInLocationByRoomNo(location, this.$route.params.room)[0];
+                //console.log(room)
+                if(room)
+                {
+                    this.selectedCourtRoom= room.value;
+                    this.selectedCourtRoomState = true;
+                    setTimeout(() => { this.searchForCourtList();}, 500);                   
+                }
+                else
+                {
+                    this.selectedCourtRoom= 'null';
+                    this.selectedCourtRoomState = false;
+                    this.searchAllowed = true;                    
+                }
+            }
+            else
+            {
+                this.selectedCourtLocation = this.courtRoomsAndLocations[0].value;
+                this.selectedCourtLocationState=false;
+                this.searchAllowed = true;
+            }
+            
+
+            // this.courtListRoom = this.$route.params.room;
+            // this.validSelectedDate = this.$route.params.date;                    
+
+            // console.log(this.getCourtNameById(this.courtListLocationID)[0].value)
+        
+            // this.selectedCourtLocation = 
+            // console.log(this.selectedCourtLocation);
+            // this.selectedDate = this.validSelectedDate;
+            // this.selectedCourtRoom = this.courtListRoom;                            
+            // console.log(this.selectedCourtRoom)
+            // setTimeout(() => { this.searchForCourtList();}, 500);
+            
+        } 
     }
 
     public onCalenderContext(datePicked) {
@@ -392,6 +441,7 @@ export default class CourtList extends Vue {
         
         if(datePicked.selectedYMD)
         {
+            //console.log(datePicked)
             this.validSelectedDate = datePicked.selectedYMD
             this.fullSelectedDate = datePicked.selectedFormatted
         } 
@@ -468,7 +518,8 @@ export default class CourtList extends Vue {
 
     public searchForCourtList()
     {        
-        if(this.selectedCourtLocation ==null)
+        //console.log(this.selectedCourtLocation.Location)
+        if(!this.selectedCourtLocation.Location)
         {
             //console.log(this.selectedCourtLocation)
             this.selectedCourtLocationState=false;
@@ -499,6 +550,17 @@ export default class CourtList extends Vue {
                     //console.log(this.selectedCourtRoom) 
                     this.courtListRoom = this.selectedCourtRoom;
                     // console.log('search')
+
+                    if( this.$route.params.location != this.courtListLocationID ||
+                        this.$route.params.room != this.courtListRoom ||
+                        this.$route.params.date != this.validSelectedDate)
+                    {
+                        this.$route.params.location = this.courtListLocationID;                    
+                        this.$route.params.room = this.courtListRoom;
+                        this.$route.params.date = this.validSelectedDate;
+                        this.$router.push({name:'CourtListResult'})
+                    }
+
                     //console.log(this.searchingRequest)
                     this.searchAllowed = false; 
                     setTimeout(() => { this.getCourtListDetails();}, 50);  
@@ -530,8 +592,6 @@ export default class CourtList extends Vue {
         this.totalMins += parseInt(mins);        
         this.totalHours += (Math.floor(this.totalMins/60) +parseInt(hrs));
         this.totalMins %= 60;
-        console.log(this.totalMins)
-        console.log(this.totalHours)
     }
 
 }
