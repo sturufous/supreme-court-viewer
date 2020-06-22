@@ -13,7 +13,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Scv.Api.Models.Civil.Detail;
 
 namespace Scv.Api.Services
 {
@@ -23,6 +22,7 @@ namespace Scv.Api.Services
 
         private readonly FileServicesClient _filesClient;
         private readonly LookupService _lookupService;
+        private readonly LocationService _locationService;
         private readonly IAppCache _cache;
         private readonly IMapper _mapper;
         private readonly string _requestApplicationCode;
@@ -42,6 +42,7 @@ namespace Scv.Api.Services
             _mapper = mapper;
 
             _lookupService = lookupService;
+            _locationService = locationService;
             _requestApplicationCode = configuration.GetNonEmptyValue("Request:ApplicationCd");
             _requestAgencyIdentifierId = configuration.GetNonEmptyValue("Request:AgencyIdentifierId");
             _requestPartId = configuration.GetNonEmptyValue("Request:PartId");
@@ -49,79 +50,121 @@ namespace Scv.Api.Services
 
         #endregion Constructor
 
-        public async Task<Models.CourtList.CourtList> CourtListAsync(string agencyId, string roomCode, DateTime? proceeding, string divisionCode, string fileNumber)
+        public async Task<Models.CourtList.CourtList> CourtListAsync(string agencyId, string roomCode, DateTime proceeding, string divisionCode, string fileNumber)
         {
-            var proceedingDateString = proceeding.HasValue ? proceeding.Value.ToString("yyyy-MM-dd") : "";
+            var proceedingDateString = proceeding.ToString("yyyy-MM-dd");
+            var agencyCode = await _locationService.GetLocationCodeFromId(agencyId);
+
             async Task<CourtList> CourtList() => await _filesClient.FilesCourtlistAsync(agencyId, roomCode, proceedingDateString, divisionCode, fileNumber);
-            var originalCourtList = await _cache.GetOrAddAsync($"CivilCourtList-{agencyId}-{roomCode}-{proceedingDateString}-{fileNumber}", CourtList);
+            async Task<CourtCalendarDetailByDay> CourtCalendarDetailByDay() =>
+                await _filesClient.FilesCourtCalendarDetailsByDayAsync(_requestAgencyIdentifierId, _requestPartId, agencyCode,
+                    proceeding.ToString("yyyy-MM-dd HH:mm:ss.S"), roomCode);
 
-            if (originalCourtList == null)
-                return null;
+            var courtCalendarDetailsTask = _cache.GetOrAdd($"CivilCourtCalendarDetails-{agencyId}-{roomCode}-{proceedingDateString}-{fileNumber}",
+                    CourtCalendarDetailByDay);
+            var originalCourtListTask = _cache.GetOrAddAsync($"CourtList-{agencyId}-{roomCode}-{proceedingDateString}-{fileNumber}", CourtList);
 
-            var courtList = _mapper.Map<Models.CourtList.CourtList>(originalCourtList);
+            //Query by courtCalendarDetails, because it returns quite a bit faster than the courtList.
+            var courtCalendarDetails = await courtCalendarDetailsTask;
+
+            var civilCourtCalendarAppearances = courtCalendarDetails?.Appearance
+                .WhereToList(app => app.CourtDivisionCd == CourtCalendarDetailAppearanceCourtDivisionCd.I);
+            var criminalCourtCalendarAppearances = courtCalendarDetails?.Appearance
+                .WhereToList(app => app.CourtDivisionCd == CourtCalendarDetailAppearanceCourtDivisionCd.R);
+
+            var civilFileIds = civilCourtCalendarAppearances.SelectToList(ccl => ccl.PhysicalFileId);
+            var criminalFileIds = criminalCourtCalendarAppearances.SelectToList(ccl => ccl.MdocJustinNo);
+
+            if (civilFileIds.Count == 0 && criminalFileIds.Count == 0)
+                return new Models.CourtList.CourtList();
 
             //Start file details tasks.
-            var civilFileDetailTasks = CivilFileDetailTasks(courtList);
-            var criminalFileDetailTasks = CriminalFileDetailTasks(courtList);
+            var civilFileDetailTasks = CivilFileDetailTasks(civilFileIds);
+            var criminalFileDetailTasks = CriminalFileDetailTasks(criminalFileIds);
 
             //Start appearances tasks.
-            var civilAppearanceTasks = CivilAppearancesTasks(proceeding, courtList);
-            var criminalAppearanceTasks = CriminalAppearancesTasks(proceeding, courtList);
+            var civilAppearanceTasks = CivilAppearancesTasks(proceeding, civilFileIds);
+            var criminalAppearanceTasks = CriminalAppearancesTasks(proceeding, criminalFileIds);
+
+            //Start file content tasks. 
+            var civilFileContentTasks = CivilFileContentTasks(civilFileIds);
 
             //Await our asynchronous requests.
             var civilFileDetails = (await civilFileDetailTasks.WhenAll()).ToList();
             var criminalFileDetails = (await criminalFileDetailTasks.WhenAll()).ToList();
             var civilAppearances = (await civilAppearanceTasks.WhenAll()).ToList();
             var criminalAppearances = (await criminalAppearanceTasks.WhenAll()).ToList();
+            var civilFileContents = (await civilFileContentTasks.WhenAll()).ToList();
+            var originalCourtList = await originalCourtListTask;
 
-            //Join court list + file details + appearances.
-            courtList.CivilCourtList = await PopulateCivilFiles(civilFileDetails, courtList.CivilCourtList, civilAppearances);
-            courtList.CriminalCourtList = await PopulateCriminalFiles(criminalFileDetails, courtList.CriminalCourtList, criminalAppearances);
+            var courtList = _mapper.Map<Models.CourtList.CourtList>(originalCourtList);
 
+            courtList.CivilCourtList = await PopulateCivilCourtListFromFileDetails(courtList.CivilCourtList, civilFileDetails);
+            courtList.CriminalCourtList = await PopulateCriminalCourtListFromFileDetails(courtList.CriminalCourtList, criminalFileDetails);
+
+            courtList.CivilCourtList = await PopulateCivilCourtListFromAppearances(courtList.CivilCourtList, civilAppearances);
+            courtList.CriminalCourtList = await PopulateCriminalCourtListFromAppearances(courtList.CriminalCourtList, criminalAppearances);
+            
+            courtList.CivilCourtList = PopulateCivilCourtListFromCourtCalendarDetails(courtList.CivilCourtList, civilCourtCalendarAppearances);
+            courtList.CriminalCourtList = PopulateCriminalCourtListFromCourtCalendarDetails(courtList.CriminalCourtList, criminalCourtCalendarAppearances);
+
+            courtList.CivilCourtList = PopulateCivilCourtListFromFileContent(courtList.CivilCourtList, civilFileContents);
             return courtList;
         }
 
         #region Helpers
 
-        private List<Task<CivilFileAppearancesResponse>> CivilAppearancesTasks(DateTime? proceeding, Models.CourtList.CourtList courtList)
+        #region Fetching Methods
+
+        #region Civil
+        private List<Task<CivilFileDetailResponse>> CivilFileDetailTasks(List<string> fileIds)
+        {
+            var fileDetailTasks = new List<Task<CivilFileDetailResponse>>();
+            foreach (var fileId in fileIds)
+            {
+                async Task<CivilFileDetailResponse> FileDetails() => await _filesClient.FilesCivilFileIdAsync(_requestAgencyIdentifierId, _requestPartId, fileId);
+                fileDetailTasks.Add(_cache.GetOrAddAsync($"CivilFileDetail-{fileId}", FileDetails));
+            }
+
+            return fileDetailTasks;
+        }
+
+        private List<Task<CivilFileAppearancesResponse>> CivilAppearancesTasks(DateTime? proceeding, List<string> fileIds)
         {
             var targetDateInPast = DateTime.Now > proceeding;
             var lookForPastAppearances = targetDateInPast ? HistoryYN2.Y : HistoryYN2.N;
             var lookForFutureAppearances = targetDateInPast ? FutureYN2.N : FutureYN2.Y;
 
             var appearanceTasks = new List<Task<CivilFileAppearancesResponse>>();
-            foreach (var fileId in courtList.CivilCourtList.Select(ccl => ccl.PhysicalFile.PhysicalFileID))
+            foreach (var fileId in fileIds)
             {
                 async Task<CivilFileAppearancesResponse> Appearances() => await _filesClient.FilesCivilFileIdAppearancesAsync(_requestAgencyIdentifierId, _requestPartId, lookForFutureAppearances,
                     lookForPastAppearances, fileId);
-                appearanceTasks.Add(_cache.GetOrAddAsync($"CivilAppearances-{fileId}", Appearances));
+                appearanceTasks.Add(_cache.GetOrAddAsync($"CivilAppearances-{fileId}-InPast-{targetDateInPast}", Appearances));
             }
 
             return appearanceTasks;
         }
 
-        private List<Task<CriminalFileAppearancesResponse>> CriminalAppearancesTasks(DateTime? proceeding, Models.CourtList.CourtList courtList)
+        private List<Task<CivilFileContent>> CivilFileContentTasks(List<string> fileIds)
         {
-            var targetDateInPast = DateTime.Now > proceeding;
-            var lookForPastAppearances = targetDateInPast ? HistoryYN.Y : HistoryYN.N;
-            var lookForFutureAppearances = targetDateInPast ? FutureYN.N : FutureYN.Y;
-
-            var appearanceTasks = new List<Task<CriminalFileAppearancesResponse>>();
-            foreach (var fileId in courtList.CriminalCourtList.Select(ccl => ccl.FileInformation.MdocJustinNo))
+            var fileContentTasks = new List<Task<CivilFileContent>>();
+            foreach (var fileId in fileIds)
             {
-                async Task<CriminalFileAppearancesResponse> Appearances() => await _filesClient.FilesCriminalFileIdAppearancesAsync(
-                    _requestAgencyIdentifierId, _requestPartId, lookForFutureAppearances,
-                    lookForPastAppearances, fileId);
-                appearanceTasks.Add(_cache.GetOrAddAsync($"CriminalAppearances-{fileId}", Appearances));
+                async Task<CivilFileContent> FileContent() =>
+                    await _filesClient.FilesCivilFilecontentAsync(null, null, null, null, fileId);
+                fileContentTasks.Add(_cache.GetOrAddAsync($"CivilFileContent-{fileId}", FileContent));
             }
 
-            return appearanceTasks;
+            return fileContentTasks;
         }
+        #endregion Civil
 
-        private List<Task<CriminalFileDetailResponse>> CriminalFileDetailTasks(Models.CourtList.CourtList courtList)
+        #region Criminal 
+        private List<Task<CriminalFileDetailResponse>> CriminalFileDetailTasks(List<string> fileIds)
         {
             var fileDetailTasks = new List<Task<CriminalFileDetailResponse>>();
-            foreach (var fileId in courtList.CriminalCourtList.Select(ccl => ccl.FileInformation.MdocJustinNo))
+            foreach (var fileId in fileIds)
             {
                 async Task<CriminalFileDetailResponse> FileDetails() =>
                     await _filesClient.FilesCriminalFileIdAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode,
@@ -132,31 +175,54 @@ namespace Scv.Api.Services
             return fileDetailTasks;
         }
 
-        private List<Task<CivilFileDetailResponse>> CivilFileDetailTasks(Models.CourtList.CourtList courtList)
+        private List<Task<CriminalFileAppearancesResponse>> CriminalAppearancesTasks(DateTime? proceeding, List<string> fileIds)
         {
-            var fileDetailTasks = new List<Task<CivilFileDetailResponse>>();
-            foreach (var fileId in courtList.CivilCourtList.Select(ccl => ccl.PhysicalFile.PhysicalFileID))
+            var targetDateInPast = DateTime.Now > proceeding;
+            var lookForPastAppearances = targetDateInPast ? HistoryYN.Y : HistoryYN.N;
+            var lookForFutureAppearances = targetDateInPast ? FutureYN.N : FutureYN.Y;
+
+            var appearanceTasks = new List<Task<CriminalFileAppearancesResponse>>();
+            foreach (var fileId in fileIds)
             {
-                async Task<CivilFileDetailResponse> FileDetails() => await _filesClient.FilesCivilFileIdAsync(_requestAgencyIdentifierId, _requestPartId, fileId);
-                fileDetailTasks.Add(_cache.GetOrAddAsync($"CivilFileDetail-{fileId}", FileDetails));
+                async Task<CriminalFileAppearancesResponse> Appearances() => await _filesClient.FilesCriminalFileIdAppearancesAsync(
+                    _requestAgencyIdentifierId, _requestPartId, lookForFutureAppearances,
+                    lookForPastAppearances, fileId);
+                appearanceTasks.Add(_cache.GetOrAddAsync($"CriminalAppearances-{fileId}-InPast-{targetDateInPast}", Appearances));
             }
 
-            return fileDetailTasks;
+            return appearanceTasks;
         }
+        #endregion Criminal
 
-        private async Task<ICollection<CivilCourtList>> PopulateCivilFiles(List<CivilFileDetailResponse> civilFileDetails, ICollection<CivilCourtList> courtList, ICollection<CivilFileAppearancesResponse> civilAppearances)
+        #endregion Fetching Methods
+
+        #region Populating Methods
+
+        #region Civil
+        private async Task<ICollection<CivilCourtList>> PopulateCivilCourtListFromFileDetails(ICollection<CivilCourtList> courtList, ICollection<CivilFileDetailResponse> fileDetails)
         {
             foreach (var courtListFile in courtList)
             {
-                var fileDetail = civilFileDetails.FirstOrDefault(x => x.PhysicalFileId == courtListFile.PhysicalFile.PhysicalFileID);
+                var fileId = courtListFile.PhysicalFile.PhysicalFileID;
+                var fileDetail = fileDetails.FirstOrDefault(x => x.PhysicalFileId == fileId);
                 courtListFile.ActivityClassCd = await _lookupService.GetActivityClassCdLong(fileDetail?.CourtClassCd.ToString());
                 courtListFile.ActivityClassDesc = await _lookupService.GetActivityClassCdShort(fileDetail?.CourtClassCd.ToString());
+                courtListFile.CommentToJudgeText = fileDetail?.CommentToJudgeTxt;
+                courtListFile.TrialRemarkTxt = fileDetail?.TrialRemarkTxt;
 
                 foreach (var hearingRestriction in courtListFile.HearingRestriction)
                 {
                     hearingRestriction.HearingRestrictionTypeDesc = await _lookupService.GetHearingRestrictionDescription(hearingRestriction.HearingRestrictiontype);
                 }
+                courtListFile.Document = PopulateCivilDocuments(courtListFile.Document);
+            }
 
+            return courtList;
+        }
+        private async Task<ICollection<CivilCourtList>> PopulateCivilCourtListFromAppearances(ICollection<CivilCourtList> courtList, ICollection<CivilFileAppearancesResponse> civilAppearances)
+        {
+            foreach (var courtListFile in courtList)
+            {
                 var targetAppearanceResponse = civilAppearances.FirstOrDefault(ca => ca.ApprDetail.Any(ad => ad.AppearanceId == courtListFile.AppearanceId));
                 var targetAppearance = targetAppearanceResponse?.ApprDetail.FirstOrDefault(ad => ad.AppearanceId == courtListFile.AppearanceId);
                 if (targetAppearance != null)
@@ -164,6 +230,8 @@ namespace Scv.Api.Services
                     courtListFile.AppearanceReasonCd = targetAppearance?.AppearanceReasonCd;
                     courtListFile.AppearanceReasonDesc =
                         await _lookupService.GetCivilAppearanceReasonsDescription(targetAppearance?.AppearanceReasonCd);
+
+                    courtListFile.AppearanceStatusCd = targetAppearance?.AppearanceStatusCd.ToString();
                     courtListFile.OutOfTownJudge = targetAppearance.OutOfTownJudgeTxt;
                     courtListFile.SecurityRestriction = targetAppearance.SecurityRestrictionTxt;
                     courtListFile.SupplementalEquipment = targetAppearance.SupplementalEquipmentTxt;
@@ -171,34 +239,98 @@ namespace Scv.Api.Services
                     courtListFile.EstimatedTimeHour = targetAppearance.EstimatedTimeHour?.ReturnNullIfEmpty();
                     courtListFile.EstimatedTimeMin = targetAppearance.EstimatedTimeMin?.ReturnNullIfEmpty();
                 }
-
-                courtListFile.Document = PopulateCivilDocuments(courtListFile.Document);
             }
 
             return courtList;
         }
 
-        private async Task<ICollection<CriminalCourtList>> PopulateCriminalFiles(List<CriminalFileDetailResponse> criminalFileDetails, ICollection<CriminalCourtList> courtList, ICollection<CriminalFileAppearancesResponse> criminalAppearances)
+
+        private ICollection<CivilClDocument> PopulateCivilDocuments(ICollection<CivilClDocument> documents)
+        {
+            foreach (var document in documents)
+            {
+                document.Category = _lookupService.GetDocumentCategory(document.DocumentTypeCd);
+            }
+            return documents;
+        }
+
+        private ICollection<CivilCourtList> PopulateCivilCourtListFromFileContent(ICollection<CivilCourtList> courtList,
+            ICollection<CivilFileContent> fileContents)
         {
             foreach (var courtListFile in courtList)
             {
-                var fileDetail = criminalFileDetails.FirstOrDefault(x => x.JustinNo == courtListFile.FileInformation.MdocJustinNo);
+                var fileId = courtListFile.PhysicalFile.PhysicalFileID;
+                var civilFile = fileContents.FirstOrDefault(fc => fc.PhysicalFileId == fileId)?.CivilFile
+                    .FirstOrDefault(cf => cf.PhysicalFileID == fileId);
+
+                //This doesn't map correctly. the WSDL states CFCSAFileYN, but the server returns cfcsafileYN.
+                if (civilFile != null && civilFile.AdditionalProperties.ContainsKey("cfcsafileYN") && civilFile.AdditionalProperties["cfcsafileYN"] != null)
+                {
+                    courtListFile.CfcsaFile = civilFile.AdditionalProperties["cfcsafileYN"].Equals("Y");
+                }
+
+                courtListFile.FileCommentText = civilFile?.FileCommentText;
+            }
+
+            return courtList;
+        }
+
+        private ICollection<CivilCourtList> PopulateCivilCourtListFromCourtCalendarDetails(ICollection<CivilCourtList> courtList,
+            ICollection<CourtCalendarDetailAppearance> courtCalendarDetailAppearances)
+        {
+            foreach (var courtListFile in courtList)
+            {
+                var courtCalendarDetailAppearance = courtCalendarDetailAppearances.FirstOrDefault(cda => cda.AppearanceId == courtListFile.AppearanceId);
+                courtListFile.Video = courtCalendarDetailAppearance?.VideoYn == CourtCalendarDetailAppearanceVideoYn.Y;
+                courtListFile.RemoteVideo = courtCalendarDetailAppearance?.RemoteVideoYn == CourtCalendarDetailAppearanceRemoteVideoYn.Y;
+            }
+
+            return courtList;
+        }
+        #endregion
+
+        #region Criminal
+
+        private async Task<ICollection<CriminalCourtList>> PopulateCriminalCourtListFromFileDetails(ICollection<CriminalCourtList> courtList,
+        ICollection<CriminalFileDetailResponse> fileDetails)
+        {
+            foreach (var courtListFile in courtList)
+            {
+                var fileDetail = fileDetails.FirstOrDefault(x => x.JustinNo == courtListFile.FileInformation.MdocJustinNo);
                 courtListFile.ActivityClassCd = await _lookupService.GetActivityClassCdLong(fileDetail?.CourtClassCd.ToString());
                 courtListFile.ActivityClassDesc = await _lookupService.GetActivityClassCdShort(fileDetail?.CourtClassCd.ToString());
                 courtListFile.Crown = PopulateCrown(fileDetail);
-            
+                courtListFile.TrialRemark = fileDetail?.TrialRemark;
+                courtListFile.TrialRemarkTxt = fileDetail?.TrialRemarkTxt;
+                var participant = fileDetail?.Participant.FirstOrDefault(p => p.PartId == courtListFile.FileInformation.PartId);
+                if (participant != null)
+                {
+                    courtListFile.InCustody = participant.InCustodyYN.HasValue && participant.InCustodyYN == CriminalParticipantInCustodyYN.Y;
+                    courtListFile.Detained = participant.DetainedYN.HasValue && participant.DetainedYN == CriminalParticipantDetainedYN.Y;
+                }
+
                 foreach (var hearingRestriction in courtListFile.HearingRestriction)
                 {
                     hearingRestriction.HearingRestrictionTypeDesc = await _lookupService.GetHearingRestrictionDescription(hearingRestriction.HearingRestrictiontype);
                 }
+            }
 
-                var targetAppearanceResponse = criminalAppearances.FirstOrDefault(ca => ca.ApprDetail.Any(ad => ad.AppearanceId == courtListFile.CriminalAppearanceID));
-                var targetAppearance = targetAppearanceResponse?.ApprDetail.FirstOrDefault(ad => ad.AppearanceId == courtListFile.CriminalAppearanceID);
+            return courtList;
+        }
+
+        private async Task<ICollection<CriminalCourtList>> PopulateCriminalCourtListFromAppearances(ICollection<CriminalCourtList> courtList, ICollection<CriminalFileAppearancesResponse> criminalAppearances)
+        {
+            foreach (var courtListFile in courtList)
+            {
+                var targetAppearanceResponse = criminalAppearances.FirstOrDefault(ca =>
+                    ca.ApprDetail.Any(ad => ad.AppearanceId == courtListFile.CriminalAppearanceID));
+                var targetAppearance =
+                    targetAppearanceResponse?.ApprDetail.FirstOrDefault(ad => ad.AppearanceId == courtListFile.CriminalAppearanceID);
                 if (targetAppearance != null)
                 {
                     courtListFile.AppearanceReasonCd = targetAppearance?.AppearanceReasonCd;
-                    courtListFile.AppearanceReasonDesc =
-                        await _lookupService.GetCriminalAppearanceReasonsDescription(targetAppearance?.AppearanceReasonCd);
+                    courtListFile.AppearanceReasonDesc = await _lookupService.GetCriminalAppearanceReasonsDescription(targetAppearance?.AppearanceReasonCd);
+                    courtListFile.AppearanceStatusCd = targetAppearance?.AppearanceStatusCd.ToString();
                     courtListFile.OutOfTownJudge = targetAppearance.OutOfTownJudgeTxt;
                     courtListFile.SecurityRestriction = targetAppearance.SecurityRestrictionTxt;
                     courtListFile.SupplementalEquipment = targetAppearance.SupplementalEquipmentTxt;
@@ -227,14 +359,24 @@ namespace Scv.Api.Services
             return crown;
         }
 
-        private ICollection<CivilClDocument> PopulateCivilDocuments(ICollection<CivilClDocument> documents)
+        private ICollection<CriminalCourtList> PopulateCriminalCourtListFromCourtCalendarDetails(ICollection<CriminalCourtList> courtList,
+            ICollection<CourtCalendarDetailAppearance> courtCalendarDetailAppearances)
         {
-            foreach (var document in documents)
+            foreach (var courtListFile in courtList)
             {
-                document.Category = _lookupService.GetDocumentCategory(document.DocumentTypeCd);
+                var courtCalendarDetailAppearance = courtCalendarDetailAppearances.FirstOrDefault(cda => cda.ApprId == courtListFile.CriminalAppearanceID);
+                courtListFile.Video = courtCalendarDetailAppearance?.VideoYn == CourtCalendarDetailAppearanceVideoYn.Y;
+                courtListFile.RemoteVideo = courtCalendarDetailAppearance?.RemoteVideoYn == CourtCalendarDetailAppearanceRemoteVideoYn.Y;
+                courtListFile.CaseAgeDaysNumber = courtCalendarDetailAppearance?.CaseAgeDays;
+                courtListFile.AdjudicatorNm = courtCalendarDetailAppearance?.AdjudicatorNm;
             }
-            return documents;
+
+            return courtList;
         }
+
+        #endregion Criminal
+
+        #endregion Populating Methods
 
         #endregion Helpers
     }
