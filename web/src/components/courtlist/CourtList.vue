@@ -1,5 +1,5 @@
 <template>
-<body>
+<div>
     <b-card bg-variant="light" v-if= "!isLocationDataMounted && !isLocationDataReady">
         <b-overlay :show= "true"> 
             <b-card  style="min-height: 100px;"/>                   
@@ -38,7 +38,7 @@
                     variant="primary" 
                     class="ml-2 my-2 my-sm-0">
                         Jump to Next Day
-                        <b-icon icon="arrow-right-short"></b-icon>
+                        <b-icon icon="chevron-right"></b-icon>
                 </b-button>
             </b-navbar-nav>    
         </b-navbar>
@@ -46,7 +46,7 @@
         <b-row class = "mt-2 ml-2">
             <b-col md="4">          
                 <b-form-group>
-                    <label for="locationSelect">Location*</label>
+                    <label for="locationSelect">Location<span class="text-danger">*</span></label>
                     <b-form-select
                         v-model="selectedCourtLocation"
                         id="locationSelect"
@@ -59,7 +59,7 @@
                 </b-form-group>
             </b-col>
             <b-col md="3">
-                <label for="datepicker">Date* (YYYY-MM-DD)</label>
+                <label for="datepicker">Date<span class="text-danger">*</span> (YYYY-MM-DD)</label>
                
                 <b-input-group class="mb-3">
                     <b-form-input
@@ -85,7 +85,7 @@
             </b-col>
             <b-col md="2">
                 <b-form-group class = "mr-3"> 
-                    <label for="roomSelect">Room*</label>
+                    <label for="roomSelect">Room<span class="text-danger">*</span></label>
                     <b-form-select
                         v-if="syncFlag"
                         v-model="selectedCourtRoom"
@@ -116,23 +116,37 @@
         <b-card bg-variant="light" v-if= "searchingRequest">
             <b-card class="mb-2">
                 <b-navbar type="white" variant="white" style="height:40px;" >
-                    <b-nav-text class="text-primary mr-2 mt-2">               
+                    <b-navbar-nav>
+                    <b-nav-text class="text-primary mt-3">               
                         <h2>{{fullSelectedDate}}</h2>                
                     </b-nav-text>
 
-                    <b-nav-text class="text-muted ml-5 mt-2">               
-                        <h3>{{courtListLocation}}</h3>               
+                    <b-nav-text class="text-muted ml-4" style="padding-top:28px">               
+                        <h4>{{courtListLocation}}</h4>               
                     </b-nav-text>
-                    <b-nav-text class="text-muted ml-1" style="padding-top:18px">               
-                        <h4>({{courtListLocationID}})</h4>               
+                    <b-nav-text class="text-muted ml-1" style="padding-top:29px">               
+                        <h5>({{courtListLocationID}})</h5>               
                     </b-nav-text>
 
-                    <b-nav-text class=" ml-5 mt-2">               
-                        <h3> CourtRoom: </h3>                
+                    <b-nav-text class=" ml-4" style="padding-top:25px">               
+                        <h3> CourtRoom: {{courtListRoom}}</h3>                
                     </b-nav-text>            
-                    <b-nav-text class=" ml-1 mt-2 ">               
-                        <h3>{{courtListRoom}}</h3>                
-                    </b-nav-text>
+
+                    </b-navbar-nav>
+                    <b-navbar-nav class="ml-auto">
+                        
+                        <b-nav-text class=" mr-1" style="font-size:12px; line-height: 1.4;"> 
+                            <b-row class="text-primary"> 
+                                Total Cases (<b>{{totalCases}}</b>) 
+                                <span style="transform: translate(0,-1px);" class="border text-muted ml-3"> 
+                                    <b> {{totalTime}}</b> {{totalTimeUnit}} 
+                                </span>
+                            </b-row> 
+                            <b-row class="text-criminal"> Criminal (<b>{{criminalCases}}</b>) </b-row>
+                            <b-row class="text-family"> Family (<b>{{familyCases}}</b>) </b-row>
+                            <b-row class="text-civil"> Civil (<b>{{civilCases}}</b>) </b-row>
+                        </b-nav-text>
+                    </b-navbar-nav>
                 </b-navbar>
             </b-card>      
 
@@ -157,13 +171,14 @@
                     <criminal-list/>
                     <civil-list civilClass='family'/>
                     <civil-list civilClass='civil'/>
+                    <b-card class="mb-5"/>
                     
                 </b-row> 
             </b-card>
         </b-card> 
 
     </b-card>
-</body>
+</div>
 </template>
 
 
@@ -193,7 +208,7 @@ export default class CourtList extends Vue {
     @courtListState.Action
     public UpdateCourtList!: (newCourtListInformation: any) => void 
 
-    mounted () {                 
+    mounted () { 
         this.getListOfAvailableCourts();
     }
 
@@ -208,6 +223,7 @@ export default class CourtList extends Vue {
                     if(this.courtRoomsAndLocations.length>0)
                     {                    
                         this.isLocationDataReady = true;
+                        this.searchByRouterParams();                        
                     }
                 }
                 this.isLocationDataMounted = true;
@@ -219,23 +235,56 @@ export default class CourtList extends Vue {
         this.isDataReady = false;
         this.isMounted = false;
         this.searchingRequest = true;
-        //console.log('before call')
-        //console.log(this.searchingRequest)
+        this.totalCases = 0;
+        this.criminalCases = 0;
+        this.familyCases = 0;
+        this.civilCases = 0;
+        this.totalHours = 0;
+        this.totalMins = 0;
+        this.totalTime = '0' ;
+        this.totalTimeUnit = 'Hours';        
        
         this.$http.get('/api/courtlist/court-list?agencyId='+ this.courtListLocationID +'&roomCode='+ this.courtListRoom+'&proceeding=' +this.validSelectedDate)
             .then(Response => Response.json(), err => {this.errorCode= err.status;this.errorText= err.statusText;console.log(err);}        
             ).then(data => {
-                if(data){
+                if(data){                    
+                    this.courtListInformation.detailsData = data;
+                    this.totalCases = data.civilCourtList.length+data.criminalCourtList.length;
+                    this.criminalCases = data.criminalCourtList.length;                    
+                    for(const civil of data.civilCourtList)
+                    {
+                        if(civil.activityClassCd == 'F') this.familyCases++;else this.civilCases ++;
+                        this.setTotalTimeForRoom(civil.estimatedTimeHour,civil.estimatedTimeMin)
+                    }
 
-                   // console.log(data)
-                    this.courtListInformation.detailsData = data; 
-                    // this.participantJson = data.participant                
-                    this.UpdateCourtList(this.courtListInformation);               
-                    // this.ExtractFileInfo()
+                    for(const criminal of data.criminalCourtList)
+                    { 
+                        this.setTotalTimeForRoom(criminal.estimatedTimeHour,criminal.estimatedTimeMin)
+                    }
+
+                    this.UpdateCourtList(this.courtListInformation);              
+                    
                     if((data.civilCourtList.length>0) || (data.criminalCourtList.length>0))
                     {                    
-                        this.isDataReady = true;
+                        this.isDataReady = true;                        
                     }
+
+                    if(this.totalMins>0 && this.totalHours>0)
+                    {
+                         this.totalTime = (this.totalHours + (this.totalMins)/60).toFixed(1)
+                         this.totalTimeUnit = 'Hours';
+                    }
+                    else if(this.totalMins>0 && this.totalHours==0)
+                    {
+                        this.totalTime = (this.totalMins).toString() ;
+                        this.totalTimeUnit = 'Mins';
+                    }
+                    else
+                    {
+                        this.totalTime = (this.totalHours).toString() ;
+                        this.totalTimeUnit = 'Hours';
+                    }
+                    
                 }
                 this.isMounted = true;
                 this.searchAllowed = true;
@@ -253,9 +302,20 @@ export default class CourtList extends Vue {
     searchAllowed = true;
     syncFlag = true
 
+    totalCases = 0;
+    criminalCases = 0;
+    familyCases = 0;
+    civilCases = 0;
+
+    totalHours =0;
+    totalMins =0;
+    totalTime = '';
+    totalTimeUnit = 'Hours';
 
     courtRoomsAndLocationsJson;
-    courtRoomsAndLocations: any[] = [];
+    courtRoomsAndLocations= [
+        {text:'', value:{}}
+    ]
 
     selectedDate = (new Date).toISOString().substring(0,10);
     validSelectedDate = this.selectedDate;
@@ -278,7 +338,7 @@ export default class CourtList extends Vue {
         {            
             if(jroomAndLocation.courtRooms.length>0)
             {
-                const locationInfo = {};
+                const locationInfo = {text:'', value:{}};
                 locationInfo["text"]= jroomAndLocation.name + ' (' +jroomAndLocation.locationId+')';             
                         
                 const rooms: any[] = [];         
@@ -295,27 +355,95 @@ export default class CourtList extends Vue {
                     "LocationID": jroomAndLocation.locationId,
                     "Rooms" : rooms
                 };
-
-               // console.log(locationInfo)
                 this.courtRoomsAndLocations.push(locationInfo);
+                //console.log(locationInfo)
             }                
         }
         this.courtRoomsAndLocations =  _.sortBy(this.courtRoomsAndLocations, 'text')
-        this.selectedCourtLocation = this.courtRoomsAndLocations[0].value;       
-        //console.log(this.courtRoomsAndLocations)
+        this.selectedCourtLocation = this.courtRoomsAndLocations[0].value; 
+    }
+
+    public getCourtNameById(locationId) 
+    {        
+        return this.courtRoomsAndLocations.filter(location => {                
+            if (location.value['LocationID'] == locationId) 
+                return true;
+            else 
+                return false;
+            
+        });
+    }
+
+    public getRoomInLocationByRoomNo(location, roomNo)
+    {
+        return location.value['Rooms'].filter(room=>{
+            if(room.value==roomNo)
+                return true;
+            else 
+                return false;
+        })
+    }
+
+    public searchByRouterParams()
+    {
+        //http://localhost:8080/court-list/location/4801/room/101/date/2020-06-15
+
+        if (this.$route.params.location && this.$route.params.room && this.$route.params.date) 
+        {
+            const location = this.getCourtNameById(this.$route.params.location)[0];
+            //console.log(location)
+            if(location)
+            {
+                this.selectedCourtLocation = location.value;
+                this.selectedCourtLocationState=true;
+                this.selectedDate = this.$route.params.date;
+                const room = this.getRoomInLocationByRoomNo(location, this.$route.params.room)[0];
+                //console.log(room)
+                if(room)
+                {
+                    this.selectedCourtRoom= room.value;
+                    this.selectedCourtRoomState = true;
+                    setTimeout(() => { this.searchForCourtList();}, 500);                   
+                }
+                else
+                {
+                    this.selectedCourtRoom= 'null';
+                    this.selectedCourtRoomState = false;
+                    this.searchAllowed = true;                    
+                }
+            }
+            else
+            {
+                this.selectedCourtLocation = this.courtRoomsAndLocations[0].value;
+                this.selectedCourtLocationState=false;
+                this.searchAllowed = true;
+            }
+            
+
+            // this.courtListRoom = this.$route.params.room;
+            // this.validSelectedDate = this.$route.params.date;                    
+
+            // console.log(this.getCourtNameById(this.courtListLocationID)[0].value)
+        
+            // this.selectedCourtLocation = 
+            // console.log(this.selectedCourtLocation);
+            // this.selectedDate = this.validSelectedDate;
+            // this.selectedCourtRoom = this.courtListRoom;                            
+            // console.log(this.selectedCourtRoom)
+            // setTimeout(() => { this.searchForCourtList();}, 500);
+            
+        } 
     }
 
     public onCalenderContext(datePicked) {
-        
-        //console.log(datePicked.selectedFormatted)        
-        //console.log(datePicked.selectedYMD)
+       
         this.searchingRequest = false
         
         if(datePicked.selectedYMD)
         {
+            //console.log(datePicked)
             this.validSelectedDate = datePicked.selectedYMD
             this.fullSelectedDate = datePicked.selectedFormatted
-            //console.log('Date OK')
         } 
     }
 
@@ -327,15 +455,13 @@ export default class CourtList extends Vue {
             const date=new Date(this.selectedDate)
             date.setDate(date.getDate() - 1)
             this.selectedDate = date.toISOString().substring(0,10)
-            //console.log( this.selectedDate)
-            // console.log('pre day')
-            //console.log(this.searchingRequest)
+            
             setTimeout(() => { this.searchForCourtList(); }, 500);
         }
     }
 
     public JumpToNextDay()
-    {
+    {        
         if(!this.checkDateInValid())
         {
             this.searchAllowed = false;   
@@ -392,7 +518,8 @@ export default class CourtList extends Vue {
 
     public searchForCourtList()
     {        
-        if(this.selectedCourtLocation ==null)
+        //console.log(this.selectedCourtLocation.Location)
+        if(!this.selectedCourtLocation.Location)
         {
             //console.log(this.selectedCourtLocation)
             this.selectedCourtLocationState=false;
@@ -423,9 +550,21 @@ export default class CourtList extends Vue {
                     //console.log(this.selectedCourtRoom) 
                     this.courtListRoom = this.selectedCourtRoom;
                     // console.log('search')
+
+                    if( this.$route.params.location != this.courtListLocationID ||
+                        this.$route.params.room != this.courtListRoom ||
+                        this.$route.params.date != this.validSelectedDate)
+                    {
+                        this.$route.params.location = this.courtListLocationID;                    
+                        this.$route.params.room = this.courtListRoom;
+                        this.$route.params.date = this.validSelectedDate;
+                        this.$router.push({name:'CourtListResult'})
+                    }
+
                     //console.log(this.searchingRequest)
-                    this.searchAllowed = false;   
-                    this.getCourtListDetails();
+                    this.searchAllowed = false; 
+                    setTimeout(() => { this.getCourtListDetails();}, 50);  
+                    
                 }
             }
         }
@@ -446,8 +585,17 @@ export default class CourtList extends Vue {
         this.selectedCourtRoomState=true;        
     }
 
-}
+    public setTotalTimeForRoom(hrs,mins)
+    {
+        if(!mins) mins ='0';
+        if(!hrs) hrs ='0';
+        this.totalMins += parseInt(mins);        
+        this.totalHours += (Math.floor(this.totalMins/60) +parseInt(hrs));
+        this.totalMins %= 60;
+    }
 
+}
+ 
 </script>
 
 <style scoped>

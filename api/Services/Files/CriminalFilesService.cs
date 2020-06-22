@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using JCCommon.Clients.FileServices;
+﻿using JCCommon.Clients.FileServices;
 using JCCommon.Models;
 using LazyCache;
 using MapsterMapper;
@@ -14,6 +10,10 @@ using Scv.Api.Helpers.Extensions;
 using Scv.Api.Models.Criminal.AppearanceDetail;
 using Scv.Api.Models.Criminal.Appearances;
 using Scv.Api.Models.Criminal.Detail;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using CriminalAppearanceDetail = Scv.Api.Models.Criminal.AppearanceDetail.CriminalAppearanceDetail;
 using CriminalAppearanceMethod = Scv.Api.Models.Criminal.AppearanceDetail.CriminalAppearanceMethod;
 using CriminalParticipant = Scv.Api.Models.Criminal.Detail.CriminalParticipant;
@@ -156,7 +156,8 @@ namespace Scv.Api.Services.Files
                 Prosecutor = await PopulateAppearanceDetailProsecutor(appearanceFromAccused, attendanceMethods, appearanceMethods.AppearanceMethod),
                 Adjudicator = await PopulateAppearanceDetailAdjudicator(appearanceFromAccused, attendanceMethods, appearanceMethods.AppearanceMethod),
                 JustinCounsel = await PopulateAppearanceDetailJustinCounsel(criminalParticipant, appearanceFromAccused, attendanceMethods, appearanceMethods.AppearanceMethod),
-                Charges = await PopulateCharges(appearanceCount.ApprCount)
+                Charges = await PopulateCharges(appearanceCount.ApprCount),
+                InitiatingDocuments = GetInitiatingDocumentsImageIds(accusedFile.Document)
             };
             return appearanceDetail;
         }
@@ -166,6 +167,13 @@ namespace Scv.Api.Services.Files
         #region Helpers
 
         #region Criminal Details
+
+        //Couldn't find any data for this in DEV, or TEST. 
+        private List<string> GetInitiatingDocumentsImageIds(ICollection<CfcDocument> documents)
+        {
+            return documents?.Where(doc => doc?.DocmClassification == "Initiating" && !string.IsNullOrEmpty(doc.ImageId))
+                .Select(a => a.ImageId).ToList();
+        }
 
         private async Task<CriminalFileAppearances> PopulateDetailsAppearancesAsync(string fileId, FutureYN? future, HistoryYN? history)
         {

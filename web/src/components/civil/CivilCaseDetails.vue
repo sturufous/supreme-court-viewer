@@ -1,5 +1,5 @@
 <template>
-<body> 
+<div style="overflow:hidden"> 
     <b-card bg-variant="light" v-if= "!isMounted && !isDataReady">
         <b-overlay :show= "true"> 
             <b-card  style="min-height: 100px;"/>                   
@@ -14,9 +14,9 @@
 
     <b-card bg-variant="light" v-if= "isMounted && !isDataReady">
         <b-card  style="min-height: 100px;">
-            <span v-if="errorCode==404">This <b>File-Number '{{this.civilFileInformation.fileNumber}}'</b> doesn't exist in the <b>civil</b> records.</span>
-            <span v-if="errorCode>405"> Server doesn't respond. <b>({{errorText}})</b> </span>
-            <span v-if="errorCode==200"> Bad Data.</span>
+            <span v-if="errorCode==404">This <b>File-Number '{{this.civilFileInformation.fileNumber}}'</b> doesn't exist in the <b>civil</b> records.</span>            
+            <span v-else-if="errorCode==200 || errorCode==204"> Bad Data in <b>File-Number '{{this.civilFileInformation.fileNumber}}'</b>.</span>
+            <span v-else> Server is not responding. <b>({{errorText}})</b> </span>
         </b-card>
         <b-card>         
             <b-button variant="info" @click="navigateToLandingPage">Back to the Landing Page</b-button>
@@ -46,7 +46,7 @@
             </b-col>
         </b-row>
     </b-card>
-</body>
+</div>
 </template>
 
 <script lang="ts">
@@ -118,6 +118,7 @@ export default class CivilCaseDetails extends Vue {
 
     public getFileDetails(): void {
        
+        this.errorCode=0
         this.$http.get('/api/files/civil/'+ this.civilFileInformation.fileNumber)
             .then(Response => Response.json(), err => {this.errorCode= err.status;this.errorText= err.statusText;console.log(err);}        
             ).then(data => {
@@ -134,7 +135,11 @@ export default class CivilCaseDetails extends Vue {
                         this.UpdateCivilFile(this.civilFileInformation);                    
                         this.isDataReady = true;
                     }
+                    else
+                        this.errorCode=200;                    
                 }
+                else
+                    if(this.errorCode==0) this.errorCode=200;
                 this.isMounted = true;
                        
             });

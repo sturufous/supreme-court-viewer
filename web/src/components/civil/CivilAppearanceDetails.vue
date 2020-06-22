@@ -18,17 +18,18 @@
             <b-col md="8" cols="8" style="overflow: auto;">
                 <b-overlay :show="loadingPdf" rounded="sm">
                     <div>                        
-                        <b-button-group><h3 class="mx-2 mt-2 font-weight-normal" style="height: 10px;"> Document Summary</h3> 
-                           <b-button                                     
-                                    variant="outline-primary text-info" 
-                                    style="border:0px;"
-                                    class="mt-1"
-                                    v-b-tooltip.hover.right
-                                    title="Download Court Summary"
-                                    @click="openCourtSummaryPdf(appearanceInfo.appearanceId)"
-                                    size="sm">
-                                    <b-icon icon="file-earmark-arrow-down"></b-icon>
-                           </b-button>
+                        <b-button-group>
+                            <h3 class="mx-2 mt-2 font-weight-normal" style="height: 10px;"> Document Summary</h3> 
+                            <b-button                                     
+                                variant="outline-primary text-info" 
+                                style="transform:translate(0,5px);border:0px;"
+                                class="mt-0"
+                                v-b-tooltip.hover.right                                
+                                title="Download Court Summary"
+                                @click="openCourtSummaryPdf(appearanceInfo.appearanceId)"
+                                size="sm">                                        
+                                <b-icon icon="file-earmark-arrow-down" font-scale="2"></b-icon>
+                            </b-button>
                         </b-button-group>                        
                         <hr class="mb-0 bg-light" style="height: 5px;"/> 
                     </div>
@@ -45,8 +46,9 @@
                         responsive="sm"
                         >
                             <template v-slot:head(Result)>
-                                <b>Result</b><b style="margin-left: 10px">Issues</b>
-                            </template>   
+                                <b>Result</b><b style="margin-left: 20px">Issues</b>
+                            </template>
+
                             <template v-slot:[`cell(${documentFields[1].key})`]="data" >
                                 <b-button 
                                     v-if="data.item.PdfAvail" 
@@ -86,24 +88,28 @@
                                 <b-table
                                     :items="data.item.Issues"
                                     :fields="issueFields"
+                                    borderless 
                                     thead-class="d-none"
-                                    :striped="stripedStyle"
-                                    borderless
                                     small               
                                     responsive="sm">
-                                    <template v-slot:cell(Issue)="data" >                               
-                                        <li :style="data.field.cellStyle">
-                                            {{ data.item.Issue }}
+
+                                    <template v-slot:table-colgroup>
+                                        <col style=" width: 70px ">
+                                    </template>
+                                    
+                                    <template v-slot:cell(Issue)="dataR" >
+                                        <li :style="dataR.field.cellStyle">                                        
+                                            {{ dataR.value }}
                                         </li>
                                     </template>
-                                    <template v-slot:cell(Result)="data" >
-                                        <span :style="data.field.cellStyle">                               
+                                    <template v-slot:cell(Result)="dataR" >
+                                        <span :style="dataR.field.cellStyle">
                                             <b-badge
-                                                v-if="data.value"                                     
+                                                v-if="dataR.value"                                     
                                                 variant="secondary"
                                                 v-b-tooltip.hover.left
-                                                :title="data.item['ResultDsc']">
-                                                    {{data.value}}                                 
+                                                :title="dataR.item['ResultDsc']">
+                                                    {{dataR.value}}                               
                                             </b-badge>
                                         </span>
                                     </template>
@@ -121,7 +127,8 @@
             </b-col>
             <b-col col md="4" cols="4" style="overflow: auto;">
                 <div>
-                    <b-button-group><h3 class="mx-2 mt-2 font-weight-normal" style="height: 10px;"> Additional Info</h3>
+                    <b-button-group>
+                        <h3 class="mx-2 font-weight-normal" style="margin-top:8px; height:10px"> Additional Info</h3>
                         <b-button 
                             size="sm"
                             style=" font-size:12px; border:0px;" 
@@ -131,12 +138,16 @@
                             class="mt-1"
                             v-b-tooltip.hover.right
                             title="Adjudicator Comment">
-                            <b-icon icon="chat-square-fill"></b-icon>                                
+                            <b-icon icon="chat-square-fill" font-scale="2"></b-icon>                                
                         </b-button>
                     </b-button-group>
                     <hr class="mb-0 bg-light" style="height: 5px;"/> 
-                </div>                           
+                </div>
+                <b-card v-if="!(appearanceAdditionalInfo.length>0)" style="border: white;">
+                    <span class="text-muted"> No additional information. </span>
+                </b-card>                           
                 <b-table
+                    v-if="appearanceAdditionalInfo.length> 0"
                     :items="appearanceAdditionalInfo"
                     :fields="addInfoFields"
                     thead-class="d-none"               
@@ -231,7 +242,7 @@
       </b-card>  
     </b-card>
 
-    <b-modal v-model="showAdjudicatorComment" id="bv-modal-comment" hide-footer>
+    <b-modal v-if= "isMounted" v-model="showAdjudicatorComment" id="bv-modal-comment" hide-footer>
         <template v-slot:modal-title>
                 <h2 class="mb-0"> Adjudicator Comment </h2>
         </template>
@@ -272,7 +283,7 @@ export default class CivilAppearanceDetails extends Vue {
     appearanceMethods: any[] = [];
     /* eslint-enable */
     
-    loadingPdf = false;  
+    loadingPdf = false; 
     isMounted = false;
     isDataReady = false;
     stripedStyle = false;
@@ -286,11 +297,11 @@ export default class CivilAppearanceDetails extends Vue {
         {key:'key',    sortable:false},
         {key:'value',  sortable:false},
     ];   
-
+   
     issueFields =
     [
-        {key:'Result',        sortable:false,  tdClass: '', cellClass:'badge badge-dark mt-2', cellStyle: 'display: block; margin-top: 1px; font-size: 14px; width: 60px;'},
-        {key:'Issue',         sortable:false,  tdClass: '', cellClass:'text',                  cellStyle: 'font-weight: normal; font-size: 14px; padding-top:6px; line-height: 100%;'}
+        {key:'Result',  sortable:false,  cellStyle: 'display: block; font-size: 14px;'},
+        {key:'Issue',   sortable:false,  cellStyle: 'font-weight: normal; font-size: 14px; padding-top:4px; line-height: 120%;'}
     ]
 
     documentFields =  
@@ -324,29 +335,30 @@ export default class CivilAppearanceDetails extends Vue {
     }
 
     public getAppearanceDetails(): void {      
-    
-        this.$http.get('/api/files/civil/'+ this.additionalInfo["File Number"]+'/appearance-detail/'+this.additionalInfo["Appearance ID"])
-            .then(Response => Response.json(), err => {console.log(err);} )        
+            
+        this.$http.get('/api/files/civil/'+ this.appearanceInfo.fileNo +'/appearance-detail/'+this.appearanceInfo.appearanceId)
+            .then(Response => Response.json(), err => {console.log(err);window.alert("bad data!");} )        
             .then(data => {
                 if(data){ 
                     this.appearanceDetailsJson = data;              
                     this.ExtractAppearanceDetailsInfo();
+                }
+                else{
+                    window.alert("bad data!");
                 }
                 this.isMounted = true;                       
             }); 
     }    
     
     public getAdditionalInfo()
-    {
-        this.additionalInfo["Supplemental Equipment"] = this.appearanceInfo.supplementalEquipmentTxt;
-        this.additionalInfo["Security Restriction"] = this.appearanceInfo.securityRestrictionTxt;
-        this.additionalInfo["Out-Of-Town Judge"] =  this.appearanceInfo.outOfTownJudgeTxt;
+    {   
+        this.additionalInfo["Supplemental Equipment"] = this.appearanceInfo.supplementalEquipmentTxt? this.appearanceInfo.supplementalEquipmentTxt: '';
+        this.additionalInfo["Security Restriction"] = this.appearanceInfo.securityRestrictionTxt? this.appearanceInfo.securityRestrictionTxt: '';
+        this.additionalInfo["Out-Of-Town Judge"] =  this.appearanceInfo.outOfTownJudgeTxt? this.appearanceInfo.outOfTownJudgeTxt: '';
 
         for(const info in this.additionalInfo)
-            this.appearanceAdditionalInfo.push({'key':info,'value':this.additionalInfo[info]});
-
-        this.additionalInfo["File Number"] = this.appearanceInfo.fileNo; 
-        this.additionalInfo["Appearance ID"] = this.appearanceInfo.appearanceId;                  
+            if(this.additionalInfo[info].length>0)
+            this.appearanceAdditionalInfo.push({'key':info,'value':this.additionalInfo[info]});                      
     }
 
     public ExtractAppearanceDetailsInfo()
@@ -474,7 +486,7 @@ export default class CivilAppearanceDetails extends Vue {
         if(document.item.DocTypeCd != "CSR") {
             this.openDocumentsPdf(document.item['ID']);
         } else if (document.item.DocTypeCd == "CSR") {
-            this.openCourtSummaryPdf(this.additionalInfo["Appearance ID"]);
+            this.openCourtSummaryPdf(this.appearanceInfo.appearanceId);
         }
     }
 
