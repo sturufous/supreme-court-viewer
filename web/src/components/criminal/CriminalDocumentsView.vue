@@ -96,12 +96,6 @@ const criminalState = namespace("CriminalFileInformation");
 const commonState = namespace("CommonInformation");
 
 enum fieldTab {Categories=0, Summary}
-enum DecodeCourtLevel {'P'= 0, 'S' = 1, 'A' = 2 }
-enum DecodeCourtClass {
-    'A' = 0, 'Y' = 1, 'T' = 2, 'F' = 3, 'C' = 4, 'M' = 5,        
-    'L' = 6, 'R' = 7, 'B' = 8, 'D' = 9, 'E' = 10, 'G' = 11,        
-    'H' = 12, 'N' = 13, 'O' = 14, 'P' = 15, 'S' = 16, 'V' = 17,
-}
 
 @Component
 export default class CriminalDocumentsView extends Vue {    
@@ -166,10 +160,9 @@ export default class CriminalDocumentsView extends Vue {
     public getDocuments(): void {
        
         const data = this.criminalFileInformation.detailsData;
-        this.participantList = this.criminalFileInformation.participantList 
-
-        this.courtLevel = DecodeCourtLevel[data.courtLevelCd];
-        this.courtClass = DecodeCourtClass[data.courtClassCd];
+        this.participantList = this.criminalFileInformation.participantList;
+        this.courtLevel = this.criminalFileInformation.courtLevel;
+        this.courtClass = this.criminalFileInformation.courtClass;
 
         this.ExtractDocumentInfo()          
         this.isMounted = true;
