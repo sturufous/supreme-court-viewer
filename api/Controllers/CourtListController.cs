@@ -40,7 +40,7 @@ namespace Scv.Api.Controllers
         /// <returns>CourtList</returns>
         [HttpGet]
         [Route("court-list")]
-        public async Task<ActionResult<CourtList>> GetCourtList(string agencyId, string roomCode, DateTime? proceeding, string divisionCode, string fileNumber)
+        public async Task<ActionResult<CourtList>> GetCourtList(string agencyId, string roomCode, DateTime proceeding, string divisionCode, string fileNumber)
         {
             var courtList = await _courtListService.CourtListAsync(agencyId, roomCode, proceeding, divisionCode,
                 fileNumber);

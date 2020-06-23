@@ -9,7 +9,8 @@ module.exports = {
 					target: "https://localhost:44369",
 					headers: {
 						Connection: 'keep-alive'
-					}
+					},
+					changeOrigin: true
 				}
 			}
 		},
