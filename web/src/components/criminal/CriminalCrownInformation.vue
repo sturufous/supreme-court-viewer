@@ -62,8 +62,10 @@ export default class CriminalCrownInformation extends Vue {
         const assignedCrown: string[] = [];
         if (data.crown.length > 0) {
             for (const assignee of data.crown) {
-                this.UpdateDisplayName({'lastName': assignee.lastNm, 'givenName': assignee.givenNm});
-                assignedCrown.push(this.displayName)
+                if (assignee.assigned) {
+                    this.UpdateDisplayName({'lastName': assignee.lastNm, 'givenName': assignee.givenNm});
+                    assignedCrown.push(this.displayName)
+                }                
             }
         }
         let crownInfo = {};

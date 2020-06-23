@@ -14,7 +14,15 @@ const routes: Array<RouteConfig> = [
     path: '/court-list',
     name: 'CourtList',
     component: CourtList, 
-    props: true
+    props: true,
+    children: [
+      {
+        path: 'location/:location/room/:room/date/:date',
+        name: 'CourtListResult',
+        component: CourtList, 
+        props: true
+      }
+    ]
   },
   {
     path: '/civil-file/:fileNumber',
