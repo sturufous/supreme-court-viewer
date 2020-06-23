@@ -47,8 +47,8 @@
                     <b-button  
                         size="sm" 
                         style=" font-size:16px"
-                        :id="'criminalcase'+data.item.Index"
-                        :href="'#criminalcase'+data.item.Index"
+                        :id="'criminalcase-'+data.item.Tag"
+                        :href="'#criminalcase-'+data.item.Tag"
                         @click="OpenDetails(data); data.toggleDetails();" 
                         variant="outline-primary border-white text-criminal" 
                         class="mr-2">
@@ -58,9 +58,9 @@
                     </b-button>                   
                 </template>
 
-                <template v-slot:row-details>
+                <template v-slot:row-details="data">
                     <b-card no-body bg-border="dark"> 
-                        <criminal-appearance-details/>
+                        <criminal-appearance-details :tagcasename="'criminalcase-'+data.item.Tag"/>
                     </b-card>
                 </template> 
                 
@@ -68,7 +68,9 @@
                     <b-button
                         style=" font-size:16px" 
                         size="sm" 
-                        @click="OpenCriminalFilePage(data)"                         
+                        @click="OpenCriminalFilePage(data)" 
+                        v-b-tooltip.hover.right
+                        :title="data.item['AccusedTruncApplied']?data.item['AccusedDesc']:null"
                         variant="outline-primary border-white text-criminal" 
                         class="mr-2">                            
                             {{data.value}}
@@ -236,13 +238,20 @@ export default class CriminalList extends Vue {
 
             criminalListInfo["Index"] = criminalListIndex;
 
-            criminalListInfo['Seq.']=jcriminalList.appearanceSequenceNumber?parseInt(jcriminalList.appearanceSequenceNumber):''
-            criminalListInfo['File Number']=jcriminalList.fileNumberText
+            criminalListInfo['Seq.'] = jcriminalList.appearanceSequenceNumber?parseInt(jcriminalList.appearanceSequenceNumber):''
+            criminalListInfo['File Number'] = jcriminalList.fileNumberText
+            criminalListInfo['Tag'] = criminalListInfo['File Number']+'-'+criminalListInfo['Seq.'];  
+
             criminalListInfo['Case Age']= jcriminalList.caseAgeDaysNumber? jcriminalList.caseAgeDaysNumber: ''
             criminalListInfo["Time"] = this.getTime(jcriminalList.appearanceTime.split(' ')[1].substr(0,5));
 
             criminalListInfo["Room"] = this.courtRoom
-            criminalListInfo["Accused"] = jcriminalList.accusedFullName
+
+            const accusedName = this.getNameOfAccusedTrunc(jcriminalList.accusedFullName)
+            criminalListInfo["Accused"] = accusedName.name;            
+            criminalListInfo["AccusedTruncApplied"] = accusedName.trunc
+            criminalListInfo["AccusedDesc"] = jcriminalList.accusedFullName
+
             criminalListInfo['Reason'] = jcriminalList.appearanceReasonCd
             criminalListInfo['ReasonDesc'] = jcriminalList.appearanceReasonDesc
 
@@ -347,6 +356,15 @@ export default class CriminalList extends Vue {
         this.UpdateCriminalFile(fileInformation)
         const routeData = this.$router.resolve({name:'CriminalCaseDetails', params: {fileNumber: fileInformation['fileNumber']}})
         window.open(routeData.href, '_blank');
+    }
+
+    public getNameOfAccusedTrunc(nameOfAccused) 
+    {
+        const maximumFullNameLength = 20
+        if(nameOfAccused.length > maximumFullNameLength)   
+            return {name: nameOfAccused.substr(0, maximumFullNameLength) +' ... ', trunc:true};   
+        else 
+            return  {name: nameOfAccused, trunc:false};        
     }
 
     get SortedCriminalList()

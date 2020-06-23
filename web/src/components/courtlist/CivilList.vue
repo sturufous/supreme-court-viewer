@@ -47,8 +47,8 @@
                     <b-button 
                         style=" font-size:16px" 
                         size="sm"
-                        :id="civilClass+'case'+data.item.Index"
-                        :href="'#'+civilClass+'case'+data.item.Index"
+                        :id="civilClass+'case-'+data.item.Tag"
+                        :href="'#'+civilClass+'case-'+data.item.Tag"
                         @click="OpenDetails(data); data.toggleDetails();" 
                         :variant="'outline-primary border-white text-'+civilClass" 
                         class="mr-2">
@@ -58,9 +58,9 @@
                     </b-button>                  
                 </template>
 
-                <template v-slot:row-details>
+                <template v-slot:row-details="data">
                     <b-card no-body bg-border="dark"> 
-                        <civil-appearance-details />
+                        <civil-appearance-details :tagcasename="civilClass+'case-'+data.item.Tag" />
                     </b-card>
                 </template> 
                 
@@ -228,7 +228,9 @@ export default class CivilList extends Vue {
 
             civilListInfo['Seq.']=jcivilList.courtListPrintSortNumber? parseInt(jcivilList.courtListPrintSortNumber):''
 
-            civilListInfo['File Number']=jcivilList.physicalFile.fileNumber           
+            civilListInfo['File Number']=jcivilList.physicalFile.fileNumber
+            civilListInfo['Tag'] = civilListInfo['File Number']+'-'+civilListInfo['Seq.'];      
+
             civilListInfo["Time"] = this.getTime(jcivilList.appearanceTime.substr(0,5));
 
             civilListInfo["Room"] = this.courtRoom
@@ -343,6 +345,11 @@ export default class CivilList extends Vue {
             this.appearanceInfo.outOfTownJudgeTxt = data.item["OutOfTown Judge"]
             
             this.UpdateAppearanceInfo(this.appearanceInfo);
+        //     const element = document.getElementById("civilcase2");
+        //     console.log(element)
+                    
+        // if(element !=null)
+        //             setTimeout(() => {element.scrollIntoView();console.log('found civilcase2'); }, 1000);
         }        
     }
 
@@ -353,6 +360,7 @@ export default class CivilList extends Vue {
         this.UpdateCivilFile(fileInformation)
         const routeData = this.$router.resolve({name:'CivilCaseDetails', params: {fileNumber: fileInformation['fileNumber']}})
         window.open(routeData.href, '_blank');
+        
     }
 
     
