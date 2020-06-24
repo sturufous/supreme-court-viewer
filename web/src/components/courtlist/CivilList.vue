@@ -86,6 +86,7 @@
                             {{data.value}}
                     </b-button>                                 
                 </template>
+                
                 <template  v-slot:cell(Counsel)="data">
                     <b-badge
                         v-if="data.item['CounselDesc']"
@@ -113,8 +114,57 @@
                         </b-badge>
                 </template>
 
+                <template  v-slot:cell(Notes)="data">
+                    <b-button
+                        v-if="data.item['NoteExist']"
+                        size="sm"
+                        style=" font-size:12px; border:0px;"
+                        @click="OpenNotes(data.value)"                        
+                        variant="outline-primary border-white text-info" 
+                        class="mt-1"
+                        v-b-tooltip.hover.left
+                        title="Notes">                            
+                            <b-icon icon="chat-square-fill" font-scale="1.5"></b-icon>
+                    </b-button>
+                </template>
+
             </b-table>
         </b-card>
+
+        <b-modal v-if= "isMounted" v-model="showNotes" id="bv-modal-notes" hide-footer>
+            <template v-slot:modal-title>
+                    <h2 class="mb-0">Notes</h2>
+            </template>
+            <b-card 
+                v-if="notes.TrialNotes" 
+                title="Trial Notes" 
+                border-variant="white">
+                    {{notes.TrialNotes}}
+            </b-card>
+
+            <b-card 
+                v-if="notes.FileComment" 
+                title="File Comment" 
+                border-variant="white">
+                    {{notes.FileComment}}
+            </b-card>
+
+            <b-card 
+                v-if="notes.CommentToJudge" 
+                title="Comment To Judge" 
+                border-variant="white">
+                    {{notes.CommentToJudge}}
+            </b-card>
+
+            <b-card 
+                v-if="notes.SheriffComment" 
+                title="Sheriff Comment" 
+                border-variant="white">
+                    {{notes.SheriffComment}}
+            </b-card>
+                     
+            <b-button class="mt-3 bg-info" @click="$bvModal.hide('bv-modal-notes')">Close</b-button>
+        </b-modal> 
       
     </b-card> 
 
@@ -201,6 +251,8 @@ export default class CivilList extends Vue {
     courtRoom;
     isMounted = false;
     isDataReady = false;
+    showNotes = false;
+    notes = {TrialNotes:'', FileComment:'', CommentToJudge:'', SheriffComment:''};      
     
     fields =  
     [
@@ -284,10 +336,27 @@ export default class CivilList extends Vue {
                 civilListInfo['File Markers'].push({abbr:marker, key:markerDesc});
             }
             //console.log(civilListInfo['File Markers'])
-                       
+
+            civilListInfo['Notes'] ={TrialNotes: jcivilList.trialRemarkTxt, FileComment:jcivilList.fileCommentText, CommentToJudge:jcivilList.commentToJudgeText, SheriffComment:jcivilList.sheriffCommentText};                       
+            civilListInfo["NoteExist"] = this.isNoteAvailable(civilListInfo);
             this.civilList.push(civilListInfo);
             //console.log(civilListInfo)
         }
+    }
+
+    public isNoteAvailable(civilListInfo)
+    {
+        if( civilListInfo['Notes'].TrialNotes||
+            civilListInfo['Notes'].FileComment||
+            civilListInfo['Notes'].CommentToJudge||
+            civilListInfo['Notes'].SheriffComment) 
+            return true;
+        else return false;
+    }
+    public OpenNotes(notesData)
+    {
+        this.notes = notesData;
+        this.showNotes = true;           
     }
 
     public getNameOfPartyTrunc(partyNames) 

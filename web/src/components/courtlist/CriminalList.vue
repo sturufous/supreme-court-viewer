@@ -121,10 +121,50 @@
                     <b-badge variant="white" style="margin-top: 5px; font-weight: normal;font-size:16px">{{data.value}}
                     <span class="text-muted" style="font-weight: normal; font-size:14px">d</span>  </b-badge>                
                 </template>
+
+                <template  v-slot:cell(Notes)="data">
+                    <b-button
+                        v-if="data.item['NoteExist']"
+                        size="sm"
+                        style=" font-size:12px; border:0px;"
+                        @click="OpenNotes(data.value)"                        
+                        variant="outline-primary border-white text-info" 
+                        class="mt-1"
+                        v-b-tooltip.hover.left
+                        title="Notes">                            
+                            <b-icon icon="chat-square-fill" font-scale="1.5"></b-icon>
+                    </b-button>
+                </template>
             
                 
             </b-table>
         </b-card>
+        <b-modal v-if= "isMounted" v-model="showNotes" id="bv-modal-notes" hide-footer>
+            <template v-slot:modal-title>
+                    <h2 class="mb-0">Notes</h2>
+            </template>
+            <b-card 
+                v-if="notes.text" 
+                title="Trial Notes" 
+                border-variant="white">
+                    {{notes.text}}
+            </b-card>
+            <b-card 
+                v-if="notes.remarks.length>0" 
+                title="Crown Notes to JCM" 
+                border-variant="white">
+                    <b-table        
+                        borderless
+                        :items="notes.remarks"                                    
+                        thead-class="d-none"
+                        responsive="sm"          
+                        striped
+                        >
+                    </b-table>
+               
+            </b-card>             
+            <b-button class="mt-3 bg-info" @click="$bvModal.hide('bv-modal-notes')">Close</b-button>
+        </b-modal> 
       
     </b-card> 
 
@@ -192,7 +232,7 @@ export default class CriminalList extends Vue {
        
         this.criminalCourtListJson = data.criminalCourtList
 
-        ///console.log(this.criminalCourtListJson)
+        //consoleconsole.log(this.criminalCourtListJson)
         this.courtRoom = data.courtRoomCode    
         this.ExtractCriminalListInfo()
         if(this.criminalList.length)
@@ -209,6 +249,8 @@ export default class CriminalList extends Vue {
     courtRoom;
     isMounted = false;
     isDataReady = false;
+    showNotes = false;
+    notes = {remarks:[], text:''};
     
     fields =  
     [
@@ -300,7 +342,16 @@ export default class CriminalList extends Vue {
                 //console.log(markerDesc)
                 //console.log(hearingRestriction.hearingRestrictiontype)
             }
-            //console.log(criminalListInfo['File Markers'])
+            criminalListInfo['TrialNotes'] = jcriminalList.trialRemarkTxt;
+
+            criminalListInfo['TrialRemarks'] = [];
+            for (const trialRemark of jcriminalList.trialRemark)
+            {
+                criminalListInfo['TrialRemarks'].push({txt:trialRemark.commentTxt})
+            }
+            criminalListInfo["Notes"]={remarks:criminalListInfo['TrialRemarks'], text:criminalListInfo['TrialNotes']}
+            //console.log(criminalListInfo['TrialRemarks'].length)
+            
             criminalListInfo["Supplemental Equipment"] = jcriminalList.supplementalEquipment
             criminalListInfo["Security Restriction"] = jcriminalList.securityRestriction
             criminalListInfo["OutOfTown Judge"] = jcriminalList.outOfTownJudge
@@ -309,9 +360,21 @@ export default class CriminalList extends Vue {
             criminalListInfo["Court Class"] = jcriminalList.fileInformation.courtClassCd
             criminalListInfo["Prof SeqNo"] = jcriminalList.fileInformation.profSeqNo
                        
+            criminalListInfo["NoteExist"] = this.isNoteAvailable(criminalListInfo);
             this.criminalList.push(criminalListInfo); 
             //console.log(criminalListInfo)
         }
+    }
+
+    public isNoteAvailable(criminalListInfo)
+    {
+        if(criminalListInfo['TrialRemarks'].length>0) return true;
+        if(criminalListInfo['TrialNotes']) return true;
+        return false;
+    }
+    public OpenNotes(notesData) {
+        this.notes = notesData;
+        this.showNotes=true;           
     }
 
     public getNameOfParticipant(lastName, givenName) {
