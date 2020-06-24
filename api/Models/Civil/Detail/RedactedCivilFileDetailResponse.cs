@@ -18,6 +18,7 @@ namespace Scv.Api.Models.Civil.Detail
         public CivilFileDetailResponseCourtLevelCd CourtLevelCd { get; set; }
         public string CourtLevelDescription { get; set; }
         public string ActivityClassCd { get; set; }
+        public string ActivityClassDesc { get; set; }
         public string SealedYN { get; set; }
         public string LeftRoleDsc { get; set; }
         public string RightRoleDsc { get; set; }
