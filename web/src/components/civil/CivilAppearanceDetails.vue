@@ -223,8 +223,7 @@
                             class="text-success"  
                             v-bind:key="index"
                             v-else-if="counsel.Info.length > 0"
-                            v-b-tooltip.hover.left
-                            v-b-tooltip.hover.html="counsel.Info"> 
+                            v-b-tooltip.hover.right.html="counsel.Info"> 
                                 CEIS: {{ counsel.Name }} 
                         <br></span>
                     </span>
@@ -237,9 +236,8 @@
                     class="text-success"  
                     v-bind:key="index"
                     :style="field.cellStyle"
-                    v-else-if="data.field.key == 'Name' && data.item.Info.length > 0"
-                    v-b-tooltip.hover.left
-                    v-b-tooltip.hover.html="data.item.Info"
+                    v-else-if="data.field.key == 'Name' && data.item.Info.length > 0"                    
+                    v-b-tooltip.hover.right.html="data.item.Info"
                     >
                     {{ data.value }} 
                 </span>
@@ -250,8 +248,7 @@
                             class="text-success"  
                             v-bind:key="index"
                             v-else-if="rep.Info.length > 0"
-                            v-b-tooltip.hover.left
-                            v-b-tooltip.hover.html="rep.Info">
+                            v-b-tooltip.hover.left.html="rep.Info">
                             {{ rep.Name }} 
                         <br></span>
                     </span>
@@ -277,7 +274,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Prop } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import "@store/modules/CommonInformation";
 import "@store/modules/CivilFileInformation";
@@ -357,6 +354,8 @@ export default class CivilAppearanceDetails extends Vue {
         this.getAppearanceDetails();
     }
 
+    @Prop() tagcasename
+
     public getAppearanceDetails(): void {      
             
         this.$http.get('/api/files/civil/'+ this.appearanceInfo.fileNo +'/appearance-detail/'+this.appearanceInfo.appearanceId)
@@ -364,7 +363,12 @@ export default class CivilAppearanceDetails extends Vue {
             .then(data => {
                 if(data){ 
                     this.appearanceDetailsJson = data;              
-                    this.ExtractAppearanceDetailsInfo();
+                    this.ExtractAppearanceDetailsInfo(); 
+                        const element = document.getElementById(this.tagcasename);                        
+                        // console.log(this.tagcasename)
+                        // console.log(element)
+                        if(element !=null)
+                            setTimeout(() => {element.scrollIntoView(); }, 100);                  
                 }
                 else{
                     window.alert("bad data!");
