@@ -51,7 +51,7 @@
 
                             <template v-slot:[`cell(${documentFields[1].key})`]="data" >
                                 <b-button 
-                                    v-if="data.item.PdfAvail" 
+                                    v-if="data.item.PdfAvail && !data.item.Sealed" 
                                     variant="outline-primary text-info" 
                                     :style="data.field.cellStyle"
                                     @click="documentClick(data)"
@@ -61,8 +61,13 @@
                                 <span
                                     class="ml-2"
                                     :style="data.field.cellLabelStyle"
-                                    v-else>
+                                    v-else-if="!data.item.PdfAvail && !data.item.Sealed">
                                         {{data.value}}
+                                </span>
+                                <span class="ml-2 text-muted"
+                                      v-else-if="data.item.Sealed"
+                                      :style="data.field.cellLabelStyle">
+                                    {{data.value}}
                                 </span>
                             </template>
 
@@ -76,10 +81,22 @@
                                     :title="act.Description"> 
                                         {{act.Code}} 
                                 </b-badge>
-                            </template>                            
-
+                            </template>
+                            <template v-slot:cell(Seq.)="data">
+                                <span v-if="data.item.Sealed" class="ml-2 text-muted" :style="data.field.cellStyle"> 
+                                    {{data.value}}
+                                </span>
+                                <span v-else class="ml-2" :style="data.field.cellStyle"> 
+                                    {{data.value}}
+                                </span>
+                            </template>
                             <template v-slot:[`cell(${documentFields[3].key})`]="data" >
-                                <span :style="data.field.cellStyle">
+                                <span v-if="data.item.Sealed" 
+                                      :style="data.field.cellStyle"
+                                      class="text-muted">
+                                    {{ data.value | beautify-date}}
+                                </span>
+                                <span v-else :style="data.field.cellStyle">
                                     {{ data.value | beautify-date}}
                                 </span>
                             </template>
@@ -98,7 +115,13 @@
                                     </template>
                                     
                                     <template v-slot:cell(Issue)="dataR" >
-                                        <li :style="dataR.field.cellStyle">                                        
+                                        <li v-if="data.item.Sealed" 
+                                            class="text-muted" 
+                                            :style="dataR.field.cellStyle">                                        
+                                            {{ dataR.value }}
+                                        </li>
+                                        <li v-else
+                                            :style="dataR.field.cellStyle">                                        
                                             {{ dataR.value }}
                                         </li>
                                     </template>
@@ -378,7 +401,13 @@ export default class CivilAppearanceDetails extends Vue {
                 for (const act of document.documentSupport) {
                     docInfo["Act"].push({'Code': act.actCd, 'Description': act.actDsc})
                 }
-            }    
+            }
+            
+            if (document.sealedYN == "Y") {                
+                docInfo["Sealed"] = true;
+            } else {
+                docInfo["Sealed"] = false;
+            }
             
             docInfo["Date Filed"]= document.filedDt? document.filedDt.split(' ')[0] : '';
             docInfo["Result"]= document.appearanceResultCd
