@@ -46,6 +46,15 @@
             </b-col>
         </b-row>
     </b-card>
+    <b-modal v-if= "isMounted" v-model="showSealedWarning" id="bv-modal-ban" hide-header hide-footer>        
+        <b-card v-if="isSealed"> 
+            This file has been sealed. Only authorized users are permitted access to sealed files.
+        </b-card>
+        <b-card v-else-if="docIsSealed"> 
+            This File contains one or more Sealed Documents.
+        </b-card>                     
+        <b-button class="mt-3 bg-primary" @click="$bvModal.hide('bv-modal-ban')">Continue</b-button>
+    </b-modal>
 </div>
 </template>
 
@@ -98,14 +107,21 @@ export default class CivilCaseDetails extends Vue {
     leftPartiesInfo: any[] = [];
     rightPartiesInfo: any[] = [];
     adjudicatorRestrictionsInfo: any[] = [];
+    documentsInfo: any[] = [];
+    summaryDocumentsInfo: any[] = [];
     /* eslint-enable */
     
     isDataReady = false
     isMounted = false
+    isSealed = false;
+    docIsSealed = false;
+    showSealedWarning = false;
     errorCode =0 ;
     errorText='';
     partiesJson;    
     adjudicatorRestrictionsJson;
+    documentsDetailsJson;
+    categories: string[] = [];
     sidePanelTitles = [ 
        'Case Details', 'Future Appearances', 'Past Appearances'    
     ];
@@ -125,14 +141,25 @@ export default class CivilCaseDetails extends Vue {
                 if(data){
                     this.civilFileInformation.detailsData = data;
                     this.partiesJson = data.party
-                    this.adjudicatorRestrictionsJson = data.hearingRestriction; 
+                    this.adjudicatorRestrictionsJson = data.hearingRestriction;
+                    this.documentsDetailsJson = data.document;
+                    if (data.sealedYN == "Y") {
+                        this.isSealed = true;
+                    } 
                     this.ExtractCaseInfo()
                     if((this.leftPartiesInfo.length> 0)  || (this.rightPartiesInfo.length > 0))
                     {
-                        this.civilFileInformation.leftPartiesInfo = this.leftPartiesInfo
-                        this.civilFileInformation.rightPartiesInfo = this.rightPartiesInfo
+                        this.civilFileInformation.leftPartiesInfo = this.leftPartiesInfo;
+                        this.civilFileInformation.rightPartiesInfo = this.rightPartiesInfo;
+                        this.civilFileInformation.isSealed = this.isSealed;                        
                         this.civilFileInformation.adjudicatorRestrictionsInfo = this.adjudicatorRestrictionsInfo;
-                        this.UpdateCivilFile(this.civilFileInformation);                    
+                        this.civilFileInformation.documentsInfo = this.documentsInfo;
+                        this.civilFileInformation.summaryDocumentsInfo = this.summaryDocumentsInfo;
+                        this.civilFileInformation.categories = this.categories;
+                        this.UpdateCivilFile(this.civilFileInformation);
+                        if (this.isSealed || this.docIsSealed) {
+                            this.showSealedWarning = true;
+                        }                    
                         this.isDataReady = true;
                     }
                     else
@@ -207,6 +234,54 @@ export default class CivilCaseDetails extends Vue {
                     
             this.adjudicatorRestrictionsInfo.push(restrictionInfo);      
         }
+
+        for(const docIndex in this.documentsDetailsJson)
+        {
+            const docInfo = {}; 
+            const jDoc =  this.documentsDetailsJson[docIndex];
+            docInfo["Index"] = docIndex;
+            if(jDoc.documentTypeCd != 'CSR') {
+                docInfo["Seq."] = jDoc.fileSeqNo;
+                docInfo["Document Type"] = jDoc.documentTypeDescription;
+                docInfo["Concluded"] = jDoc.concludedYn;
+                if((this.categories.indexOf("CONCLUDED") < 0) && docInfo["Concluded"].toUpperCase() =="Y") this.categories.push("CONCLUDED")        
+                docInfo["Appearance Date"] = jDoc.lastAppearanceDt? jDoc.lastAppearanceDt.split(' ')[0] : ''; 
+                if(new Date(docInfo["Appearance Date"]) > new Date() && this.categories.indexOf("SCHEDULED") < 0) this.categories.push("SCHEDULED")   
+
+                docInfo["Category"] = jDoc.category? jDoc.category : '';
+                if((this.categories.indexOf(docInfo["Category"]) < 0) && docInfo["Category"].length > 0) this.categories.push(docInfo["Category"])
+                docInfo["Act"] = [];            
+                if (jDoc.documentSupport && jDoc.documentSupport.length > 0) {
+                    for (const act of jDoc.documentSupport) {
+                        docInfo["Act"].push({'Code': act.actCd, 'Description': act.actDsc})
+                    }
+                }
+                
+                if (jDoc.sealedYN == "Y") {
+                    this.docIsSealed = true;
+                    docInfo["Sealed"] = true;
+                } else {
+                    docInfo["Sealed"] = false;
+                }
+                docInfo["Document ID"] = jDoc.civilDocumentId;            
+                docInfo["PdfAvail"] = jDoc.imageId? true : false 
+                docInfo["Date Filed"] = jDoc.filedDt? jDoc.filedDt.split(' ')[0] : '';
+                docInfo["Issues"] = [];
+                if (jDoc.issue && jDoc.issue.length > 0) {
+                    for (const issue of jDoc.issue) {
+                        docInfo["Issues"].push(issue.issueDsc)
+                    }
+                } 
+                this.documentsInfo.push(docInfo);
+
+            } else {                
+                docInfo["Document Type"] = 'CourtSummary';
+                docInfo["Appearance Date"] = jDoc.lastAppearanceDt.split(' ')[0];
+                docInfo["Appearance ID"] = jDoc.imageId;
+                docInfo["PdfAvail"] = jDoc.imageId? true : false
+                this.summaryDocumentsInfo.push(docInfo);
+            }
+        } 
     }
 
     public SortParties(partiesList) {
