@@ -217,7 +217,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Prop } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 
 import "@store/modules/CriminalFileInformation";
@@ -287,6 +287,7 @@ export default class CriminalAppearanceDetails extends Vue {
         this.getAppearanceDetails();
     }
 
+    @Prop() tagcasename
     public getAppearanceDetails(): void {      
     
         this.$http.get('/api/files/criminal/'+ this.appearanceInfo.fileNo+'/appearance-detail/'+this.appearanceInfo.appearanceId+ '/'+this.appearanceInfo.partId)
@@ -295,6 +296,11 @@ export default class CriminalAppearanceDetails extends Vue {
                 if(data){  
                     this.appearanceDetailsJson = data;              
                     this.ExtractAppearanceDetailsInfo();
+                    const element = document.getElementById(this.tagcasename);                        
+                        // console.log(this.tagcasename)
+                        // console.log(element)
+                    if(element !=null)
+                        setTimeout(() => {element.scrollIntoView(); }, 100);         
                 }
                 else{
                     window.alert("bad data!");

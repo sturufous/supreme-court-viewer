@@ -59,6 +59,9 @@
     <Content Include="src\assets\landing.jpg" />
     <Content Include="src\assets\logo.png" />
     <Content Include="src\components\civil\CivilDocumentsView.vue" />
+    <Content Include="src\components\courtlist\CivilList.vue" />
+    <Content Include="src\components\courtlist\CourtList.vue" />
+    <Content Include="src\components\courtlist\CriminalList.vue" />
     <Content Include="src\components\criminal\AdjudicatorRestrictions.vue" />
     <Content Include="src\components\criminal\AppearanceDetails.vue" />
     <Content Include="src\components\criminal\CriminalCaseDetails.vue" />
@@ -93,6 +96,7 @@
     <Folder Include="src\assets\" />
     <Folder Include="src\components\" />
     <Folder Include="src\components\civil\" />
+    <Folder Include="src\components\courtlist\" />
     <Folder Include="src\components\criminal\" />
     <Folder Include="src\constants\" />
     <Folder Include="src\router\" />
