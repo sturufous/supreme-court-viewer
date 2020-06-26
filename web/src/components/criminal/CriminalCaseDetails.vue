@@ -20,7 +20,7 @@
             <span v-else> Server is not responding. <b>({{errorText}})</b> </span>
         </b-card>
         <b-card>         
-            <b-button variant="info" @click="navigateToLandingPage">Back to the Landing Page</b-button>
+            <b-button id="backToLandingPage" variant="info" @click="navigateToLandingPage">Back to the Landing Page</b-button>
         </b-card>
     </b-card>
 

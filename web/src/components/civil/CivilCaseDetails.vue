@@ -19,7 +19,7 @@
             <span v-else> Server is not responding. <b>({{errorText}})</b> </span>
         </b-card>
         <b-card>         
-            <b-button variant="info" @click="navigateToLandingPage">Back to the Landing Page</b-button>
+            <b-button id="backToLandingPage" variant="info" @click="navigateToLandingPage">Back to the Landing Page</b-button>
         </b-card>
     </b-card>
 
@@ -150,7 +150,9 @@ export default class CivilCaseDetails extends Vue {
                         this.isSealed = true;
                     } 
                     this.ExtractCaseInfo()
-                    if((this.leftPartiesInfo.length> 0)  || (this.rightPartiesInfo.length > 0))
+                    if ((this.adjudicatorRestrictionsInfo.length>0) || 
+                        (this.leftPartiesInfo.length> 0)  || (this.rightPartiesInfo.length > 0)
+                        || (this.documentsInfo.length>0) || (this.summaryDocumentsInfo.length>0))
                     {
                         this.civilFileInformation.leftPartiesInfo = this.leftPartiesInfo;
                         this.civilFileInformation.rightPartiesInfo = this.rightPartiesInfo;
