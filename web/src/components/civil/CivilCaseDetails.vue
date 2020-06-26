@@ -262,6 +262,9 @@ export default class CivilCaseDetails extends Vue {
                 
                 if (jDoc.sealedYN == "Y") {
                     this.docIsSealed = true;
+                    docInfo["Sealed"] = true;
+                } else {
+                    docInfo["Sealed"] = false;
                 }
                 docInfo["Document ID"] = jDoc.civilDocumentId;            
                 docInfo["PdfAvail"] = jDoc.imageId? true : false 
@@ -280,7 +283,6 @@ export default class CivilCaseDetails extends Vue {
                 docInfo["Appearance ID"] = jDoc.imageId;
                 docInfo["PdfAvail"] = jDoc.imageId? true : false
                 this.summaryDocumentsInfo.push(docInfo);
-                // courtSummaryExists = true;
             }
         } 
     }

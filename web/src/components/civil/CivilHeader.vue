@@ -52,7 +52,7 @@
             <b-badge pill variant="danger">{{adjudicatorRestrictionsInfo.length}}</b-badge>
         </b-nav-text>
 
-        <b-nav-item-dropdown right no-caret > 
+        <b-nav-item-dropdown right no-caret :disabled="adjudicatorRestrictionsInfo.length==0"> 
             <template v-slot:button-content>
                 <b-button
                     :variant="(adjudicatorRestrictionsInfo.length>0)? 'outline-primary text-info':'white'" 
