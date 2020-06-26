@@ -39,21 +39,27 @@
                     </template>
 
                     <template v-slot:[`cell(${fields[fieldsTab][datePlace[fieldsTab]].key})`]="data" >
-                        <span :style="data.field.cellStyle">
+                        <span v-if="data.item.Sealed" :style="data.field.cellStyle" class="text-muted">
+                            {{ data.value | beautify-date}}
+                        </span>
+                        <span v-else :style="data.field.cellStyle">
                             {{ data.value | beautify-date}}
                         </span>
                     </template> 
 
                     <template v-slot:[`cell(${fields[fieldsTab][documentPlace[fieldsTab]].key})`]="data" >
                         <b-button 
-                            v-if="data.item.PdfAvail" 
+                            v-if="data.item.PdfAvail && !data.item.Sealed" 
                             variant="outline-primary text-info" 
                             :style="data.field.cellStyle"
                             @click="cellClick(data)"
                             size="sm">
                                 {{data.value}}
                         </b-button>
-                        <span class="ml-2" v-else>
+                        <span class="ml-2" v-else-if="!data.item.PdfAvail && !data.item.Sealed">
+                             {{data.value}}
+                        </span>
+                        <span class="ml-2 text-muted" v-else-if="data.item.Sealed">
                              {{data.value}}
                         </span>
                     </template>
@@ -75,12 +81,16 @@
                             v-for="(issue, issueIndex) in data.value"  
                             v-bind:key="issueIndex"
                             :style="data.field.cellStyle">
-                            {{ issue }}
+                            <span v-if="data.item.Sealed" class="text-muted">{{ issue }}</span>
+                            <span v-else>{{ issue }}</span>
                         </li>
                     </template>
                     
                     <template v-slot:cell(Seq.)="data">
-                        <span class="ml-2" :style="data.field.cellStyle"> 
+                        <span v-if="data.item.Sealed" class="ml-2 text-muted" :style="data.field.cellStyle"> 
+                            {{data.value}}
+                        </span>
+                        <span v-else class="ml-2" :style="data.field.cellStyle"> 
                             {{data.value}}
                         </span>
                     </template>

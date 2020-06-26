@@ -21,6 +21,7 @@ namespace Scv.Api.Models.Criminal.Detail
         public CriminalFileDetailResponseCourtClassCd CourtClassCd { get; set; }
         public string CourtClassDescription { get; set; }
         public string ActivityClassCd { get; set; }
+        public string ActivityClassDesc { get; set; }
         public string CurrentEstimateLenQty { get; set; }
         public CriminalFileDetailResponseCurrentEstimateLenUnit CurrentEstimateLenUnit { get; set; }
         public string InitialEstimateLenQty { get; set; }

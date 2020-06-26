@@ -4,18 +4,22 @@
         <b-overlay :show= "true"> 
             <b-card  style="min-height: 100px;"/>                   
             <template v-slot:overlay>               
-            <div> 
+                <div> 
                     <loading-spinner/> 
                     <p id="loading-label">Loading ...</p>
-            </div>                
+                </div>                
             </template> 
         </b-overlay> 
     </b-card>
 
     <b-card bg-variant="light" v-else-if= "isLocationDataMounted && !isLocationDataReady">
-        <b-card >
-            <span >No Court Location Found. </span>            
-        </b-card>       
+        <b-card style="min-height: 40px;">
+            <span v-if="errorCode>0"> Server is not responding. <b>({{errorText}} "{{errorCode}}")</b> </span>
+            <span v-else > No Court Location Found. </span>                    
+        </b-card>
+        <b-card>         
+            <b-button variant="info" @click="navigateToLandingPage">Back to the Landing Page</b-button>
+        </b-card>      
     </b-card>
 
     <b-card v-else >
@@ -163,7 +167,10 @@
             </b-card>
 
             <b-card class="mt-1" v-if= "isMounted && !isDataReady">
-                <span class="ml-3" >No appearances. </span> 
+                <b-card class="ml-3" style="min-height: 40px;">
+                    <span v-if="errorCode>0"> Server is not responding. <b>({{errorText}} "{{errorCode}}")</b> </span>
+                    <span v-else > No appearances. </span>                    
+                </b-card>
             </b-card>
     
             <b-card no-body v-if="isDataReady">
@@ -214,6 +221,7 @@ export default class CourtList extends Vue {
 
     public getListOfAvailableCourts(): void 
     {
+        this.errorCode = 0;
         this.$http.get('/api/location/court-rooms')
             .then(Response => Response.json(), err => {this.errorCode= err.status;this.errorText= err.statusText;console.log(err);}        
             ).then(data => {
@@ -242,7 +250,8 @@ export default class CourtList extends Vue {
         this.totalHours = 0;
         this.totalMins = 0;
         this.totalTime = '0' ;
-        this.totalTimeUnit = 'Hours';        
+        this.totalTimeUnit = 'Hours';
+        this.errorCode = 0;        
        
         this.$http.get('/api/courtlist/court-list?agencyId='+ this.courtListLocationID +'&roomCode='+ this.courtListRoom+'&proceeding=' +this.validSelectedDate)
             .then(Response => Response.json(), err => {this.errorCode= err.status;this.errorText= err.statusText;console.log(err);}        
@@ -268,6 +277,7 @@ export default class CourtList extends Vue {
                     {                    
                         this.isDataReady = true;                        
                     }
+                    
 
                     if(this.totalMins>0 && this.totalHours>0)
                     {
@@ -286,13 +296,14 @@ export default class CourtList extends Vue {
                     }
                     
                 }
+                
                 this.isMounted = true;
                 this.searchAllowed = true;
             });
         
     }
 
-    errorCode=''
+    errorCode=0
     errorText=''
     isDataReady = false
     isMounted = false
@@ -452,7 +463,8 @@ export default class CourtList extends Vue {
         if(!this.checkDateInValid())
         {
             this.searchAllowed = false;   
-            const date=new Date(this.selectedDate)
+            const olddate = this.seperateIsoDate(this.selectedDate) 
+            const date = new Date(olddate.year, olddate.month-1, olddate.day, 0,0,0,0)
             date.setDate(date.getDate() - 1)
             this.selectedDate = date.toISOString().substring(0,10)
             
@@ -461,12 +473,15 @@ export default class CourtList extends Vue {
     }
 
     public JumpToNextDay()
-    {        
+    {      
         if(!this.checkDateInValid())
         {
-            this.searchAllowed = false;   
-            const date=new Date(this.selectedDate)
+            this.searchAllowed = false; 
+            //console.log( this.selectedDate)
+            const olddate = this.seperateIsoDate(this.selectedDate) 
+            const date = new Date(olddate.year, olddate.month-1, olddate.day, 0,0,0,0)            
             date.setDate(date.getDate() + 1)
+            //console.log( date)
             this.selectedDate = date.toISOString().substring(0,10)
             //console.log( this.selectedDate)
             //console.log('next day')
@@ -480,14 +495,14 @@ export default class CourtList extends Vue {
     {
         if(this.isValidDate(this.selectedDate))
         {
-           // console.log('date ok')
-           // console.log(this.validSelectedDate)
+            //console.log('date ok')
+            //console.log(this.validSelectedDate)
             this.selectedDateState = true;
             return false
         }
         else
         {
-          // console.log('date error')
+           //console.log('date error')
            this.selectedDateState = false;
            return true
         }         
@@ -498,10 +513,10 @@ export default class CourtList extends Vue {
         if(!/^\d{4}-\d{1,2}-\d{1,2}$/.test(dateString))
             return false;
 
-        const parts = dateString.split("-");
-        const day = parseInt(parts[2], 10);
-        const month = parseInt(parts[1], 10);
-        const year = parseInt(parts[0], 10);
+        const seperatedDate = this.seperateIsoDate(dateString);
+        const day = seperatedDate.day;
+        const month = seperatedDate.month;
+        const year = seperatedDate.year;
         
         if(year < 1800 || year > 3000 || month == 0 || month > 12)
             return false;
@@ -514,6 +529,16 @@ export default class CourtList extends Vue {
 
         return day > 0 && day <= monthLength[month - 1];
     } 
+
+    public seperateIsoDate(dateString)
+    {
+        const seperatedDate = {day:0, month:0, year:0};
+        const parts = dateString.split("-");
+        seperatedDate.day = parseInt(parts[2], 10);
+        seperatedDate.month = parseInt(parts[1], 10);
+        seperatedDate.year = parseInt(parts[0], 10);
+        return seperatedDate;
+    }
         
 
     public searchForCourtList()
@@ -593,6 +618,10 @@ export default class CourtList extends Vue {
         this.totalHours += (Math.floor(this.totalMins/60) +parseInt(hrs));
         this.totalMins %= 60;
     }
+
+    public navigateToLandingPage() {
+        this.$router.push({name:'Home'})
+    }   
 
 }
  

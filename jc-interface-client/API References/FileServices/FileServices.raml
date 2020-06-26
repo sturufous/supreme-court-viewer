@@ -3,7 +3,7 @@
 title: JC-Interface - File Services
 version: 0.0.1
 protocols: [HTTPS]
-baseUri: 
+baseUri:
 mediaType: application/json
 securedBy: [basic]
 
@@ -3067,12 +3067,189 @@ schemas:
             "items" : { "$ref" : "criminalAppearanceCount" }
            }
         }
-       }   
+       }  
 
+  -  courtCalendarDetailAppearanceParty: |
+       {
+         "$schema": "http://json-schema.org/draft-04/schema#",
+         "type" : "object",
+         "properties" : {
+           "partyId" : {
+            "type" : "string"
+           },
+           "partyNm" : {
+            "type" : "string"
+           },
+           "counselNm" : {
+            "type" : "string"
+           }
+         }
+       }
+              
+  - courtCalendarDetailByDay: | 
+      {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type" : "object",
+        "properties" : {
+          "responseCd" : {
+            "type" : "string"
+          },
+          "responseMessageTxt" : {
+            "type" : "string"
+          },
+          "appearance" : {
+            "type" : "array",
+            "items" : { "$ref" : "courtCalendarDetailAppearance" }
+          }
+        }
+      }
+      
+  -  courtCalendarDetailAppearance: |
+      {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type" : "object",
+          "properties" : {
+          "courtDivisionCd" : {
+            "type" : "string",
+            "enum" : ["R", "I"]
+          },
+          "courtClassCd" : {
+            "type" : "string",
+            "enum" : [ "A", "Y", "T", "F", "C", "M", "L", "R", "B", "D", "E", "G", "H", "N", "O", "P", "S", "V" ]
+           },
+          "courtRoomCd" : {
+            "type" : "string"
+           },
+          "appearanceDt" : {
+            "type" : "string"
+           },
+          "appearanceTm" : {
+            "type" : "string"
+           },
+          "appearanceReasonCd" : {
+            "type" : "string"
+           },
+          "durationHour" : {
+            "type" : "string"
+           },
+          "durationMin" : {
+            "type" : "string"
+           },
+          "courtFileNumber" : {
+            "type" : "string"
+           },
+          "styleOfCause" : {
+            "type" : "string"
+           },
+          "adjudicatorInitials" : {
+            "type" : "string"
+           },
+          "adjudicatorNm" : {
+            "type" : "string"
+           },
+          "hearingRestrictionCd" : {
+            "type" : "string",
+            "enum" : [ "S", "D", "A", "G", "XXX" ]
+           },
+          "caseAgeDays" : {
+            "type" : "string"
+           },
+          "videoYn" : {
+            "type" : "string",
+            "enum" : [ "Y", "N" ]
+           },
+          "inCustodyYn" : {
+            "type" : "string",
+            "enum" : [ "Y", "N", null ]
+           },
+          "apprId" : {
+            "type" : "string"
+           },
+          "accusedNm" : {
+            "type" : "string"
+           },
+          "accusedCounselNm" : {
+            "type" : "string"
+           },
+          "appearanceId" : {
+            "type" : "string"
+           },
+          "profPartId" : {
+            "type" : "string"
+           },
+          "profSeqNo" : {
+            "type" : "string"
+           },
+          "appearanceStatusCd" : {
+            "type" : "string",
+            "enum" : [ "SCHD", "CNCL", "UNCF" ]
+           },
+          "remoteVideoYn" : {
+            "type" : "string",
+            "enum" : ["Y" , "N"]
+           },
+          "homeLocationAgenId" : {
+            "type" : "string"
+           },
+          "courtlistRefNumber" : {
+            "type" : "string"
+           },
+          "mdocJustinNo" : {
+            "type" : "string"
+           },
+          "physicalFileId" : {
+            "type" : "string"
+           },
+          "courtLevelCd" : {
+            "type" : "string",
+            "enum" : [ "P", "S", "A"]
+           },
+          "party" : {
+            "type" : "array",
+            "items" : { "$ref" : "courtCalendarDetailAppearanceParty" }
+           }
+        }
+      }    
 
 /files:
   displayName: Court File Resources
 
+  /courtCalendarDetailsByDay:
+    get:
+      description: |
+        Gets the court list details from JUSTIN web services.
+      queryParameters:
+        requestAgencyId:
+          description: Requesting Agency Identifier
+          type: string
+          required: true
+        requestPartId:
+          description: Requesting Participant Id
+          type: string
+          required: true
+        agencyCode:
+          description: Agency Code; for example 83.0001 (Kelowna).
+          type: string
+          required: true
+        appearanceDt: 
+          description: The appearance date in the format YYYY-MM-dd
+          type: string
+          required: true
+        roomCd:
+          description: Court room code
+          type: string
+          required: true
+      responses:
+        200:
+          body:
+            application/json:
+              schema: courtCalendarDetailByDay
+        404:
+          body:
+            application/json:
+              example: |
+                {"message": "No items matching the given criteria were found."}
+              
   /courtlist:
     get:
       description: |
@@ -3080,7 +3257,7 @@ schemas:
       queryParameters:
         agencyId:
           displayName: agencyId
-          description: Agency Identifier Code (Location Code); for example 4801 (Kelona).
+          description: Agency Identifier Code (Location Code); for example 4801 (Kelowna).
           type: string
           required: true
         roomCd:
