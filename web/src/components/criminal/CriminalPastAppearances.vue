@@ -47,7 +47,11 @@
 
                 <template v-slot:cell(Date)="data" >
                     <span :class="data.field.cellClass" style="display: inline-flex;"> 
-                        <b-button :style="data.field.cellStyle" size="sm" @click="OpenDetails(data);data.toggleDetails();" variant="outline-primary border-white text-info" class="mr-2 mt-1">
+                        <b-button :style="data.field.cellStyle" 
+                                  size="sm" 
+                                  @click="OpenDetails(data);data.toggleDetails();" 
+                                  variant="outline-primary border-white text-info" 
+                                  class="mr-2 mt-1">
                             <b-icon-caret-right-fill v-if="!data.item['_showDetails']"></b-icon-caret-right-fill>
                             <b-icon-caret-down-fill v-if="data.item['_showDetails']"></b-icon-caret-down-fill>
                             {{data.item.FormattedDate}}
@@ -82,11 +86,17 @@
                 </template>
 
                 <template  v-slot:cell(Accused)="data">
-                     <b-badge  variant="white" :style="data.field.cellStyle" class = "mt-2"> {{data.value}} </b-badge>
+                    <b-badge
+                            variant="white" 
+                            :style="data.field.cellStyle" 
+                            class = "mt-2"> {{data.value}} 
+                    </b-badge>
                 </template>
 
                 <template  v-slot:cell(Status)="data">
-                    <b :class = "data.item['Status Style']" :style="data.field.cellStyle"> {{data.value}} </b>
+                    <b :class = "data.item['Status Style']" 
+                       :style="data.field.cellStyle"> {{data.value}} 
+                    </b>
                 </template>
                 
             </b-table>
@@ -152,7 +162,25 @@ export default class CriminalPastAppearances extends Vue {
 
     pastAppearancesList: any[] = [];
     /* eslint-enable */  
+    isMounted = false;
+    isDataReady = false;
+    pastAppearancesJson;    
+    sortBy = 'Date';
+    sortDesc = true;    
 
+    fields =  
+    [
+        {key:'Date',       sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'transform: translate(0,-7px); font-size:16px', cellClass:'text-info mt-2 d-inline-flex'},
+        {key:'Reason',     sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'margin-top: 10px; font-size: 14px;'},
+        {key:'Time',       sortable:false, tdClass: 'border-top', headerStyle:'text'},
+        {key:'Duration',   sortable:false, tdClass: 'border-top', headerStyle:'text'},
+        {key:'Location',   sortable:true,  tdClass: 'border-top', headerStyle:'text-primary'},
+        {key:'Room',       sortable:false, tdClass: 'border-top', headerStyle:'text'},
+        {key:'Presider',   sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'margin-top: 10px; font-size: 14px;'},
+        {key:'Accused',    sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'font-size: 16px;'},
+        {key:'Status',     sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'font-weight: normal; font-size: 16px; width:110px'},
+    ];
+    
     mounted() {
         this.getPastAppearances();
     }
@@ -168,27 +196,6 @@ export default class CriminalPastAppearances extends Vue {
         }    
         this.isMounted = true;           
     } 
-  
-    isMounted = false;
-    isDataReady = false;
-    pastAppearancesJson;
-    
-    sortBy = 'Date';
-    sortDesc = true;
-    
-
-    fields =  
-    [
-        {key:'Date',       sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'transform: translate(0,-7px); font-size:16px', cellClass:'text-info mt-2 d-inline-flex'},
-        {key:'Reason',     sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'margin-top: 10px; font-size: 14px;'},
-        {key:'Time',       sortable:false, tdClass: 'border-top', headerStyle:'text'},
-        {key:'Duration',   sortable:false, tdClass: 'border-top', headerStyle:'text'},
-        {key:'Location',   sortable:true,  tdClass: 'border-top', headerStyle:'text-primary'},
-        {key:'Room',       sortable:false, tdClass: 'border-top', headerStyle:'text'},
-        {key:'Presider',   sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'margin-top: 10px; font-size: 14px;'},
-        {key:'Accused',    sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'font-size: 16px;'},
-        {key:'Status',     sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'font-weight: normal; font-size: 16px; width:110px'},
-    ];    
   
     public ExtractPastAppearancesInfo(): void {
         const currentDate = new Date();
@@ -206,21 +213,22 @@ export default class CriminalPastAppearances extends Vue {
           
             appInfo["Duration"] = this.getDuration(jApp.estimatedTimeHour, jApp.estimatedTimeMin)           
             appInfo["Location"] = jApp.courtLocation;
-            appInfo["Room"] =jApp.courtRoomCd
+            appInfo["Room"] =jApp.courtRoomCd;
 
             appInfo["First Name"] = jApp.givenNm ? jApp.givenNm : "";
             appInfo["Last Name"] = jApp.lastNm ? jApp.lastNm : jApp.orgNm;
             appInfo["Accused"] = this.getNameOfParticipant(appInfo["Last Name"], appInfo["First Name"]);  
-            appInfo["Status"] = jApp.appearanceStatusCd ? appearanceStatus[jApp.appearanceStatusCd] :''
-            appInfo["Status Style"] = this.getStatusStyle(appInfo["Status"])
-            appInfo["Presider"] =  jApp.judgeInitials ? jApp.judgeInitials :''
-            appInfo["Judge Full Name"] =  jApp.judgeInitials ? jApp.judgeFullNm : ''
+            appInfo["Status"] = jApp.appearanceStatusCd ? appearanceStatus[jApp.appearanceStatusCd] :'';
+            appInfo["Status Style"] = this.getStatusStyle(appInfo["Status"]);
+            appInfo["Presider"] =  jApp.judgeInitials ? jApp.judgeInitials :'';
+            appInfo["Judge Full Name"] =  jApp.judgeInitials ? jApp.judgeFullNm : '';
 
-            appInfo["Appearance ID"] = jApp.appearanceId
-            appInfo["Part ID"] = jApp.partId
-            appInfo["Supplemental Equipment"] = jApp.supplementalEquipmentTxt
-            appInfo["Security Restriction"] = jApp.securityRestrictionTxt
-            appInfo["OutOfTown Judge"] = jApp.outOfTownJudgeTxt
+            appInfo["Appearance ID"] = jApp.appearanceId;
+            appInfo["Part ID"] = jApp.partId;
+            appInfo["Supplemental Equipment"] = jApp.supplementalEquipmentTxt;
+            appInfo["Security Restriction"] = jApp.securityRestrictionTxt;
+            appInfo["OutOfTown Judge"] = jApp.outOfTownJudgeTxt;
+            appInfo["Prof Seq No"] = jApp.profSeqNo;
                        
             this.pastAppearancesList.push(appInfo); 
         }
@@ -251,14 +259,17 @@ export default class CriminalPastAppearances extends Vue {
     {
         if(!data.detailsShowing)
         {
-            this.appearanceInfo.fileNo = this.criminalFileInformation.fileNumber; 
-            
-            this.appearanceInfo.appearanceId = data.item["Appearance ID"]
-            this.appearanceInfo.partId = data.item["Part ID"]
-            this.appearanceInfo.supplementalEquipmentTxt = data.item["Supplemental Equipment"]
-            this.appearanceInfo.securityRestrictionTxt = data.item["Security Restriction"]
+            this.appearanceInfo.fileNo = this.criminalFileInformation.fileNumber;
+            this.appearanceInfo.courtLevel = this.criminalFileInformation.courtLevel;
+            this.appearanceInfo.courtClass = this.criminalFileInformation.courtClass;
+            this.appearanceInfo.appearanceId = data.item["Appearance ID"];
+            this.appearanceInfo.partId = data.item["Part ID"];
+            this.appearanceInfo.supplementalEquipmentTxt = data.item["Supplemental Equipment"];
+            this.appearanceInfo.securityRestrictionTxt = data.item["Security Restriction"];
             this.appearanceInfo.outOfTownJudgeTxt = data.item["OutOfTown Judge"]
+            this.appearanceInfo.profSeqNo = data.item["Prof Seq No"]            
             this.UpdateAppearanceInfo(this.appearanceInfo);
+          
         }
         
     }

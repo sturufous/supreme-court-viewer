@@ -24,7 +24,7 @@
 
         <b-card bg-variant="white" v-if="isDataReady" no-body class="mx-3" style="overflow:auto">           
             <b-table
-            :items="criminalList"
+            :items="SortedCriminalList"
             :fields="fields"            
             borderless
             small
@@ -43,12 +43,14 @@
                     </b-badge>
                 </template>
 
-                <template v-slot:[`cell(${fields[0].key})`]="data" >                     
+                <template v-slot:[`cell(${fields[1].key})`]="data" >                     
                     <b-button  
                         size="sm" 
                         style=" font-size:16px"
+                        :id="'criminalcase'+data.item.Index"
+                        :href="'#criminalcase'+data.item.Index"
                         @click="OpenDetails(data); data.toggleDetails();" 
-                        variant="outline-primary border-white text-info" 
+                        variant="outline-primary border-white text-criminal" 
                         class="mr-2">
                             <b-icon-caret-right-fill variant="criminal" v-if="!data.item['_showDetails']"></b-icon-caret-right-fill>
                             <b-icon-caret-down-fill variant="criminal" v-if="data.item['_showDetails']"></b-icon-caret-down-fill>
@@ -62,8 +64,20 @@
                     </b-card>
                 </template> 
                 
+                <template  v-slot:cell(Accused)="data">
+                    <b-button
+                        style=" font-size:16px" 
+                        size="sm" 
+                        @click="OpenCriminalFilePage(data)"                         
+                        variant="outline-primary border-white text-criminal" 
+                        class="mr-2">                            
+                            {{data.value}}
+                    </b-button>
+                </template>
+
                 <template  v-slot:cell(Reason)="data">
                     <b-badge
+                        v-if="data.item['Reason']"
                         variant="secondary"
                         v-b-tooltip.hover.right                            
                         :title="data.item['ReasonDesc']"
@@ -89,19 +103,19 @@
                 </template>
                 
 
-                <template v-slot:[`cell(${fields[7].key})`]="data" >
+                <template v-slot:[`cell(${fields[8].key})`]="data" >
                         <b-badge  
                             v-for="(field,index) in data.value"
                             :key="index" 
                             class="mr-1"
                             style="font-weight: normal;margin-top: 6px; font-size: 14px;"
-                            v-b-tooltip.hover 
+                            v-b-tooltip.hover.right 
                             :title='field.key' > 
                             {{ field.abbr }} 
                         </b-badge>
                 </template>
 
-                <template v-slot:[`cell(${fields[9].key})`]="data" >                     
+                <template v-slot:[`cell(${fields[10].key})`]="data" >                     
                     <b-badge variant="white" style="margin-top: 5px; font-weight: normal;font-size:16px">{{data.value}}
                     <span class="text-muted" style="font-weight: normal; font-size:14px">d</span>  </b-badge>                
                 </template>
@@ -118,6 +132,7 @@
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import CriminalAppearanceDetails from '@components/criminal/CriminalAppearanceDetails.vue';
+import * as _ from 'underscore';
 
 import "@store/modules/CommonInformation";
 const commonState = namespace("CommonInformation");
@@ -144,6 +159,8 @@ export default class CriminalList extends Vue {
     @criminalState.Action
     public UpdateAppearanceInfo!: (newAppearanceInfo: any) => void       
 
+    @criminalState.Action
+    public UpdateCriminalFile!: (newCriminalFileInformation: any) => void
 
     @commonState.State
     public displayName!: string;    
@@ -173,7 +190,7 @@ export default class CriminalList extends Vue {
        
         this.criminalCourtListJson = data.criminalCourtList
 
-         //console.log(this.criminalCourtListJson)
+        ///console.log(this.criminalCourtListJson)
         this.courtRoom = data.courtRoomCode    
         this.ExtractCriminalListInfo()
         if(this.criminalList.length)
@@ -193,6 +210,7 @@ export default class CriminalList extends Vue {
     
     fields =  
     [
+        {key:'Seq.',        tdClass: 'border-top', headerStyle:'', cellStyle:''},
         {key:'File Number', tdClass: 'border-top', headerStyle:'', cellStyle:''},
         {key:'Accused',     tdClass: 'border-top', headerStyle:'', cellStyle:'text-primary'},
         {key:'Time',        tdClass: 'border-top', headerStyle:'', cellStyle:''},
@@ -217,6 +235,8 @@ export default class CriminalList extends Vue {
             const jcriminalList = this.criminalCourtListJson[criminalListIndex];
 
             criminalListInfo["Index"] = criminalListIndex;
+
+            criminalListInfo['Seq.']=jcriminalList.appearanceSequenceNumber?parseInt(jcriminalList.appearanceSequenceNumber):''
             criminalListInfo['File Number']=jcriminalList.fileNumberText
             criminalListInfo['Case Age']= jcriminalList.caseAgeDaysNumber? jcriminalList.caseAgeDaysNumber: ''
             criminalListInfo["Time"] = this.getTime(jcriminalList.appearanceTime.split(' ')[1].substr(0,5));
@@ -275,6 +295,10 @@ export default class CriminalList extends Vue {
             criminalListInfo["Supplemental Equipment"] = jcriminalList.supplementalEquipment
             criminalListInfo["Security Restriction"] = jcriminalList.securityRestriction
             criminalListInfo["OutOfTown Judge"] = jcriminalList.outOfTownJudge
+
+            criminalListInfo["Court Level"] = jcriminalList.fileInformation.courtLevelCd
+            criminalListInfo["Court Class"] = jcriminalList.fileInformation.courtClassCd
+            criminalListInfo["Prof SeqNo"] = jcriminalList.fileInformation.profSeqNo
                        
             this.criminalList.push(criminalListInfo); 
             //console.log(criminalListInfo)
@@ -308,13 +332,26 @@ export default class CriminalList extends Vue {
             this.appearanceInfo.supplementalEquipmentTxt = data.item["Supplemental Equipment"]
             this.appearanceInfo.securityRestrictionTxt = data.item["Security Restriction"]
             this.appearanceInfo.outOfTownJudgeTxt = data.item["OutOfTown Judge"]
+
+            this.appearanceInfo.courtLevel = data.item['Court Level']
+            this.appearanceInfo.courtClass = data.item['Court Class']
+            this.appearanceInfo.profSeqNo = data.item['Prof SeqNo']
             this.UpdateAppearanceInfo(this.appearanceInfo);
         }        
     }
 
+    public OpenCriminalFilePage(data)
+    {
+        const fileInformation = { }
+        fileInformation['fileNumber'] = data.item['JustinNo']
+        this.UpdateCriminalFile(fileInformation)
+        const routeData = this.$router.resolve({name:'CriminalCaseDetails', params: {fileNumber: fileInformation['fileNumber']}})
+        window.open(routeData.href, '_blank');
+    }
+
     get SortedCriminalList()
-    {           
-        return 0       
+    {                
+        return  _.sortBy(this.criminalList, 'Seq.')
     }
 }
 </script>

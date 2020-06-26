@@ -22,7 +22,7 @@
             </b-overlay> 
         </b-card>
 
-        <b-card bg-variant="white" v-if="isDataReady" no-body class="mx-3">           
+        <b-card bg-variant="white" v-if="isDataReady" no-body class="mx-3 mb-5" style="overflow:auto">           
             <b-table
             :items="SortedFutureAppearances"
             :fields="fields"
@@ -47,7 +47,7 @@
                 </template>
 
                 <template v-slot:cell(Date)="data" >
-                    <span :class="data.field.cellClass"> 
+                    <span :class="data.field.cellClass" style="display: inline-flex;"> 
                         <b-button :style="data.field.cellStyle" 
                                   size="sm" 
                                   @click="OpenDetails(data);data.toggleDetails();" 
@@ -76,11 +76,17 @@
                 </template>
 
                 <template  v-slot:cell(Accused)="data">
-                     <b-badge  variant="white" :style="data.field.cellStyle" class = "mt-2"> {{data.value}} </b-badge>
+                    <b-badge  
+                            variant="white" 
+                            :style="data.field.cellStyle" 
+                            class = "mt-2"> {{data.value}} 
+                    </b-badge>
                 </template>
 
                 <template  v-slot:cell(Status)="data">
-                    <b :class = "data.item['Status Style']" :style="data.field.cellStyle"> {{data.value}} </b>
+                    <b :class = "data.item['Status Style']" 
+                       :style="data.field.cellStyle"> {{data.value}}
+                    </b>
                 </template>
                 
             </b-table>
@@ -244,12 +250,15 @@ export default class CriminalFutureAppearances extends Vue {
     {
         if(!data.detailsShowing)
         {
-            this.appearanceInfo.fileNo = this.criminalFileInformation.fileNumber;
+            this.appearanceInfo.fileNo = this.criminalFileInformation.fileNumber;            
+            this.appearanceInfo.courtLevel = this.criminalFileInformation.courtLevel;
+            this.appearanceInfo.courtClass = this.criminalFileInformation.courtClass;
             this.appearanceInfo.appearanceId = data.item["Appearance ID"]
             this.appearanceInfo.partId = data.item["Part ID"]
             this.appearanceInfo.supplementalEquipmentTxt = data.item["Supplemental Equipment"]
             this.appearanceInfo.securityRestrictionTxt = data.item["Security Restriction"]
             this.appearanceInfo.outOfTownJudgeTxt = data.item["OutOfTown Judge"]
+            this.appearanceInfo.profSeqNo = data.item["Prof Seq No"]
             this.UpdateAppearanceInfo(this.appearanceInfo);
         }        
     }

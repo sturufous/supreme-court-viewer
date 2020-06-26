@@ -1,5 +1,5 @@
 <template>
-<body> 
+<div style="overflow:hidden"> 
 
     <b-card bg-variant="light" v-if= "!isMounted && !isDataReady">
         <b-overlay :show= "true"> 
@@ -16,7 +16,8 @@
     <b-card bg-variant="light" v-if= "isMounted && !isDataReady">
         <b-card  style="min-height: 100px;">
             <span v-if="errorCode==404">This <b>File-Number '{{this.criminalFileInformation.fileNumber}}'</b> doesn't exist in the <b>criminal</b> records. </span>
-            <span v-if="errorCode>405"> Server doesn't respond. <b>({{errorText}})</b> </span>
+            <span v-else-if="errorCode==200 || errorCode==204"> Bad Data in <b>File-Number '{{this.criminalFileInformation.fileNumber}}'</b> ! </span>
+            <span v-else> Server is not responding. <b>({{errorText}})</b> </span>
         </b-card>
         <b-card>         
             <b-button variant="info" @click="navigateToLandingPage">Back to the Landing Page</b-button>
@@ -48,7 +49,15 @@
             <b-card><br></b-card>  
         </b-col>
     </b-row>
-</body>
+
+    <b-modal v-if= "isMounted" v-model="banExists" id="bv-modal-ban" hide-header hide-footer>        
+        <b-card> 
+            A Ban has been ordered on at least one participant in this case. 
+            Please check Ban Details before giving out sensitive details.
+        </b-card>                     
+        <b-button class="mt-3 bg-primary" @click="$bvModal.hide('bv-modal-ban')">Continue</b-button>
+    </b-modal>
+</div>
 </template>
 
 <script lang="ts">
@@ -70,6 +79,13 @@ import '@store/modules/CriminalFileInformation';
 import "@store/modules/CommonInformation";
 const criminalState = namespace('CriminalFileInformation');
 const commonState = namespace("CommonInformation");
+
+enum DecodeCourtLevel {'P'= 0, 'S' = 1, 'A' = 2 }
+enum DecodeCourtClass {
+    'A' = 0, 'Y' = 1, 'T' = 2, 'F' = 3, 'C' = 4, 'M' = 5,        
+    'L' = 6, 'R' = 7, 'B' = 8, 'D' = 9, 'E' = 10, 'G' = 11,        
+    'H' = 12, 'N' = 13, 'O' = 14, 'P' = 15, 'S' = 16, 'V' = 17,
+}
 
 @Component({
     components: {
@@ -107,10 +123,12 @@ export default class CriminalCaseDetails extends Vue {
    
     participantList: any[] = [];
     adjudicatorRestrictionsInfo: any[] = [];
+    bans: any[] = [];
     /* eslint-enable */
 
     isDataReady = false
     isMounted = false
+    banExists = false
     errorCode =0;
     errorText ='';
     
@@ -139,7 +157,7 @@ export default class CriminalCaseDetails extends Vue {
     }
 
     public getFileDetails(): void {
-       
+        this.errorCode=0;
         this.$http.get('/api/files/criminal/'+ this.criminalFileInformation.fileNumber)
             .then(Response => Response.json(), err => {this.errorCode= err.status;this.errorText= err.statusText;console.log(err);}        
             ).then(data => {
@@ -147,15 +165,29 @@ export default class CriminalCaseDetails extends Vue {
                     this.criminalFileInformation.detailsData = data; 
                     this.participantJson = data.participant
                     this.adjudicatorRestrictionsJson = data.hearingRestriction;
+                    const courtLevel = DecodeCourtLevel[data.courtLevelCd];
+                    const courtClass = DecodeCourtClass[data.courtClassCd];
                     this.ExtractFileInfo()
                     if(this.participantList.length)
                     {
                         this.criminalFileInformation.participantList = this.participantList;
                         this.criminalFileInformation.adjudicatorRestrictionsInfo = this.adjudicatorRestrictionsInfo;
+                        if (this.bans.length > 0) {
+                            this.banExists = true;
+                        }
+                        this.criminalFileInformation.bans = this.bans;
+                        this.criminalFileInformation.courtLevel = courtLevel;
+                        this.criminalFileInformation.courtClass = courtClass;
                         this.UpdateCriminalFile(this.criminalFileInformation);
                         this.isDataReady = true;
                     }
+                    else
+                        this.errorCode=200;                    
                 }
+                else
+                    if(this.errorCode==0) this.errorCode=200;
+                    
+                
                 this.isMounted = true;
                        
             });
@@ -218,10 +250,10 @@ export default class CriminalCaseDetails extends Vue {
             const charges: any[] = [];         
             for(const charge of jParticipant.charge)
             {              
-                    const chargeInfo = {};                   
-                    chargeInfo["Description"]= charge.sectionDscTxt
-                    chargeInfo["Code"]= charge.sectionTxt
-                    charges.push(chargeInfo);
+                const chargeInfo = {};                   
+                chargeInfo["Description"]= charge.sectionDscTxt
+                chargeInfo["Code"]= charge.sectionTxt
+                charges.push(chargeInfo);
             }
             participantInfo["Charges"] = charges;
 
@@ -231,10 +263,23 @@ export default class CriminalCaseDetails extends Vue {
                 if(jParticipant[status.code] =='Y')
                     participantInfo["Status"].push(status);
             }
+            
+            for(const ban of jParticipant.ban)
+            {              
+                const banInfo = {};
+                banInfo["Ban Participant"] = participantInfo["Name"];                   
+                banInfo["Ban Type"] = ban.banTypeDescription;
+                banInfo["Order Date"] = ban.banOrderedDate;                   
+                banInfo["Act"] = ban.banTypeAct;
+                banInfo["Sect."] = ban.banTypeSection;                   
+                banInfo["Sub"] = ban.banTypeSubSection;
+                banInfo["Description"] = ban.banStatuteId;                   
+                banInfo["Comment"] = ban.banCommentText;                  
+                this.bans.push(banInfo);
+            }                      
 
             participantInfo['DocumentsJson'] = jParticipant.document;
             participantInfo['CountsJson'] = jParticipant.count;
-
 
             this.UpdateDisplayName({'lastName': jParticipant.counselLastNm? jParticipant.counselLastNm: '', 'givenName': jParticipant.counselGivenNm? jParticipant.counselGivenNm: ''});
             participantInfo['Counsel'] = this.displayName.trim.length? 'JUSTIN: ' + this.displayName: '';
