@@ -58,23 +58,34 @@
     <Content Include="src\assets\bc-logo.svg" />
     <Content Include="src\assets\landing.jpg" />
     <Content Include="src\assets\logo.png" />
+    <Content Include="src\components\civil\CivilAdjudicatorRestrictions.vue" />
+    <Content Include="src\components\civil\CivilAppearanceDetails.vue" />
+    <Content Include="src\components\civil\CivilCaseDetails.vue" />
     <Content Include="src\components\civil\CivilDocumentsView.vue" />
+    <Content Include="src\components\civil\CivilFutureAppearances.vue" />
+    <Content Include="src\components\civil\CivilHeader.vue" />
+    <Content Include="src\components\civil\CivilHeaderTop.vue" />
+    <Content Include="src\components\civil\CivilParties.vue" />
+    <Content Include="src\components\civil\CivilPastAppearances.vue" />
+    <Content Include="src\components\civil\CivilSidePanel.vue" />
     <Content Include="src\components\courtlist\CivilList.vue" />
     <Content Include="src\components\courtlist\CourtList.vue" />
     <Content Include="src\components\courtlist\CriminalList.vue" />
-    <Content Include="src\components\criminal\AdjudicatorRestrictions.vue" />
-    <Content Include="src\components\criminal\AppearanceDetails.vue" />
+    <Content Include="src\components\criminal\CriminalAdjudicatorRestrictions.vue" />
+    <Content Include="src\components\criminal\CriminalAppearanceDetails.vue" />
     <Content Include="src\components\criminal\CriminalCaseDetails.vue" />
     <Content Include="src\components\criminal\CriminalCrownInformation.vue" />
     <Content Include="src\components\criminal\CriminalCrownNotes.vue" />
     <Content Include="src\components\criminal\CriminalDocumentsView.vue" />
+    <Content Include="src\components\criminal\CriminalFutureAppearances.vue" />
     <Content Include="src\components\criminal\CriminalHeader.vue" />
     <Content Include="src\components\criminal\CriminalHeaderTop.vue" />
     <Content Include="src\components\criminal\CriminalParticipants.vue" />
+    <Content Include="src\components\criminal\CriminalPastAppearances.vue" />
+    <Content Include="src\components\criminal\CriminalSentence.vue" />
+    <Content Include="src\components\criminal\CriminalSentenceDetails.vue" />
     <Content Include="src\components\criminal\CriminalSidePanel.vue" />
     <Content Include="src\components\criminal\CriminalWitnesses.vue" />
-    <Content Include="src\components\criminal\FutureAppearances.vue" />
-    <Content Include="src\components\criminal\PastAppearances.vue" />
     <Content Include="src\components\Home.vue" />
     <Content Include="src\components\LoadingSpinner.vue" />
     <Content Include="src\components\NavigationFooter.vue" />
@@ -99,6 +110,7 @@
     <Folder Include="src\components\courtlist\" />
     <Folder Include="src\components\criminal\" />
     <Folder Include="src\constants\" />
+    <Folder Include="src\filters\" />
     <Folder Include="src\router\" />
     <Folder Include="src\store\" />
     <Folder Include="src\store\modules\" />
@@ -113,6 +125,7 @@
     <Content Include="babel.config.js" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="src\filters\index.ts" />
     <TypeScriptCompile Include="src\router\index.ts" />
     <TypeScriptCompile Include="src\store\index.ts" />
     <TypeScriptCompile Include="src\store\modules\CivilFileInformation.ts" />
