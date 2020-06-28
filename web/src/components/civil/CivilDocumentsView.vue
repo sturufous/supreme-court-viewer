@@ -112,6 +112,7 @@
 import { Component, Vue} from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
 import '@store/modules/CivilFileInformation';
+import {civilFileInformationType, documentsInfoType, summaryDocumentsInfoType} from '../../types/civil';
 const civilState = namespace('CivilFileInformation');
 
 enum fieldTab {Categories=0, Summary}
@@ -119,16 +120,14 @@ enum fieldTab {Categories=0, Summary}
 @Component
 export default class CivilDocumentsView extends Vue {
 
-    /* eslint-disable */
     @civilState.State
-    public civilFileInformation!: any
+    public civilFileInformation!: civilFileInformationType
 
     @civilState.Action
-    public UpdateCivilFile!: (newCivilFileInformation: any) => void
+    public UpdateCivilFile!: (newCivilFileInformation: civilFileInformationType) => void
 
-    documents: any[] = [];
-    summaryDocuments: any[] = [];
-    /* eslint-enable */
+    documents: documentsInfoType[] = [];
+    summaryDocuments: summaryDocumentsInfoType[] = [];
 
     documentsDetailsJson;
     loadingPdf = false;

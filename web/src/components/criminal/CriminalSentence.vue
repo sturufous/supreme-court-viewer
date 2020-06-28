@@ -142,6 +142,8 @@ import { namespace } from 'vuex-class';
 import CriminalSentenceDetails from '@components/criminal/CriminalSentenceDetails.vue';
 import '@store/modules/CriminalFileInformation';
 import "@store/modules/CommonInformation";
+import {countInfoType, participantListInfoType, participantSentencesDetailsInfoType, participantSentencesInfoType, criminalFileInformationType} from '../../types/criminal';
+import {inputNamesType} from '../../types/common'
 const criminalState = namespace("CriminalFileInformation");
 const commonState = namespace("CommonInformation");
 
@@ -158,22 +160,20 @@ export default class CriminalSentence extends Vue {
     @commonState.State
     public displayName!: string;
 
-    /* eslint-disable */
     @criminalState.State
-    public criminalFileInformation!: any
+    public criminalFileInformation!: criminalFileInformationType
 
     @criminalState.Action
-    public UpdateCriminalFile!: (newCriminalFileInformation: any) => void
+    public UpdateCriminalFile!: (newCriminalFileInformation: criminalFileInformationType) => void
 
     @criminalState.Action
-    public UpdateCriminalParticipantSentenceInformation!: (newCriminalParticipantSentenceInformation: any) => void
+    public UpdateCriminalParticipantSentenceInformation!: (newCriminalParticipantSentenceInformation: participantSentencesDetailsInfoType) => void
      
     @commonState.Action
-    public UpdateDisplayName!: (newInputNames: any) => void
+    public UpdateDisplayName!: (newInputNames: inputNamesType) => void
 
-    participantFiles: any[] = [];
-    participantList: any[] = [];
-    /* eslint-enable */
+    participantSentences: participantSentencesInfoType[] = [];
+    participantList: participantListInfoType[] = [];
     
     participantJson;   
     isMounted = false    
@@ -195,7 +195,7 @@ export default class CriminalSentence extends Vue {
         const data = this.criminalFileInformation.detailsData;
         this.participantJson = data.participant
         this.participantList = this.criminalFileInformation.participantList
-        this.ExtractParticipantInfo()          
+        this.ExtractParticipantSentencesInfo()          
         this.isMounted = true;
     }
 
@@ -203,16 +203,19 @@ export default class CriminalSentence extends Vue {
         this.getParticipants();  
     }
     
-    public ExtractParticipantInfo(): void {        
+    public ExtractParticipantSentencesInfo(): void {        
         
         for(const partIndex in this.participantList)
-        {
-            const partInfo = this.participantList[partIndex];
+        {            
+            const partInfo = {} as participantSentencesInfoType;
+            partInfo["Index"] = this.participantList[partIndex]["Index"];
+            partInfo["Last Name"] = this.participantList[partIndex]["Last Name"];
+            partInfo["Name"] = this.participantList[partIndex]["Name"];
+            partInfo["CountsJson"] = this.participantList[partIndex]["CountsJson"];
 
             partInfo["Counts"] = [];
-            /* eslint-disable */
-            const counts: any[] = [];
-             /* eslint-enable */ 
+            
+            const counts: countInfoType[] = [];
             
             partInfo["OrderMade"] = [];
             partInfo["OrderMadeDisable"] =  true;
@@ -221,7 +224,7 @@ export default class CriminalSentence extends Vue {
               
             for(const cnt of this.mergeSentences(partInfo.CountsJson))           
             {                
-                const countInfo = {}; 
+                const countInfo = {} as countInfoType; 
                
                 countInfo["Date"] = cnt.appearanceDate? cnt.appearanceDate.split(' ')[0] : ''; 
                 countInfo["FormattedDate"] = Vue.filter('beautify-date')(countInfo["Date"]);
@@ -307,10 +310,11 @@ export default class CriminalSentence extends Vue {
             partInfo["CountsDisable"] = counts.length>0 ? false: true;
             
             
-            this.participantFiles.push(partInfo);
+            this.participantSentences.push(partInfo);
         } 
-        const participantInfo = {participantFiles:{}, selectedParticipant:0}
-        participantInfo.participantFiles = this.participantFiles;
+        const participantInfo = {} as participantSentencesDetailsInfoType;
+        participantInfo.selectedParticipant=0;
+        participantInfo.participantSentences = this.participantSentences;
         this.UpdateCriminalParticipantSentenceInformation(participantInfo);
     }
 
@@ -336,17 +340,17 @@ export default class CriminalSentence extends Vue {
 
     get SortedParticipants()
     {         
-        return _.sortBy(this.participantFiles,(participant=>{return (participant["Last Name"]? participant["Last Name"].toUpperCase() : '')}))       
+        return _.sortBy(this.participantSentences,(participant=>{return (participant["Last Name"]? participant["Last Name"].toUpperCase() : '')}))       
     }
 
     get SortedOrderMade()
     {
-        return _.sortBy(this.participantFiles[this.orderMadeClickedParticipant].OrderMade, 'Date').reverse()
+        return _.sortBy(this.participantSentences[this.orderMadeClickedParticipant].OrderMade, 'Date').reverse()
     }
 
      get SortedJudgesRecommendation()
     {
-        return _.sortBy(this.participantFiles[this.judgeRecomClickedParticipant].JudgesRecommendation, 'Date').reverse()
+        return _.sortBy(this.participantSentences[this.judgeRecomClickedParticipant].JudgesRecommendation, 'Date').reverse()
     }
 
     public OpenDetails(data)
@@ -364,14 +368,12 @@ export default class CriminalSentence extends Vue {
 
     public OpenOrderMadeDetails(data)
     {
-        console.log(data)
         this.orderMadeClickedParticipant = data.item.Index
         this.showOrderMade=true
     }
 
     public OpenJudgeRecommendation(data)
-    { 
-        console.log(data)
+    {
         this.judgeRecomClickedParticipant = data.item.Index
         this.showRecommendation=true           
     }

@@ -111,22 +111,21 @@
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import "@store/modules/CivilFileInformation";
+import {civilFileInformationType} from '../../types/civil';
 const civilState = namespace("CivilFileInformation");
 
 @Component
 export default class CivilHeader extends Vue {
-
-  /* eslint-disable */
+  
   @civilState.State
-  public civilFileInformation!: any;
-   /* eslint-enable */  
+  public civilFileInformation!: civilFileInformationType;   
 
   maximumFullNameLength = 15;
   activeParty = 0;
   fileNumberText;
   sheriffComment;
   activityClassCode;
-  agencyLocation = {Name:'', Code:0, Region:'' };
+  agencyLocation = {Name:'', Code:'0', Region:'' };
   isMounted = false;
   isSealed = false;
   partyDisplayedTxt;

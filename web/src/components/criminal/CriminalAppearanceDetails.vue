@@ -219,26 +219,25 @@
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { namespace } from "vuex-class";
-
+import {criminalFileInformationType, appearanceAdditionalInfoType, appearanceMethodDetailsInfoType, appearanceChargesInfoType, criminalAppearanceInfoType, criminalAppearanceMethodsInfoType} from '../../types/criminal';
 import "@store/modules/CriminalFileInformation";
 const criminalState = namespace("CriminalFileInformation");
 
 
 @Component
 export default class CriminalAppearanceDetails extends Vue {
-
-    /* eslint-disable */
-    @criminalState.State
-    public criminalFileInformation!: any;
-
-    @criminalState.State
-    public appearanceInfo!: any;
     
-    appearanceAdditionalInfo: any[] = [];
-    appearanceCharges: any[] = [];    
-    appearanceMethods: any[] = [];
-    appearanceMethodDetails: any[] = [];
-    /* eslint-enable */ 
+    @criminalState.State
+    public criminalFileInformation!: criminalFileInformationType;
+
+    @criminalState.State
+    public appearanceInfo!: criminalAppearanceInfoType;
+    
+    appearanceAdditionalInfo: appearanceAdditionalInfoType[] = [];
+    appearanceCharges: appearanceChargesInfoType[] = [];    
+    appearanceMethods: criminalAppearanceMethodsInfoType[] = [];
+    appearanceMethodDetails: appearanceMethodDetailsInfoType[] = [];
+     
   
     loadingPdf = false;
     loadingROP = false;
@@ -296,9 +295,7 @@ export default class CriminalAppearanceDetails extends Vue {
                 if(data){  
                     this.appearanceDetailsJson = data;              
                     this.ExtractAppearanceDetailsInfo();
-                    const element = document.getElementById(this.tagcasename);                        
-                        // console.log(this.tagcasename)
-                        // console.log(element)
+                    const element = document.getElementById(this.tagcasename);
                     if(element !=null)
                         setTimeout(() => {element.scrollIntoView(); }, 100);         
                 }
@@ -333,7 +330,7 @@ export default class CriminalAppearanceDetails extends Vue {
              
         for(const charge of this.appearanceDetailsJson.charges)
         {              
-            const chargeInfo = {};             
+            const chargeInfo = {} as appearanceChargesInfoType;             
             chargeInfo["Count"] = charge.printSeqNo;
 
             chargeInfo["Criminal Code"]= charge.statuteSectionDsc                 
@@ -350,7 +347,7 @@ export default class CriminalAppearanceDetails extends Vue {
 
         for(const appearanceMethod of this.appearanceDetailsJson.appearanceMethods)
         {                         
-            const methodInfo = {};             
+            const methodInfo = {} as criminalAppearanceMethodsInfoType;             
             methodInfo["role"] = appearanceMethod.roleTypeDsc;
             methodInfo["method"] = appearanceMethod.appearanceMethodDesc;
             methodInfo["instruction"] = appearanceMethod.instructionTxt? appearanceMethod.instructionTxt: '';

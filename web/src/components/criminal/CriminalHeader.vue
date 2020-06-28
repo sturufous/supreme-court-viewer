@@ -123,6 +123,8 @@ import * as _ from 'underscore';
 import { namespace } from "vuex-class";
 import "@store/modules/CriminalFileInformation";
 import "@store/modules/CommonInformation";
+import {bansInfoType, participantListInfoType, criminalFileInformationType} from '../../types/criminal';
+import {inputNamesType, adjudicatorRestrictionsInfoType } from '../../types/common'
 const criminalState = namespace("CriminalFileInformation");
 const commonState = namespace("CommonInformation");
 
@@ -135,25 +137,23 @@ export default class CriminalHeader extends Vue {
   @commonState.State
   public displayName!: string;
 
-  /* eslint-disable */
   @criminalState.State
-  public criminalFileInformation!: any;
+  public criminalFileInformation!: criminalFileInformationType;
 
   @criminalState.Action
-  public UpdateActiveCriminalParticipantIndex!: (newActiveCriminalParticipantIndex: any) => void
+  public UpdateActiveCriminalParticipantIndex!: (newActiveCriminalParticipantIndex: string) => void
 
   @commonState.Action
-  public UpdateDisplayName!: (newInputNames: any) => void
+  public UpdateDisplayName!: (newInputNames: inputNamesType) => void
 
-  participantList: any[] = [];
-  adjudicatorRestrictions: any[] = [];
-  bans: any[] = [];
-  /* eslint-enable */
+  participantList: participantListInfoType[] = [];
+  adjudicatorRestrictions: adjudicatorRestrictionsInfoType[] = [];
+  bans: bansInfoType[] = [];
 
   maximumFullNameLength = 15;
   numberOfParticipants = 0;
   fileNumberText;
-  agencyLocation = {Name:'', Code:0, Region:'' };
+  agencyLocation = {Name:'', Code:'0', Region:'' };
   adjudicatorRestrictionsJson;
   isMounted = false;
   participantJson;

@@ -175,6 +175,9 @@ import { Component, Vue, Prop } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import CivilAppearanceDetails from '@components/civil/CivilAppearanceDetails.vue';
 import * as _ from 'underscore';
+import {courtListInformationInfoType, civilListInfoType} from '../../types/courtlist';
+import {civilFileInformationType, civilAppearanceInfoType} from '../../types/civil';
+import {inputNamesType, durationType } from '../../types/common'
 
 import "@store/modules/CommonInformation";
 const commonState = namespace("CommonInformation");
@@ -193,16 +196,16 @@ enum HearingType {'A'= '+','G' = '@','D'='-', 'S' = '*'  }
 export default class CivilList extends Vue {
 
     @courtListState.State
-    public courtListInformation!: any
+    public courtListInformation!: courtListInformationInfoType
 
     @civilState.State
-    public appearanceInfo!: any;
+    public appearanceInfo!: civilAppearanceInfoType;
 
     @civilState.Action
-    public UpdateAppearanceInfo!: (newAppearanceInfo: any) => void 
+    public UpdateAppearanceInfo!: (newAppearanceInfo: civilAppearanceInfoType) => void 
     
     @civilState.Action
-    public UpdateCivilFile!: (newCivilFileInformation: any) => void   
+    public UpdateCivilFile!: (newCivilFileInformation: civilFileInformationType) => void   
 
     @commonState.State
     public displayName!: string;    
@@ -214,13 +217,13 @@ export default class CivilList extends Vue {
     public time
 
     @commonState.Action
-    public UpdateDisplayName!: (newInputNames: any) => void
+    public UpdateDisplayName!: (newInputNames: inputNamesType) => void
 
     @commonState.Action
-    public UpdateDuration!: (duration: any) => void
+    public UpdateDuration!: (duration: durationType) => void
 
     @commonState.Action
-    public UpdateTime!: (time: any) => void
+    public UpdateTime!: (time: string) => void
 
     mounted() {
         this.getCivilList();
@@ -245,7 +248,7 @@ export default class CivilList extends Vue {
 
     @Prop() civilClass
 
-    civilList: any[] = [];
+    civilList: civilListInfoType[] = [];
     
     civilCourtListJson;
     courtRoom;
@@ -272,13 +275,13 @@ export default class CivilList extends Vue {
         const listClass = this.civilClass=='family'? 'F': 'I';
         for (const civilListIndex in this.civilCourtListJson) 
         {
-            const civilListInfo = {};
+            const civilListInfo = {} as civilListInfoType;
             const jcivilList = this.civilCourtListJson[civilListIndex];
 
             civilListInfo["Index"] = civilListIndex;
             if(jcivilList.activityClassCd != listClass) continue;
 
-            civilListInfo['Seq.']=jcivilList.courtListPrintSortNumber? parseInt(jcivilList.courtListPrintSortNumber):''
+            civilListInfo['Seq.']=jcivilList.courtListPrintSortNumber? parseInt(jcivilList.courtListPrintSortNumber):0
 
             civilListInfo['File Number']=jcivilList.physicalFile.fileNumber
             civilListInfo['Tag'] = civilListInfo['File Number']+'-'+civilListInfo['Seq.'];      
@@ -424,7 +427,7 @@ export default class CivilList extends Vue {
 
     public OpenCivilFilePage(data)
     {
-        const fileInformation = { }
+        const fileInformation = { } as civilFileInformationType
         fileInformation['fileNumber'] = data.item['FileID']
         this.UpdateCivilFile(fileInformation)
         const routeData = this.$router.resolve({name:'CivilCaseDetails', params: {fileNumber: fileInformation['fileNumber']}})

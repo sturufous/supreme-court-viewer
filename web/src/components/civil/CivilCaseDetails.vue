@@ -71,6 +71,8 @@ import CivilParties from '@components/civil/CivilParties.vue';
 import CivilHeaderTop from '@components/civil/CivilHeaderTop.vue';
 import CivilHeader from '@components/civil/CivilHeader.vue';
 import CivilSidePanel from '@components/civil/CivilSidePanel.vue';
+import {civilFileInformationType, partiesInfoType, documentsInfoType, summaryDocumentsInfoType} from '../../types/civil';
+import {inputNamesType, adjudicatorRestrictionsInfoType } from '../../types/common'
 import "@store/modules/CommonInformation";
 import "@store/modules/CivilFileInformation";
 const civilState = namespace("CivilFileInformation");
@@ -96,23 +98,21 @@ export default class CivilCaseDetails extends Vue {
     
     @commonState.State
     public displayName!: string;
-
-    /* eslint-disable */
+    
     @civilState.State
-    public civilFileInformation!: any
+    public civilFileInformation!: civilFileInformationType
 
     @civilState.Action
-    public UpdateCivilFile!: (newCivilFileInformation: any) => void 
+    public UpdateCivilFile!: (newCivilFileInformation: civilFileInformationType) => void 
 
     @commonState.Action
-    public UpdateDisplayName!: (newInputNames: any) => void
+    public UpdateDisplayName!: (newInputNames: inputNamesType) => void
 
-    leftPartiesInfo: any[] = [];
-    rightPartiesInfo: any[] = [];
-    adjudicatorRestrictionsInfo: any[] = [];
-    documentsInfo: any[] = [];
-    summaryDocumentsInfo: any[] = [];
-    /* eslint-enable */
+    leftPartiesInfo: partiesInfoType[] = [];
+    rightPartiesInfo: partiesInfoType[] = [];
+    adjudicatorRestrictionsInfo: adjudicatorRestrictionsInfoType[] = [];
+    documentsInfo: documentsInfoType[] = [];
+    summaryDocumentsInfo: summaryDocumentsInfoType[] = [];
     
     isDataReady = false
     isMounted = false
@@ -203,7 +203,7 @@ export default class CivilCaseDetails extends Vue {
 
     public ExtractCaseInfo(): void {        
         for(const jParty of this.partiesJson) {            
-            const partyInfo = {};            
+            const partyInfo = {} as partiesInfoType;            
             partyInfo["Party ID"] = jParty.partyId;
             partyInfo["Role"] = jParty.roleTypeDescription;
             if (jParty.counsel.length > 0) {
@@ -230,7 +230,7 @@ export default class CivilCaseDetails extends Vue {
         this.rightPartiesInfo = this.SortParties(this.rightPartiesInfo);
 
         for (const jRestriction of this.adjudicatorRestrictionsJson) {
-            const restrictionInfo = {};     
+            const restrictionInfo = {} as adjudicatorRestrictionsInfoType;     
             restrictionInfo["Adj Restriction"] = jRestriction.adjInitialsTxt?jRestriction.hearingRestrictionTypeDsc+ ": " + jRestriction.adjInitialsTxt:jRestriction.hearingRestrictionTypeDsc;     
             restrictionInfo["Adjudicator"] =   jRestriction.adjInitialsTxt?jRestriction.adjInitialsTxt +" - " + jRestriction.adjFullNm: jRestriction.adjFullNm;
             restrictionInfo["Full Name"] = jRestriction.adjFullNm;
@@ -241,11 +241,11 @@ export default class CivilCaseDetails extends Vue {
         }
 
         for(const docIndex in this.documentsDetailsJson)
-        {
-            const docInfo = {}; 
-            const jDoc =  this.documentsDetailsJson[docIndex];
-            docInfo["Index"] = docIndex;
+        {             
+            const jDoc =  this.documentsDetailsJson[docIndex];            
             if(jDoc.documentTypeCd != 'CSR') {
+                const docInfo = {} as documentsInfoType;
+                docInfo["Index"] = docIndex;
                 docInfo["Seq."] = jDoc.fileSeqNo;
                 docInfo["Document Type"] = jDoc.documentTypeDescription;
                 docInfo["Concluded"] = jDoc.concludedYn;
@@ -281,7 +281,9 @@ export default class CivilCaseDetails extends Vue {
                 docInfo["Date Granted"] = jDoc.DateGranted? jDoc.DateGranted : ''; 
                 this.documentsInfo.push(docInfo);                
 
-            } else {                
+            } else {
+                const docInfo = {} as summaryDocumentsInfoType;
+                docInfo["Index"] = docIndex;                
                 docInfo["Document Type"] = 'CourtSummary';
                 docInfo["Appearance Date"] = jDoc.lastAppearanceDt.split(' ')[0];
                 docInfo["Appearance ID"] = jDoc.imageId;

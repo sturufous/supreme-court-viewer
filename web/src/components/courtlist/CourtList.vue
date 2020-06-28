@@ -197,7 +197,7 @@ import * as _ from 'underscore';
 
 import CriminalList from "@components/courtlist/CriminalList.vue";
 import CivilList from "@components/courtlist/CivilList.vue";
-
+import {courtListInformationInfoType, roomsInfoType, courtRoomsAndLocationsInfoType, locationInfoType} from '../../types/courtlist';
 import '@store/modules/CourtListInformation';
 const courtListState = namespace('CourtListInformation');
 
@@ -210,10 +210,10 @@ const courtListState = namespace('CourtListInformation');
 export default class CourtList extends Vue {
 
     @courtListState.State
-    public courtListInformation!: any
+    public courtListInformation!: courtListInformationInfoType
 
     @courtListState.Action
-    public UpdateCourtList!: (newCourtListInformation: any) => void 
+    public UpdateCourtList!: (newCourtListInformation: courtListInformationInfoType) => void 
 
     mounted () { 
         this.getListOfAvailableCourts();
@@ -324,9 +324,7 @@ export default class CourtList extends Vue {
     totalTimeUnit = 'Hours';
 
     courtRoomsAndLocationsJson;
-    courtRoomsAndLocations= [
-        {text:'', value:{}}
-    ]
+    courtRoomsAndLocations: courtRoomsAndLocationsInfoType[] = []
 
     selectedDate = (new Date).toISOString().substring(0,10);
     validSelectedDate = this.selectedDate;
@@ -335,7 +333,7 @@ export default class CourtList extends Vue {
     selectedDateState = true
     selectedCourtRoom= 'null';
     selectedCourtRoomState=true;
-    selectedCourtLocation: any;
+    selectedCourtLocation = {} as locationInfoType;
     selectedCourtLocationState=true;
     
     courtListLocation = "Vancouver"
@@ -349,25 +347,23 @@ export default class CourtList extends Vue {
         {            
             if(jroomAndLocation.courtRooms.length>0)
             {
-                const locationInfo = {text:'', value:{}};
-                locationInfo["text"]= jroomAndLocation.name + ' (' +jroomAndLocation.locationId+')';             
+                const roomAndLocationInfo = {} as courtRoomsAndLocationsInfoType;
+                roomAndLocationInfo["text"]= jroomAndLocation.name + ' (' +jroomAndLocation.locationId+')';             
                         
-                const rooms: any[] = [];         
+                const rooms: roomsInfoType[] = [];         
                 for(const jroom of jroomAndLocation.courtRooms)
                 {              
-                    const roomInfo = {};                   
+                    const roomInfo = {} as roomsInfoType;                   
                     roomInfo["value"]= jroom.room 
                     roomInfo["text"]= jroom.room                        
                     rooms.push(roomInfo);
-                }
-
-                locationInfo["value"] ={
-                    "Location": jroomAndLocation.name,
-                    "LocationID": jroomAndLocation.locationId,
-                    "Rooms" : rooms
-                };
-                this.courtRoomsAndLocations.push(locationInfo);
-                //console.log(locationInfo)
+                }               
+                roomAndLocationInfo.value = {} as locationInfoType;
+                roomAndLocationInfo.value["Location"] = jroomAndLocation.name;
+                roomAndLocationInfo.value["LocationID"] = jroomAndLocation.locationId;
+                roomAndLocationInfo.value["Rooms"] = rooms
+               
+                this.courtRoomsAndLocations.push(roomAndLocationInfo);
             }                
         }
         this.courtRoomsAndLocations =  _.sortBy(this.courtRoomsAndLocations, 'text')
