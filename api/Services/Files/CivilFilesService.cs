@@ -90,7 +90,7 @@ namespace Scv.Api.Services.Files
 
             detail = await PopulateBaseDetail(detail);
             detail.Appearances = appearances;
-            detail.FileCommentText = fileContent.CivilFile.First(cf => cf.PhysicalFileID == fileId).FileCommentText;
+            detail.FileCommentText = fileContent?.CivilFile?.First(cf => cf.PhysicalFileID == fileId).FileCommentText;
             detail.Party = await PopulateDetailParties(detail.Party);
             detail.Document = await PopulateDetailDocuments(detail.Document);
             detail.HearingRestriction = await PopulateDetailHearingRestrictions(fileDetail.HearingRestriction);
@@ -136,7 +136,7 @@ namespace Scv.Api.Services.Files
 
             var appearanceDetail = appearances.ApprDetail?.FirstOrDefault(app => app.AppearanceId == appearanceId);
             var fileDetailDocuments = detail.Document.Where(doc => doc.Appearance != null && doc.Appearance.Any(app => app.AppearanceId == appearanceId)).ToList();
-            var previousAppearance = fileContent?.CivilFile.FirstOrDefault(cf => cf.PhysicalFileID == fileId)?.PreviousAppearance.FirstOrDefault(pa => pa?.AppearanceId == appearanceId);
+            var previousAppearance = fileContent?.CivilFile?.FirstOrDefault(cf => cf.PhysicalFileID == fileId)?.PreviousAppearance.FirstOrDefault(pa => pa?.AppearanceId == appearanceId);
 
             var detailedAppearance = new CivilAppearanceDetail
             {
