@@ -26,7 +26,7 @@
             <template v-slot:button-content>
                 <b-button
                     variant="outline-primary text-info" 
-                    style="transform: translate(0,-4px); border:0px; font-size:16px; text-overflow: ellipsis;"
+                    style="transform: translate(0,-4px); border:0px; font-size:14px; text-overflow: ellipsis;"
                     v-b-tooltip.hover.bottomleft 
                     :title='partyDisplayedTxt'
                     size="sm">
@@ -48,7 +48,7 @@
             >{{rightParty.Name}}</b-dropdown-item-button>
         </b-dropdown>     
  
-        <b-nav-text  style="margin-top: 4px;font-size: 14px;" variant="white">
+        <b-nav-text  style="margin-top: 4px;font-size: 12px;" variant="white">
             <b-badge pill variant="danger">{{adjudicatorRestrictionsInfo.length}}</b-badge>
         </b-nav-text>
 
@@ -57,7 +57,7 @@
                 <b-button
                     :variant="(adjudicatorRestrictionsInfo.length>0)? 'outline-primary text-info':'white'" 
                     :disabled="adjudicatorRestrictionsInfo.length==0"
-                    style="transform: translate(-5px,0); border:0px; font-size:14px;text-overflow: ellipsis;"                    
+                    style="transform: translate(-5px,0); border:0px; font-size:12px;text-overflow: ellipsis;"                    
                     size="sm">                    
                     Adjudicator Restrictions
                     <b-icon v-if="(adjudicatorRestrictionsInfo.length>0)" class="ml-1" icon="caret-down-fill" font-scale="1"></b-icon>
@@ -67,7 +67,7 @@
             <b-dropdown-item-button      
             v-for="(restriction, index) in adjudicatorRestrictionsInfo"
             :key="index">
-                <b-button style="font-size: 14px; padding: 5px 5px;" 
+                <b-button style="font-size: 12px; padding: 5px 5px;" 
                           variant="secondary" 
                           v-b-tooltip.hover.left 
                           :title='restriction["Full Name"]'>
@@ -76,14 +76,14 @@
             </b-dropdown-item-button>
         </b-nav-item-dropdown>
 
-        <b-nav-text v-if="sheriffComment.length>0" style="margin-top: 4px;font-size: 14px;" variant="white">
+        <b-nav-text v-if="sheriffComment.length>0" style="margin-top: 4px;font-size: 12px;" variant="white">
             <b-badge pill variant="danger">1</b-badge>
         </b-nav-text>
         <b-nav-item-dropdown v-if="sheriffComment.length>0" right no-caret > 
             <template v-slot:button-content>
                 <b-button
                     variant="outline-primary text-info"                    
-                    style="transform: translate(-5px,0); border:0px; font-size:14px;text-overflow: ellipsis;"                    
+                    style="transform: translate(-5px,0); border:0px; font-size:12px;text-overflow: ellipsis;"                    
                     size="sm">                    
                     Sheriff Comments
                     <b-icon class="ml-1" icon="caret-down-fill" font-scale="1"></b-icon>
@@ -97,7 +97,7 @@
             </b-dropdown-item-button>
         </b-nav-item-dropdown>
 
-        <b-nav-text style="margin-top: 4px;font-size: 14px;" variant="white">
+        <b-nav-text style="margin-top: 4px;font-size: 12px;" variant="white">
             <b-badge v-if="isSealed" variant="danger">Sealed</b-badge>
         </b-nav-text>    
 
