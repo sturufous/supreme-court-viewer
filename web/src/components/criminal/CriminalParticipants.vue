@@ -73,6 +73,8 @@ import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import "@store/modules/CriminalFileInformation";
 import "@store/modules/CommonInformation";
+import {participantListInfoType, criminalFileInformationType} from '../../types/criminal';
+import {inputNamesType} from '../../types/common'
 const criminalState = namespace("CriminalFileInformation");
 const commonState = namespace("CommonInformation");
 
@@ -82,17 +84,14 @@ export default class CriminalParticipants extends Vue {
 
     @commonState.State
     public displayName!: string;
-
-    /* eslint-disable */
+    
     @criminalState.State
-    public criminalFileInformation!: any; 
+    public criminalFileInformation!: criminalFileInformationType; 
 
     @commonState.Action
-    public UpdateDisplayName!: (newInputNames: any) => void
+    public UpdateDisplayName!: (newInputNames: inputNamesType) => void
 
-    participantList: any[] = [];
-    /* eslint-enable */ 
-    
+    participantList: participantListInfoType[] = [];
 
     isMounted = false;
     participantJson;

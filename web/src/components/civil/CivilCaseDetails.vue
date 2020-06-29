@@ -253,7 +253,7 @@ export default class CivilCaseDetails extends Vue {
                 docInfo["Document Type"] = jDoc.documentTypeDescription;
                 docInfo["Concluded"] = jDoc.concludedYn;
                 if((this.categories.indexOf("CONCLUDED") < 0) && docInfo["Concluded"].toUpperCase() =="Y") this.categories.push("CONCLUDED")        
-                docInfo["Next Appearance Date"] = jDoc.nextAppearanceDt? jDoc.nextAppearanceDt : ''; 
+                docInfo["Next Appearance Date"] = jDoc.nextAppearanceDt? Vue.filter('beautify-date')(jDoc.nextAppearanceDt) : ''; 
                 if(docInfo["Next Appearance Date"].length > 0 && this.categories.indexOf("SCHEDULED") < 0) this.categories.push("SCHEDULED")   
 
                 docInfo["Category"] = jDoc.category? jDoc.category : '';
@@ -280,8 +280,8 @@ export default class CivilCaseDetails extends Vue {
                     }
                 }
                 docInfo["Comment"] = jDoc.commentTxt? jDoc.commentTxt : '';
-                docInfo["filedByName"] = jDoc.filedByName? jDoc.filedByName : '';
-                docInfo["Date Granted"] = jDoc.DateGranted? jDoc.DateGranted : ''; 
+                docInfo["Filed By Name"] = jDoc.filedByName? jDoc.filedByName : '';
+                docInfo["Order Made Date"] = jDoc.DateGranted? Vue.filter('beautify-date')(jDoc.DateGranted) : '';                
                 this.documentsInfo.push(docInfo);                
 
             } else {
