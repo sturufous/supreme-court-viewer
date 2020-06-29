@@ -1,15 +1,15 @@
 <template>
-    <b-card bg-variant="white" no-body>
+    <b-card bg-variant="white" no-body class="mb-5">
         <div>
             <h3 class="mx-4 font-weight-normal"> Adjudicator Restrictions </h3>
             <hr class="mx-3 bg-light" style="height: 5px;"/> 
         </div>
 
         <b-card v-if="!(adjudicatorRestrictionsInfo.length>0)">
-            <span class="text-muted ml-4 mb-5"> No adjudicator restrictions. </span>
+            <span class="text-muted ml-4"> No adjudicator restrictions. </span>
         </b-card>
 
-        <b-card bg-variant="white" v-if="isMounted && (adjudicatorRestrictionsInfo.length>0)" no-body class="mx-3 mb-5">           
+        <b-card bg-variant="white" v-if="isMounted && (adjudicatorRestrictionsInfo.length>0)" no-body class="mx-3">           
             <b-table        
             borderless
             :items="adjudicatorRestrictionsInfo"
