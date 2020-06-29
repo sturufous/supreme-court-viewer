@@ -10,8 +10,8 @@ export interface partiesInfoType {
     "First Name": string,
     "Last Name": string,
     "Name": string,
-    "ID": string          
-
+    "ID": string,
+    "Index": number
 }
 
 export interface actType {

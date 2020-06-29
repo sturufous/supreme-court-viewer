@@ -76,7 +76,8 @@
 
                 <template  v-slot:cell(Parties)="data">
                     <b-button
-                        style=" font-size:16px" 
+                        v-if="data.value.length>0"
+                        style="font-size:16px; font-weight: bold;" 
                         size="sm" 
                         @click="OpenCivilFilePage(data)" 
                         v-b-tooltip.hover.right                            
@@ -84,7 +85,18 @@
                         :variant="'outline-primary border-white text-'+civilClass" 
                         class="mr-2">                            
                             {{data.value}}
-                    </b-button>                                 
+                    </b-button>
+                    <b-button
+                        v-else
+                        style="font-size:16px; font-weight: bold;" 
+                        size="sm" 
+                        @click="OpenCivilFilePage(data)" 
+                        v-b-tooltip.hover.right                            
+                        :title="data.item['PartiesTruncApplied']?data.item['PartiesDesc']:null"
+                        :variant="'outline-primary border-white text-'+civilClass" 
+                        class="mr-2">                            
+                            File
+                    </b-button>                                  
                 </template>
                 
                 <template  v-slot:cell(Counsel)="data">

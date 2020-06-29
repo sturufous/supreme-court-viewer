@@ -201,8 +201,9 @@ export default class CivilCaseDetails extends Vue {
         return ((this.showSections['Case Details'] || this.showSections['Past Appearances'] ) && this.isDataReady)
     }    
 
-    public ExtractCaseInfo(): void {        
-        for(const jParty of this.partiesJson) {            
+    public ExtractCaseInfo(): void {
+        let partyIndex = 0       
+        for(const jParty of this.partiesJson) {                        
             const partyInfo = {} as partiesInfoType;            
             partyInfo["Party ID"] = jParty.partyId;
             partyInfo["Role"] = jParty.roleTypeDescription;
@@ -219,7 +220,9 @@ export default class CivilCaseDetails extends Vue {
             partyInfo["Last Name"] =  jParty.lastNm? jParty.lastNm: jParty.orgNm ;
             this.UpdateDisplayName({'lastName': partyInfo["Last Name"], 'givenName': partyInfo["First Name"]});
             partyInfo["Name"] = this.displayName            
-            partyInfo["ID"] = jParty.partyId            
+            partyInfo["ID"] = jParty.partyId
+            partyInfo["Index"] = partyIndex
+            partyIndex = partyIndex + 1            
             if (partyInfo["Left/Right"] == "R") {
                 this.rightPartiesInfo.push(partyInfo);
             } else {

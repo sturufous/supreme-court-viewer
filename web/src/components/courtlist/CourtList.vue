@@ -188,8 +188,6 @@
 </div>
 </template>
 
-
-
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
@@ -251,8 +249,8 @@ export default class CourtList extends Vue {
         this.totalMins = 0;
         this.totalTime = '0' ;
         this.totalTimeUnit = 'Hours';
-        this.errorCode = 0;        
-       
+        this.errorCode = 0;
+        
         this.$http.get('/api/courtlist/court-list?agencyId='+ this.courtListLocationID +'&roomCode='+ this.courtListRoom+'&proceeding=' +this.validSelectedDate)
             .then(Response => Response.json(), err => {this.errorCode= err.status;this.errorText= err.statusText;console.log(err);}        
             ).then(data => {
@@ -410,7 +408,9 @@ export default class CourtList extends Vue {
                 {
                     this.selectedCourtRoom= room.value;
                     this.selectedCourtRoomState = true;
-                    setTimeout(() => { this.searchForCourtList();}, 500);                   
+                    Vue.nextTick().then(() => {
+                        this.searchForCourtList();
+                    });                   
                 }
                 else
                 {
@@ -448,7 +448,6 @@ export default class CourtList extends Vue {
         
         if(datePicked.selectedYMD)
         {
-            //console.log(datePicked)
             this.validSelectedDate = datePicked.selectedYMD
             this.fullSelectedDate = datePicked.selectedFormatted
         } 
@@ -462,9 +461,10 @@ export default class CourtList extends Vue {
             const olddate = this.seperateIsoDate(this.selectedDate) 
             const date = new Date(olddate.year, olddate.month-1, olddate.day, 0,0,0,0)
             date.setDate(date.getDate() - 1)
-            this.selectedDate = date.toISOString().substring(0,10)
-            
-            setTimeout(() => { this.searchForCourtList(); }, 500);
+            this.selectedDate = date.toISOString().substring(0,10) 
+            Vue.nextTick().then(() => {
+                this.searchForCourtList();
+            });
         }
     }
 
@@ -482,7 +482,10 @@ export default class CourtList extends Vue {
             //console.log( this.selectedDate)
             //console.log('next day')
             //console.log(this.searchingRequest)
-            setTimeout(() => { this.searchForCourtList(); }, 500);
+            // setTimeout(() => { this.searchForCourtList(); }, 500);
+           Vue.nextTick().then(() => {
+                this.searchForCourtList();
+           });
         }
     }
 

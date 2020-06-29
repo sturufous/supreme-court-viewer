@@ -66,7 +66,7 @@
                 
                 <template  v-slot:cell(Accused)="data">
                     <b-button
-                        style=" font-size:16px" 
+                        style="font-size:16px; font-weight: bold;" 
                         size="sm" 
                         @click="OpenCriminalFilePage(data)" 
                         v-b-tooltip.hover.right

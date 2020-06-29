@@ -408,7 +408,6 @@ export default class CriminalAppearanceDetails extends Vue {
     public openDocumentsPdf(): void {
         this.loadingPdf = true;
         const imageId = this.initiatingDocuments[0]
-        console.log(imageId)
         const filename = 'doc'+imageId+'.pdf';
         window.open(`/api/files/document/${imageId}/${filename}?isCriminal=true`)
         this.loadingPdf = false;
