@@ -31,18 +31,16 @@
 import { Component, Vue } from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
 import '@store/modules/CivilFileInformation';
+import {civilFileInformationType, civilNotesType } from '../../types/civil';
 const civilState = namespace('CivilFileInformation');
 
 @Component
 export default class CivilCommentNotes extends Vue {
 
-    /* eslint-disable */
     @civilState.State
-    public civilFileInformation!: any
+    public civilFileInformation!: civilFileInformationType
 
-    civilNotes: any[] = [];
-    /* eslint-enable */
-    
+    civilNotes: civilNotesType[] = [];    
     isMounted = false
     notesExist = false
 
@@ -55,16 +53,16 @@ export default class CivilCommentNotes extends Vue {
        
         const data = this.civilFileInformation.detailsData;
         
-        let notesInfo = {};
+        let notesInfo = {} as civilNotesType;
         notesInfo['NotesFieldName'] = "Trial Remark";
         notesInfo['NotesValue'] = data.trialRemarkTxt? data.trialRemarkTxt: '';
         this.civilNotes.push(notesInfo);
-        notesInfo = {};
+        notesInfo = {} as civilNotesType;
 
         notesInfo['NotesFieldName'] = "Comment To Judge";
         notesInfo['NotesValue'] = data.commentToJudgeTxt? data.commentToJudgeTxt: '';
         this.civilNotes.push(notesInfo);
-        notesInfo = {};
+        notesInfo = {} as civilNotesType;
 
         notesInfo['NotesFieldName'] = "File Comment";
         notesInfo['NotesValue'] = data.fileCommentText? data.fileCommentText: '';
