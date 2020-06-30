@@ -179,6 +179,7 @@ namespace Scv.Api.Controllers
             var criminalFileDetailResponse = await _criminalFilesService.FileDetailByAgencyIdCodeAndFileNumberText(location, fileNumber);
             if (criminalFileDetailResponse?.JustinNo == null)
                 throw new NotFoundException("Couldn't find criminal file with this id.");
+
             return Ok(criminalFileDetailResponse);
         }
 
