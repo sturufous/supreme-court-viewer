@@ -97,6 +97,11 @@ namespace Scv.Api.Services
             var civilFileContents = (await civilFileContentTasks.WhenAll()).ToList();
             var originalCourtList = await originalCourtListTask;
 
+            //Note, there is test data that doesn't have a CourtList, but may have CourtCalendarDetails. 
+            //If this is the case with real data, or becomes an issue with testing, I'll have to 
+            //create a blank courtList object and overlay CourtCalendarDetails on top of it.
+            //Some overlap happens already, but some of the fields aren't passed over (they already exist in CourtList). 
+            //PCSS for example isn't aware of CourtList, it only uses CourtCalendarDetails where as SCV uses the CourtList + CourtCalendarDetails. 
             var courtList = _mapper.Map<Models.CourtList.CourtList>(originalCourtList);
 
             courtList.CivilCourtList = await PopulateCivilCourtListFromFileDetails(courtList.CivilCourtList, civilFileDetails);
