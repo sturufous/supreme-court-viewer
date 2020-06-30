@@ -9,8 +9,6 @@ using Scv.Api.Models.Civil.Detail;
 using Scv.Api.Models.Criminal.Detail;
 using System;
 using System.Threading.Tasks;
-using Scv.Api.Helpers;
-using Scv.Api.Services;
 using Scv.Api.Services.Files;
 using CivilAppearanceDetail = Scv.Api.Models.Civil.AppearanceDetail.CivilAppearanceDetail;
 using CriminalAppearanceDetail = Scv.Api.Models.Criminal.AppearanceDetail.CriminalAppearanceDetail;
@@ -60,6 +58,26 @@ namespace Scv.Api.Controllers
         {
             var fileSearchResponse = await _civilFilesService.SearchAsync(fcq);
             return Ok(fileSearchResponse);
+        }
+
+        /// <summary>
+        /// Gets the details for a given a location civil file number text.
+        /// </summary>
+        /// <param name="location">Agency Location Id Code: EX. 104.0001</param>
+        /// <param name="fileNumber">FileNumber: EX. P-241</param>
+        /// <returns>RedactedCivilFileDetailResponse</returns>
+        [HttpGet]
+        [Route("civil")]
+        public async Task<ActionResult<RedactedCivilFileDetailResponse>> GetCivilFileDetailByAgencyIdCodeAndFileNumberText(string location, string fileNumber)
+        {
+            if (!fileNumber.Contains("-"))
+                throw new BadRequestException("Requires a fileNumber with a dash.");
+
+            var civilFileDetailResponse = await _civilFilesService.FileDetailByAgencyIdCodeAndFileNumberText(location, fileNumber);
+            if (civilFileDetailResponse?.PhysicalFileId == null)
+                throw new NotFoundException("Couldn't find civil file with this id.");
+
+            return Ok(civilFileDetailResponse);
         }
 
         /// <summary>
@@ -143,6 +161,26 @@ namespace Scv.Api.Controllers
         {
             var fileSearchResponse = await _criminalFilesService.SearchAsync(fcq);
             return Ok(fileSearchResponse);
+        }
+
+        /// <summary>
+        /// Gets the details for a given a location criminal file number text.
+        /// </summary>
+        /// <param name="location"> Agency Identifier Code to look for EX. 83.0001</param>
+        /// <param name="fileNumber"> FileNumberText to look for EX. 500-2</param>
+        /// <returns>RedactedCriminalFileDetailResponse</returns>
+        [HttpGet]
+        [Route("criminal")]
+        public async Task<ActionResult<RedactedCriminalFileDetailResponse>> GetCriminalFileDetailByAgencyIdCodeAndFileNumberText(string location, string fileNumber)
+        {
+            if (!fileNumber.Contains("-"))
+                throw new BadRequestException("Requires a fileNumber with a dash.");
+
+            var criminalFileDetailResponse = await _criminalFilesService.FileDetailByAgencyIdCodeAndFileNumberText(location, fileNumber);
+            if (criminalFileDetailResponse?.JustinNo == null)
+                throw new NotFoundException("Couldn't find criminal file with this id.");
+
+            return Ok(criminalFileDetailResponse);
         }
 
         /// <summary>
