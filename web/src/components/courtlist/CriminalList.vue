@@ -66,7 +66,7 @@
                 
                 <template  v-slot:cell(Accused)="data">
                     <b-button
-                        style=" font-size:16px" 
+                        style="font-size:16px; font-weight: bold;" 
                         size="sm" 
                         @click="OpenCriminalFilePage(data)" 
                         v-b-tooltip.hover.right
@@ -175,7 +175,9 @@ import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import CriminalAppearanceDetails from '@components/criminal/CriminalAppearanceDetails.vue';
 import * as _ from 'underscore';
-
+import {courtListInformationInfoType, criminalListInfoType} from '../../types/courtlist';
+import {criminalFileInformationType, criminalAppearanceInfoType} from '../../types/criminal';
+import {inputNamesType, durationType } from '../../types/common'
 import "@store/modules/CommonInformation";
 const commonState = namespace("CommonInformation");
 import '@store/modules/CourtListInformation';
@@ -193,16 +195,16 @@ enum HearingType {'A'= '+','G' = '@','D'='-', 'S' = '*'  }
 export default class CriminalList extends Vue {
 
     @courtListState.State
-    public courtListInformation!: any
+    public courtListInformation!: courtListInformationInfoType
 
     @criminalState.State
-    public appearanceInfo!: any;
+    public appearanceInfo!: criminalAppearanceInfoType;
 
     @criminalState.Action
-    public UpdateAppearanceInfo!: (newAppearanceInfo: any) => void       
+    public UpdateAppearanceInfo!: (newAppearanceInfo: criminalAppearanceInfoType) => void       
 
     @criminalState.Action
-    public UpdateCriminalFile!: (newCriminalFileInformation: any) => void
+    public UpdateCriminalFile!: (newCriminalFileInformation: criminalFileInformationType) => void
 
     @commonState.State
     public displayName!: string;    
@@ -214,13 +216,13 @@ export default class CriminalList extends Vue {
     public time
 
     @commonState.Action
-    public UpdateDisplayName!: (newInputNames: any) => void
+    public UpdateDisplayName!: (newInputNames: inputNamesType) => void
 
     @commonState.Action
-    public UpdateDuration!: (duration: any) => void
+    public UpdateDuration!: (duration: durationType) => void
 
     @commonState.Action
-    public UpdateTime!: (time: any) => void
+    public UpdateTime!: (time: string) => void
 
     mounted() {
         this.getCriminalList();       
@@ -243,7 +245,7 @@ export default class CriminalList extends Vue {
         this.isMounted = true;
     } 
 
-    criminalList: any[] = [];
+    criminalList: criminalListInfoType[] = [];
     
     criminalCourtListJson;
     courtRoom;
@@ -271,16 +273,16 @@ export default class CriminalList extends Vue {
     
   
     public ExtractCriminalListInfo(): void {
-        const currentDate = new Date();
+        // const currentDate = new Date();
 
         for (const criminalListIndex in this.criminalCourtListJson) 
         {
-            const criminalListInfo = {};
+            const criminalListInfo = {} as criminalListInfoType;
             const jcriminalList = this.criminalCourtListJson[criminalListIndex];
 
             criminalListInfo["Index"] = criminalListIndex;
 
-            criminalListInfo['Seq.'] = jcriminalList.appearanceSequenceNumber?parseInt(jcriminalList.appearanceSequenceNumber):''
+            criminalListInfo['Seq.'] = jcriminalList.appearanceSequenceNumber?parseInt(jcriminalList.appearanceSequenceNumber):0
             criminalListInfo['File Number'] = jcriminalList.fileNumberText
             criminalListInfo['Tag'] = criminalListInfo['File Number']+'-'+criminalListInfo['Seq.'];  
 
@@ -301,7 +303,7 @@ export default class CriminalList extends Vue {
 
             criminalListInfo['Crown']= ''
             criminalListInfo['CrownDesc']= ''            
-            if(jcriminalList.crown.length>0)
+            if(jcriminalList.crown && jcriminalList.crown.length>0)
             {
                 //console.log(jcriminalList.crown)
                 let firstCrownSet=false
@@ -414,7 +416,7 @@ export default class CriminalList extends Vue {
 
     public OpenCriminalFilePage(data)
     {
-        const fileInformation = { }
+        const fileInformation = { } as criminalFileInformationType
         fileInformation['fileNumber'] = data.item['JustinNo']
         this.UpdateCriminalFile(fileInformation)
         const routeData = this.$router.resolve({name:'CriminalCaseDetails', params: {fileNumber: fileInformation['fileNumber']}})

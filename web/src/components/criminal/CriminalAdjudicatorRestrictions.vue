@@ -38,19 +38,19 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
+import {criminalFileInformationType} from '../../types/criminal';
+import {adjudicatorRestrictionsInfoType } from '../../types/common'
 import "@store/modules/CriminalFileInformation";
 const criminalState = namespace("CriminalFileInformation");
 
 @Component
 export default class  CriminalAdjudicatorRestrictions extends Vue {
-
-  /* eslint-disable */
+ 
   @criminalState.State
-  public criminalFileInformation!: any;
+  public criminalFileInformation!: criminalFileInformationType;
 
-  adjudicatorRestrictions: any[] = [];
-  /* eslint-enable */
-  
+  adjudicatorRestrictions: adjudicatorRestrictionsInfoType[] = [];
+    
   sortBy = 'Adjudicator';
   sortDesc = false;
   isMounted = false;  

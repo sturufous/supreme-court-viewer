@@ -111,6 +111,8 @@ import { namespace } from "vuex-class";
 import CriminalAppearanceDetails from '@components/criminal/CriminalAppearanceDetails.vue';
 import "@store/modules/CriminalFileInformation";
 import "@store/modules/CommonInformation";
+import {criminalAppearancesListType, criminalAppearanceInfoType, criminalFileInformationType} from '../../types/criminal';
+import {inputNamesType, durationType} from '../../types/common'
 const criminalState = namespace("CriminalFileInformation");
 const commonState = namespace("CommonInformation");
 
@@ -138,30 +140,28 @@ export default class CriminalPastAppearances extends Vue {
     @commonState.State
     public statusStyle
     
-    /* eslint-disable */
     @criminalState.State
-    public criminalFileInformation!: any;
+    public criminalFileInformation!: criminalFileInformationType;
 
     @criminalState.State
-    public appearanceInfo!: any;
+    public appearanceInfo!: criminalAppearanceInfoType;
 
     @criminalState.Action
-    public UpdateAppearanceInfo!: (newAppearanceInfo: any) => void       
+    public UpdateAppearanceInfo!: (newAppearanceInfo: criminalAppearanceInfoType) => void       
 
     @commonState.Action
-    public UpdateDisplayName!: (newInputNames: any) => void    
+    public UpdateDisplayName!: (newInputNames: inputNamesType) => void    
 
     @commonState.Action
-    public UpdateDuration!: (duration: any) => void    
+    public UpdateDuration!: (duration: durationType) => void    
 
     @commonState.Action
-    public UpdateTime!: (time: any) => void    
+    public UpdateTime!: (time: string) => void    
     
     @commonState.Action
-    public UpdateStatusStyle!: (statusStyle: any) => void
+    public UpdateStatusStyle!: (statusStyle: string) => void
 
-    pastAppearancesList: any[] = [];
-    /* eslint-enable */  
+    pastAppearancesList: criminalAppearancesListType[] = [];     
     isMounted = false;
     isDataReady = false;
     pastAppearancesJson;    
@@ -200,7 +200,7 @@ export default class CriminalPastAppearances extends Vue {
     public ExtractPastAppearancesInfo(): void {
         const currentDate = new Date();
         for (const appIndex in this.pastAppearancesJson) {
-            const appInfo = {};
+            const appInfo = {} as criminalAppearancesListType;
             const jApp = this.pastAppearancesJson[appIndex];
 
             appInfo["Index"] = appIndex;
@@ -268,8 +268,7 @@ export default class CriminalPastAppearances extends Vue {
             this.appearanceInfo.securityRestrictionTxt = data.item["Security Restriction"];
             this.appearanceInfo.outOfTownJudgeTxt = data.item["OutOfTown Judge"]
             this.appearanceInfo.profSeqNo = data.item["Prof Seq No"]            
-            this.UpdateAppearanceInfo(this.appearanceInfo);
-          
+            this.UpdateAppearanceInfo(this.appearanceInfo);          
         }
         
     }

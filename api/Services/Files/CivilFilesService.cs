@@ -381,6 +381,7 @@ namespace Scv.Api.Services.Files
             {
                 document.Category = _lookupService.GetDocumentCategory(document.DocumentTypeCd);
                 document.DocumentTypeDescription = await _lookupService.GetDocumentDescriptionAsync(document.DocumentTypeCd);
+				document.ImageId = document.SealedYN != "N" ? null : document.ImageId;
                 foreach (var issue in document.Issue)
                 {
                     issue.IssueTypeDesc = await _lookupService.GetCivilDocumentIssueType(issue.IssueTypeCd);

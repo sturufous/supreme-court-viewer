@@ -45,7 +45,7 @@
                         <span v-else :style="data.field.cellStyle">
                             {{ data.value | beautify-date}}
                         </span>
-                    </template> 
+                    </template>                     
 
                     <template v-slot:[`cell(${fields[fieldsTab][documentPlace[fieldsTab]].key})`]="data" >
                         <b-button 
@@ -95,6 +95,12 @@
                         </span>
                     </template>
 
+                    <template v-for="(field,index) in fields" v-slot:[`cell(${field.key})`]="data" >
+                    <span class="ml-2" :style="data.field.cellStyle" v-bind:key="index"> 
+                            {{data.value}}
+                    </span>
+                    </template>
+
                 </b-table>
             </b-card>
             <template v-slot:overlay>               
@@ -109,27 +115,25 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch} from 'vue-property-decorator';
+import { Component, Vue} from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
 import '@store/modules/CivilFileInformation';
+import {civilFileInformationType, documentsInfoType, summaryDocumentsInfoType} from '../../types/civil';
 const civilState = namespace('CivilFileInformation');
 
-enum fieldTab {Categories=0, Summary}
+enum fieldTab {Categories=0, Summary, Orders, Scheduled}
 
 @Component
 export default class CivilDocumentsView extends Vue {
 
-    /* eslint-disable */
     @civilState.State
-    public civilFileInformation!: any
+    public civilFileInformation!: civilFileInformationType
 
     @civilState.Action
-    public UpdateCivilFile!: (newCivilFileInformation: any) => void
+    public UpdateCivilFile!: (newCivilFileInformation: civilFileInformationType) => void
 
-    documents: any[] = [];
-    summaryDocuments: any[] = [];
-    /* eslint-enable */
-
+    documents: documentsInfoType[] = [];
+    summaryDocuments: summaryDocumentsInfoType[] = [];
     documentsDetailsJson;
     loadingPdf = false;
     isMounted = false;
@@ -137,8 +141,8 @@ export default class CivilDocumentsView extends Vue {
     sortDesc = false;
     categories: string[] = []; 
     fieldsTab = fieldTab.Categories;
-    documentPlace = [1,0]
-    datePlace = [3,1]
+    documentPlace = [1,0,1,1]
+    datePlace = [3,1,2,4]
 
     fields = [ 
         [
@@ -146,11 +150,31 @@ export default class CivilDocumentsView extends Vue {
             {key:'Document Type',  sortable:true,  headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 16px;'},
             {key:'Act',            sortable:false, headerStyle:'text',          cellStyle:'display: block; margin-top: 1px; font-size: 14px; max-width : 50px;'},
             {key:'Date Filed',     sortable:true,  headerStyle:'text-danger',   cellStyle:'font-size: 16px;'},
-            {key:'Issues',         sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px;'}
+            {key:'Issues',         sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px;'},
+            {key:'Filed By Name',  sortable:false, headerStyle:'text',          cellStyle:'font-size: 16px;'},
+            {key:'Comment',        sortable:false, headerStyle:'text',          cellStyle:'font-size: 16px;'}
         ],
         [
             {key:'Document Type',    sortable:false, headerStyle:'text-primary',    cellStyle:'border:0px; font-size: 16px;'},
-            {key:'Appearance Date',  sortable:true,  headerStyle:'text-danger',     cellStyle:'font-size: 16px;'},
+            {key:'Appearance Date',  sortable:true,  headerStyle:'text-danger',     cellStyle:'font-size: 16px;'}
+        ],
+        [
+            {key:'Seq.',           sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
+            {key:'Document Type',  sortable:true,  headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 16px;'},
+            {key:'Date Filed',     sortable:false, headerStyle:'text-primary',   cellStyle:'font-size: 16px;'},
+            {key:'Order Made Date',sortable:true,  headerStyle:'text-primary',   cellStyle:'font-size: 16px;'},
+            {key:'Filed By Name',  sortable:false, headerStyle:'text',          cellStyle:'font-size: 16px;'},
+            {key:'Comment',        sortable:false, headerStyle:'text',          cellStyle:'font-size: 16px;'}
+        ],
+        [
+            {key:'Seq.',                 sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
+            {key:'Document Type',        sortable:true,  headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 16px;'},
+            {key:'Act',                  sortable:false, headerStyle:'text',          cellStyle:'display: block; margin-top: 1px; font-size: 14px; max-width : 50px;'},
+            {key:'Next Appearance Date', sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
+            {key:'Date Filed',           sortable:false, headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
+            {key:'Issues',               sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px;'},
+            {key:'Filed By Name',        sortable:false, headerStyle:'text',          cellStyle:'font-size: 16px;'},
+            {key:'Comment',              sortable:false, headerStyle:'text',          cellStyle:'font-size: 16px;'}
         ]  
         
     ];
@@ -164,13 +188,6 @@ export default class CivilDocumentsView extends Vue {
         if(this.summaryDocuments.length > 0) this.categories.push("COURT SUMMARY")
         this.categories.unshift("ALL")        
         this.isMounted = true;
-    }
-
-    @Watch('$route', { immediate: false, deep: true })
-    onUrlChange() {
-        this.civilFileInformation.fileNumber = this.$route.params.fileNumber;
-        this.UpdateCivilFile(this.civilFileInformation);
-        location.reload();
     }
 
     mounted () { 
@@ -206,24 +223,37 @@ export default class CivilDocumentsView extends Vue {
         {
             this.fieldsTab = fieldTab.Summary;
             return this.summaryDocuments;
-        }
+        } 
         else {       
             return this.documents.filter(doc => {                
                 this.fieldsTab = fieldTab.Categories;
                 if(this.activetab == 'CONCLUDED') {
                     if(doc["Concluded"] === "Y") return true; else return false;
                 
-                } else if(this.activetab == 'SCHEDULED') {
-                    if(doc["Appearance Date"]){        
-                        if(new Date(doc["Appearance Date"]) > new Date()) return true; else return false;
-                    
+                } 
+                else if(this.activetab == 'SCHEDULED') {
+                    this.fieldsTab = fieldTab.Scheduled;
+                    if(doc["Next Appearance Date"] && doc["Concluded"] !== "Y"){        
+                        return true;                    
                     } else {
                         return false
-                    }  
-
-                } else if ( this.activetab != 'ALL' )
+                    } 
+                }
+                else if(this.activetab == 'ORDERS')
                 {
-                    if (doc["Category"].toUpperCase() == this.activetab.toUpperCase()) return true;                                   
+                    this.fieldsTab = fieldTab.Orders;
+                    
+                    if (doc["Category"].toUpperCase() == this.activetab.toUpperCase()){
+                        return true;
+                    }                                    
+                                  
+                    return false; 
+                } 
+                else if ( this.activetab != 'ALL' )
+                {
+                    if (doc["Category"].toUpperCase() == this.activetab.toUpperCase()) {                        
+                        return true;
+                    }                                                                       
                                   
                     return false;                     
                 }

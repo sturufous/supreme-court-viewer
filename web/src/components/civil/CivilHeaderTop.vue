@@ -15,16 +15,15 @@
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import '@store/modules/CivilFileInformation';
+import {civilFileInformationType} from '../../types/civil';
 const civilState = namespace('CivilFileInformation');
 
 @Component
 export default class CivilHeaderTop extends Vue {
   
-  /* eslint-disable */
   @civilState.State
-  public civilFileInformation!: any;
-  /* eslint-enable */  
-
+  public civilFileInformation!: civilFileInformationType;
+  
   courtLevelDescription;
   courtClassDescription;
   isMounted = false;

@@ -92,6 +92,8 @@ import { namespace } from 'vuex-class';
 import * as _ from 'underscore';
 import '@store/modules/CriminalFileInformation';
 import "@store/modules/CommonInformation";
+import {participantFilesInfoType, participantROPInfoType, participantListInfoType, participantDocumentsInfoType, criminalFileInformationType} from '../../types/criminal';
+import {inputNamesType} from '../../types/common'
 const criminalState = namespace("CriminalFileInformation");
 const commonState = namespace("CommonInformation");
 
@@ -106,24 +108,21 @@ export default class CriminalDocumentsView extends Vue {
     @commonState.State
     public displayName!: string;    
     
-     /* eslint-disable */
     @criminalState.Action
-    public UpdateActiveCriminalParticipantIndex!: (newActiveCriminalParticipantIndex: any) => void
+    public UpdateActiveCriminalParticipantIndex!: (newActiveCriminalParticipantIndex: string) => void
 
     @criminalState.State
-    public criminalFileInformation!: any
+    public criminalFileInformation!: criminalFileInformationType
 
     @criminalState.Action
-    public UpdateCriminalFile!: (newCriminalFileInformation: any) => void   
+    public UpdateCriminalFile!: (newCriminalFileInformation: criminalFileInformationType) => void   
 
     @commonState.Action
-    public UpdateDisplayName!: (newInputNames: any) => void
+    public UpdateDisplayName!: (newInputNames: inputNamesType) => void
 
-    participantFiles: any[] = [];
-    participantList: any[] = [];
-    ropDocuments: any[] = [];
-    categories: any = [];
-    /* eslint-enable */    
+    participantFiles: participantFilesInfoType[] = [];
+    participantList: participantListInfoType[] = [];
+    categories: string[] = [];   
 
     courtLevel;
     courtClass;
@@ -203,16 +202,14 @@ export default class CriminalDocumentsView extends Vue {
         {         
             const partInfo = this.participantList[partIndex];
             partInfo["Documents"] = [];
-            partInfo["Record of Proceedings"] = [];
-
-            /* eslint-disable */
-            const document: any[] = [];
-            const rop: any[] = [];
-            /* eslint-enable */
+            partInfo["Record of Proceedings"] = [];            
+            const document: participantDocumentsInfoType[] = [];
+            const rop: participantROPInfoType[] = [];
+            
             for(const doc of partInfo.DocumentsJson)
             {
                 if(doc.category != 'rop') {
-                    const docInfo = {}; 
+                    const docInfo = {} as participantDocumentsInfoType; 
                     docInfo["Date"]= doc.issueDate? doc.issueDate.split(' ')[0] : ''; 
                     docInfo["Document Type"]= doc.docmFormDsc;
                     docInfo["Category"]= doc.docmClassification;
@@ -225,7 +222,7 @@ export default class CriminalDocumentsView extends Vue {
                     document.push(docInfo);
                 }
                 else {
-                    const docInfo = {};                   
+                    const docInfo = {} as participantROPInfoType;                   
                     docInfo["Document Type"]= 'Record of Proceedings';
                     docInfo["Category"]= "ROP";
                     docInfo["Pages"]= doc.documentPageCount;
@@ -236,8 +233,7 @@ export default class CriminalDocumentsView extends Vue {
                 }
             }
             partInfo["Documents"] = document;
-            partInfo["Record of Proceedings"] = rop;
-                        
+            partInfo["Record of Proceedings"] = rop;                        
             this.participantFiles.push(partInfo);
         }
 
