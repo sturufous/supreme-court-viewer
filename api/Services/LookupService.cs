@@ -282,13 +282,18 @@ namespace Scv.Api.Services
         /// Reads from the configuration for the document category.
         /// </summary>
         /// <param name="documentCode"></param>
+        /// <param name="docmClassification"></param>
         /// <returns>string</returns>
-        public string GetDocumentCategory(string documentCode)
+        public string GetDocumentCategory(string documentCode, string docmClassification = null)
         {
             var configurationSections =
                 _configuration.GetSection("DocumentCategories").Get<Dictionary<string, string>>() ??
                 throw new ConfigurationException("Couldn't not build dictionary based on DocumentCategories");
-            return configurationSections.FirstOrDefault(cs => cs.Value.Split(",").Contains(documentCode)).Key;
+
+            var categoryFromConfig =
+                configurationSections.FirstOrDefault(cs => cs.Value.Split(",").Contains(documentCode)).Key;
+
+            return categoryFromConfig ?? docmClassification;
         }
 
         #endregion Lookup Methods

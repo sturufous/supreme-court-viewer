@@ -263,7 +263,7 @@ namespace Scv.Api.Services.Files
                 //Populate extra fields.
                 foreach (var document in criminalDocuments)
                 {
-                    document.Category = string.IsNullOrEmpty(document.Category) ? _lookupService.GetDocumentCategory(document.DocmFormId) : document.Category;
+                    document.Category = string.IsNullOrEmpty(document.Category) ? _lookupService.GetDocumentCategory(document.DocmFormId, document.DocmClassification) : document.Category;
                     document.DocumentTypeDescription = document.DocmFormDsc;
                     document.PartId = string.IsNullOrEmpty(ac.PartId) ? null : ac.PartId;
                     document.DocmId = string.IsNullOrEmpty(document.DocmId) ? null : document.DocmId;
