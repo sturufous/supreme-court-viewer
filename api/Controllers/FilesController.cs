@@ -9,12 +9,9 @@ using Scv.Api.Models.Civil.Detail;
 using Scv.Api.Models.Criminal.Detail;
 using System;
 using System.Threading.Tasks;
-using Scv.Api.Helpers;
-using Scv.Api.Services;
 using Scv.Api.Services.Files;
 using CivilAppearanceDetail = Scv.Api.Models.Civil.AppearanceDetail.CivilAppearanceDetail;
 using CriminalAppearanceDetail = Scv.Api.Models.Criminal.AppearanceDetail.CriminalAppearanceDetail;
-using System.Linq;
 
 namespace Scv.Api.Controllers
 {
@@ -66,25 +63,17 @@ namespace Scv.Api.Controllers
         /// <summary>
         /// Gets the details for a given a location civil file number text.
         /// </summary>
-        /// <param name="fileId"></param>
+        /// <param name="location">Agency Location Id Code: EX. 104.0001</param>
+        /// <param name="fileNumber">FileNumber: EX. P-241</param>
         /// <returns>RedactedCivilFileDetailResponse</returns>
         [HttpGet]
         [Route("civil")]
         public async Task<ActionResult<RedactedCivilFileDetailResponse>> GetCivilFileDetailByAgencyIdCodeAndFileNumberText(string location, string fileNumber)
         {
             if (!fileNumber.Contains("-"))
-                throw new BadRequestException("Wasn't provided a fileNumber with a dash.");
+                throw new BadRequestException("Requires a fileNumber with a dash.");
 
-            Enum.TryParse(fileNumber.Split("-")[0], out FileDetailCourtClassCd courtClass);
-            fileNumber = fileNumber.Split("-")[1];
-
-            var fileSearchResponse = await _civilFilesService.SearchAsync(new FilesCivilQuery { FileHomeAgencyId = location, FileNumber = fileNumber, SearchMode = SearchMode2.FILENO, });
-            
-            var targetFile = fileSearchResponse.FileDetail.Single(fd => fd.CourtClassCd == courtClass);
-            if (targetFile == null)
-                throw new NotFoundException("Couldn't find a single entry for this agencyIdCode and fileNumberText.");
-
-            var civilFileDetailResponse = await _civilFilesService.FileIdAsync(fileSearchResponse.FileDetail.First().PhysicalFileId);
+            var civilFileDetailResponse = await _civilFilesService.FileDetailByAgencyIdCodeAndFileNumberText(location, fileNumber);
             if (civilFileDetailResponse?.PhysicalFileId == null)
                 throw new NotFoundException("Couldn't find civil file with this id.");
 
@@ -177,7 +166,7 @@ namespace Scv.Api.Controllers
         /// <summary>
         /// Gets the details for a given a location criminal file number text.
         /// </summary>
-        /// <param name="location"> Agency Identifier Code to look for EX 83.0001</param>
+        /// <param name="location"> Agency Identifier Code to look for EX. 83.0001</param>
         /// <param name="fileNumber"> FileNumberText to look for EX. 500-2</param>
         /// <returns>RedactedCriminalFileDetailResponse</returns>
         [HttpGet]
@@ -185,20 +174,11 @@ namespace Scv.Api.Controllers
         public async Task<ActionResult<RedactedCriminalFileDetailResponse>> GetCriminalFileDetailByAgencyIdCodeAndFileNumberText(string location, string fileNumber)
         {
             if (!fileNumber.Contains("-"))
-                throw new BadRequestException("Wasn't provided a fileNumber with a dash.");
+                throw new BadRequestException("Requires a fileNumber with a dash.");
 
-            var fileNumberText = fileNumber.Split("-")[0];
-            var mdocSequenceNumber = fileNumber.Split("-")[1];
-            var fileSearchResponse = await _criminalFilesService.SearchAsync(new FilesCriminalQuery {FileHomeAgencyId = location, FileNumberTxt = fileNumberText, SearchMode = SearchMode.FILENO });
-
-            var targetFile = fileSearchResponse.FileDetail.Single(fd => fd.MdocSeqNo == mdocSequenceNumber);
-            if (targetFile == null)
-                throw new NotFoundException("Couldn't find a single entry for this agencyIdCode and fileNumberText.");
-
-            var criminalFileDetailResponse = await _criminalFilesService.FileIdAsync(targetFile.MdocJustinNo);
+            var criminalFileDetailResponse = await _criminalFilesService.FileDetailByAgencyIdCodeAndFileNumberText(location, fileNumber);
             if (criminalFileDetailResponse?.JustinNo == null)
                 throw new NotFoundException("Couldn't find criminal file with this id.");
-
             return Ok(criminalFileDetailResponse);
         }
 

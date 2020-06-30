@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using JCCommon.Clients.FileServices;
 using JCCommon.Models;
@@ -65,6 +66,25 @@ namespace Scv.Api.Services.Files
                 fcq.NameSearchType, fcq.LastName, fcq.OrgName, fcq.GivenName, fcq.Birth?.ToString("yyyy-MM-dd"),
                 fcq.SearchByCrownPartId, fcq.SearchByCrownActiveOnly, fcq.SearchByCrownFileDesignation,
                 fcq.MdocJustinNumberSet, fcq.PhysicalFileIdSet);
+        }
+
+        public async Task<RedactedCivilFileDetailResponse> FileDetailByAgencyIdCodeAndFileNumberText(string location,
+            string fileNumber)
+        {
+            if (!fileNumber.Contains("-"))
+                return null;
+            
+            Enum.TryParse(fileNumber.Split("-")[0], out FileDetailCourtClassCd courtClass);
+            fileNumber = fileNumber.Split("-")[1];
+
+            var fileSearchResponse = await SearchAsync(new FilesCivilQuery { FileHomeAgencyId = location, FileNumber = fileNumber, SearchMode = SearchMode2.FILENO, });
+
+            var targetFile = fileSearchResponse?.FileDetail?.Single(fd => fd.CourtClassCd == courtClass);
+            if (targetFile == null)
+                return null;
+
+            var civilFileDetailResponse = await FileIdAsync(fileSearchResponse.FileDetail.First().PhysicalFileId);
+            return civilFileDetailResponse?.PhysicalFileId == null ? null : civilFileDetailResponse;
         }
 
         public async Task<RedactedCivilFileDetailResponse> FileIdAsync(string fileId)

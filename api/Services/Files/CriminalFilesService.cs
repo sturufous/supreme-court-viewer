@@ -68,6 +68,25 @@ namespace Scv.Api.Services.Files
                 fcq.SearchByCrownFileDesignation, fcq.MdocJustinNoSet, fcq.PhysicalFileIdSet);
         }
 
+        public async Task<RedactedCriminalFileDetailResponse> FileDetailByAgencyIdCodeAndFileNumberText(string location,
+            string fileNumber)
+        {
+            if (!fileNumber.Contains("-"))
+                return null;
+
+            var fileNumberText = fileNumber.Split("-")[0];
+            var mdocSequenceNumber = fileNumber.Split("-")[1];
+            var fileSearchResponse = await SearchAsync(new FilesCriminalQuery { FileHomeAgencyId = location, FileNumberTxt = fileNumberText, SearchMode = SearchMode.FILENO });
+
+            var targetFile = fileSearchResponse?.FileDetail?.Single(fd => fd.MdocSeqNo == mdocSequenceNumber);
+            if (targetFile == null)
+                return null;
+
+            var criminalFileDetailResponse = await FileIdAsync(targetFile.MdocJustinNo);
+            return criminalFileDetailResponse?.JustinNo == null ? null : criminalFileDetailResponse;
+        }
+
+
         public async Task<RedactedCriminalFileDetailResponse> FileIdAsync(string fileId)
         {
             async Task<CriminalFileDetailResponse> FileDetails() => await _filesClient.FilesCriminalFileIdAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode, fileId);
