@@ -97,7 +97,7 @@ import {inputNamesType} from '../../types/common'
 const criminalState = namespace("CriminalFileInformation");
 const commonState = namespace("CommonInformation");
 
-enum fieldTab {Categories=0, Summary}
+enum fieldTab {Categories=0, Summary, Bail}
 
 @Component
 export default class CriminalDocumentsView extends Vue {    
@@ -139,7 +139,7 @@ export default class CriminalDocumentsView extends Vue {
     isDataValid = false     
 
     fieldsTab = fieldTab.Categories;
-    documentPlace = [1,0]
+    documentPlace = [1,0,1]
 
     fields = [ 
         [
@@ -152,13 +152,20 @@ export default class CriminalDocumentsView extends Vue {
             {key:'Document Type',    sortable:false,  tdClass: 'border-top', headerStyle:'text-primary'},
             {key:'Category',         sortable:true,   tdClass: 'border-top', headerStyle:'text'},
             {key:'Pages',            sortable:false,  tdClass: 'border-top', headerStyle:'text'},
+        ],
+        [
+            {key:'Date',               sortable:true,   tdClass: 'border-top',  headerStyle:'text-danger'},
+            {key:'Document Type',      sortable:true,   tdClass: 'border-top',  headerStyle:'text-primary'},
+            {key:'Status',             sortable:true,   tdClass: 'border-top',  headerStyle:'text-primary'},
+            {key:'Status Date',        sortable:true,   tdClass: 'border-top',  headerStyle:'text-primary'},
+            {key:'Category',           sortable:false,  tdClass: 'border-top',  headerStyle:'text'},
+            {key:'Pages',              sortable:false,  tdClass: 'border-top',  headerStyle:'text'},
         ]  
         
     ];
 
     public getDocuments(): void {
        
-        const data = this.criminalFileInformation.detailsData;
         this.participantList = this.criminalFileInformation.participantList;
         this.courtLevel = this.criminalFileInformation.courtLevel;
         this.courtClass = this.criminalFileInformation.courtClass;
@@ -212,11 +219,15 @@ export default class CriminalDocumentsView extends Vue {
                     const docInfo = {} as participantDocumentsInfoType; 
                     docInfo["Date"]= doc.issueDate? doc.issueDate.split(' ')[0] : ''; 
                     docInfo["Document Type"]= doc.docmFormDsc;
-                    docInfo["Category"]= doc.docmClassification;
+                    docInfo["Category"]= doc.category? doc.category: doc.docmClassification;
                     docInfo["Pages"]= doc.documentPageCount;
                     docInfo["PdfAvail"]= doc.imageId? true : false
-                    docInfo["Image ID"]= doc.imageId
-                    
+                    docInfo["Image ID"]= doc.imageId;
+                    docInfo["Status"] = doc.docmDispositionDsc;
+                    docInfo["Status Date"] = doc.docmDispositionDate;
+                    if (docInfo["Category"] != "PSR") {
+                        docInfo["Category"] = docInfo["Category"].charAt(0).toUpperCase() + docInfo["Category"].slice(1).toLowerCase();                        
+                    }                                                     
                     if((this.categories.indexOf(docInfo["Category"]) < 0) ) this.categories.push(docInfo["Category"]) 
                     
                     document.push(docInfo);
@@ -256,7 +267,17 @@ export default class CriminalDocumentsView extends Vue {
         else{  
             return this.participantFiles[this.activeCriminalParticipantIndex]["Documents"].filter(doc => {                
                 this.fieldsTab = fieldTab.Categories;
-                if ( this.activetab != 'ALL' )
+                if(this.activetab == 'Bail')
+                {
+                    this.fieldsTab = fieldTab.Bail;
+                    
+                    if (doc["Category"].toUpperCase() == this.activetab.toUpperCase()){
+                        return true;
+                    }                                    
+                                  
+                    return false; 
+                } 
+                else if ( this.activetab != 'ALL' )
                 {
                     if (doc["Category"].toUpperCase() == this.activetab.toUpperCase()) return true;                                   
                                   
@@ -321,7 +342,7 @@ export default class CriminalDocumentsView extends Vue {
         const url =`/api/files/criminal/record-of-proceedings/${partID}/${filename}?profSequenceNumber=${profSeqNo}&courtLevelCode=${this.courtLevel}&courtClassCode=${this.courtClass}`;
 
         this.$http.get(url)
-            .then(Response => {
+            .then(() => {
                 window.open(url);
                 this.loadingPdf = false;},
               err => {

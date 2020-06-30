@@ -66,7 +66,9 @@ export interface participantDocumentsInfoType {
     "Category": string,
     "Pages": string,
     "PdfAvail": boolean,
-    "Image ID": string
+    "Image ID": string,
+    "Status": string,
+    "Status Date": string 
 }
 
 export interface participantROPInfoType {    

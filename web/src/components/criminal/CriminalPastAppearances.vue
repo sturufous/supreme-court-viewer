@@ -29,7 +29,8 @@
             :sort-desc.sync="sortDesc"
             :no-sort-reset="true"
             sort-icon-left
-            borderless           
+            borderless
+            @sort-changed="sortChanged"           
             small                        
             responsive ="sm"
             >   
@@ -108,6 +109,7 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
+import * as _ from 'underscore';
 import CriminalAppearanceDetails from '@components/criminal/CriminalAppearanceDetails.vue';
 import "@store/modules/CriminalFileInformation";
 import "@store/modules/CommonInformation";
@@ -273,6 +275,13 @@ export default class CriminalPastAppearances extends Vue {
         
     }
 
+    public sortChanged() 
+    {
+        this.SortedPastAppearances.forEach((item) => {
+            this.$set(item, '_showDetails', false)
+        })
+    }
+
     get SortedPastAppearances()
     {           
         if(this.showSections['Past Appearances'])
@@ -281,15 +290,7 @@ export default class CriminalPastAppearances extends Vue {
         }
         else
         {
-            return  this.pastAppearancesList
-            .sort((a, b): any =>
-            {            
-                if(a["Date"] > b["Date"]) return -1;
-                else if(a["Date"] < b["Date"]) return 1;
-                else return 0;
-            })
-            .slice(0, 3);
-           
+            return _.sortBy(this.pastAppearancesList,"Date").reverse().slice(0, 3);           
         }        
     }
 }
