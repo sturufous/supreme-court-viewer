@@ -290,10 +290,14 @@ namespace Scv.Api.Services
                 _configuration.GetSection("DocumentCategories").Get<Dictionary<string, string>>() ??
                 throw new ConfigurationException("Couldn't not build dictionary based on DocumentCategories");
 
-            var categoryFromConfig =
-                configurationSections.FirstOrDefault(cs => cs.Value.Split(",").Contains(documentCode)).Key;
+            if (!String.IsNullOrEmpty(documentCode))
+            {
+                var categoryFromConfig =
+                    configurationSections.FirstOrDefault(cs => cs.Value.Split(",").Contains(documentCode)).Key;
+                return categoryFromConfig;
+            }
 
-            return categoryFromConfig ?? docmClassification;
+            return configurationSections.Keys.Contains(docmClassification, StringComparer.OrdinalIgnoreCase) ? docmClassification?.ToUpper() : null;
         }
 
         #endregion Lookup Methods
