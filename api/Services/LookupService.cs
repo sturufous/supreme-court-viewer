@@ -297,7 +297,7 @@ namespace Scv.Api.Services
                 return categoryFromConfig;
             }
 
-            return configurationSections.Keys.Contains(docmClassification, StringComparer.OrdinalIgnoreCase) ? docmClassification?.ToUpper() : null;
+            return configurationSections.Keys.Contains(docmClassification, StringComparer.OrdinalIgnoreCase) ? docmClassification : null;
         }
 
         #endregion Lookup Methods
