@@ -39,18 +39,17 @@
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import "@store/modules/CivilFileInformation";
+import {civilFileInformationType} from '../../types/civil';
+import {adjudicatorRestrictionsInfoType } from '../../types/common'
 const civilState = namespace("CivilFileInformation");
 
 @Component
 export default class  CivilAdjudicatorRestrictions extends Vue {
 
-  /* eslint-disable */
   @civilState.State
-  public civilFileInformation!: any;
+  public civilFileInformation!: civilFileInformationType;
     
-  adjudicatorRestrictionsInfo: any[] = [];
-  /* eslint-enable */  
-
+  adjudicatorRestrictionsInfo: adjudicatorRestrictionsInfoType[] = []; 
   sortBy = 'Adjudicator';
   sortDesc = false;
   isMounted = false;

@@ -38,13 +38,13 @@
             <b-dropdown-item-button
                 disabled
                 v-for="leftParty in leftPartiesInfo"
-                v-bind:key="leftParty.ID"
+                v-bind:key="leftParty.Index"
             >{{leftParty.Name}}</b-dropdown-item-button>
             <b-dropdown-divider></b-dropdown-divider>
             <b-dropdown-item-button 
                 disabled
                 v-for="rightParty in rightPartiesInfo"
-                v-bind:key="rightParty.ID"
+                v-bind:key="rightParty.Index"
             >{{rightParty.Name}}</b-dropdown-item-button>
         </b-dropdown>     
  
@@ -111,22 +111,21 @@
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import "@store/modules/CivilFileInformation";
+import {civilFileInformationType} from '../../types/civil';
 const civilState = namespace("CivilFileInformation");
 
 @Component
 export default class CivilHeader extends Vue {
-
-  /* eslint-disable */
+  
   @civilState.State
-  public civilFileInformation!: any;
-   /* eslint-enable */  
+  public civilFileInformation!: civilFileInformationType;   
 
   maximumFullNameLength = 15;
   activeParty = 0;
   fileNumberText;
   sheriffComment;
   activityClassCode;
-  agencyLocation = {Name:'', Code:0, Region:'' };
+  agencyLocation = {Name:'', Code:'0', Region:'' };
   isMounted = false;
   isSealed = false;
   partyDisplayedTxt;
@@ -160,7 +159,7 @@ export default class CivilHeader extends Vue {
       this.leftPartiesInfo = this.civilFileInformation.leftPartiesInfo;
       this.rightPartiesInfo = this.civilFileInformation.rightPartiesInfo; 
       this.adjudicatorRestrictionsInfo = this.civilFileInformation.adjudicatorRestrictionsInfo;
-      this.isMounted = true;          
+      this.isMounted = true;         
   } 
 
   public getNameOfPartyTrunc() {
