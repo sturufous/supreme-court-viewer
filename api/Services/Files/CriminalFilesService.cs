@@ -268,6 +268,8 @@ namespace Scv.Api.Services.Files
                     document.PartId = string.IsNullOrEmpty(ac.PartId) ? null : ac.PartId;
                     document.DocmId = string.IsNullOrEmpty(document.DocmId) ? null : document.DocmId;
                     document.ImageId = string.IsNullOrEmpty(document.ImageId) ? null : document.ImageId;
+                    document.HasFutureAppearance = ac.Appearance?.Any(a =>
+                        a?.AppearanceDate != null && DateTime.Parse(a.AppearanceDate) >= DateTime.Today);
                 }
                 return criminalDocuments;
             }).ToList();
