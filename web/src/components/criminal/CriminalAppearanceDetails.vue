@@ -424,7 +424,7 @@ export default class CriminalAppearanceDetails extends Vue {
         const url =`/api/files/criminal/record-of-proceedings/${partID}/${filename}?profSequenceNumber=${profSeqNo}&courtLevelCode=${courtLevel}&courtClassCode=${courtClass}`;
 
         this.$http.get(url)
-            .then(Response => {
+            .then(() => {
                 window.open(url);
                 this.loadingROP = false;},
               err => {

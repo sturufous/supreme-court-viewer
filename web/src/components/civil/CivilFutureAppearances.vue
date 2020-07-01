@@ -30,6 +30,7 @@
         :no-sort-reset="true"
         sort-icon-left
         borderless
+        @sort-changed="sortChanged"
         small
         responsive="sm"
         >   
@@ -109,6 +110,7 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
+import * as _ from 'underscore';
 import CivilAppearanceDetails from '@components/civil/CivilAppearanceDetails.vue';
 import "@store/modules/CommonInformation";
 import "@store/modules/CivilFileInformation";
@@ -261,6 +263,13 @@ export default class CivilFutureAppearances extends Vue {
         }        
     }
 
+    public sortChanged() 
+    {
+        this.SortedFutureAppearances.forEach((item) => {
+            this.$set(item, '_showDetails', false)
+        })
+    }
+
     get SortedFutureAppearances()
     {           
         if(this.showSections['Future Appearances'])
@@ -269,15 +278,8 @@ export default class CivilFutureAppearances extends Vue {
         }
         else
         {
-            return  this.futureAppearancesList
-            .sort((a, b): any =>
-            {            
-                if(a["Date"] > b["Date"]) return -1;
-                else if(a["Date"] < b["Date"]) return 1;
-                else return 0;
-            })
-            .slice(0, 3);           
-        }        
+            return _.sortBy(this.futureAppearancesList,"Date").reverse().slice(0, 3);           
+        }   
     }
 }
 </script>

@@ -165,8 +165,9 @@ export default class CivilHeader extends Vue {
   public getNameOfPartyTrunc() {
 
       if (this.partyDisplayedTxt) {
-          let firstParty = this.partyDisplayedTxt.split('/')[0].trim()
-          let secondParty = this.partyDisplayedTxt.split('/')[1].trim()
+          
+          let firstParty = this.partyDisplayedTxt.split('/')[0]? this.partyDisplayedTxt.split('/')[0].trim(): '';
+          let secondParty = this.partyDisplayedTxt.split('/')[1]? this.partyDisplayedTxt.split('/')[1].trim(): '';
 
           if(firstParty.length > this.maximumFullNameLength) 
             firstParty = firstParty.substr(0, this.maximumFullNameLength) +' ...';
