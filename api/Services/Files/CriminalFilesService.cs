@@ -68,6 +68,25 @@ namespace Scv.Api.Services.Files
                 fcq.SearchByCrownFileDesignation, fcq.MdocJustinNoSet, fcq.PhysicalFileIdSet);
         }
 
+        public async Task<RedactedCriminalFileDetailResponse> FileDetailByAgencyIdCodeAndFileNumberText(string location,
+            string fileNumber)
+        {
+            if (!fileNumber.Contains("-"))
+                return null;
+
+            var fileNumberText = fileNumber.Split("-")[0];
+            var mdocSequenceNumber = fileNumber.Split("-")[1];
+            var fileSearchResponse = await SearchAsync(new FilesCriminalQuery { FileHomeAgencyId = location, FileNumberTxt = fileNumberText, SearchMode = SearchMode.FILENO });
+
+            var targetFile = fileSearchResponse?.FileDetail?.Single(fd => fd.MdocSeqNo == mdocSequenceNumber);
+            if (targetFile == null)
+                return null;
+
+            var criminalFileDetailResponse = await FileIdAsync(targetFile.MdocJustinNo);
+            return criminalFileDetailResponse?.JustinNo == null ? null : criminalFileDetailResponse;
+        }
+
+
         public async Task<RedactedCriminalFileDetailResponse> FileIdAsync(string fileId)
         {
             async Task<CriminalFileDetailResponse> FileDetails() => await _filesClient.FilesCriminalFileIdAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode, fileId);
@@ -244,11 +263,13 @@ namespace Scv.Api.Services.Files
                 //Populate extra fields.
                 foreach (var document in criminalDocuments)
                 {
-                    document.Category = string.IsNullOrEmpty(document.Category) ? _lookupService.GetDocumentCategory(document.DocmFormId) : document.Category;
+                    document.Category = string.IsNullOrEmpty(document.Category) ? _lookupService.GetDocumentCategory(document.DocmFormId, document.DocmClassification) : document.Category;
                     document.DocumentTypeDescription = document.DocmFormDsc;
                     document.PartId = string.IsNullOrEmpty(ac.PartId) ? null : ac.PartId;
                     document.DocmId = string.IsNullOrEmpty(document.DocmId) ? null : document.DocmId;
                     document.ImageId = string.IsNullOrEmpty(document.ImageId) ? null : document.ImageId;
+                    document.HasFutureAppearance = ac.Appearance?.Any(a =>
+                        a?.AppearanceDate != null && DateTime.Parse(a.AppearanceDate) >= DateTime.Today);
                 }
                 return criminalDocuments;
             }).ToList();
