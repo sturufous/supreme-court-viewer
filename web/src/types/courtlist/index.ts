@@ -1,4 +1,4 @@
-import {adjudicatorRestrictionsInfoType} from '../common';
+import {iconStyleType} from '../common';
 import {courtListType} from '../courtlist/jsonTypes';
 
 export interface courtListInformationInfoType {
@@ -27,6 +27,7 @@ export interface civilListInfoType {
     "Seq.": number,
     "File Number": string,
     "Tag": string,
+    "Icons": iconStyleType[],
     "Time": string,
     "Room": string,
     "Parties": string,
@@ -63,7 +64,8 @@ export interface criminalListInfoType {
     "Index": string,
     "Seq.": number,
     "File Number": string,
-    "Tag": string,
+    "Tag": string,    
+    "Icons": iconStyleType[],
     "Case Age": string,
     "Time": string,
     "Room": string,
