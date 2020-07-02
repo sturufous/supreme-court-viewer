@@ -115,7 +115,7 @@ namespace tests.api.Controllers
 
             targetCriminalCourtList = courtListResponse.CriminalCourtList.FirstOrDefault();
             Assert.NotNull(targetCriminalCourtList);
-            Assert.Equal("5043", targetCriminalCourtList?.CaseAgeDaysNumber);
+            Assert.True(Convert.ToInt32(targetCriminalCourtList?.CaseAgeDaysNumber) > 5000);
 
             targetCriminalCourtList = courtListResponse.CriminalCourtList.FirstOrDefault(ccl => ccl.AppearanceSequenceNumber == "2");
             Assert.NotNull(targetCriminalCourtList);

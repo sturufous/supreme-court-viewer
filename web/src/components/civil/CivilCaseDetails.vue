@@ -62,6 +62,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
+import * as _ from 'underscore';
 import CivilDocumentsView from '@components/civil/CivilDocumentsView.vue';
 import CivilPastAppearances from '@components/civil/CivilPastAppearances.vue';
 import CivilFutureAppearances from '@components/civil/CivilFutureAppearances.vue';
@@ -297,13 +298,7 @@ export default class CivilCaseDetails extends Vue {
     }
 
     public SortParties(partiesList) {
-        return partiesList.sort((a, b): any => {
-        const LastName1 = a["Last Name"] ? a["Last Name"].toUpperCase() : "";
-        const LastName2 = b["Last Name"] ? b["Last Name"].toUpperCase() : "";
-        if (LastName1 > LastName2) return 1;
-        if (LastName1 < LastName2) return -1;
-        return 0;
-        });
+        return _.sortBy(partiesList,((party: partiesInfoType) =>{return (party["Last Name"]? party["Last Name"].toUpperCase() : '')}))        
     }
 
     public navigateToLandingPage() {
