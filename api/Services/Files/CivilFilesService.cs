@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using JCCommon.Clients.FileServices;
 using JCCommon.Models;
@@ -67,6 +68,25 @@ namespace Scv.Api.Services.Files
                 fcq.MdocJustinNumberSet, fcq.PhysicalFileIdSet);
         }
 
+        public async Task<RedactedCivilFileDetailResponse> FileDetailByAgencyIdCodeAndFileNumberText(string location,
+            string fileNumber)
+        {
+            if (!fileNumber.Contains("-"))
+                return null;
+            
+            Enum.TryParse(fileNumber.Split("-")[0], out FileDetailCourtClassCd courtClass);
+            fileNumber = fileNumber.Split("-")[1];
+
+            var fileSearchResponse = await SearchAsync(new FilesCivilQuery { FileHomeAgencyId = location, FileNumber = fileNumber, SearchMode = SearchMode2.FILENO, });
+
+            var targetFile = fileSearchResponse?.FileDetail?.Single(fd => fd.CourtClassCd == courtClass);
+            if (targetFile == null)
+                return null;
+
+            var civilFileDetailResponse = await FileIdAsync(fileSearchResponse.FileDetail.First().PhysicalFileId);
+            return civilFileDetailResponse?.PhysicalFileId == null ? null : civilFileDetailResponse;
+        }
+
         public async Task<RedactedCivilFileDetailResponse> FileIdAsync(string fileId)
         {
             async Task<CivilFileDetailResponse> FileDetails() => await _filesClient.FilesCivilFileIdAsync(_requestAgencyIdentifierId, _requestPartId, fileId);
@@ -90,7 +110,7 @@ namespace Scv.Api.Services.Files
 
             detail = await PopulateBaseDetail(detail);
             detail.Appearances = appearances;
-            detail.FileCommentText = fileContent.CivilFile.First(cf => cf.PhysicalFileID == fileId).FileCommentText;
+            detail.FileCommentText = fileContent?.CivilFile?.First(cf => cf.PhysicalFileID == fileId).FileCommentText;
             detail.Party = await PopulateDetailParties(detail.Party);
             detail.Document = await PopulateDetailDocuments(detail.Document);
             detail.HearingRestriction = await PopulateDetailHearingRestrictions(fileDetail.HearingRestriction);
@@ -136,7 +156,7 @@ namespace Scv.Api.Services.Files
 
             var appearanceDetail = appearances.ApprDetail?.FirstOrDefault(app => app.AppearanceId == appearanceId);
             var fileDetailDocuments = detail.Document.Where(doc => doc.Appearance != null && doc.Appearance.Any(app => app.AppearanceId == appearanceId)).ToList();
-            var previousAppearance = fileContent?.CivilFile.FirstOrDefault(cf => cf.PhysicalFileID == fileId)?.PreviousAppearance.FirstOrDefault(pa => pa?.AppearanceId == appearanceId);
+            var previousAppearance = fileContent?.CivilFile?.FirstOrDefault(cf => cf.PhysicalFileID == fileId)?.PreviousAppearance.FirstOrDefault(pa => pa?.AppearanceId == appearanceId);
 
             var detailedAppearance = new CivilAppearanceDetail
             {
@@ -381,6 +401,7 @@ namespace Scv.Api.Services.Files
             {
                 document.Category = _lookupService.GetDocumentCategory(document.DocumentTypeCd);
                 document.DocumentTypeDescription = await _lookupService.GetDocumentDescriptionAsync(document.DocumentTypeCd);
+				document.ImageId = document.SealedYN != "N" ? null : document.ImageId;
                 foreach (var issue in document.Issue)
                 {
                     issue.IssueTypeDesc = await _lookupService.GetCivilDocumentIssueType(issue.IssueTypeCd);

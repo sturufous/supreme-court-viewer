@@ -28,19 +28,17 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
+import {criminalFileInformationType, criminalCrownNotesInfoType} from '../../types/criminal';
 import '@store/modules/CriminalFileInformation';
 const criminalState = namespace('CriminalFileInformation');
 
 @Component
 export default class CriminalCrownNotes extends Vue {
 
-    /* eslint-disable */
     @criminalState.State
-    public criminalFileInformation!: any
-
-    crownNotes: any[] = [];
-    /* eslint-enable */
-    
+    public criminalFileInformation!: criminalFileInformationType
+    crownNotes: criminalCrownNotesInfoType[] = [];
+        
     isMounted = false
 
     fields = [
@@ -53,7 +51,7 @@ export default class CriminalCrownNotes extends Vue {
         
         if (data.trialRemark.length > 0) {
             for (const note of data.trialRemark) {
-                const crownNote = {};
+                const crownNote = {} as criminalCrownNotesInfoType;
                 crownNote['CrownNotes'] = note.commentTxt
                 this.crownNotes.push(crownNote)
             }

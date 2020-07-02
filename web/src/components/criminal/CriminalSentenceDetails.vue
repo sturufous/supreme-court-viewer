@@ -12,7 +12,7 @@
                 </b-tr>
             </b-thead>
 
-            <b-tbody v-for="(counts,inx) in SortedParticipantFilesCounts" v-bind:key="inx">
+            <b-tbody v-for="(counts,inx) in SortedParticipantSentencesCounts" v-bind:key="inx">
                 <b-tr v-for="(sentence,index) in counts['Sentence/Disposition Type']" v-bind:key="index" :style ="getRowStyle(index)">                            
                     
                     <b-td :rowspan="counts.Len" v-if="index==0">{{counts['Date'] | beautify-date}}</b-td>                            
@@ -67,6 +67,7 @@ import { Component, Vue} from 'vue-property-decorator';
 import * as _ from 'underscore';
 import { namespace } from 'vuex-class';
 import '@store/modules/CriminalFileInformation';
+import {participantSentencesInfoType} from '../../types/criminal';
 const criminalState = namespace("CriminalFileInformation");
 
 @Component
@@ -77,7 +78,7 @@ export default class CriminalSentenceDetails extends Vue {
     
     public getParticipants(): void {       
          
-        this.participantFiles = this.criminalParticipantSentenceInformation.participantFiles
+        this.participantSentences = this.criminalParticipantSentenceInformation.participantSentences
         this.selectedParticipant = this.criminalParticipantSentenceInformation.selectedParticipant
          
         this.isMounted = true;
@@ -92,10 +93,7 @@ export default class CriminalSentenceDetails extends Vue {
     dateSortDir = 'desc';   
     isMounted = false
     selectedParticipant = 0;
-
-    /* eslint-disable */
-    participantFiles: any[] = [];
-    /* eslint-enable */
+    participantSentences: participantSentencesInfoType[] = [];
 
     fields = [        
         {key:'Date',                     sortable:true,   tdClass: 'border-top', headerStyle:'text-primary'},
@@ -109,16 +107,16 @@ export default class CriminalSentenceDetails extends Vue {
         {key:'Effective Date',           sortable:false,  tdClass: 'border-top', headerStyle:'text'},
     ];   
     
-    get SortedParticipantFilesCounts()
+    get SortedParticipantSentencesCounts()
     {
         if(this.dateSortDir =='desc')
-            return _.sortBy(this.participantFiles[this.selectedParticipant]['Counts'],this.sortBy).reverse()
+            return _.sortBy(this.participantSentences[this.selectedParticipant]['Counts'],this.sortBy).reverse()
         else
-            return _.sortBy(this.participantFiles[this.selectedParticipant]['Counts'],this.sortBy)  
+            return _.sortBy(this.participantSentences[this.selectedParticipant]['Counts'],this.sortBy)  
     } 
 
     get NumberOfCounts() { 
-        return(this.participantFiles[this.selectedParticipant]["Counts"].length) 
+        return(this.participantSentences[this.selectedParticipant]["Counts"].length) 
     }
 
     public getRowStyle(index) {
