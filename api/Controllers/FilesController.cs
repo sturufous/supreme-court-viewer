@@ -75,7 +75,7 @@ namespace Scv.Api.Controllers
                 throw new BadRequestException("Requires a fileNumber with a dash.");
 
             var civilFileIds = await _civilFilesService.GetFileIdsByAgencyIdCodeAndFileNumberText(location, fileNumber);
-            if (civilFileIds?.Count == 0)
+            if (civilFileIds == null || civilFileIds.Count == 0)
                 throw new NotFoundException("Couldn't find civil file with this location and file number.");
 
             return Ok(civilFileIds);
@@ -178,7 +178,7 @@ namespace Scv.Api.Controllers
                 throw new BadRequestException("Requires a fileNumber with a dash.");
 
             var criminalFileIds = await _criminalFilesService.GetFileIdsByAgencyIdCodeAndFileNumberText(location, fileNumber);
-            if (criminalFileIds?.Count == 0)
+            if (criminalFileIds == null || criminalFileIds.Count == 0)
                 throw new NotFoundException("Couldn't find criminal file with this location and file number.");
 
             return Ok(criminalFileIds);
