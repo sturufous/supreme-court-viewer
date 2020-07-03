@@ -178,7 +178,7 @@ namespace Scv.Api.Controllers
                 throw new BadRequestException("Requires a fileNumber with a dash.");
 
             var criminalFileIds = await _criminalFilesService.GetFileIdsByAgencyIdCodeAndFileNumberText(location, fileNumber);
-            if (criminalFileIds?.Count == 1)
+            if (criminalFileIds?.Count == 0)
                 throw new NotFoundException("Couldn't find criminal file with this location and file number.");
 
             return Ok(criminalFileIds);
