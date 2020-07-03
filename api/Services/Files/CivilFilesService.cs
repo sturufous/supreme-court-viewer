@@ -68,7 +68,7 @@ namespace Scv.Api.Services.Files
                 fcq.MdocJustinNumberSet, fcq.PhysicalFileIdSet);
         }
 
-        public async Task<RedactedCivilFileDetailResponse> FileDetailByAgencyIdCodeAndFileNumberText(string location,
+        public async Task<List<string>> GetFileIdsByAgencyIdCodeAndFileNumberText(string location,
             string fileNumber)
         {
             if (!fileNumber.Contains("-"))
@@ -78,13 +78,7 @@ namespace Scv.Api.Services.Files
             fileNumber = fileNumber.Split("-")[1];
 
             var fileSearchResponse = await SearchAsync(new FilesCivilQuery { FileHomeAgencyId = location, FileNumber = fileNumber, SearchMode = SearchMode2.FILENO, });
-
-            var targetFile = fileSearchResponse?.FileDetail?.Single(fd => fd.CourtClassCd == courtClass);
-            if (targetFile == null)
-                return null;
-
-            var civilFileDetailResponse = await FileIdAsync(fileSearchResponse.FileDetail.First().PhysicalFileId);
-            return civilFileDetailResponse?.PhysicalFileId == null ? null : civilFileDetailResponse;
+            return fileSearchResponse?.FileDetail?.Where(fd => fd.CourtClassCd == courtClass).SelectToList(fd => fd.PhysicalFileId);
         }
 
         public async Task<RedactedCivilFileDetailResponse> FileIdAsync(string fileId)
