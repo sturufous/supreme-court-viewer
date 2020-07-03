@@ -62,23 +62,20 @@ namespace Scv.Api.Controllers
         }
 
         /// <summary>
-        /// Gets the Ids for a given a location and civil file number text.
+        /// Gets the details for a given a location and civil file number text.
         /// </summary>
         /// <param name="location">Agency Location Id Code: EX. 104.0001</param>
         /// <param name="fileNumber">FileNumber: EX. P-241</param>
-        /// <returns>List{string}</returns>
+        /// <returns>List{RedactedCivilFileDetailResponse}</returns>
         [HttpGet]
         [Route("civil")]
-        public async Task<ActionResult<List<string>>> GetCivilFileIdsByAgencyIdCodeAndFileNumberText(string location, string fileNumber)
+        public async Task<ActionResult<List<RedactedCivilFileDetailResponse>>> GetCivilFileIdsByAgencyIdCodeAndFileNumberText(string location, string fileNumber)
         {
-            if (!fileNumber.Contains("-"))
-                throw new BadRequestException("Requires a fileNumber with a dash.");
-
-            var civilFileIds = await _civilFilesService.GetFileIdsByAgencyIdCodeAndFileNumberText(location, fileNumber);
-            if (civilFileIds == null || civilFileIds.Count == 0)
+            var civilFiles = await _civilFilesService.GetFilesByAgencyIdCodeAndFileNumberText(location, fileNumber);
+            if (civilFiles == null || civilFiles.Count == 0)
                 throw new NotFoundException("Couldn't find civil file with this location and file number.");
 
-            return Ok(civilFileIds);
+            return Ok(civilFiles);
         }
 
         /// <summary>
@@ -165,23 +162,20 @@ namespace Scv.Api.Controllers
         }
 
         /// <summary>
-        /// Gets the Ids for a given a location and criminal file number text.
+        /// Gets the details for a given a location and criminal file number text.
         /// </summary>
         /// <param name="location"> Agency Identifier Code to look for EX. 83.0001</param>
         /// <param name="fileNumber"> FileNumberText to look for EX. 500-2</param>
-        /// <returns>List{string}</returns>
+        /// <returns>List{RedactedCriminalFileDetailResponse}</returns>
         [HttpGet]
         [Route("criminal")]
-        public async Task<ActionResult<List<string>>> GetCriminalFileIdsByAgencyIdCodeAndFileNumberText(string location, string fileNumber)
+        public async Task<ActionResult<List<RedactedCriminalFileDetailResponse>>> GetCriminalFileIdsByAgencyIdCodeAndFileNumberText(string location, string fileNumber)
         {
-            if (!fileNumber.Contains("-"))
-                throw new BadRequestException("Requires a fileNumber with a dash.");
-
-            var criminalFileIds = await _criminalFilesService.GetFileIdsByAgencyIdCodeAndFileNumberText(location, fileNumber);
-            if (criminalFileIds == null || criminalFileIds.Count == 0)
+            var criminalFiles = await _criminalFilesService.GetFilesByAgencyIdCodeAndFileNumberText(location, fileNumber);
+            if (criminalFiles == null || criminalFiles.Count == 0)
                 throw new NotFoundException("Couldn't find criminal file with this location and file number.");
 
-            return Ok(criminalFileIds);
+            return Ok(criminalFiles);
         }
 
         /// <summary>

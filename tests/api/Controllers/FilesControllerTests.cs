@@ -13,6 +13,7 @@ using Scv.Api.Services;
 using Scv.Api.Services.Files;
 using System;
 using System.Linq;
+using System.Reflection.Metadata;
 using Scv.Api.Helpers.Exceptions;
 using tests.api.Helpers;
 using Xunit;
@@ -54,6 +55,26 @@ namespace tests.api.Controllers
         #region Tests
 
         [Fact]
+        public async void Civil_File_Details_ByFileNumberText_Multiple()
+        {
+            var actionResult =
+                await _controller.GetCivilFileIdsByAgencyIdCodeAndFileNumberText("83.0001", "1");
+
+            var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+            Assert.Equal(2, fileSearchResponse.Count);
+        }
+
+        [Fact]
+        public async void Criminal_File_Details_ByFileNumberText_Multiple()
+        {
+            var actionResult =
+                await _controller.GetCriminalFileIdsByAgencyIdCodeAndFileNumberText("83.0001", "58819");
+
+            var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+            Assert.Equal(2, fileSearchResponse.Count);
+        }
+
+        [Fact]
         public async void Criminal_File_Details_By_FileNumberText_Empty()
         {
             var failed = false;
@@ -89,22 +110,32 @@ namespace tests.api.Controllers
         [Fact]
         public async void Criminal_File_Details_By_FileNumberText()
         {
-            var actionResult = await _controller.GetCriminalFileIdsByAgencyIdCodeAndFileNumberText("83.0001","500-2");
+            var actionResult = await _controller.GetCriminalFileIdsByAgencyIdCodeAndFileNumberText("83.0001", "58819-1");
 
             var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
-            Assert.Contains("3001", fileSearchResponse);
+            Assert.Contains("3779", fileSearchResponse.First().JustinNo);
         }
 
 
         [Fact]
-        public async void Civil_File_Details_By_FileNumberText()
+        public async void Civil_File_Details_By_FileNumberText_2()
         {
-            var actionResult = await _controller.GetCivilFileIdsByAgencyIdCodeAndFileNumberText("104.0001", "P-241");
+            var actionResult = await _controller.GetCivilFileIdsByAgencyIdCodeAndFileNumberText("83.0001", "S-1");
 
             var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
-            Assert.Contains("40", fileSearchResponse);
+            Assert.Contains("1619", fileSearchResponse.First().PhysicalFileId);
         }
 
+        [Fact]
+        public async void Civil_File_Details_By_FileNumberText()
+        {
+            var actionResult = await _controller.GetCivilFileIdsByAgencyIdCodeAndFileNumberText("83.0001", "44459");
+
+            var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+            Assert.Contains("3059", fileSearchResponse.First().PhysicalFileId);
+        }
+
+        
         [Fact]
         public async void Criminal_File_Search_By_LastName()
         {
