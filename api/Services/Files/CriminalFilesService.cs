@@ -68,24 +68,45 @@ namespace Scv.Api.Services.Files
                 fcq.SearchByCrownFileDesignation, fcq.MdocJustinNoSet, fcq.PhysicalFileIdSet);
         }
 
-        public async Task<RedactedCriminalFileDetailResponse> FileDetailByAgencyIdCodeAndFileNumberText(string location,
+        public async Task<List<RedactedCriminalFileDetailResponse>> GetFilesByAgencyIdCodeAndFileNumberText(string location,
             string fileNumber)
         {
-            if (!fileNumber.Contains("-"))
-                return null;
+            var fileDetails = new List<RedactedCriminalFileDetailResponse>();
 
-            var fileNumberText = fileNumber.Split("-")[0];
-            var mdocSequenceNumber = fileNumber.Split("-")[1];
-            var fileSearchResponse = await SearchAsync(new FilesCriminalQuery { FileHomeAgencyId = location, FileNumberTxt = fileNumberText, SearchMode = SearchMode.FILENO });
+            var fileNumberText = fileNumber.Contains("-") ? fileNumber.Split("-")[0] : fileNumber;
+            var mdocSequenceNumber = fileNumber.Contains("-") ? fileNumber.Split("-")[1] : null;
+            var fileSearchResponse = await SearchAsync(new FilesCriminalQuery
+            {
+                FileHomeAgencyId = location,
+                FileNumberTxt = fileNumberText,
+                CourtLevel = CourtLevelCd2.S,
+                SearchMode = SearchMode.FILENO
+            });
 
-            var targetFile = fileSearchResponse?.FileDetail?.Single(fd => fd.MdocSeqNo == mdocSequenceNumber);
-            if (targetFile == null)
-                return null;
+            var targetIds = fileSearchResponse?.FileDetail?.Where(fd => mdocSequenceNumber == null || fd.MdocSeqNo == mdocSequenceNumber)
+                .SelectToList(fd => fd.MdocJustinNo);
 
-            var criminalFileDetailResponse = await FileIdAsync(targetFile.MdocJustinNo);
-            return criminalFileDetailResponse?.JustinNo == null ? null : criminalFileDetailResponse;
+            if (targetIds == null || targetIds.Count == 0)
+                return fileDetails;
+
+            //Return the basic entry without doing a lookup.
+            if (targetIds.Count == 1)
+                return new List<RedactedCriminalFileDetailResponse> {new RedactedCriminalFileDetailResponse {JustinNo = targetIds.First()}};
+
+            var fileDetailTasks = new List<Task<CriminalFileDetailResponse>>();
+            foreach (var fileId in targetIds)
+            {
+                async Task<CriminalFileDetailResponse> FileDetails() =>
+                    await _filesClient.FilesCriminalFileIdAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode,
+                        fileId);
+                fileDetailTasks.Add(_cache.GetOrAddAsync($"CriminalFileDetail-{fileId}", FileDetails));
+            }
+
+            var fileDetailResponses = await fileDetailTasks.WhenAll();
+            fileDetails = fileDetailResponses.SelectToList(fdr => _mapper.Map<RedactedCriminalFileDetailResponse>(fdr));
+
+            return fileDetails;
         }
-
 
         public async Task<RedactedCriminalFileDetailResponse> FileIdAsync(string fileId)
         {
