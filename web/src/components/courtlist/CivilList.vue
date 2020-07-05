@@ -75,17 +75,19 @@
                 </template>
 
                 <template v-slot:cell(Icons)="data" >
-                        <b-icon
-                            v-for="(field,index) in data.value"
-                            :key="index"
+                    <b-badge
+                        variant="white border-white outline-white"
+                        class="mr-1 mt-1" 
+                        v-for="(field,index) in data.value"
+                        :key="index"
+                        v-b-tooltip.hover.top 
+                        :title='field.desc'>
+                        <b-icon                            
                             :icon="field.icon"
-                            font-scale="1" 
-                            class="mr-1"
-                            style="margin-top: 6px; font-weight: normal; font-size: 14px;"
-                            v-b-tooltip.hover.right 
-                            :title='field.desc' >
+                            font-scale="1.25">                            
                         </b-icon>
-                </template>
+                    </b-badge>    
+                </template> 
 
                 <template  v-slot:cell(Parties)="data">
                     <b-button
@@ -128,6 +130,18 @@
                 </template>
 
                 <template v-slot:[`cell(${fields[9].key})`]="data" >
+                        <b-badge  
+                            v-for="(field,index) in data.value"
+                            :key="index" 
+                            class="mr-1"
+                            style="margin-top: 6px; font-weight: normal; font-size: 14px;"
+                            v-b-tooltip.hover.right 
+                            :title='field.key' > 
+                            {{ field.abbr }} 
+                        </b-badge>
+                </template>
+
+                <template v-slot:[`cell(${fields[10].key})`]="data" >
                         <b-badge  
                             v-for="(field,index) in data.value"
                             :key="index" 
@@ -267,17 +281,18 @@ export default class CivilList extends Vue {
     
     fields =  
     [
-        {key:'Seq.',        tdClass: 'border-top', headerStyle:'', cellStyle:''},        
-        {key:'File Number', tdClass: 'border-top', headerStyle:'', cellStyle:''},
-        {key:'Icons',       tdClass: 'border-top', thClass:'text-white', cellStyle:''},
-        {key:'Parties',     tdClass: 'border-top', headerStyle:'', cellStyle:'text-primary'},
-        {key:'Time',        tdClass: 'border-top', headerStyle:'', cellStyle:''},
-        {key:'Est.',        tdClass: 'border-top', headerStyle:'', cellStyle:''},
-        {key:'Reason',      tdClass: 'border-top', headerStyle:'', cellStyle:''},
-        {key:'Room',        tdClass: 'border-top', headerStyle:'', cellStyle:'text-primary'},
-        {key:'Counsel',     tdClass: 'border-top', headerStyle:'', cellStyle:''},
-        {key:'File Markers',tdClass: 'border-top', headerStyle:'', cellStyle:''},
-        {key:'Notes',       tdClass: 'border-top', headerStyle:'', cellStyle:''},
+        {key:'Seq.',                tdClass: 'border-top', headerStyle:'', cellStyle:''},        
+        {key:'File Number',         tdClass: 'border-top', headerStyle:'', cellStyle:''},
+        {key:'Icons',               tdClass: 'border-top', thClass:'text-white', cellStyle:''},
+        {key:'Parties',             tdClass: 'border-top', headerStyle:'', cellStyle:'text-primary'},
+        {key:'Time',                tdClass: 'border-top', headerStyle:'', cellStyle:''},
+        {key:'Est.',                tdClass: 'border-top', headerStyle:'', cellStyle:''},
+        {key:'Reason',              tdClass: 'border-top', headerStyle:'', cellStyle:''},
+        {key:'Room',                tdClass: 'border-top', headerStyle:'', cellStyle:'text-primary'},
+        {key:'Counsel',             tdClass: 'border-top', headerStyle:'', cellStyle:''},
+        {key:'File Markers',        tdClass: 'border-top', headerStyle:'', cellStyle:''},
+        {key:'Hearing Restrictions',tdClass: 'border-top', headerStyle:'', cellStyle:''},
+        {key:'Notes',               tdClass: 'border-top', headerStyle:'', cellStyle:''},
     ];
     
     mounted() {
@@ -286,16 +301,14 @@ export default class CivilList extends Vue {
 
     public getCivilList(): void 
     {            
-        const data = this.courtListInformation.detailsData;
-       
+        const data = this.courtListInformation.detailsData;       
         this.civilCourtListJson = data.civilCourtList
         this.courtRoom = data.courtRoomCode    
         this.ExtractCivilListInfo()
         if(this.civilList.length)
         {                    
             this.isDataReady = true;
-        }
-    
+        }    
         this.isMounted = true;
     } 
 
@@ -324,11 +337,7 @@ export default class CivilList extends Vue {
             if (jcivilList.video){
                 iconInfo.push({"info": "Video", "desc": ''})
                 iconExists = true;
-            }
-            if (jcivilList.remoteVideo){
-                iconInfo.push({"info": "RemoteVideo", "desc": ''})
-                iconExists = true;
-            }
+            }            
             if (iconExists){
                 this.UpdateIconStyle(iconInfo);
                 civilListInfo["Icons"] = this.iconStyles
@@ -340,17 +349,13 @@ export default class CivilList extends Vue {
             civilListInfo["Parties"] = partyNames.name
             civilListInfo["PartiesTruncApplied"] = partyNames.trunc
             civilListInfo["PartiesDesc"] = jcivilList.sealFileSOCText
-
-
             civilListInfo['Reason'] = jcivilList.appearanceReasonCd             
             civilListInfo['ReasonDesc'] = jcivilList.appearanceReasonDesc
             civilListInfo['Est.'] = this.getDuration(jcivilList.estimatedTimeHour, jcivilList.estimatedTimeMin)
 
             civilListInfo["Supplemental Equipment"] = jcivilList.supplementalEquipment
             civilListInfo["Security Restriction"] = jcivilList.securityRestriction
-            civilListInfo["OutOfTown Judge"] = jcivilList.outOfTownJudge
-
-                        
+            civilListInfo["OutOfTown Judge"] = jcivilList.outOfTownJudge                        
             civilListInfo['Counsel'] = ''          
             civilListInfo['CounselDesc'] =''
 
@@ -376,12 +381,17 @@ export default class CivilList extends Vue {
             civilListInfo['AppearanceID'] = jcivilList.appearanceId
 
             civilListInfo['File Markers'] = [];
+            if (jcivilList.cfcsaFile){
+                civilListInfo['File Markers'].push({abbr: 'CFCSA', key: 'Child, Family and Community Service Act'})
+            } 
+
+            civilListInfo['Hearing Restrictions'] = [];
             for (const hearingRestriction of jcivilList.hearingRestriction)
             {
                 const marker =  hearingRestriction.adjInitialsText +  HearingType[hearingRestriction.hearingRestrictiontype]  
                 const markerDesc =  hearingRestriction.judgeName + ' ('+ hearingRestriction.hearingRestrictionTypeDesc+')'                
                 
-                civilListInfo['File Markers'].push({abbr:marker, key:markerDesc});
+                civilListInfo['Hearing Restrictions'].push({abbr:marker, key:markerDesc});
             }            
 
             civilListInfo['Notes'] ={TrialNotes: jcivilList.trialRemarkTxt, FileComment:jcivilList.fileCommentText, CommentToJudge:jcivilList.commentToJudgeText, SheriffComment:jcivilList.sheriffCommentText};                       

@@ -44,8 +44,14 @@ export interface civilListInfoType {
     "FileID": string,
     "AppearanceID": string,
     "File Markers": fileMarkerInfoType[],
+    "Hearing Restrictions": hearingRestrictionInfoType[],
     "Notes": civilNotesInfoType,
     "NoteExist": boolean
+}
+
+export interface hearingRestrictionInfoType {
+    "abbr": string,
+    "key": string
 }
 
 export interface fileMarkerInfoType {
@@ -85,7 +91,8 @@ export interface criminalListInfoType {
     "PartID": string,
     "JustinNo": string,
     "AppearanceID": string,
-    "File Markers": fileMarkerInfoType[],
+    "File Markers": fileMarkerInfoType[],    
+    "Hearing Restrictions": hearingRestrictionInfoType[],
     "TrialNotes": string,
     "TrialRemarks": trialRemarkInfoType[]
     "Notes": criminalNotesInfoType,

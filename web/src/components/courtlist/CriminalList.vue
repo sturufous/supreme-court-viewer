@@ -65,16 +65,18 @@
                 </template>
 
                 <template v-slot:cell(Icons)="data" >
-                        <b-icon
-                            v-for="(field,index) in data.value"
-                            :key="index"
+                    <b-badge
+                        variant="white border-white outline-white"
+                        class="mr-1 mt-1" 
+                        v-for="(field,index) in data.value"
+                        :key="index"
+                        v-b-tooltip.hover.top 
+                        :title='field.desc'>
+                        <b-icon                            
                             :icon="field.icon"
-                            font-scale="1" 
-                            class="mr-1"
-                            style="margin-top: 6px; font-weight: normal; font-size: 14px;"
-                            v-b-tooltip.hover.right 
-                            :title='field.desc' >
+                            font-scale="1.25">                            
                         </b-icon>
+                    </b-badge>    
                 </template> 
                 
                 <template  v-slot:cell(Accused)="data">
@@ -130,7 +132,19 @@
                         </b-badge>
                 </template>
 
-                <template v-slot:[`cell(${fields[11].key})`]="data" >                     
+                <template v-slot:[`cell(${fields[10].key})`]="data" >
+                        <b-badge  
+                            v-for="(field,index) in data.value"
+                            :key="index" 
+                            class="mr-1"
+                            style="font-weight: normal;margin-top: 6px; font-size: 14px;"
+                            v-b-tooltip.hover.right 
+                            :title='field.key' > 
+                            {{ field.abbr }} 
+                        </b-badge>
+                </template>
+
+                <template v-slot:[`cell(${fields[12].key})`]="data" >                     
                     <b-badge variant="white" style="margin-top: 5px; font-weight: normal;font-size:16px">{{data.value}}
                     <span class="text-muted" style="font-weight: normal; font-size:14px">d</span>  </b-badge>                
                 </template>
@@ -252,19 +266,20 @@ export default class CriminalList extends Vue {
     
     fields =  
     [
-        {key:'Seq.',        tdClass: 'border-top', headerStyle:'', cellStyle:''},
-        {key:'File Number', tdClass: 'border-top', headerStyle:'', cellStyle:''},
-        {key:'Icons',       tdClass: 'border-top', thClass:'text-white', cellStyle:''},
-        {key:'Accused',     tdClass: 'border-top', headerStyle:'', cellStyle:'text-primary'},
-        {key:'Time',        tdClass: 'border-top', headerStyle:'', cellStyle:''},
-        {key:'Est.',        tdClass: 'border-top', headerStyle:'', cellStyle:''},
-        {key:'Reason',      tdClass: 'border-top', headerStyle:'', cellStyle:''},
-        {key:'Room',        tdClass: 'border-top', headerStyle:'', cellStyle:'text-primary'},
-        {key:'Counsel',     tdClass: 'border-top', headerStyle:'', cellStyle:''},
-        {key:'File Markers',tdClass: 'border-top', headerStyle:'', cellStyle:''},
-        {key:'Crown',       tdClass: 'border-top', headerStyle:'', cellStyle:''},
-        {key:'Case Age',    tdClass: 'border-top', headerStyle:'', cellStyle:''},
-        {key:'Notes',       tdClass: 'border-top', headerStyle:'', cellStyle:''},
+        {key:'Seq.',                tdClass: 'border-top', headerStyle:'', cellStyle:''},
+        {key:'File Number',         tdClass: 'border-top', headerStyle:'', cellStyle:''},
+        {key:'Icons',               tdClass: 'border-top', thClass:'text-white', cellStyle:''},
+        {key:'Accused',             tdClass: 'border-top', headerStyle:'', cellStyle:'text-primary'},
+        {key:'Time',                tdClass: 'border-top', headerStyle:'', cellStyle:''},
+        {key:'Est.',                tdClass: 'border-top', headerStyle:'', cellStyle:''},
+        {key:'Reason',              tdClass: 'border-top', headerStyle:'', cellStyle:''},
+        {key:'Room',                tdClass: 'border-top', headerStyle:'', cellStyle:'text-primary'},
+        {key:'Counsel',             tdClass: 'border-top', headerStyle:'', cellStyle:''},
+        {key:'File Markers',        tdClass: 'border-top', headerStyle:'', cellStyle:''},
+        {key:'Hearing Restrictions',tdClass: 'border-top', headerStyle:'', cellStyle:''},
+        {key:'Crown',               tdClass: 'border-top', headerStyle:'', cellStyle:''},
+        {key:'Case Age',            tdClass: 'border-top', headerStyle:'', cellStyle:''},
+        {key:'Notes',               tdClass: 'border-top', headerStyle:'', cellStyle:''},
     ];
 
      mounted() {
@@ -307,10 +322,6 @@ export default class CriminalList extends Vue {
             }              
             if (jcriminalList.video){
                 iconInfo.push({"info": "Video", "desc": ''})
-                iconExists = true;
-            }
-            if (jcriminalList.remoteVideo){
-                iconInfo.push({"info": "RemoteVideo", "desc": ''})
                 iconExists = true;
             }
             if (jcriminalList.fileHomeLocationName){
@@ -360,18 +371,27 @@ export default class CriminalList extends Vue {
                 if(criminalListInfo['CrownDesc']) criminalListInfo['CrownDesc'] += criminalListInfo['Crown'];
             }
             criminalListInfo['Est.'] = this.getDuration(jcriminalList.estimatedTimeHour, jcriminalList.estimatedTimeMin)
-
             criminalListInfo['PartID'] =  jcriminalList.fileInformation.partId
             criminalListInfo['JustinNo'] = jcriminalList.fileInformation.mdocJustinNo
             criminalListInfo['AppearanceID'] = jcriminalList.criminalAppearanceID
 
-
             criminalListInfo['File Markers'] = [];
+            if (jcriminalList.inCustody){
+                criminalListInfo['File Markers'].push({abbr: 'IC', key: 'In Custody'})
+            }            
+            if (jcriminalList.otherFileInformationText) {
+                criminalListInfo['File Markers'].push({abbr: 'OTH', key: jcriminalList.otherFileInformationText})
+            }
+            if (jcriminalList.detained) {
+                criminalListInfo['File Markers'].push({abbr: 'DO', key: 'Detention Order'})
+            }
+
+            criminalListInfo['Hearing Restrictions'] = [];
             for (const hearingRestriction of jcriminalList.hearingRestriction)
             {
                 const marker =  hearingRestriction.adjInitialsText +  HearingType[hearingRestriction.hearingRestrictiontype]  
                 const markerDesc =  hearingRestriction.judgeName + ' ('+ hearingRestriction.hearingRestrictionTypeDesc+')'          
-                criminalListInfo['File Markers'].push({abbr:marker, key:markerDesc});
+                criminalListInfo['Hearing Restrictions'].push({abbr:marker, key:markerDesc});
             }
             criminalListInfo['TrialNotes'] = jcriminalList.trialRemarkTxt;
 
