@@ -8,6 +8,7 @@ using Scv.Api.Helpers.Exceptions;
 using Scv.Api.Models.Civil.Detail;
 using Scv.Api.Models.Criminal.Detail;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Scv.Api.Services.Files;
 using CivilAppearanceDetail = Scv.Api.Models.Civil.AppearanceDetail.CivilAppearanceDetail;
@@ -61,23 +62,20 @@ namespace Scv.Api.Controllers
         }
 
         /// <summary>
-        /// Gets the details for a given a location civil file number text.
+        /// Gets the details for a given a location and civil file number text.
         /// </summary>
         /// <param name="location">Agency Location Id Code: EX. 104.0001</param>
         /// <param name="fileNumber">FileNumber: EX. P-241</param>
-        /// <returns>RedactedCivilFileDetailResponse</returns>
+        /// <returns>List{RedactedCivilFileDetailResponse}</returns>
         [HttpGet]
         [Route("civil")]
-        public async Task<ActionResult<RedactedCivilFileDetailResponse>> GetCivilFileDetailByAgencyIdCodeAndFileNumberText(string location, string fileNumber)
+        public async Task<ActionResult<List<RedactedCivilFileDetailResponse>>> GetCivilFileIdsByAgencyIdCodeAndFileNumberText(string location, string fileNumber)
         {
-            if (!fileNumber.Contains("-"))
-                throw new BadRequestException("Requires a fileNumber with a dash.");
+            var civilFiles = await _civilFilesService.GetFilesByAgencyIdCodeAndFileNumberText(location, fileNumber);
+            if (civilFiles == null || civilFiles.Count == 0)
+                throw new NotFoundException("Couldn't find civil file with this location and file number.");
 
-            var civilFileDetailResponse = await _civilFilesService.FileDetailByAgencyIdCodeAndFileNumberText(location, fileNumber);
-            if (civilFileDetailResponse?.PhysicalFileId == null)
-                throw new NotFoundException("Couldn't find civil file with this id.");
-
-            return Ok(civilFileDetailResponse);
+            return Ok(civilFiles);
         }
 
         /// <summary>
@@ -164,23 +162,20 @@ namespace Scv.Api.Controllers
         }
 
         /// <summary>
-        /// Gets the details for a given a location criminal file number text.
+        /// Gets the details for a given a location and criminal file number text.
         /// </summary>
         /// <param name="location"> Agency Identifier Code to look for EX. 83.0001</param>
         /// <param name="fileNumber"> FileNumberText to look for EX. 500-2</param>
-        /// <returns>RedactedCriminalFileDetailResponse</returns>
+        /// <returns>List{RedactedCriminalFileDetailResponse}</returns>
         [HttpGet]
         [Route("criminal")]
-        public async Task<ActionResult<RedactedCriminalFileDetailResponse>> GetCriminalFileDetailByAgencyIdCodeAndFileNumberText(string location, string fileNumber)
+        public async Task<ActionResult<List<RedactedCriminalFileDetailResponse>>> GetCriminalFileIdsByAgencyIdCodeAndFileNumberText(string location, string fileNumber)
         {
-            if (!fileNumber.Contains("-"))
-                throw new BadRequestException("Requires a fileNumber with a dash.");
+            var criminalFiles = await _criminalFilesService.GetFilesByAgencyIdCodeAndFileNumberText(location, fileNumber);
+            if (criminalFiles == null || criminalFiles.Count == 0)
+                throw new NotFoundException("Couldn't find criminal file with this location and file number.");
 
-            var criminalFileDetailResponse = await _criminalFilesService.FileDetailByAgencyIdCodeAndFileNumberText(location, fileNumber);
-            if (criminalFileDetailResponse?.JustinNo == null)
-                throw new NotFoundException("Couldn't find criminal file with this id.");
-
-            return Ok(criminalFileDetailResponse);
+            return Ok(criminalFiles);
         }
 
         /// <summary>
