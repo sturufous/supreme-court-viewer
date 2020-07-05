@@ -68,23 +68,44 @@ namespace Scv.Api.Services.Files
                 fcq.MdocJustinNumberSet, fcq.PhysicalFileIdSet);
         }
 
-        public async Task<RedactedCivilFileDetailResponse> FileDetailByAgencyIdCodeAndFileNumberText(string location,
+        public async Task<List<RedactedCivilFileDetailResponse>> GetFilesByAgencyIdCodeAndFileNumberText(string location,
             string fileNumber)
         {
-            if (!fileNumber.Contains("-"))
-                return null;
-            
-            Enum.TryParse(fileNumber.Split("-")[0], out FileDetailCourtClassCd courtClass);
-            fileNumber = fileNumber.Split("-")[1];
+            var fileDetails = new List<RedactedCivilFileDetailResponse>();
+            FileDetailCourtClassCd courtClass = FileDetailCourtClassCd.A;
+            var courtClassSet = fileNumber.Contains("-") && Enum.TryParse(fileNumber.Split("-")[0], out courtClass);
+            fileNumber = fileNumber.Contains("-") ? fileNumber.Split("-")[1] : fileNumber;
 
-            var fileSearchResponse = await SearchAsync(new FilesCivilQuery { FileHomeAgencyId = location, FileNumber = fileNumber, SearchMode = SearchMode2.FILENO, });
+            var fileSearchResponse = await SearchAsync(new FilesCivilQuery
+            {
+                FileHomeAgencyId = location,
+                FileNumber = fileNumber,
+                CourtLevel = CourtLevelCd3.S,
+                SearchMode = SearchMode2.FILENO
+            });
 
-            var targetFile = fileSearchResponse?.FileDetail?.Single(fd => fd.CourtClassCd == courtClass);
-            if (targetFile == null)
-                return null;
+            var targetIds = fileSearchResponse?.FileDetail?.Where(fd => !courtClassSet || fd.CourtClassCd == courtClass)
+                                                           .SelectToList(fd => fd.PhysicalFileId);
 
-            var civilFileDetailResponse = await FileIdAsync(fileSearchResponse.FileDetail.First().PhysicalFileId);
-            return civilFileDetailResponse?.PhysicalFileId == null ? null : civilFileDetailResponse;
+            if (targetIds == null || targetIds.Count == 0)
+                return fileDetails;
+
+            //Return the basic entry without doing a lookup.
+            if (targetIds.Count == 1)
+                return new List<RedactedCivilFileDetailResponse> { new RedactedCivilFileDetailResponse { PhysicalFileId = targetIds.First() }} ;
+
+            var fileDetailTasks = new List<Task<CivilFileDetailResponse>>();
+            foreach (var fileId in targetIds)
+            {
+                async Task<CivilFileDetailResponse> FileDetails() =>
+                    await _filesClient.FilesCivilFileIdAsync(_requestAgencyIdentifierId, _requestPartId, fileId);
+                fileDetailTasks.Add(_cache.GetOrAddAsync($"CivilFileDetail-{fileId}", FileDetails));
+            }
+
+            var fileDetailResponses = await fileDetailTasks.WhenAll();
+            fileDetails = fileDetailResponses.SelectToList(fdr => _mapper.Map<RedactedCivilFileDetailResponse>(fdr));
+
+            return fileDetails;
         }
 
         public async Task<RedactedCivilFileDetailResponse> FileIdAsync(string fileId)

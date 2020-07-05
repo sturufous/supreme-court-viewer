@@ -13,6 +13,8 @@ using Scv.Api.Services;
 using Scv.Api.Services.Files;
 using System;
 using System.Linq;
+using System.Reflection.Metadata;
+using Scv.Api.Helpers.Exceptions;
 using tests.api.Helpers;
 using Xunit;
 
@@ -53,30 +55,91 @@ namespace tests.api.Controllers
         #region Tests
 
         [Fact]
-        public async void Criminal_File_Details_By_FileNumberText()
+        public async void Civil_File_Details_ByFileNumberText_Multiple()
         {
-            var actionResult = await _controller.GetCriminalFileDetailByAgencyIdCodeAndFileNumberText("83.0001","500-2");
+            var actionResult =
+                await _controller.GetCivilFileIdsByAgencyIdCodeAndFileNumberText("83.0001", "1");
 
             var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
-            Assert.Equal("83.0001", fileSearchResponse.HomeLocationAgenId);
-            Assert.Equal("3001" ,fileSearchResponse.JustinNo);
+            Assert.Equal(2, fileSearchResponse.Count);
         }
 
+        [Fact]
+        public async void Criminal_File_Details_ByFileNumberText_Multiple()
+        {
+            var actionResult =
+                await _controller.GetCriminalFileIdsByAgencyIdCodeAndFileNumberText("83.0001", "58819");
+
+            var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+            Assert.Equal(2, fileSearchResponse.Count);
+        }
+
+        [Fact]
+        public async void Criminal_File_Details_By_FileNumberText_Empty()
+        {
+            var failed = false;
+            try
+            {
+                var actionResult =
+                    await _controller.GetCriminalFileIdsByAgencyIdCodeAndFileNumberText("83.0001", "500-24747474774");
+            }
+            catch (NotFoundException nfe)
+            {
+                failed = true;
+            }
+
+            Assert.True(failed);
+        }
+
+        [Fact]
+        public async void Civil_File_Details_By_FileNumberText_Empty()
+        {
+            var failed = false;
+            try
+            {
+                var actionResult =
+                    await _controller.GetCivilFileIdsByAgencyIdCodeAndFileNumberText("104.0001", "P-24166666666");
+            }
+            catch (NotFoundException nfe)
+            {
+                failed = true;
+            }
+            Assert.True(failed);
+        }
+
+        [Fact]
+        public async void Criminal_File_Details_By_FileNumberText()
+        {
+            var actionResult = await _controller.GetCriminalFileIdsByAgencyIdCodeAndFileNumberText("83.0001", "58819-1");
+
+            var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+            Assert.Contains("3779", fileSearchResponse.First().JustinNo);
+        }
+
+
+        [Fact]
+        public async void Civil_File_Details_By_FileNumberText_2()
+        {
+            var actionResult = await _controller.GetCivilFileIdsByAgencyIdCodeAndFileNumberText("83.0001", "S-1");
+
+            var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+            Assert.Contains("1619", fileSearchResponse.First().PhysicalFileId);
+        }
 
         [Fact]
         public async void Civil_File_Details_By_FileNumberText()
         {
-            var actionResult = await _controller.GetCivilFileDetailByAgencyIdCodeAndFileNumberText("104.0001", "P-241");
+            var actionResult = await _controller.GetCivilFileIdsByAgencyIdCodeAndFileNumberText("83.0001", "44459");
 
             var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
-            Assert.Equal("104.0001", fileSearchResponse.HomeLocationAgenId);
-            Assert.Equal("40", fileSearchResponse.PhysicalFileId);
+            Assert.Contains("3059", fileSearchResponse.First().PhysicalFileId);
         }
 
+        
         [Fact]
         public async void Criminal_File_Search_By_LastName()
         {
-            var fcq = new FilesCriminalQuery()
+            var fcq = new FilesCriminalQuery
             {
                 SearchMode = SearchMode.PARTNAME,
                 FileHomeAgencyId = "83.0001",
@@ -91,7 +154,7 @@ namespace tests.api.Controllers
         [Fact]
         public async void Civil_File_Search_By_LastName()
         {
-            var fcq = new FilesCivilQuery()
+            var fcq = new FilesCivilQuery
             {
                 SearchMode = SearchMode2.PARTNAME,
                 FileHomeAgencyId = "83.0001",
@@ -110,7 +173,7 @@ namespace tests.api.Controllers
         [Fact]
         public async void Criminal_File_Search_By_JustinNo()
         {
-            var fcq = new FilesCriminalQuery()
+            var fcq = new FilesCriminalQuery
             {
                 SearchMode = SearchMode.JUSTINNO,
                 FileHomeAgencyId = "83.00001",
@@ -125,7 +188,7 @@ namespace tests.api.Controllers
         [Fact]
         public async void Civil_File_Search_By_PhysicalFileId()
         {
-            var fcq = new FilesCivilQuery()
+            var fcq = new FilesCivilQuery
             {
                 SearchMode = SearchMode2.PHYSID,
                 FileHomeAgencyId = "83.0001",
