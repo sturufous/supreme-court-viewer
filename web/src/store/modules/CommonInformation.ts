@@ -12,7 +12,8 @@ class CommonInformation extends VuexModule {
   public time = ''
   public duration = ''
   public statusStyle = ''
-  public iconStyles: iconStyleType[] = [];    
+  public iconStyles: iconStyleType[] = [];
+  public fileSearch = { }    
 
   @Mutation
   public setDisplayName(displayName): void {   
@@ -124,6 +125,17 @@ class CommonInformation extends VuexModule {
     }   
     this.context.commit('setIconStyle', iconStyles)
   }
+
+  @Mutation
+  public setFileSearch(fileSearch): void {
+    this.fileSearch = fileSearch
+  }
+
+  @Action
+  public UpdateFileSearch(newFileSearch): void {
+    this.context.commit('setFileSearch', newFileSearch)
+  }
+  
 }
 
 export default CommonInformation 

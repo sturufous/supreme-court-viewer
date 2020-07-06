@@ -31,3 +31,8 @@ export interface adjudicatorRestrictionsInfoType {
     "Status": string,
     "Applies to": string
 }
+
+export interface fileSearchType {
+    "fileNumber": string,
+    "location": string
+}
