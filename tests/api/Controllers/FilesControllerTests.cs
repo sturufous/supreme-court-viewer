@@ -53,6 +53,27 @@ namespace tests.api.Controllers
         #region Tests
 
         [Fact]
+        public async void Criminal_File_Details_By_FileNumberText()
+        {
+            var actionResult = await _controller.GetCriminalFileDetailByAgencyIdCodeAndFileNumberText("83.0001","500-2");
+
+            var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+            Assert.Equal("83.0001", fileSearchResponse.HomeLocationAgenId);
+            Assert.Equal("3001" ,fileSearchResponse.JustinNo);
+        }
+
+
+        [Fact]
+        public async void Civil_File_Details_By_FileNumberText()
+        {
+            var actionResult = await _controller.GetCivilFileDetailByAgencyIdCodeAndFileNumberText("104.0001", "P-241");
+
+            var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+            Assert.Equal("104.0001", fileSearchResponse.HomeLocationAgenId);
+            Assert.Equal("40", fileSearchResponse.PhysicalFileId);
+        }
+
+        [Fact]
         public async void Criminal_File_Search_By_LastName()
         {
             var fcq = new FilesCriminalQuery()

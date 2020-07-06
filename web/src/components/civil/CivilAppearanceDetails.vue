@@ -51,7 +51,7 @@
 
                             <template v-slot:[`cell(${documentFields[1].key})`]="data" >
                                 <b-button 
-                                    v-if="data.item.PdfAvail" 
+                                    v-if="data.item.PdfAvail && !data.item.Sealed" 
                                     variant="outline-primary text-info" 
                                     :style="data.field.cellStyle"
                                     @click="documentClick(data)"
@@ -61,8 +61,13 @@
                                 <span
                                     class="ml-2"
                                     :style="data.field.cellLabelStyle"
-                                    v-else>
+                                    v-else-if="!data.item.PdfAvail && !data.item.Sealed">
                                         {{data.value}}
+                                </span>
+                                <span class="ml-2 text-muted"
+                                      v-else-if="data.item.Sealed"
+                                      :style="data.field.cellLabelStyle">
+                                    {{data.value}}
                                 </span>
                             </template>
 
@@ -76,10 +81,22 @@
                                     :title="act.Description"> 
                                         {{act.Code}} 
                                 </b-badge>
-                            </template>                            
-
+                            </template>
+                            <template v-slot:cell(Seq.)="data">
+                                <span v-if="data.item.Sealed" class="ml-2 text-muted" :style="data.field.cellStyle"> 
+                                    {{data.value}}
+                                </span>
+                                <span v-else class="ml-2" :style="data.field.cellStyle"> 
+                                    {{data.value}}
+                                </span>
+                            </template>
                             <template v-slot:[`cell(${documentFields[3].key})`]="data" >
-                                <span :style="data.field.cellStyle">
+                                <span v-if="data.item.Sealed" 
+                                      :style="data.field.cellStyle"
+                                      class="text-muted">
+                                    {{ data.value | beautify-date}}
+                                </span>
+                                <span v-else :style="data.field.cellStyle">
                                     {{ data.value | beautify-date}}
                                 </span>
                             </template>
@@ -98,7 +115,13 @@
                                     </template>
                                     
                                     <template v-slot:cell(Issue)="dataR" >
-                                        <li :style="dataR.field.cellStyle">                                        
+                                        <li v-if="data.item.Sealed" 
+                                            class="text-muted" 
+                                            :style="dataR.field.cellStyle">                                        
+                                            {{ dataR.value }}
+                                        </li>
+                                        <li v-else
+                                            :style="dataR.field.cellStyle">                                        
                                             {{ dataR.value }}
                                         </li>
                                     </template>
@@ -255,6 +278,8 @@ import { Component, Vue, Prop } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import "@store/modules/CommonInformation";
 import "@store/modules/CivilFileInformation";
+import {appearanceAdditionalInfoType, civilAppearanceInfoType, appearancePartiesType, appearanceMethodsType, appearanceDocumentsType} from '../../types/civil';
+import {inputNamesType } from '../../types/common'
 const civilState = namespace("CivilFileInformation");
 const commonState = namespace("CommonInformation");
 
@@ -262,23 +287,18 @@ const commonState = namespace("CommonInformation");
 export default class CivilAppearanceDetails extends Vue {
 
     @commonState.State
-    public displayName!: string;
-
-     /* eslint-disable */
-    @civilState.State
-    public civilFileInformation!: any;
+    public displayName!: string;   
 
     @civilState.State
-    public appearanceInfo!: any;        
+    public appearanceInfo!: civilAppearanceInfoType;        
 
     @commonState.Action
-    public UpdateDisplayName!: (newInputNames: any) => void
+    public UpdateDisplayName!: (newInputNames: inputNamesType) => void
 
-    appearanceAdditionalInfo: any[] = [];
-    appearanceDocuments: any[] = [];
-    appearanceParties: any[] = [];
-    appearanceMethods: any[] = [];
-    /* eslint-enable */
+    appearanceAdditionalInfo: appearanceAdditionalInfoType[] = [];
+    appearanceDocuments: appearanceDocumentsType[] = [];
+    appearanceParties: appearancePartiesType[] = [];
+    appearanceMethods: appearanceMethodsType[] = [];    
     
     loadingPdf = false; 
     isMounted = false;
@@ -370,7 +390,7 @@ export default class CivilAppearanceDetails extends Vue {
         this.adjudicatorComment = this.appearanceDetailsJson.adjudicatorComment? this.appearanceDetailsJson.adjudicatorComment: '';
         for(const documentIndex in this.appearanceDetailsJson.document)
         {              
-            const docInfo = {};
+            const docInfo = {} as appearanceDocumentsType;
             const document = this.appearanceDetailsJson.document[documentIndex]              
             docInfo["Seq."] = document.fileSeqNo;
             docInfo["Document Type"]= document.documentTypeDescription
@@ -382,7 +402,13 @@ export default class CivilAppearanceDetails extends Vue {
                 for (const act of document.documentSupport) {
                     docInfo["Act"].push({'Code': act.actCd, 'Description': act.actDsc})
                 }
-            }    
+            }
+            
+            if (document.sealedYN == "Y") {                
+                docInfo["Sealed"] = true;
+            } else {
+                docInfo["Sealed"] = false;
+            }
             
             docInfo["Date Filed"]= document.filedDt? document.filedDt.split(' ')[0] : '';
             docInfo["Result"]= document.appearanceResultCd
@@ -400,7 +426,7 @@ export default class CivilAppearanceDetails extends Vue {
 
         for(const party of this.appearanceDetailsJson.party)
         {              
-            const partyInfo = {};             
+            const partyInfo = {} as appearancePartiesType;             
             partyInfo["First Name"] = party.givenNm? party.givenNm: '';
             partyInfo["Last Name"] =  party.lastNm? party.lastNm: party.orgNm ;
             this.UpdateDisplayName({'lastName': partyInfo["Last Name"], 'givenName': partyInfo["First Name"]});
@@ -478,7 +504,7 @@ export default class CivilAppearanceDetails extends Vue {
         
         for(const appearanceMethod of this.appearanceDetailsJson.appearanceMethod)
         {              
-            const methodInfo = {};             
+            const methodInfo = {} as appearanceMethodsType;             
             methodInfo["role"] = appearanceMethod.roleTypeDesc;
             methodInfo["method"] = appearanceMethod.appearanceMethodDesc;
             this.appearanceMethods.push(methodInfo)

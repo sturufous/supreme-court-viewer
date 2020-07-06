@@ -29,7 +29,8 @@
             :sort-desc.sync="sortDesc"
             :no-sort-reset="true"
             sort-icon-left
-            borderless           
+            borderless
+            @sort-changed="sortChanged"           
             small                        
             responsive ="sm"
             >   
@@ -108,9 +109,12 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
+import * as _ from 'underscore';
 import CriminalAppearanceDetails from '@components/criminal/CriminalAppearanceDetails.vue';
 import "@store/modules/CriminalFileInformation";
 import "@store/modules/CommonInformation";
+import {criminalAppearancesListType, criminalAppearanceInfoType, criminalFileInformationType} from '../../types/criminal';
+import {inputNamesType, durationType} from '../../types/common'
 const criminalState = namespace("CriminalFileInformation");
 const commonState = namespace("CommonInformation");
 
@@ -138,30 +142,28 @@ export default class CriminalPastAppearances extends Vue {
     @commonState.State
     public statusStyle
     
-    /* eslint-disable */
     @criminalState.State
-    public criminalFileInformation!: any;
+    public criminalFileInformation!: criminalFileInformationType;
 
     @criminalState.State
-    public appearanceInfo!: any;
+    public appearanceInfo!: criminalAppearanceInfoType;
 
     @criminalState.Action
-    public UpdateAppearanceInfo!: (newAppearanceInfo: any) => void       
+    public UpdateAppearanceInfo!: (newAppearanceInfo: criminalAppearanceInfoType) => void       
 
     @commonState.Action
-    public UpdateDisplayName!: (newInputNames: any) => void    
+    public UpdateDisplayName!: (newInputNames: inputNamesType) => void    
 
     @commonState.Action
-    public UpdateDuration!: (duration: any) => void    
+    public UpdateDuration!: (duration: durationType) => void    
 
     @commonState.Action
-    public UpdateTime!: (time: any) => void    
+    public UpdateTime!: (time: string) => void    
     
     @commonState.Action
-    public UpdateStatusStyle!: (statusStyle: any) => void
+    public UpdateStatusStyle!: (statusStyle: string) => void
 
-    pastAppearancesList: any[] = [];
-    /* eslint-enable */  
+    pastAppearancesList: criminalAppearancesListType[] = [];     
     isMounted = false;
     isDataReady = false;
     pastAppearancesJson;    
@@ -200,7 +202,7 @@ export default class CriminalPastAppearances extends Vue {
     public ExtractPastAppearancesInfo(): void {
         const currentDate = new Date();
         for (const appIndex in this.pastAppearancesJson) {
-            const appInfo = {};
+            const appInfo = {} as criminalAppearancesListType;
             const jApp = this.pastAppearancesJson[appIndex];
 
             appInfo["Index"] = appIndex;
@@ -268,10 +270,16 @@ export default class CriminalPastAppearances extends Vue {
             this.appearanceInfo.securityRestrictionTxt = data.item["Security Restriction"];
             this.appearanceInfo.outOfTownJudgeTxt = data.item["OutOfTown Judge"]
             this.appearanceInfo.profSeqNo = data.item["Prof Seq No"]            
-            this.UpdateAppearanceInfo(this.appearanceInfo);
-          
+            this.UpdateAppearanceInfo(this.appearanceInfo);          
         }
         
+    }
+
+    public sortChanged() 
+    {
+        this.SortedPastAppearances.forEach((item) => {
+            this.$set(item, '_showDetails', false)
+        })
     }
 
     get SortedPastAppearances()
@@ -282,15 +290,7 @@ export default class CriminalPastAppearances extends Vue {
         }
         else
         {
-            return  this.pastAppearancesList
-            .sort((a, b): any =>
-            {            
-                if(a["Date"] > b["Date"]) return -1;
-                else if(a["Date"] < b["Date"]) return 1;
-                else return 0;
-            })
-            .slice(0, 3);
-           
+            return _.sortBy(this.pastAppearancesList,"Date").reverse().slice(0, 3);           
         }        
     }
 }

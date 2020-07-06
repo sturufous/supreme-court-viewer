@@ -25,7 +25,7 @@
             <template v-slot:button-content>
                 <b-button
                     variant="outline-primary text-info" 
-                    style="transform: translate(0,-4px); border:0px; font-size:16px"
+                    style="transform: translate(0,-4px); border:0px; font-size:14px"
                     size="sm">
                     <b-icon class="mr-2" icon="person-fill"></b-icon>
                     <b>{{getNameOfParticipantTrunc()}}</b> and {{(participantList.length-1)}} other(s)
@@ -39,16 +39,16 @@
             >{{participant['Name']}}</b-dropdown-item-button>
         </b-nav-item-dropdown>
 
-        <b-nav-text style="margin-top: 4px;font-size: 14px;" variant="white">
+        <b-nav-text style="margin-top: 4px;font-size: 12px;" variant="white">
             <b-badge pill variant="danger">{{adjudicatorRestrictions.length}}</b-badge>
         </b-nav-text>
 
-        <b-nav-item-dropdown right no-caret > 
+        <b-nav-item-dropdown right no-caret :disabled="adjudicatorRestrictions.length==0"> 
             <template v-slot:button-content>
                 <b-button
                     :variant="(adjudicatorRestrictions.length>0)? 'outline-primary text-info':'white'" 
                     :disabled="adjudicatorRestrictions.length==0"
-                    style="transform: translate(-5px,0); border:0px; font-size:14px;text-overflow: ellipsis;"                    
+                    style="transform: translate(-5px,0); border:0px; font-size:12px;text-overflow: ellipsis;"                    
                     size="sm">                    
                     Adjudicator Restrictions
                     <b-icon v-if="(adjudicatorRestrictions.length>0)" class="ml-1" icon="caret-down-fill" font-scale="1"></b-icon>
@@ -58,7 +58,7 @@
             <b-dropdown-item-button                      
               v-for="(restriction, index) in adjudicatorRestrictions"
               :key="index">
-                  <b-button style="font-size: 14px; padding: 5px 5px;" 
+                  <b-button style="font-size: 12px; padding: 5px 5px;" 
                             variant="secondary" 
                             v-b-tooltip.hover.left 
                             :title='restriction["Full Name"]'>
@@ -67,7 +67,7 @@
             </b-dropdown-item-button>
         </b-nav-item-dropdown>
 
-        <b-nav-text v-if="bans.length>0" style="margin-top: 4px;font-size: 14px;" variant="white">
+        <b-nav-text v-if="bans.length>0" style="margin-top: 4px;font-size: 12px;" variant="white">
             <b-badge pill variant="danger">{{bans.length}}</b-badge>
         </b-nav-text>
 
@@ -75,7 +75,7 @@
             <template v-slot:button-content>
                 <b-button
                     variant="outline-primary text-info"
-                    style="transform: translate(-5px,0); border:0px; font-size:14px;text-overflow: ellipsis;"                    
+                    style="transform: translate(-5px,0); border:0px; font-size:12px;text-overflow: ellipsis;"                    
                     size="sm">                    
                     Ban Details
                     <b-icon class="ml-1" icon="caret-down-fill" font-scale="1"></b-icon>
@@ -123,6 +123,8 @@ import * as _ from 'underscore';
 import { namespace } from "vuex-class";
 import "@store/modules/CriminalFileInformation";
 import "@store/modules/CommonInformation";
+import {bansInfoType, participantListInfoType, criminalFileInformationType} from '../../types/criminal';
+import {inputNamesType, adjudicatorRestrictionsInfoType } from '../../types/common'
 const criminalState = namespace("CriminalFileInformation");
 const commonState = namespace("CommonInformation");
 
@@ -135,25 +137,23 @@ export default class CriminalHeader extends Vue {
   @commonState.State
   public displayName!: string;
 
-  /* eslint-disable */
   @criminalState.State
-  public criminalFileInformation!: any;
+  public criminalFileInformation!: criminalFileInformationType;
 
   @criminalState.Action
-  public UpdateActiveCriminalParticipantIndex!: (newActiveCriminalParticipantIndex: any) => void
+  public UpdateActiveCriminalParticipantIndex!: (newActiveCriminalParticipantIndex: string) => void
 
   @commonState.Action
-  public UpdateDisplayName!: (newInputNames: any) => void
+  public UpdateDisplayName!: (newInputNames: inputNamesType) => void
 
-  participantList: any[] = [];
-  adjudicatorRestrictions: any[] = [];
-  bans: any[] = [];
-  /* eslint-enable */
+  participantList: participantListInfoType[] = [];
+  adjudicatorRestrictions: adjudicatorRestrictionsInfoType[] = [];
+  bans: bansInfoType[] = [];
 
   maximumFullNameLength = 15;
   numberOfParticipants = 0;
   fileNumberText;
-  agencyLocation = {Name:'', Code:0, Region:'' };
+  agencyLocation = {Name:'', Code:'0', Region:'' };
   adjudicatorRestrictionsJson;
   isMounted = false;
   participantJson;

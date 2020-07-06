@@ -69,19 +69,18 @@
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import "@store/modules/CivilFileInformation";
+import {civilFileInformationType, partiesInfoType} from '../../types/civil';
 const civilState = namespace("CivilFileInformation");
 
 @Component
 export default class CivilParties extends Vue {
-
-    /* eslint-disable */
+    
     @civilState.State
-    public civilFileInformation!: any;
-    /* eslint-enable */    
+    public civilFileInformation!: civilFileInformationType;        
   
     isMounted = false;
-    leftPartiesInfo = [];
-    rightPartiesInfo = [];
+    leftPartiesInfo: partiesInfoType[] = [];
+    rightPartiesInfo: partiesInfoType[] = [];
     leftRole = '';
     rightRole = '';
     numberOfLeftParties = 0
