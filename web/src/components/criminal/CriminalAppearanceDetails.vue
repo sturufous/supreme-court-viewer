@@ -236,8 +236,7 @@ export default class CriminalAppearanceDetails extends Vue {
     appearanceAdditionalInfo: appearanceAdditionalInfoType[] = [];
     appearanceCharges: appearanceChargesInfoType[] = [];    
     appearanceMethods: criminalAppearanceMethodsInfoType[] = [];
-    appearanceMethodDetails: appearanceMethodDetailsInfoType[] = [];
-     
+    appearanceMethodDetails: appearanceMethodDetailsInfoType[] = [];    
   
     loadingPdf = false;
     loadingROP = false;

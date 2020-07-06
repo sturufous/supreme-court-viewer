@@ -8,6 +8,16 @@ export interface durationType {
     "min": string
 }
 
+export interface iconStyleType {
+    "icon": string,
+    "desc": string
+}
+
+export interface iconInfoType {
+    "info": string,
+    "desc": string
+}
+
 export interface additionalProperties {
     "additionalProp1": {},
     "additionalProp2": {},
