@@ -17,6 +17,7 @@ using System.Reflection.Metadata;
 using Scv.Api.Helpers.Exceptions;
 using tests.api.Helpers;
 using Xunit;
+using System.Diagnostics.CodeAnalysis;
 
 namespace tests.api.Controllers
 {
@@ -30,7 +31,7 @@ namespace tests.api.Controllers
         #region Variables
 
         private readonly FilesController _controller;
-
+        private readonly FileServicesClient _fileServicesClient;
         #endregion Variables
 
         #region Constructor
@@ -43,6 +44,7 @@ namespace tests.api.Controllers
             var lookupServiceClient = new LookupServiceClient(lookupServices.HttpClient);
             var locationServiceClient = new LocationServicesClient(locationServices.HttpClient);
             var fileServicesClient = new FileServicesClient(fileServices.HttpClient);
+            _fileServicesClient = fileServicesClient;
             var lookupService = new LookupService(lookupServices.Configuration, lookupServiceClient, new CachingService());
             var locationService = new LocationService(locationServices.Configuration, locationServiceClient, new CachingService());
             var filesService = new FilesService(fileServices.Configuration, fileServicesClient, new Mapper(), lookupService, locationService, new CachingService());
@@ -53,6 +55,24 @@ namespace tests.api.Controllers
         #endregion Constructor
 
         #region Tests
+
+        [Fact]
+        public async void Civil_File_Services_File_Content()
+        {
+            //This is the largest file on dev. 
+            var result = await _fileServicesClient.FilesCivilFilecontentAsync(null, null, null, null, "2222");
+            Assert.NotNull(result);
+        }
+
+
+        [Fact]
+        public async void Criminal_File_Details_ByFileNumberText_Three()
+        {
+            var actionResult = await _controller.GetCriminalFileIdsByAgencyIdCodeAndFileNumberText("83.0001", "98050101");
+
+            var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+            Assert.Equal(3, fileSearchResponse.Count);
+        }
 
         [Fact]
         public async void Civil_File_Details_ByFileNumberText_Multiple()
@@ -71,7 +91,7 @@ namespace tests.api.Controllers
                 await _controller.GetCriminalFileIdsByAgencyIdCodeAndFileNumberText("83.0001", "58819");
 
             var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
-            Assert.Equal(2, fileSearchResponse.Count);
+            Assert.Equal(3, fileSearchResponse.Count);
         }
 
         [Fact]
@@ -113,7 +133,7 @@ namespace tests.api.Controllers
             var actionResult = await _controller.GetCriminalFileIdsByAgencyIdCodeAndFileNumberText("83.0001", "58819-1");
 
             var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
-            Assert.Contains("3779", fileSearchResponse.First().JustinNo);
+            Assert.Contains("3777", fileSearchResponse.First().JustinNo);
         }
 
 
@@ -313,7 +333,7 @@ namespace tests.api.Controllers
             var actionResult = await _controller.FilesCriminalSearchAsync(fcq);
 
             var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
-            Assert.Equal("2", fileSearchResponse.RecCount);
+            Assert.Equal("3", fileSearchResponse.RecCount);
         }
 
         [Fact]
@@ -537,7 +557,7 @@ namespace tests.api.Controllers
             var civilAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
 
             //Here we have AppearanceMethods, for adjudicator.  Note no data for name.
-            Assert.Equal("VC", civilAppearanceDetail.Adjudicator.AppearanceMethodCd);
+            Assert.Equal("VC", civilAppearanceDetail.Adjudicator?.AppearanceMethodCd);
             Assert.Equal("Video Conference", civilAppearanceDetail.Adjudicator.AppearanceMethodDesc);
             //Also data for applicant.
             Assert.True(civilAppearanceDetail.Party.Where(p => p.PartyRole.Any(pr => pr.RoleTypeCd == "APP"))
