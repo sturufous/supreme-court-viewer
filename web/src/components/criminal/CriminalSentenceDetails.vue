@@ -74,19 +74,7 @@ const criminalState = namespace("CriminalFileInformation");
 export default class CriminalSentenceDetails extends Vue {   
 
     @criminalState.State
-    public criminalParticipantSentenceInformation
-    
-    public getParticipants(): void {       
-         
-        this.participantSentences = this.criminalParticipantSentenceInformation.participantSentences
-        this.selectedParticipant = this.criminalParticipantSentenceInformation.selectedParticipant
-         
-        this.isMounted = true;
-    }
-
-    mounted () {        
-        this.getParticipants();  
-    }
+    public criminalParticipantSentenceInformation 
 
     participantJson;         
     sortBy = 'Date';
@@ -105,7 +93,18 @@ export default class CriminalSentenceDetails extends Vue {
         {key:'Amount',                   sortable:false,  tdClass: 'border-top', headerStyle:'text'},
         {key:'Due Date/ Until',          sortable:false,  tdClass: 'border-top', headerStyle:'text'},
         {key:'Effective Date',           sortable:false,  tdClass: 'border-top', headerStyle:'text'},
-    ];   
+    ];
+    
+    public getParticipants(): void {       
+         
+        this.participantSentences = this.criminalParticipantSentenceInformation.participantSentences
+        this.selectedParticipant = this.criminalParticipantSentenceInformation.selectedParticipant         
+        this.isMounted = true;
+    }
+
+    mounted () {        
+        this.getParticipants();  
+    }
     
     get SortedParticipantSentencesCounts()
     {
