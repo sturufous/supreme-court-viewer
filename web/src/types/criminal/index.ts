@@ -213,5 +213,10 @@ export interface showSectionsInfoType {
     "Witnesses": boolean,
     "Documents": boolean,
     "Sentence/Order Details": boolean
-  }
+}
+
+export interface fileSearchCriminalInfoType {
+    "Participants": string[],
+    "File Id": string
+}
 

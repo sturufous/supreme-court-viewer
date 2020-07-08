@@ -154,3 +154,8 @@ export interface civilShowSectionsType {
     "Future Appearances": boolean,
     "Past Appearances": boolean
 }
+
+export interface fileSearchCivilInfoType {
+    "Parties": string[],
+    "File Id": string
+}

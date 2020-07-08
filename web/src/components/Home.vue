@@ -33,8 +33,12 @@
                     </b-card>
                     <b-card> 
                         <b-card-text for="civil/criminal"> Civil/Criminal: </b-card-text>
+                        <b-form-select v-model="selectedFileSearch" :options="options"></b-form-select>               
+                    </b-card>
+                    <b-card> 
+                        <b-card-text for="location"> Location: </b-card-text>
                         <b-form-select
-                         v-model="selectedCourtLocation"
+                        v-model="selectedCourtLocation"
                         id="locationSelect"
                         :disabled="!searchAllowed"
                         :state = "selectedCourtLocationState?null:false"
@@ -44,7 +48,7 @@
                         </b-form-select>               
                     </b-card>                
                     <b-card >
-                        <b-button @click="navigateToDocumentsView(fileInformation)">Search</b-button>
+                        <b-button @click="navigateToFilesView(fileSearch)">Search</b-button>
                     </b-card>                    
                 </b-card>
             </b-col>
@@ -61,25 +65,22 @@
     import * as _ from 'underscore';
     import '@store/modules/CivilFileInformation';
     import '@store/modules/CriminalFileInformation';
-    import {criminalFileInformationType} from '../types/criminal';
-    import {civilFileInformationType} from '../types/civil';
-    import {fileSearchType} from '../types/common';
+    import {criminalFileInformationType, fileSearchCriminalInfoType} from '../types/criminal';
+    import {civilFileInformationType, fileSearchCivilInfoType} from '../types/civil';
+    import {courtRoomsAndLocationsInfoType, locationInfoType} from '../types/courtlist';
+    import {fileSearchType, inputNamesType} from '../types/common';
     const civilState = namespace('CivilFileInformation');
     const criminalState = namespace('CriminalFileInformation');
     const commonState = namespace('CommonInformation');
 
     @Component
     export default class Home extends Vue {
-
-        selected = 'criminal';
-        options= [
-          { value: 'civil', text: 'Civil' },
-          { value: 'criminal', text: 'Criminal' }
-        ]
         
-        fileInformation = { }
+        @commonState.State
+        public displayName!: string;
 
-        fileSearch = {}
+        @commonState.Action
+        public UpdateDisplayName!: (newInputNames: inputNamesType) => void
 
         @civilState.Action
         public UpdateCivilFile!: (newCivilFileInformation: civilFileInformationType) => void
@@ -88,11 +89,33 @@
         public UpdateCriminalFile!: (newCriminalFileInformation: criminalFileInformationType) => void
         
         @commonState.Action
-        public UpdateFileSearch!: (newFileSearch: fileSearchType) => void        
+        public UpdateFileSearch!: (newFileSearch: fileSearchType) => void
+        
+        selected = 'criminal';
+        selectedFileSearch = 'criminal';
+        options= [
+          { value: 'civil', text: 'Civil' },
+          { value: 'criminal', text: 'Criminal' }
+        ]
+        
+        fileInformation = {};
+        fileSearch = {} as fileSearchType;        
+        errorCode=0
+        errorText=''
+        syncFlag = true
+        searchingRequest = false;
+        searchAllowed = true;
+        isLocationDataMounted = false;
+        isLocationDataReady = false;
+        courtRoomsAndLocationsJson;
+        courtRoomsAndLocations: courtRoomsAndLocationsInfoType[] = []
+        fileSearchCivilInfo: fileSearchCivilInfoType[] = []
+        fileSearchCriminalInfo: fileSearchCriminalInfoType[] = []
+        selectedCourtLocation = {} as locationInfoType;
+        selectedCourtLocationState=true;
         
         // TODO: add validation so that the user has to enter values before clicking the search button
         navigateToDocumentsView(fileInformation): void {
-
             if(this.selected == 'civil') {
                 this.UpdateCivilFile(fileInformation)
                 this.$router.push({name:'CivilCaseDetails', params: {fileNumber: fileInformation.fileNumber}})
@@ -102,10 +125,16 @@
             }            
         }
 
-        navigateToFilesView(fileSearch): void {           
-            this.UpdateFileSearch(fileSearch)
-            this.$router.push({name:'CriminalCaseDetails', params: {fileNumber: fileSearch.fileNumber, location: fileSearch.location}})
-                   
+        navigateToFilesView(fileSearch): void {
+            if(this.selectedFileSearch == 'civil') {
+                this.fileSearch.location = this.selectedCourtLocation.LocationID;
+                this.UpdateFileSearch(fileSearch)
+                this.$router.push({name:'CivilFileSearchResultList', params: {fileNumber: this.fileSearch.fileNumber, location: this.fileSearch.location}})
+            } else if(this.selectedFileSearch == 'criminal') {
+                this.fileSearch.location = this.selectedCourtLocation.LocationID;
+                this.UpdateFileSearch(fileSearch)
+                this.$router.push({name:'CriminalFileSearchResultList', params: {fileNumber: this.fileSearch.fileNumber, location: this.fileSearch.location}})
+            }                    
         }
 
         mounted () { 
@@ -123,8 +152,7 @@
                         this.ExtractCourtRoomsAndLocationsInfo();
                         if(this.courtRoomsAndLocations.length>0)
                         {                    
-                            this.isLocationDataReady = true;
-                            this.searchByRouterParams();                        
+                            this.isLocationDataReady = true;                       
                         }
                     }
                     this.isLocationDataMounted = true;
@@ -138,26 +166,23 @@
                 if(jroomAndLocation.courtRooms.length>0)
                 {
                     const roomAndLocationInfo = {} as courtRoomsAndLocationsInfoType;
-                    roomAndLocationInfo["text"]= jroomAndLocation.name + ' (' +jroomAndLocation.locationId+')';             
-                            
-                    const rooms: roomsInfoType[] = [];         
-                    for(const jroom of jroomAndLocation.courtRooms)
-                    {              
-                        const roomInfo = {} as roomsInfoType;                   
-                        roomInfo["value"]= jroom.room 
-                        roomInfo["text"]= jroom.room                        
-                        rooms.push(roomInfo);
-                    }               
+                    roomAndLocationInfo["text"]= jroomAndLocation.name + ' (' +jroomAndLocation.code+')';                    
                     roomAndLocationInfo.value = {} as locationInfoType;
                     roomAndLocationInfo.value["Location"] = jroomAndLocation.name;
-                    roomAndLocationInfo.value["LocationID"] = jroomAndLocation.locationId;
-                    roomAndLocationInfo.value["Rooms"] = rooms
-                
+                    roomAndLocationInfo.value["LocationID"] = jroomAndLocation.code;                
                     this.courtRoomsAndLocations.push(roomAndLocationInfo);
                 }                
             }
             this.courtRoomsAndLocations =  _.sortBy(this.courtRoomsAndLocations, 'text')
             this.selectedCourtLocation = this.courtRoomsAndLocations[0].value; 
+        }
+
+        public LocationChanged()
+        {   
+            this.searchingRequest = false;
+            this.selectedCourtLocationState=true;        
+            this.syncFlag = false; 
+            this.syncFlag = true;     
         }
         
         navigateToCourtList(): void {
