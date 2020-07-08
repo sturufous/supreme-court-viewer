@@ -265,7 +265,7 @@ namespace Scv.Api.Services
             foreach (var courtListFile in courtList)
             {
                 var fileId = courtListFile.PhysicalFile.PhysicalFileID;
-                var civilFile = fileContents.FirstOrDefault(fc => fc.PhysicalFileId == fileId)?.CivilFile
+                var civilFile = fileContents.Where(fc => fc != null).FirstOrDefault(fc => fc.PhysicalFileId == fileId)?.CivilFile
                     .FirstOrDefault(cf => cf.PhysicalFileID == fileId);
 
                 //This doesn't map correctly. the WSDL states CFCSAFileYN, but the server returns cfcsafileYN.
