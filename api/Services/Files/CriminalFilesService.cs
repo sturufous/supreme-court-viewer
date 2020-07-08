@@ -60,8 +60,9 @@ namespace Scv.Api.Services.Files
                 "[\"A\", \"Y\", \"T\", \"F\", \"C\", \"M\", \"L\", \"R\", \"B\", \"D\", \"E\", \"G\", \"H\", \"N\", \"O\", \"P\", \"S\", \"V\"]"; // for now, use all types - TODO: determine proper list of types?
 
             //CourtLevel = "S"  Supreme court data, CourtLevel = "P" - Province.
+            //TODO remove A2A and replace with SCV, when the applicationCode has been generated. 
             return await _filesClient.FilesCriminalAsync(_requestAgencyIdentifierId,
-                _requestPartId, _requestApplicationCode, fcq.SearchMode, fcq.FileHomeAgencyId, fcq.FileNumberTxt,
+                _requestPartId, "A2A", fcq.SearchMode, fcq.FileHomeAgencyId, fcq.FileNumberTxt,
                 fcq.FilePrefixTxt, fcq.FilePermissions, fcq.FileSuffixNo, fcq.MdocRefTypeCode, fcq.CourtClass,
                 fcq.CourtLevel, fcq.NameSearchTypeCd, fcq.LastName, fcq.OrgName, fcq.GivenName,
                 fcq.Birth?.ToString("yyyy-MM-dd"), fcq.SearchByCrownPartId, fcq.SearchByCrownActiveOnly,
@@ -79,7 +80,6 @@ namespace Scv.Api.Services.Files
             {
                 FileHomeAgencyId = location,
                 FileNumberTxt = fileNumberText,
-                CourtLevel = CourtLevelCd2.S,
                 SearchMode = SearchMode.FILENO
             });
 

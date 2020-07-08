@@ -60,8 +60,9 @@ namespace Scv.Api.Services.Files
         {
             fcq.FilePermissions =
                 "[\"A\", \"Y\", \"T\", \"F\", \"C\", \"M\", \"L\", \"R\", \"B\", \"D\", \"E\", \"G\", \"H\", \"N\", \"O\", \"P\", \"S\", \"V\"]"; // for now, use all types - TODO: determine proper list of types?
+            //TODO remove A2A and replace with SCV, when the applicationCode has been generated. 
             return await _filesClient.FilesCivilAsync(_requestAgencyIdentifierId, _requestPartId,
-                _requestApplicationCode, fcq.SearchMode, fcq.FileHomeAgencyId, fcq.FileNumber, fcq.FilePrefix,
+                "A2A", fcq.SearchMode, fcq.FileHomeAgencyId, fcq.FileNumber, fcq.FilePrefix,
                 fcq.FilePermissions, fcq.FileSuffixNumber, fcq.MDocReferenceTypeCode, fcq.CourtClass, fcq.CourtLevel,
                 fcq.NameSearchType, fcq.LastName, fcq.OrgName, fcq.GivenName, fcq.Birth?.ToString("yyyy-MM-dd"),
                 fcq.SearchByCrownPartId, fcq.SearchByCrownActiveOnly, fcq.SearchByCrownFileDesignation,
@@ -80,7 +81,6 @@ namespace Scv.Api.Services.Files
             {
                 FileHomeAgencyId = location,
                 FileNumber = fileNumber,
-                CourtLevel = CourtLevelCd3.S,
                 SearchMode = SearchMode2.FILENO
             });
 
