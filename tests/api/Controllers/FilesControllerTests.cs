@@ -59,7 +59,9 @@ namespace tests.api.Controllers
         [Fact]
         public async void Civil_File_Services_File_Content()
         {
-            //This is the largest file on dev. 
+            /* This is the largest civil file on dev. Unfortunately if the WSDL changes for this route, 
+             * it will always return back 200, but a null file. It would have been nice if the server 
+             * would return 500 etc on errors. */
             var result = await _fileServicesClient.FilesCivilFilecontentAsync(null, null, null, null, "2222");
             Assert.NotNull(result);
         }
