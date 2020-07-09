@@ -56,6 +56,23 @@ namespace tests.api.Controllers
 
         #region Tests
 
+
+        [Fact]
+        public async void Civil_File_Document_Filed_By_Name()
+        {
+            var actionResult = await _controller.GetCivilFileDetailByFileId("3834");
+
+            var fileDetailResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+
+            var document = fileDetailResponse.Document.FirstOrDefault(doc => doc.CivilDocumentId == "10672");
+            Assert.NotNull(document);
+            Assert.Equal(2, document.FiledBy.Count());
+            Assert.NotNull(document.FiledBy.FirstOrDefault());
+            Assert.Equal("CHAMBERS, Martin", document.FiledBy.FirstOrDefault().FiledByName);
+            Assert.Equal("PLA", document.FiledBy.FirstOrDefault().RoleTypeCode);
+        }
+
+
         [Fact]
         public async void Civil_File_Services_File_Content()
         {
@@ -105,7 +122,7 @@ namespace tests.api.Controllers
                 var actionResult =
                     await _controller.GetCriminalFileIdsByAgencyIdCodeAndFileNumberText("83.0001", "500-24747474774");
             }
-            catch (NotFoundException nfe)
+            catch (NotFoundException)
             {
                 failed = true;
             }
@@ -122,7 +139,7 @@ namespace tests.api.Controllers
                 var actionResult =
                     await _controller.GetCivilFileIdsByAgencyIdCodeAndFileNumberText("104.0001", "P-24166666666");
             }
-            catch (NotFoundException nfe)
+            catch (NotFoundException)
             {
                 failed = true;
             }
