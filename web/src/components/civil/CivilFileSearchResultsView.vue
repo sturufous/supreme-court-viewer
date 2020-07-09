@@ -1,14 +1,19 @@
 <template>
-
-    <b-card bg-variant="white" no-body>        
-        
+    <b-card bg-variant="white" no-body>
         <div>            
             <h2 class="mx-4 mt-5 font-weight-normal text-civil ">Civil</h2>
             <hr class="mx-3 bg-civil" style="height: 5px;"/> 
         </div>
 
-        <b-card v-if="isMounted &&!isDataReady" no-body>
-            <span class="text-muted ml-4 mb-5"> No Civil List has been found. </span>
+        <b-card bg-variant="light" v-if="isMounted &&!isDataReady">
+            <b-card  style="min-height: 100px;">
+                <span v-if="errorCode==404">This <b>File-Number '{{this.$route.query.fileNumber}}'</b> at <b> location '{{this.$route.query.location}}' </b> doesn't exist in the <b>civil</b> records. </span>
+                <span v-else-if="errorCode==200 || errorCode==204"> Bad Data in search results! </span>
+                <span v-else> Server is not responding. <b>({{errorText}})</b> </span>
+            </b-card>
+            <b-card>         
+                <b-button id="backToLandingPage" variant="info" @click="navigateToLandingPage">Back to the Landing Page</b-button>
+            </b-card>
         </b-card>
 
         <b-card bg-variant="light" v-if= "!isMounted && !isDataReady" >
@@ -28,28 +33,30 @@
             :items="SortedList"
             :fields="fields"            
             borderless
-            small
+            striped
             responsive="sm"
             >   
-                <template v-slot:head()="data">
-                    <b> {{ data.label }}</b>
-                </template>               
-                
+                 <template v-for="(field,index) in fields" v-slot:[`head(${field.key})`]="data">
+                    <h3 v-bind:key="index" > {{ data.label }}</h3>
+                </template> 
                 <template  v-slot:[`cell(${fields[0].key})`]="data">
                     <b-button
-                        style="font-size:16px; font-weight: bold;" 
+                        style="font-size:16px; font-weight: bold; border: none;" 
                         size="sm" 
-                        @click="OpenCivilFilePage(data)"                        
+                        @click="OpenCivilFilePage(data.value)"                        
                         variant="outline-primary border-white text-civil" 
                         class="mr-2">                            
                             {{data.value}}
                     </b-button>
                 </template>            
-                
+                <template  v-slot:cell(Parties)="data">
+                    <span v-for="(party, index) in data.value" v-bind:key="index" style= "white-space: pre-line">
+                        {{ party }} <br>
+                    </span>
+                </template>
             </b-table>
         </b-card>      
-    </b-card> 
-
+    </b-card>
 </template>
 
 <script lang="ts">
@@ -57,19 +64,19 @@ import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import * as _ from 'underscore';
 import {civilFileInformationType, fileSearchCivilInfoType} from '../../types/civil';
-import {inputNamesType, fileSearchType} from '../../types/common';
+import {inputNamesType} from '../../types/common';
 import "@store/modules/CommonInformation";
 const commonState = namespace("CommonInformation");
 import "@store/modules/CivilFileInformation";
-const criminalState = namespace("CivilFileInformation");
+const civilState = namespace("CivilFileInformation");
 
 @Component
-export default class CriminalList extends Vue {    
+export default class CivilFileSearchResultsView extends Vue {    
     
-    @commonState.State
-    public fileSearch!: fileSearchType;           
+    @civilState.State
+    public civilFileInformation!: civilFileInformationType
 
-    @criminalState.Action
+    @civilState.Action
     public UpdateCivilFile!: (newCivilFileInformation: civilFileInformationType) => void    
     
     @commonState.State
@@ -77,7 +84,7 @@ export default class CriminalList extends Vue {
 
     @commonState.Action
     public UpdateDisplayName!: (newInputNames: inputNamesType) => void
-    
+
     civilList: fileSearchCivilInfoType[] = [];    
     isMounted = false;
     isDataReady = false;
@@ -87,18 +94,23 @@ export default class CriminalList extends Vue {
     
     fields =  
     [        
-        {key:'File Id',             tdClass: 'border-top', headerStyle:'', cellStyle:''},        
-        {key:'Parties',             tdClass: 'border-top', headerStyle:'', cellStyle:'text-primary'}        
+        {key:'File Id',             tdClass: 'border-top'},        
+        {key:'Parties',             tdClass: 'border-top'}        
     ];
 
-     mounted() {
+    mounted() {      
         this.getList();       
     }
 
-    public getList(): void 
-    {            
-        this.$http.get('/api/files/civil?location='+ this.fileSearch.location +'&fileNumber='+ this.fileSearch.fileNumber)
-            .then(Response => Response.json(), err => {this.errorCode= err.status;this.errorText= err.statusText;console.log(err);}        
+    public getList(): void {
+        this.errorCode=0;            
+        this.$http.get('/api/files/civil?location='+ this.$route.query.location +'&fileNumber='+ this.$route.query.fileNumber)
+            .then(Response => Response.json(), err => {
+                this.errorCode= err.status;
+                this.errorText= err.statusText;
+                console.log(err);
+                this.isMounted = true;
+                }        
             ).then(data => {
                 if(data){
                     if (data.length > 1) {
@@ -127,30 +139,34 @@ export default class CriminalList extends Vue {
                         }    
                         this.isMounted = true;
                     } else if (data.length == 1) {
-                        this.fileInformation["fileNumber"] = data[0].physicalFileId;
-                        const civilFileInformation = {} as civilFileInformationType;
-                        civilFileInformation.fileNumber = data[0].physicalFileId;
-                        this.UpdateCivilFile(civilFileInformation)                        
-                        this.$router.push({name:'CivilCaseDetails', params: {fileNumber: civilFileInformation.fileNumber}})
+                        this.civilFileInformation.fileNumber = data[0].physicalFileId;
+                        this.UpdateCivilFile(this.civilFileInformation)                        
+                        this.$router.push({name:'CivilCaseDetails', params: {fileNumber: this.civilFileInformation.fileNumber}})
+                    } else {
+                        this.errorCode=200;
                     }               
+                } else {
+                    if(this.errorCode==0) this.errorCode=200;
                 }
             });
     }    
 
-    public OpenCivilFilePage(data)
-    {
-        const fileInformation = { } as civilFileInformationType
-        fileInformation['fileNumber'] = data.value
-        this.UpdateCivilFile(fileInformation)
-        const routeData = this.$router.resolve({name:'CivilCaseDetails', params: {fileNumber: fileInformation['fileNumber']}})
+    public OpenCivilFilePage(fileNumber) {
+        this.civilFileInformation.fileNumber = fileNumber;
+        this.UpdateCivilFile(this.civilFileInformation)
+        const routeData = this.$router.resolve({name:'CivilCaseDetails', params: {fileNumber: this.civilFileInformation.fileNumber}})
         window.open(routeData.href, '_blank');
     }
 
-    get SortedList()
-    {                
+    get SortedList() {                
         return  _.sortBy(this.civilList, 'File Id')
     }
+
+    public navigateToLandingPage() {
+        this.$router.push({name:'Home'})
+    }
 }
+
 </script>
 
 <style scoped>

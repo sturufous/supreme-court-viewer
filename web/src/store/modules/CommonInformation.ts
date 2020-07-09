@@ -1,5 +1,5 @@
 import { VuexModule, Module, Mutation, Action } from 'vuex-module-decorators'
-import {iconStyleType, fileSearchType} from '../../types/common'
+import {iconStyleType} from '../../types/common'
 
 enum appearanceStatus {UNCF='Unconfirmed', CNCL='Canceled', SCHD='Scheduled' }
 
@@ -13,7 +13,6 @@ class CommonInformation extends VuexModule {
   public duration = ''
   public statusStyle = ''
   public iconStyles: iconStyleType[] = [];
-  public fileSearch = {} as fileSearchType;
 
   @Mutation
   public setDisplayName(displayName): void {   
@@ -124,28 +123,7 @@ class CommonInformation extends VuexModule {
       } 
     }   
     this.context.commit('setIconStyle', iconStyles)
-  }
-
-  @Mutation
-  public setFileSearch(fileSearch): void {
-    this.fileSearch = fileSearch
-  }
-
-  @Action
-  public UpdateFileSearch(newFileSearch): void {
-    this.context.commit('setFileSearch', newFileSearch)
   }  
-
-  @Action
-  public UpdateFileSearchCivilResponse(newFileSearchCivilResponse): void {
-    this.context.commit('setFileSearchCivilResponse', newFileSearchCivilResponse)
-  } 
-
-  @Action
-  public UpdateFileSearchCriminalResponse(newFileSearchCriminalResponse): void {
-    this.context.commit('setFileSearchCriminalResponse', newFileSearchCriminalResponse)
-  }
-  
 }
 
 export default CommonInformation 

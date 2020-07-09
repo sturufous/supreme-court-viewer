@@ -64,33 +64,22 @@
     import { namespace } from 'vuex-class'
     import * as _ from 'underscore';
     import '@store/modules/CivilFileInformation';
+    const civilState = namespace('CivilFileInformation');
     import '@store/modules/CriminalFileInformation';
+    const criminalState = namespace('CriminalFileInformation');    
     import {criminalFileInformationType, fileSearchCriminalInfoType} from '../types/criminal';
     import {civilFileInformationType, fileSearchCivilInfoType} from '../types/civil';
-    import {courtRoomsAndLocationsInfoType, locationInfoType} from '../types/courtlist';
-    import {fileSearchType, inputNamesType} from '../types/common';
-    const civilState = namespace('CivilFileInformation');
-    const criminalState = namespace('CriminalFileInformation');
-    const commonState = namespace('CommonInformation');
+    import {courtRoomsAndLocationsInfoType, locationInfoType} from '../types/courtlist';   
 
     @Component
-    export default class Home extends Vue {
-        
-        @commonState.State
-        public displayName!: string;
-
-        @commonState.Action
-        public UpdateDisplayName!: (newInputNames: inputNamesType) => void
+    export default class Home extends Vue {       
 
         @civilState.Action
         public UpdateCivilFile!: (newCivilFileInformation: civilFileInformationType) => void
 
         @criminalState.Action
         public UpdateCriminalFile!: (newCriminalFileInformation: criminalFileInformationType) => void
-        
-        @commonState.Action
-        public UpdateFileSearch!: (newFileSearch: fileSearchType) => void
-        
+                 
         selected = 'criminal';
         selectedFileSearch = 'criminal';
         options= [
@@ -99,7 +88,7 @@
         ]
         
         fileInformation = {};
-        fileSearch = {} as fileSearchType;        
+        fileSearch = {};        
         errorCode=0
         errorText=''
         syncFlag = true
@@ -126,14 +115,11 @@
         }
 
         navigateToFilesView(fileSearch): void {
-            if(this.selectedFileSearch == 'civil') {
-                this.fileSearch.location = this.selectedCourtLocation.LocationID;
-                this.UpdateFileSearch(fileSearch)
-                this.$router.push({name:'CivilFileSearchResultList', params: {fileNumber: this.fileSearch.fileNumber, location: this.fileSearch.location}})
+            fileSearch.location = this.selectedCourtLocation.LocationID;
+            if(this.selectedFileSearch == 'civil') {                
+                this.$router.push({name:'CivilFileSearchResultsView', query: {fileNumber: fileSearch.fileNumber, location: fileSearch.location}});                
             } else if(this.selectedFileSearch == 'criminal') {
-                this.fileSearch.location = this.selectedCourtLocation.LocationID;
-                this.UpdateFileSearch(fileSearch)
-                this.$router.push({name:'CriminalFileSearchResultList', params: {fileNumber: this.fileSearch.fileNumber, location: this.fileSearch.location}})
+                this.$router.push({name:'CriminalFileSearchResultsView', query: {fileNumber: fileSearch.fileNumber, location: fileSearch.location}});
             }                    
         }
 

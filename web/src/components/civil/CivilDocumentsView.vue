@@ -190,9 +190,7 @@ export default class CivilDocumentsView extends Vue {
         this.isMounted = true;
     }
 
-    mounted () { 
-        this.civilFileInformation.fileNumber = this.$route.params.fileNumber
-        this.UpdateCivilFile(this.civilFileInformation);        
+    mounted () {    
         this.getDocuments();        
     }
 

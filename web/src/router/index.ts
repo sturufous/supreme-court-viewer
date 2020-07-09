@@ -2,8 +2,8 @@ import { RouteConfig } from 'vue-router'
 import Home from '@components/Home.vue'
 import CivilCaseDetails from "@components/civil/CivilCaseDetails.vue";
 import CriminalCaseDetails from "@components/criminal/CriminalCaseDetails.vue";
-import CivilFileSearchResultList from "@components/civil/CivilFileSearchResultList.vue";
-import CriminalFileSearchResultList from "@components/criminal/CriminalFileSearchResultList.vue";
+import CivilFileSearchResultsView from "@components/civil/CivilFileSearchResultsView.vue";
+import CriminalFileSearchResultsView from "@components/criminal/CriminalFileSearchResultsView.vue";
 import CourtList from "@components/courtlist/CourtList.vue";
 
 const routes: Array<RouteConfig> = [
@@ -39,15 +39,15 @@ const routes: Array<RouteConfig> = [
     props: true
   },
   {
-    path: '/civil-files/fileNumber/:fileNumber/location/:location',
-    name: 'CivilFileSearchResultList',
-    component: CivilFileSearchResultList, 
+    path: '/civil-file-search',
+    name: 'CivilFileSearchResultsView',
+    component: CivilFileSearchResultsView, 
     props: true
   },
   {
-    path: '/criminal-file/fileNumber/:fileNumber/location/:location',
-    name: 'CriminalFileSearchResultList',
-    component: CriminalFileSearchResultList,
+    path: '/criminal-file-search',
+    name: 'CriminalFileSearchResultsView',
+    component: CriminalFileSearchResultsView,
     props: true
   }
 ]
