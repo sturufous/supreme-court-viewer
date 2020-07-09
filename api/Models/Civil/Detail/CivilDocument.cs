@@ -1,4 +1,5 @@
 ﻿using JCCommon.Clients.FileServices;
+using System.Collections.Generic;
 
 namespace Scv.Api.Models.Civil.Detail
 {
@@ -10,6 +11,7 @@ namespace Scv.Api.Models.Civil.Detail
         public string Category { get; set; }
         public string DocumentTypeDescription { get; set; }
         public string NextAppearanceDt { get; set; }
+        public ICollection<ClFiledBy> FiledBy { get; set; }
 
         /// <summary>
         /// Hides fields for issue. 
