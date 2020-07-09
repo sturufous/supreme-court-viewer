@@ -70,6 +70,8 @@ const commonState = namespace("CommonInformation");
 import "@store/modules/CivilFileInformation";
 const civilState = namespace("CivilFileInformation");
 
+enum CourtLevel {'P'= 'Provincial','S' = 'Supreme'}
+
 @Component
 export default class CivilFileSearchResultsView extends Vue {    
     
@@ -95,7 +97,8 @@ export default class CivilFileSearchResultsView extends Vue {
     fields =  
     [        
         {key:'File Id',             tdClass: 'border-top'},        
-        {key:'Parties',             tdClass: 'border-top'}        
+        {key:'Parties',             tdClass: 'border-top'},
+        {key:'Level',               tdClass: 'border-top'}
     ];
 
     mounted() {      
@@ -130,8 +133,9 @@ export default class CivilFileSearchResultsView extends Vue {
                             }
                             civilListInfo.Parties = partyInfo;
                             civilListInfo["File Id"] = jcivilList.physicalFileId;
-                            this.civilList.push(civilListInfo);
-                        }
+                            civilListInfo["Level"] = CourtLevel[jcivilList.courtLevelCd];
+                            this.civilList.push(civilListInfo);                            
+                        }                        
 
                         if(this.civilList.length)
                         {                    

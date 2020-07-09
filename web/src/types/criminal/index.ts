@@ -217,6 +217,7 @@ export interface showSectionsInfoType {
 
 export interface fileSearchCriminalInfoType {
     "Participants": string[],
-    "File Id": string
+    "File Id": string,
+    "Level": string
 }
 

@@ -173,8 +173,7 @@ export default class CivilCaseDetails extends Vue {
                 }
                 else
                     if(this.errorCode==0) this.errorCode=200;
-                this.isMounted = true;
-                       
+                this.isMounted = true;                       
             });
     }    
     
@@ -281,7 +280,16 @@ export default class CivilCaseDetails extends Vue {
                     }
                 }
                 docInfo["Comment"] = jDoc.commentTxt? jDoc.commentTxt : '';
-                docInfo["Filed By Name"] = jDoc.filedByName? jDoc.filedByName : '';
+                docInfo["Filed By Name"] = [];
+                if (jDoc.filedBy && jDoc.filedBy[0] && jDoc.filedBy.length > 0) {
+                    for (const filed of jDoc.filedBy) {
+                        if (filed.roleTypeCode){
+                            docInfo["Filed By Name"].push(filed.filedByName + ' (' + filed.roleTypeCode + ')');
+                        } else {
+                            docInfo["Filed By Name"].push(filed.filedByName);
+                        }                        
+                    }
+                } 
                 docInfo["Order Made Date"] = jDoc.DateGranted? Vue.filter('beautify-date')(jDoc.DateGranted) : '';                
                 this.documentsInfo.push(docInfo);                
 

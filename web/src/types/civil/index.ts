@@ -33,7 +33,7 @@ export interface documentsInfoType {
     "Date Filed": string,
     "Issues": string[],
     "Comment": string,
-    "filedByName": string,
+    "Filed By Name": string[],
     "Date Granted": string
 }
 
@@ -157,5 +157,6 @@ export interface civilShowSectionsType {
 
 export interface fileSearchCivilInfoType {
     "Parties": string[],
-    "File Id": string
+    "File Id": string,
+    "Level": string
 }

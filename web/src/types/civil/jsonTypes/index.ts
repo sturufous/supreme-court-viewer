@@ -1,4 +1,5 @@
 import {additionalProperties} from '../../common';
+import { civilFiledByType } from '@/types/courtlist/jsonTypes';
 
 export interface partyCounselType {
     "counselId": string,
@@ -67,6 +68,7 @@ export interface civilDocumentType {
     "category": string,
     "documentTypeDescription": string,
     "nextAppearanceDt": string,
+    "filedBy": civilFiledByType[],
     "issue": civilDocumentIssueType[],
     "civilDocumentId": string,
     "imageId": string,

@@ -70,6 +70,8 @@ const commonState = namespace("CommonInformation");
 import "@store/modules/CriminalFileInformation";
 const criminalState = namespace("CriminalFileInformation");
 
+enum CourtLevel {'P'= 'Provincial','S' = 'Supreme'}
+
 @Component
 export default class CriminalFileSearchResultsView extends Vue {
 
@@ -95,7 +97,8 @@ export default class CriminalFileSearchResultsView extends Vue {
     fields =  
     [        
         {key:'File Id',             tdClass: 'border-top'},        
-        {key:'Participants',        tdClass: 'border-top'}        
+        {key:'Participants',        tdClass: 'border-top'},
+        {key:'Level',               tdClass: 'border-top'}        
     ];
 
      mounted() {
@@ -125,9 +128,9 @@ export default class CriminalFileSearchResultsView extends Vue {
                             }
                             criminalListInfo.Participants = participantInfo;
                             criminalListInfo["File Id"] = jcriminalList.justinNo;
+                            criminalListInfo["Level"] = CourtLevel[jcriminalList.courtLevelCd];                            
                             this.criminalList.push(criminalListInfo);
-                        }
-                               
+                        }                               
                         if(this.criminalList.length)
                         {                    
                             this.isDataReady = true;
