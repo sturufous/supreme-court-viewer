@@ -3301,6 +3301,12 @@
             "items": {
               "$ref": "#/components/schemas/cvfcPartyInterest"
             }
+          },
+          "filedBy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/clFiledBy"
+            }
           }
         }
       },

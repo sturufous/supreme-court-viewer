@@ -131,9 +131,11 @@ namespace Scv.Api.Services.Files
 
             detail = await PopulateBaseDetail(detail);
             detail.Appearances = appearances;
-            detail.FileCommentText = fileContent?.CivilFile?.First(cf => cf.PhysicalFileID == fileId).FileCommentText;
+
+            var fileContentCivilFile = fileContent?.CivilFile?.First(cf => cf.PhysicalFileID == fileId);
+            detail.FileCommentText = fileContentCivilFile.FileCommentText;
             detail.Party = await PopulateDetailParties(detail.Party);
-            detail.Document = await PopulateDetailDocuments(detail.Document);
+            detail.Document = await PopulateDetailDocuments(detail.Document, fileContentCivilFile);
             detail.HearingRestriction = await PopulateDetailHearingRestrictions(fileDetail.HearingRestriction);
             return detail;
         }
@@ -177,7 +179,8 @@ namespace Scv.Api.Services.Files
 
             var appearanceDetail = appearances.ApprDetail?.FirstOrDefault(app => app.AppearanceId == appearanceId);
             var fileDetailDocuments = detail.Document.Where(doc => doc.Appearance != null && doc.Appearance.Any(app => app.AppearanceId == appearanceId)).ToList();
-            var previousAppearance = fileContent?.CivilFile?.FirstOrDefault(cf => cf.PhysicalFileID == fileId)?.PreviousAppearance.FirstOrDefault(pa => pa?.AppearanceId == appearanceId);
+            var fileContentCivilFile = fileContent?.CivilFile?.FirstOrDefault(cf => cf.PhysicalFileID == fileId);
+            var previousAppearance = fileContentCivilFile?.PreviousAppearance.FirstOrDefault(pa => pa?.AppearanceId == appearanceId);
 
             var detailedAppearance = new CivilAppearanceDetail
             {
@@ -267,12 +270,14 @@ namespace Scv.Api.Services.Files
             return detail;
         }
 
-        private async Task<ICollection<CivilDocument>> PopulateDetailDocuments(ICollection<CivilDocument> documents)
+        private async Task<ICollection<CivilDocument>> PopulateDetailDocuments(ICollection<CivilDocument> documents, JCCommon.Clients.FileServices.CvfcCivilFile civilFileContent )
         {
             //TODO permission for documents.
             //Populate extra fields for document.
             foreach (var document in documents.Where(doc => doc.Category != "CSR"))
             {
+                var documentFromFileContent = civilFileContent?.Document?.FirstOrDefault(doc => doc.DocumentId == document.CivilDocumentId);
+                document.FiledBy = documentFromFileContent?.FiledBy;
                 document.Category = _lookupService.GetDocumentCategory(document.DocumentTypeCd);
                 document.DocumentTypeDescription = await _lookupService.GetDocumentDescriptionAsync(document.DocumentTypeCd);
                 document.ImageId = document.SealedYN != "N" ? null : document.ImageId;
