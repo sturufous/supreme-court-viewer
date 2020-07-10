@@ -195,7 +195,7 @@
                     responsive="sm"
                     >
                         <template v-for="(field,index) in appearanceMethodsField" v-slot:[`cell(${field.key})`]="data" >                   
-                            <span v-bind:key="index" :class="data.field.cellClass" :style="data.field.cellStyle"><b>{{ data.item.role }}</b> is appearing by {{data.item.method}}. </span>
+                            <span v-bind:key="index" :class="data.field.cellClass" :style="data.field.cellStyle"><b>{{ data.item.role }}</b> is appearing by {{data.item.method}} </span>
                         </template>
                 </b-table>                                       
             </b-col>          
@@ -342,7 +342,7 @@ export default class CivilAppearanceDetails extends Vue {
 
     appearanceMethodsField = 
     [
-        {key:'Key', cellClass:'text-danger', cellStyle:'white-space: pre'}
+        {key:'Key', cellClass:'text-danger', cellStyle:'white-space: pre-line'}
     ]
 
 

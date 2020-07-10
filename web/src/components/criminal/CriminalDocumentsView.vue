@@ -87,7 +87,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
 import * as _ from 'underscore';
 import '@store/modules/CriminalFileInformation';
@@ -172,18 +172,9 @@ export default class CriminalDocumentsView extends Vue {
 
         this.ExtractDocumentInfo()          
         this.isMounted = true;
-    }
+    }    
 
-    @Watch('$route', { immediate: false, deep: true })
-    onUrlChange() {
-        this.criminalFileInformation.fileNumber = this.$route.params.fileNumber
-        this.UpdateCriminalFile(this.criminalFileInformation) 
-        location.reload();
-    }
-
-    mounted () { 
-        this.criminalFileInformation.fileNumber = this.$route.params.fileNumber
-        this.UpdateCriminalFile(this.criminalFileInformation);        
+    mounted () {       
         this.getDocuments();  
     }
 

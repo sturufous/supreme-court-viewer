@@ -125,7 +125,7 @@
                             <span v-bind:key="index">
                                 <span 
                                 :class="data.field.cellClass"
-                                :style="data.field.cellStyle"><b>{{ data.item.role }}</b> is appearing by {{data.item.method}}.<br>
+                                :style="data.field.cellStyle"><b>{{ data.item.role }}</b> is appearing by {{data.item.method}}<br>
                                 </span>
                                 <span 
                                 v-if="data.item.phoneNumber.length>0" 
@@ -195,9 +195,6 @@
             </div>                
         </template>
         </b-overlay>
-        
-
-
       </b-card>       
     </b-card>
     <b-modal v-if= "isMounted" v-model="showNotes" id="bv-modal-comment" hide-footer>
@@ -268,7 +265,7 @@ export default class CriminalAppearanceDetails extends Vue {
 
     appearanceMethodsField = 
     [
-        {key:'Key', cellClass:'text-danger', cellStyle:'white-space: pre'}
+        {key:'Key', cellClass:'text-danger', cellStyle:'white-space: pre-line'}
     ]
 
     appearanceFields =  
