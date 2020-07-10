@@ -60,7 +60,7 @@ namespace Scv.Api.Services
                 await _filesClient.FilesCourtCalendarDetailsByDayAsync(_requestAgencyIdentifierId, _requestPartId, agencyCode,
                     proceeding.ToString("yyyy-MM-dd HH:mm:ss.S"), roomCode);
 
-            var courtCalendarDetailsTask = _cache.GetOrAdd($"CivilCourtCalendarDetails-{agencyId}-{roomCode}-{proceedingDateString}-{fileNumber}",
+            var courtCalendarDetailsTask = _cache.GetOrAdd($"CourtCalendarDetails-{agencyId}-{roomCode}-{proceedingDateString}-{fileNumber}",
                     CourtCalendarDetailByDay);
             var originalCourtListTask = _cache.GetOrAddAsync($"CourtList-{agencyId}-{roomCode}-{proceedingDateString}-{fileNumber}", CourtList);
 
@@ -265,7 +265,7 @@ namespace Scv.Api.Services
             foreach (var courtListFile in courtList)
             {
                 var fileId = courtListFile.PhysicalFile.PhysicalFileID;
-                var civilFile = fileContents.FirstOrDefault(fc => fc.PhysicalFileId == fileId)?.CivilFile
+                var civilFile = fileContents.Where(fc => fc != null).FirstOrDefault(fc => fc.PhysicalFileId == fileId)?.CivilFile
                     .FirstOrDefault(cf => cf.PhysicalFileID == fileId);
 
                 //This doesn't map correctly. the WSDL states CFCSAFileYN, but the server returns cfcsafileYN.
@@ -288,6 +288,7 @@ namespace Scv.Api.Services
                 var courtCalendarDetailAppearance = courtCalendarDetailAppearances.FirstOrDefault(cda => cda.AppearanceId == courtListFile.AppearanceId);
                 courtListFile.Video = courtCalendarDetailAppearance?.VideoYn == CourtCalendarDetailAppearanceVideoYn.Y;
                 courtListFile.RemoteVideo = courtCalendarDetailAppearance?.RemoteVideoYn == CourtCalendarDetailAppearanceRemoteVideoYn.Y;
+                courtListFile.StyleOfCause = courtCalendarDetailAppearance?.StyleOfCause;
             }
 
             return courtList;
@@ -374,6 +375,7 @@ namespace Scv.Api.Services
                 courtListFile.RemoteVideo = courtCalendarDetailAppearance?.RemoteVideoYn == CourtCalendarDetailAppearanceRemoteVideoYn.Y;
                 courtListFile.CaseAgeDaysNumber = courtCalendarDetailAppearance?.CaseAgeDays;
                 courtListFile.AdjudicatorNm = courtCalendarDetailAppearance?.AdjudicatorNm;
+                courtListFile.StyleOfCause = courtCalendarDetailAppearance?.StyleOfCause;
             }
 
             return courtList;

@@ -185,8 +185,7 @@ export default class CriminalCaseDetails extends Vue {
                         this.errorCode=200;                    
                 }
                 else
-                    if(this.errorCode==0) this.errorCode=200;
-                    
+                    if(this.errorCode==0) this.errorCode=200;                    
                 
                 this.isMounted = true;
                        

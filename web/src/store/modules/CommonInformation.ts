@@ -12,7 +12,7 @@ class CommonInformation extends VuexModule {
   public time = ''
   public duration = ''
   public statusStyle = ''
-  public iconStyles: iconStyleType[] = [];    
+  public iconStyles: iconStyleType[] = [];
 
   @Mutation
   public setDisplayName(displayName): void {   
@@ -123,7 +123,7 @@ class CommonInformation extends VuexModule {
       } 
     }   
     this.context.commit('setIconStyle', iconStyles)
-  }
+  }  
 }
 
 export default CommonInformation 
