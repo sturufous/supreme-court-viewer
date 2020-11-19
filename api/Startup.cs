@@ -12,7 +12,16 @@ using Scv.Api.Helpers.Mapping;
 using Scv.Api.Helpers.Middleware;
 using System;
 using System.IO;
+using System.Net.Http;
 using System.Reflection;
+using System.Threading.Tasks;
+using IdentityModel.Client;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Http;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Scv.Api.Helpers;
 
 namespace Scv.Api
 {
@@ -52,6 +61,102 @@ namespace Scv.Api
             #endregion Setup Services
 
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
+
+            //services.AddSingleton(new AesGcmEncryptionOptions { Key = Configuration.GetNonEmptyValue("DataProtectionKeyEncryptionKey") });
+
+            /*services.AddDataProtection()
+                .PersistKeysToDbContext<SheriffDbContext>()
+                .UseXmlEncryptor(s => new AesGcmXmlEncryptor(s))
+                .SetApplicationName("SCV");*/
+
+            services.AddAuthentication(options =>
+                {
+                    options.DefaultScheme = OpenIdConnectDefaults.AuthenticationScheme;
+                    options.DefaultAuthenticateScheme = OpenIdConnectDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+                })
+            .AddCookie(options =>
+            {
+                //if (DevelopmentMode)
+                options.Cookie.Name = "SCV";
+
+                options.Cookie.HttpOnly = true;
+                //Important to be None, otherwise a redirect loop will occur.
+                options.Cookie.SameSite = SameSiteMode.None;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                //This should prevent resending this cookie on every request.
+                options.Cookie.Path = "/api";
+                options.Events = new CookieAuthenticationEvents
+                {
+                    // After the auth cookie has been validated, this event is called.
+                    // In it we see if the access token is close to expiring.  If it is
+                    // then we use the refresh token to get a new access token and save them.
+                    // If the refresh token does not work for some reason then we redirect to 
+                    // the login screen.
+                    OnValidatePrincipal = async cookieCtx =>
+                    {
+                        var accessTokenExpiration = DateTimeOffset.Parse(cookieCtx.Properties.GetTokenValue("expires_at"));
+                        var timeRemaining = accessTokenExpiration.Subtract(DateTimeOffset.UtcNow);
+                        var refreshThreshold = TimeSpan.Parse(Configuration.GetNonEmptyValue("TokenRefreshThreshold"));
+
+                        if (timeRemaining > refreshThreshold)
+                            return;
+
+                        var refreshToken = cookieCtx.Properties.GetTokenValue("refresh_token");
+                        var httpClientFactory = cookieCtx.HttpContext.RequestServices.GetRequiredService<IHttpClientFactory>();
+                        var httpClient = httpClientFactory.CreateClient(nameof(CookieAuthenticationEvents));
+                        var response = await httpClient.RequestRefreshTokenAsync(new RefreshTokenRequest
+                        {
+                            Address = Configuration.GetNonEmptyValue("Keycloak:Authority") + "/protocol/openid-connect/token",
+                            ClientId = Configuration.GetNonEmptyValue("Keycloak:Client"),
+                            ClientSecret = Configuration.GetNonEmptyValue("Keycloak:Secret"),
+                            RefreshToken = refreshToken
+                        });
+
+                        if (response.IsError)
+                        {
+                            cookieCtx.RejectPrincipal();
+                            await cookieCtx.HttpContext.SignOutAsync(CookieAuthenticationDefaults
+                                .AuthenticationScheme);
+                        }
+                        else
+                        {
+                            var expiresInSeconds = response.ExpiresIn;
+                            var updatedExpiresAt = DateTimeOffset.UtcNow.AddSeconds(expiresInSeconds);
+                            cookieCtx.Properties.UpdateTokenValue("expires_at", updatedExpiresAt.ToString());
+                            cookieCtx.Properties.UpdateTokenValue("access_token", response.AccessToken);
+                            cookieCtx.Properties.UpdateTokenValue("refresh_token", response.RefreshToken);
+
+                            // Indicate to the cookie middleware that the cookie should be remade (since we have updated it)
+                            cookieCtx.ShouldRenew = true;
+                        }
+                    }
+                };
+            }
+            )
+            .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
+            {
+                options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.Authority = Configuration.GetNonEmptyValue("Keycloak:Authority");
+                options.ClientId = Configuration.GetNonEmptyValue("Keycloak:Client");
+                options.ClientSecret = Configuration.GetNonEmptyValue("Keycloak:Secret");
+                options.RequireHttpsMetadata = true;
+                options.GetClaimsFromUserInfoEndpoint = true;
+                options.ResponseType = OpenIdConnectResponseType.Code;
+                options.UsePkce = true;
+                options.SaveTokens = true;
+                options.CallbackPath = "/api/auth/signin-oidc";
+                options.Events = new OpenIdConnectEvents
+                {
+                    OnRedirectToIdentityProvider = context =>
+                    {
+                        context.ProtocolMessage.SetParameter("kc_idp_hint", "idir");
+                        return Task.FromResult(0);
+                    }
+                };
+            });
+
+            services.AddAuthorization();
 
             #region Newtonsoft
 
@@ -109,6 +214,8 @@ namespace Scv.Api
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
