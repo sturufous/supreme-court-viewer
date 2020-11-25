@@ -285,7 +285,7 @@ export default class CriminalAppearanceDetails extends Vue {
     @Prop() tagcasename
     public getAppearanceDetails(): void {      
     
-        this.$http.get('/api/files/criminal/'+ this.appearanceInfo.fileNo+'/appearance-detail/'+this.appearanceInfo.appearanceId+ '/'+this.appearanceInfo.partId)
+        this.$http.get('api/files/criminal/'+ this.appearanceInfo.fileNo+'/appearance-detail/'+this.appearanceInfo.appearanceId+ '/'+this.appearanceInfo.partId)
             .then(Response => Response.json(), err => {console.log(err);window.alert("bad data!");} )        
             .then(data => {
                 if(data){  

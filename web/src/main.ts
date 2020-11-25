@@ -21,10 +21,14 @@ Vue.component('loading-spinner', LoadingSpinner);
 
 const router = new VueRouter({
 	mode: 'history',
+	base: process.env.BASE_URL,
 	routes: routes
 });
 
 new Vue({
+	http: {
+		root: process.env.BASE_URL
+	},
 	router,
 	store,
 	render: h => h(App)	

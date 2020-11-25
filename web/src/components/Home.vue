@@ -130,7 +130,7 @@
         public getListOfAvailableCourts(): void 
         {
             this.errorCode = 0;
-            this.$http.get('/api/location/court-rooms')
+            this.$http.get('api/location/court-rooms')
                 .then(Response => Response.json(), err => {this.errorCode= err.status;this.errorText= err.statusText;console.log(err);}        
                 ).then(data => {
                     if(data){
