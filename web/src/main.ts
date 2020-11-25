@@ -19,6 +19,8 @@ Vue.use(BootstrapVueIcons);
 Vue.config.productionTip = true;
 Vue.component('loading-spinner', LoadingSpinner);
 
+Vue.http.options.root = process.env.BASE_URL
+
 const router = new VueRouter({
 	mode: 'history',
 	base: process.env.BASE_URL,
@@ -26,9 +28,6 @@ const router = new VueRouter({
 });
 
 new Vue({
-	http: {
-		root: process.env.BASE_URL
-	},
 	router,
 	store,
 	render: h => h(App)	

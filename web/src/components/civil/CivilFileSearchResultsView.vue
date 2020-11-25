@@ -106,8 +106,8 @@ export default class CivilFileSearchResultsView extends Vue {
     }
 
     public getList(): void {
-        this.errorCode=0;            
-        this.$http.get('/api/files/civil?location='+ this.$route.query.location +'&fileNumber='+ this.$route.query.fileNumber)
+        this.errorCode=0;
+        this.$http.get('api/files/civil?location='+ this.$route.query.location +'&fileNumber='+ this.$route.query.fileNumber)
             .then(Response => Response.json(), err => {
                 this.errorCode= err.status;
                 this.errorText= err.statusText;
