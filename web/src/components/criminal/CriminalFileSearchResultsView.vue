@@ -106,7 +106,7 @@ export default class CriminalFileSearchResultsView extends Vue {
     }
 
     public getList(): void {
-        this.$http.get('/api/files/criminal?location='+ this.$route.query.location +'&fileNumber='+ this.$route.query.fileNumber)
+        this.$http.get('api/files/criminal?location='+ this.$route.query.location +'&fileNumber='+ this.$route.query.fileNumber)
             .then(Response => Response.json(), err => {
                 this.errorCode= err.status;
                 this.errorText= err.statusText;

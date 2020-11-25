@@ -285,15 +285,15 @@ export default class CivilDocumentsView extends Vue {
     public openDocumentsPdf(documentId): void {
         this.loadingPdf = true;
         const filename = 'doc'+documentId+'.pdf';
-        window.open(`/api/files/document/${documentId}/${filename}?isCriminal=false`)
+        window.open(`${process.env.BASE_URL}api/files/document/${documentId}/${filename}?isCriminal=false`)
         this.loadingPdf = false;
     }
     
     public openCourtSummaryPdf(appearanceId): void {
 
-        this.loadingPdf = true;        
+        this.loadingPdf = true; 
         const filename = 'court summary_'+appearanceId+'.pdf';
-        window.open(`/api/files/civil/court-summary-report/${appearanceId}/${filename}`)
+        window.open(`${process.env.BASE_URL}api/files/civil/court-summary-report/${appearanceId}/${filename}`)
         this.loadingPdf = false;
     }
     
