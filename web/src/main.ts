@@ -19,15 +19,13 @@ Vue.use(BootstrapVueIcons);
 Vue.config.productionTip = true;
 Vue.component('loading-spinner', LoadingSpinner);
 
-Vue.http.options.root = process.env.BASE_URL;
+Vue.http.options.root = process.env.BASE_URL
 
 const router = new VueRouter({
 	mode: 'history',
 	base: process.env.BASE_URL,
 	routes: routes
 });
-
-history.pushState({ page: "home" }, "", process.env.BASE_URL);
 
 new Vue({
 	router,
