@@ -11,8 +11,12 @@ using Scv.Api.Helpers.ContractResolver;
 using Scv.Api.Helpers.Mapping;
 using Scv.Api.Helpers.Middleware;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using Microsoft.AspNetCore.Http;
+using Microsoft.OpenApi.Models;
+using Scv.Api.Helpers;
 
 namespace Scv.Api
 {
@@ -91,11 +95,33 @@ namespace Scv.Api
                 app.UseDeveloperExceptionPage();
             }
 
+            var baseUrl = Configuration.GetNonEmptyValue("WebBaseHref");
+            app.Use((context, next) =>
+            {
+                context.Request.Scheme = "https";
+                if (context.Request.Headers.ContainsKey("X-Forwarded-Host"))
+                    context.Request.PathBase = new PathString(baseUrl.Remove(baseUrl.Length - 1));
+                return next();
+            });
+
+            app.UseForwardedHeaders();
             app.UseCors();
 
             app.UseSwagger(options =>
             {
                 options.RouteTemplate = "api/swagger/{documentname}/swagger.json";
+                options.PreSerializeFilters.Add((swaggerDoc, httpReq) =>
+                {
+                    if (!httpReq.Headers.ContainsKey("X-Forwarded-Host"))
+                        return;
+
+                    var forwardedHost = httpReq.Headers["X-Forwarded-Host"];
+                    var forwardedPort = httpReq.Headers["X-Forwarded-Port"];
+                    swaggerDoc.Servers = new List<OpenApiServer>
+                    {
+                        new OpenApiServer { Url = XForwardedForHelper.BuildUrlString(forwardedHost, forwardedPort, baseUrl) }
+                    };
+                });
             });
 
             app.UseSwaggerUI(options =>

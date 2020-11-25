@@ -139,7 +139,7 @@ export default class CivilCaseDetails extends Vue {
     public getFileDetails(): void {
        
         this.errorCode=0
-        this.$http.get('/api/files/civil/'+ this.civilFileInformation.fileNumber)
+        this.$http.get('api/files/civil/'+ this.civilFileInformation.fileNumber)
             .then(Response => Response.json(), err => {this.errorCode= err.status;this.errorText= err.statusText;console.log(err);}        
             ).then(data => {
                 if(data){

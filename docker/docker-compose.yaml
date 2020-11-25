@@ -7,6 +7,7 @@ services:
       - API_URL=${API_URL}
       - IpFilterRules=${IpFilterRules}
       - RealIpFrom=${RealIpFrom}
+      - WEB_BASE_HREF=${WEB_BASE_HREF}
     ports:
       - 8080:8080
     depends_on:
@@ -27,5 +28,6 @@ services:
       - Request__ApplicationCd=${RequestApplicationCd}
       - Request__AgencyIdentifierId=${RequestAgencyIdentifierId}
       - Request__PartId=${RequestPartId}
+      - WebBaseHref=${WEB_BASE_HREF}
     ports:
       - 5000:5000
