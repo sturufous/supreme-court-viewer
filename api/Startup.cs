@@ -11,9 +11,11 @@ using Scv.Api.Helpers.ContractResolver;
 using Scv.Api.Helpers.Mapping;
 using Scv.Api.Helpers.Middleware;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Reflection;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using IdentityModel.Client;
 using Microsoft.AspNetCore.Authentication;
@@ -22,6 +24,7 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Scv.Api.Helpers;
+using Scv.Api.Helpers.Extensions;
 
 namespace Scv.Api
 {
@@ -148,6 +151,29 @@ namespace Scv.Api
                 options.CallbackPath = "/api/auth/signin-oidc";
                 options.Events = new OpenIdConnectEvents
                 {
+                    OnTicketReceived = context =>
+                    {
+                        context.Properties.Items.Remove(".Token.id_token");
+                        context.Properties.Items[".TokenNames"] = "access_token;refresh_token;token_type;expires_at";
+                        return Task.CompletedTask;
+                    },
+                    OnTokenValidated = context =>
+                    {
+                        if (!(context.Principal.Identity is ClaimsIdentity identity)) return Task.CompletedTask;
+
+                        var usedClaims = new List<string>
+                        {
+                            ClaimTypes.NameIdentifier, 
+                            "idir_userid", 
+                            "name",
+                            "preferred_username"
+                        };
+
+                        foreach (var claim in identity.Claims.WhereToList(c =>
+                            !usedClaims.Contains(c.Type)))
+                            identity.RemoveClaim(claim);
+                        return Task.CompletedTask;
+                    },
                     OnRedirectToIdentityProvider = context =>
                     {
                         context.ProtocolMessage.SetParameter("kc_idp_hint", "idir");

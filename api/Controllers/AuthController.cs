@@ -7,12 +7,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 
 namespace Scv.Api.Controllers
 {
@@ -32,45 +27,11 @@ namespace Scv.Api.Controllers
         }
 
         [Authorize(AuthenticationSchemes = OpenIdConnectDefaults.AuthenticationScheme)]
-        [HttpGet("cookie")]
-        public async Task<IActionResult> Go2()
-        {
-            var go = GetClaimFromCookie(HttpContext, "SCV", CookieAuthenticationDefaults.AuthenticationScheme);
-            return Ok(go);
-        }
-
-        private int GetClaimFromCookie(HttpContext httpContext, string cookieName, string cookieSchema)
-        {
-            // Get the encrypted cookie value
-            var opt = httpContext.RequestServices.GetRequiredService<IOptionsMonitor<CookieAuthenticationOptions>>();
-            var cookie = opt.CurrentValue.CookieManager.GetRequestCookie(httpContext, cookieName);
-
-            // Decrypt if found
-            if (!string.IsNullOrEmpty(cookie))
-            {
-                var dataProtector = opt.CurrentValue.DataProtectionProvider.CreateProtector("Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware", cookieSchema, "v2");
-
-                var ticketDataFormat = new TicketDataFormat(dataProtector);
-                var ticket = ticketDataFormat.Unprotect(cookie);
-
-                var properties = ticket.Properties.Items.Values.Sum(s => s.Length) + ticket.Properties.Items.Keys.Sum(s => s.Length);
-
-                var claimsSize = ticket.Principal.Claims.Sum(s => s.Type.Length) +
-                                 ticket.Principal.Claims.Sum(s => s.Value.Length);
-
-                return properties + claimsSize;
-            }
-
-            return -1;
-        }
-
-        [Authorize(AuthenticationSchemes = OpenIdConnectDefaults.AuthenticationScheme)]
         [HttpGet("DarsRequestCivilFileAccess")]
         public async Task<IActionResult> RequestCivilFileAccess(string username, string fileId)
         {
             //DarsRequestCivilFileAccess
             return Ok("");
         }
-
     }
 }
