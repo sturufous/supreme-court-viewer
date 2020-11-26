@@ -1,5 +1,25 @@
 #!/bin/bash
 
+getListenConfigSection () {
+# ================================================================================
+# Generate the listen configuration section.
+# --------------------------------------------------------------------------------
+if [ ! -z "${USE_SELF_SIGNED_SSL}" ]; then
+	read -r -d '' _LISTEN_SECTION <<- EOF
+              listen       8080 ssl;
+              server_name  localhost;
+              ssl_certificate         /var/run/nginx-selfsigned.crt;
+              ssl_certificate_key     /var/run/nginx-selfsigned.key;
+	EOF
+else 
+	read -r -d '' _LISTEN_SECTION <<- EOF
+              listen       8080;
+              server_name  localhost;
+	EOF
+fi
+echo "${_LISTEN_SECTION}"
+}
+
 getApiProxyConfigSection (){
 # ================================================================================
 # Generate the /api proxy configuration section.
@@ -17,8 +37,8 @@ read -r -d '' _FORWARDED_HEADERS << EOF
             proxy_set_header Host               \$host;
             proxy_set_header X-Real-IP          \$remote_addr;
             proxy_set_header X-Forwarded-For    \$proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Host   \$host;
-            proxy_set_header X-Forwarded-Server \$host;
+            proxy_set_header X-Forwarded-Host   \$proxy_host;
+            proxy_set_header X-Forwarded-Server \$proxy_host;
             proxy_set_header X-Forwarded-Port   \$proxy_port;
             proxy_set_header X-Forwarded-Proto  \$proxy_scheme;
             proxy_pass_request_headers on;
@@ -32,9 +52,12 @@ read -r -d '' _CONFIG_SECTION << EOF
             limit_except OPTIONS {
                 ${HTTP_BASIC}
             }
-            proxy_set_header Authorization "";
             ${_FORWARDED_HEADERS}
             proxy_pass ${apiUrl};
+			
+            proxy_buffer_size       128k;
+            proxy_buffers           4 256k;
+            proxy_busy_buffers_size 256k;
         }
 EOF
 
@@ -139,6 +162,8 @@ if [ ! -z "${API_URL}" ]; then
 	API_CONFIG_SECTION=$(getApiProxyConfigSection "${API_URL}")
 	API_CONFIG_SECTION="$(echo "${API_CONFIG_SECTION}" | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/\$/\\$/g')"
 fi
+LISTEN_CONFIG_SECTION=$(getListenConfigSection)
+LISTEN_CONFIG_SECTION="$(echo "${LISTEN_CONFIG_SECTION}" | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/\$/\\$/g')"
 
 makeReplacementPattern() {
   # Generate a replacement pattern for sed in order to replace our variables in
@@ -161,10 +186,24 @@ echo "WEB_BASE_HREF = ${WEB_BASE_HREF}"
 
 REPLACE_VARS="
   RealIpFrom IpFilterRules AdditionalRealIpFromRules
-  HTTP_BASIC WEB_BASE_HREF REMOVE_BASE_HREF API_CONFIG_SECTION
+  HTTP_BASIC WEB_BASE_HREF REMOVE_BASE_HREF API_CONFIG_SECTION LISTEN_CONFIG_SECTION
 "
 
 sed "$(makeReplacementPattern $REPLACE_VARS)" /tmp/nginx.conf.template > /etc/nginx/nginx.conf
 
+if [ ! -z "${USE_SELF_SIGNED_SSL}" ]; then
+echo "---> Using self-signed SSH keys ..."
+  if [ ! -r /var/run/nginx-selfsigned.crt ]; then
+    echo "---> Generating self-signed SSH keys ..."
+    openssl req -newkey rsa:4096 \
+          -x509 \
+          -sha256 \
+          -days 365 \
+          -nodes \
+          -out /var/run/nginx-selfsigned.crt \
+          -keyout /var/run/nginx-selfsigned.key \
+          -subj "/C=CA/ST=BC/L=BC/O=BCGOV/OU=Testing"
+  fi
+fi
 echo "---> Starting nginx ..."
 /usr/sbin/nginx -g "daemon off;"

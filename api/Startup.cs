@@ -73,6 +73,25 @@ namespace Scv.Api
 
             services.AddSwaggerGen(options =>
             {
+                options.AddSecurityDefinition("Basic", new OpenApiSecurityScheme
+                {
+                    Description = "Basic auth added to authorization header",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Scheme = "basic",
+                    Type = SecuritySchemeType.Http
+                });
+
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement{
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Basic" }
+                        },
+                        new List<string>()
+                    }
+                });
+
                 options.EnableAnnotations(true);
                 options.CustomSchemaIds(o => o.FullName);
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
@@ -130,6 +149,7 @@ namespace Scv.Api
                 options.RoutePrefix = "api";
             });
 
+            app.UseMiddleware<AuthenticationMiddleware>();
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
 
             app.UseHttpsRedirection();
