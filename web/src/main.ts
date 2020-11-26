@@ -25,10 +25,6 @@ Vue.http.options.root = process.env.BASE_URL;
 if (location.pathname == "/")
 	history.pushState({ page: "home" }, "", process.env.BASE_URL);
 
-//Redirect from / to /scjscv/
-if (location.pathname == "/")
-	history.pushState({page: "home"}, "", process.env.BASE_URL)
-
 const router = new VueRouter({
 	mode: 'history',
 	base: process.env.BASE_URL,
