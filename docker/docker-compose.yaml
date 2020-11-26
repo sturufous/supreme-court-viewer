@@ -5,6 +5,7 @@ services:
     image: scv-web
     environment:
       - API_URL=${API_URL}
+      - USE_SELF_SIGNED_SSL=${USE_SELF_SIGNED_SSL}
       - IpFilterRules=${IpFilterRules}
       - RealIpFrom=${RealIpFrom}
       - WEB_BASE_HREF=${WEB_BASE_HREF}
@@ -16,6 +17,7 @@ services:
   api:
     image: scv-api
     environment: 
+      - ASPNETCORE_URLS=${ASPNETCORE_URLS}
       - FileServicesClient__Username=${FileServicesClientUsername}
       - FileServicesClient__Password=${FileServicesClientPassword}
       - FileServicesClient__Url=${FileServicesClientUrl}
@@ -29,5 +31,9 @@ services:
       - Request__AgencyIdentifierId=${RequestAgencyIdentifierId}
       - Request__PartId=${RequestPartId}
       - WebBaseHref=${WEB_BASE_HREF}
+      - Auth__UserId=${USER_ID}
+      - Auth__UserPassword=${USER_PASSWORD}
+      - Auth__SSCSServiceAccountGuid=${SSCS_SERVICE_ACCOUNT_GUID}
+      - Auth__SiteMinderUserType=${ALLOW_SITE_MINDER_USER_TYPE}
     ports:
       - 5000:5000
