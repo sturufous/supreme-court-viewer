@@ -33,7 +33,7 @@ services:
       - WebBaseHref=${WEB_BASE_HREF}
       - Auth__UserId=${USER_ID}
       - Auth__UserPassword=${USER_PASSWORD}
-      - Auth__SSCSServiceAccountGuid=${SSCS_SERVICE_ACCOUNT_GUID}
+      - Auth__SCSSServiceAccountGuid=${SCSS_SERVICE_ACCOUNT_GUID}
       - Auth__SiteMinderUserType=${ALLOW_SITE_MINDER_USER_TYPE}
     ports:
       - 5000:5000
