@@ -37,7 +37,7 @@ namespace Scv.Api.Helpers.Middleware
             string siteMinderUserGuidHeader = context.Request.Headers["SMGOV_USERGUID"];
             string siteMinderUserType = context.Request.Headers["SMGOV_USERTYPE"];
 
-            if (siteMinderUserGuidHeader == ValidSiteMinderGuid || siteMinderUserType == ValidSiteMinderUserType)
+            if (siteMinderUserGuidHeader == ValidSiteMinderGuid && siteMinderUserType == ValidSiteMinderUserType)
             {
                 await _next.Invoke(context);
                 return;
