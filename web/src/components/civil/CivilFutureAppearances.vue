@@ -30,6 +30,7 @@
         :no-sort-reset="true"
         sort-icon-left
         borderless
+        @sort-changed="sortChanged"
         small
         responsive="sm"
         >   
@@ -109,9 +110,12 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
+import * as _ from 'underscore';
 import CivilAppearanceDetails from '@components/civil/CivilAppearanceDetails.vue';
 import "@store/modules/CommonInformation";
 import "@store/modules/CivilFileInformation";
+import {civilFileInformationType, civilAppearanceInfoType, civilAppearancesListType} from '../../types/civil';
+import {inputNamesType, durationType } from '../../types/common'
 const civilState = namespace("CivilFileInformation");
 const commonState = namespace("CommonInformation");
 
@@ -138,32 +142,29 @@ export default class CivilFutureAppearances extends Vue {
 
     @commonState.State
     public statusStyle
-
-    /* eslint-disable */
+   
     @civilState.State
-    public civilFileInformation!: any;
+    public civilFileInformation!: civilFileInformationType;
     
     @civilState.State
-    public appearanceInfo!: any;
+    public appearanceInfo!: civilAppearanceInfoType;
 
     @civilState.Action
-    public UpdateAppearanceInfo!: (newAppearanceInfo: any) => void        
+    public UpdateAppearanceInfo!: (newAppearanceInfo: civilAppearanceInfoType) => void        
 
     @commonState.Action
-    public UpdateDisplayName!: (newInputNames: any) => void    
+    public UpdateDisplayName!: (newInputNames: inputNamesType) => void    
 
     @commonState.Action
-    public UpdateDuration!: (duration: any) => void    
+    public UpdateDuration!: (duration: durationType) => void    
 
     @commonState.Action
-    public UpdateTime!: (time: any) => void
+    public UpdateTime!: (time: string) => void
     
     @commonState.Action
-    public UpdateStatusStyle!: (statusStyle: any) => void
+    public UpdateStatusStyle!: (statusStyle: string) => void
 
-    futureAppearancesList: any[] = [];
-     /* eslint-enable */
-
+    futureAppearancesList: civilAppearancesListType[] = [];
    
     isMounted = false;
     isDataReady = false;
@@ -204,7 +205,7 @@ export default class CivilFutureAppearances extends Vue {
     public ExtractFutureAppearancesInfo(): void {
         const currentDate = new Date();
         for (const appIndex in this.futureAppearancesJson) {
-            const appInfo = {};
+            const appInfo = {} as civilAppearancesListType;
             const jApp = this.futureAppearancesJson[appIndex];
 
             appInfo["Index"] = appIndex;
@@ -262,6 +263,13 @@ export default class CivilFutureAppearances extends Vue {
         }        
     }
 
+    public sortChanged() 
+    {
+        this.SortedFutureAppearances.forEach((item) => {
+            this.$set(item, '_showDetails', false)
+        })
+    }
+
     get SortedFutureAppearances()
     {           
         if(this.showSections['Future Appearances'])
@@ -270,15 +278,8 @@ export default class CivilFutureAppearances extends Vue {
         }
         else
         {
-            return  this.futureAppearancesList
-            .sort((a, b): any =>
-            {            
-                if(a["Date"] > b["Date"]) return -1;
-                else if(a["Date"] < b["Date"]) return 1;
-                else return 0;
-            })
-            .slice(0, 3);           
-        }        
+            return _.sortBy(this.futureAppearancesList,"Date").reverse().slice(0, 3);           
+        }   
     }
 }
 </script>

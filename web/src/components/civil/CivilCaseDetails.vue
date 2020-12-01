@@ -19,7 +19,7 @@
             <span v-else> Server is not responding. <b>({{errorText}})</b> </span>
         </b-card>
         <b-card>         
-            <b-button variant="info" @click="navigateToLandingPage">Back to the Landing Page</b-button>
+            <b-button id="backToLandingPage" variant="info" @click="navigateToLandingPage">Back to the Landing Page</b-button>
         </b-card>
     </b-card>
 
@@ -39,6 +39,7 @@
 
                 <civil-parties v-if="showCaseDetails"/>
                 <civil-adjudicator-restrictions v-if="showCaseDetails"/>
+                <civil-comment-notes v-if="showCaseDetails"/>
                 <civil-documents-view v-if="showCaseDetails"/>            
                 <civil-past-appearances v-if="showPastAppearances" />
                 <civil-future-appearances v-if="showFutureAppearances" />
@@ -61,14 +62,18 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
+import * as _ from 'underscore';
 import CivilDocumentsView from '@components/civil/CivilDocumentsView.vue';
 import CivilPastAppearances from '@components/civil/CivilPastAppearances.vue';
 import CivilFutureAppearances from '@components/civil/CivilFutureAppearances.vue';
 import CivilAdjudicatorRestrictions from '@components/civil/CivilAdjudicatorRestrictions.vue';
+import CivilCommentNotes from '@components/civil/CivilCommentNotes.vue'; 
 import CivilParties from '@components/civil/CivilParties.vue';
 import CivilHeaderTop from '@components/civil/CivilHeaderTop.vue';
 import CivilHeader from '@components/civil/CivilHeader.vue';
 import CivilSidePanel from '@components/civil/CivilSidePanel.vue';
+import {civilFileInformationType, partiesInfoType, documentsInfoType, summaryDocumentsInfoType} from '../../types/civil';
+import {inputNamesType, adjudicatorRestrictionsInfoType } from '../../types/common'
 import "@store/modules/CommonInformation";
 import "@store/modules/CivilFileInformation";
 const civilState = namespace("CivilFileInformation");
@@ -77,6 +82,7 @@ const commonState = namespace("CommonInformation");
 @Component({
     components: {
         CivilAdjudicatorRestrictions,
+        CivilCommentNotes,
         CivilDocumentsView,
         CivilPastAppearances,
         CivilFutureAppearances,
@@ -93,23 +99,21 @@ export default class CivilCaseDetails extends Vue {
     
     @commonState.State
     public displayName!: string;
-
-    /* eslint-disable */
+    
     @civilState.State
-    public civilFileInformation!: any
+    public civilFileInformation!: civilFileInformationType
 
     @civilState.Action
-    public UpdateCivilFile!: (newCivilFileInformation: any) => void 
+    public UpdateCivilFile!: (newCivilFileInformation: civilFileInformationType) => void 
 
     @commonState.Action
-    public UpdateDisplayName!: (newInputNames: any) => void
+    public UpdateDisplayName!: (newInputNames: inputNamesType) => void
 
-    leftPartiesInfo: any[] = [];
-    rightPartiesInfo: any[] = [];
-    adjudicatorRestrictionsInfo: any[] = [];
-    documentsInfo: any[] = [];
-    summaryDocumentsInfo: any[] = [];
-    /* eslint-enable */
+    leftPartiesInfo: partiesInfoType[] = [];
+    rightPartiesInfo: partiesInfoType[] = [];
+    adjudicatorRestrictionsInfo: adjudicatorRestrictionsInfoType[] = [];
+    documentsInfo: documentsInfoType[] = [];
+    summaryDocumentsInfo: summaryDocumentsInfoType[] = [];
     
     isDataReady = false
     isMounted = false
@@ -135,7 +139,7 @@ export default class CivilCaseDetails extends Vue {
     public getFileDetails(): void {
        
         this.errorCode=0
-        this.$http.get('/api/files/civil/'+ this.civilFileInformation.fileNumber)
+        this.$http.get('api/files/civil/'+ this.civilFileInformation.fileNumber)
             .then(Response => Response.json(), err => {this.errorCode= err.status;this.errorText= err.statusText;console.log(err);}        
             ).then(data => {
                 if(data){
@@ -147,7 +151,9 @@ export default class CivilCaseDetails extends Vue {
                         this.isSealed = true;
                     } 
                     this.ExtractCaseInfo()
-                    if((this.leftPartiesInfo.length> 0)  || (this.rightPartiesInfo.length > 0))
+                    if ((this.adjudicatorRestrictionsInfo.length>0) || 
+                        (this.leftPartiesInfo.length> 0)  || (this.rightPartiesInfo.length > 0)
+                        || (this.documentsInfo.length>0) || (this.summaryDocumentsInfo.length>0))
                     {
                         this.civilFileInformation.leftPartiesInfo = this.leftPartiesInfo;
                         this.civilFileInformation.rightPartiesInfo = this.rightPartiesInfo;
@@ -167,8 +173,7 @@ export default class CivilCaseDetails extends Vue {
                 }
                 else
                     if(this.errorCode==0) this.errorCode=200;
-                this.isMounted = true;
-                       
+                this.isMounted = true;                       
             });
     }    
     
@@ -196,9 +201,10 @@ export default class CivilCaseDetails extends Vue {
         return ((this.showSections['Case Details'] || this.showSections['Past Appearances'] ) && this.isDataReady)
     }    
 
-    public ExtractCaseInfo(): void {        
-        for(const jParty of this.partiesJson) {            
-            const partyInfo = {};            
+    public ExtractCaseInfo(): void {
+        let partyIndex = 0       
+        for(const jParty of this.partiesJson) {                        
+            const partyInfo = {} as partiesInfoType;            
             partyInfo["Party ID"] = jParty.partyId;
             partyInfo["Role"] = jParty.roleTypeDescription;
             if (jParty.counsel.length > 0) {
@@ -214,7 +220,9 @@ export default class CivilCaseDetails extends Vue {
             partyInfo["Last Name"] =  jParty.lastNm? jParty.lastNm: jParty.orgNm ;
             this.UpdateDisplayName({'lastName': partyInfo["Last Name"], 'givenName': partyInfo["First Name"]});
             partyInfo["Name"] = this.displayName            
-            partyInfo["ID"] = jParty.partyId            
+            partyInfo["ID"] = jParty.partyId
+            partyInfo["Index"] = partyIndex
+            partyIndex = partyIndex + 1            
             if (partyInfo["Left/Right"] == "R") {
                 this.rightPartiesInfo.push(partyInfo);
             } else {
@@ -225,7 +233,7 @@ export default class CivilCaseDetails extends Vue {
         this.rightPartiesInfo = this.SortParties(this.rightPartiesInfo);
 
         for (const jRestriction of this.adjudicatorRestrictionsJson) {
-            const restrictionInfo = {};     
+            const restrictionInfo = {} as adjudicatorRestrictionsInfoType;     
             restrictionInfo["Adj Restriction"] = jRestriction.adjInitialsTxt?jRestriction.hearingRestrictionTypeDsc+ ": " + jRestriction.adjInitialsTxt:jRestriction.hearingRestrictionTypeDsc;     
             restrictionInfo["Adjudicator"] =   jRestriction.adjInitialsTxt?jRestriction.adjInitialsTxt +" - " + jRestriction.adjFullNm: jRestriction.adjFullNm;
             restrictionInfo["Full Name"] = jRestriction.adjFullNm;
@@ -236,17 +244,17 @@ export default class CivilCaseDetails extends Vue {
         }
 
         for(const docIndex in this.documentsDetailsJson)
-        {
-            const docInfo = {}; 
-            const jDoc =  this.documentsDetailsJson[docIndex];
-            docInfo["Index"] = docIndex;
+        {             
+            const jDoc =  this.documentsDetailsJson[docIndex];            
             if(jDoc.documentTypeCd != 'CSR') {
+                const docInfo = {} as documentsInfoType;
+                docInfo["Index"] = docIndex;
                 docInfo["Seq."] = jDoc.fileSeqNo;
                 docInfo["Document Type"] = jDoc.documentTypeDescription;
                 docInfo["Concluded"] = jDoc.concludedYn;
                 if((this.categories.indexOf("CONCLUDED") < 0) && docInfo["Concluded"].toUpperCase() =="Y") this.categories.push("CONCLUDED")        
-                docInfo["Appearance Date"] = jDoc.lastAppearanceDt? jDoc.lastAppearanceDt.split(' ')[0] : ''; 
-                if(new Date(docInfo["Appearance Date"]) > new Date() && this.categories.indexOf("SCHEDULED") < 0) this.categories.push("SCHEDULED")   
+                docInfo["Next Appearance Date"] = jDoc.nextAppearanceDt? Vue.filter('beautify-date')(jDoc.nextAppearanceDt) : ''; 
+                if(docInfo["Next Appearance Date"].length > 0 && this.categories.indexOf("SCHEDULED") < 0) this.categories.push("SCHEDULED")   
 
                 docInfo["Category"] = jDoc.category? jDoc.category : '';
                 if((this.categories.indexOf(docInfo["Category"]) < 0) && docInfo["Category"].length > 0) this.categories.push(docInfo["Category"])
@@ -255,8 +263,7 @@ export default class CivilCaseDetails extends Vue {
                     for (const act of jDoc.documentSupport) {
                         docInfo["Act"].push({'Code': act.actCd, 'Description': act.actDsc})
                     }
-                }
-                
+                }                
                 if (jDoc.sealedYN == "Y") {
                     this.docIsSealed = true;
                     docInfo["Sealed"] = true;
@@ -271,10 +278,24 @@ export default class CivilCaseDetails extends Vue {
                     for (const issue of jDoc.issue) {
                         docInfo["Issues"].push(issue.issueDsc)
                     }
+                }
+                docInfo["Comment"] = jDoc.commentTxt? jDoc.commentTxt : '';
+                docInfo["Filed By Name"] = [];
+                if (jDoc.filedBy && jDoc.filedBy[0] && jDoc.filedBy.length > 0) {
+                    for (const filed of jDoc.filedBy) {
+                        if (filed.roleTypeCode){
+                            docInfo["Filed By Name"].push(filed.filedByName + ' (' + filed.roleTypeCode + ')');
+                        } else {
+                            docInfo["Filed By Name"].push(filed.filedByName);
+                        }                        
+                    }
                 } 
-                this.documentsInfo.push(docInfo);
+                docInfo["Order Made Date"] = jDoc.DateGranted? Vue.filter('beautify-date')(jDoc.DateGranted) : '';                
+                this.documentsInfo.push(docInfo);                
 
-            } else {                
+            } else {
+                const docInfo = {} as summaryDocumentsInfoType;
+                docInfo["Index"] = docIndex;                
                 docInfo["Document Type"] = 'CourtSummary';
                 docInfo["Appearance Date"] = jDoc.lastAppearanceDt.split(' ')[0];
                 docInfo["Appearance ID"] = jDoc.imageId;
@@ -285,13 +306,7 @@ export default class CivilCaseDetails extends Vue {
     }
 
     public SortParties(partiesList) {
-        return partiesList.sort((a, b): any => {
-        const LastName1 = a["Last Name"] ? a["Last Name"].toUpperCase() : "";
-        const LastName2 = b["Last Name"] ? b["Last Name"].toUpperCase() : "";
-        if (LastName1 > LastName2) return 1;
-        if (LastName1 < LastName2) return -1;
-        return 0;
-        });
+        return _.sortBy(partiesList,((party: partiesInfoType) =>{return (party["Last Name"]? party["Last Name"].toUpperCase() : '')}))        
     }
 
     public navigateToLandingPage() {

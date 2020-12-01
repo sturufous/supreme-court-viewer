@@ -1,14 +1,23 @@
 const path = require("path");
 const vueSrc = "src";
+
+const webBaseHref = process.env.WEB_BASE_HREF || '/scjscv/';
 module.exports = {
+	publicPath: webBaseHref,
 	configureWebpack: {
 		devServer: {
 			historyApiFallback: true,
+			host: 'localhost',
+			port: 1337,
 			proxy: {
-				'^/api': {
+				//Development purposes, if WEB_BASE_HREF changes, this will have to change as well. 
+				'^/scjscv/api': {
 					target: "https://localhost:44369",
+					pathRewrite: { '^/scjscv/api': '/api' },
 					headers: {
-						Connection: 'keep-alive'
+						Connection: 'keep-alive',
+						'X-Forwarded-Host': 'localhost',
+						'X-Forwarded-Port': '1337'
 					},
 					changeOrigin: true
 				}

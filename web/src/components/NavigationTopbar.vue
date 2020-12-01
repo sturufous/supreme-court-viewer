@@ -1,5 +1,5 @@
 <template>
-  <header class="app-header" style="overflow: hidden;">
+  <header id="appHeader" class="app-header" style="overflow: hidden;">
 
     <b-navbar toggleable="lg">    
       <b-navbar-brand href="https://www2.gov.bc.ca">

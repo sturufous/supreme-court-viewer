@@ -20,18 +20,17 @@
 import { Component, Vue } from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
 import '@store/modules/CivilFileInformation';
+import {civilShowSectionsType} from '../../types/civil';
 const civilState = namespace('CivilFileInformation');
 
 @Component
 export default class CivilSidePanel extends Vue {
 
     @civilState.State
-    public showSections 
+    public showSections    
     
-    /* eslint-disable */
     @civilState.Action
-    public UpdateShowSections!: (newShowSections: any) => void
-    /* eslint-enable */
+    public UpdateShowSections!: (newShowSections: civilShowSectionsType) => void
     
     panelItems = [ 
        'Case Details', 'Future Appearances', 'Past Appearances'    

@@ -125,7 +125,7 @@
                             <span v-bind:key="index">
                                 <span 
                                 :class="data.field.cellClass"
-                                :style="data.field.cellStyle"><b>{{ data.item.role }}</b> is appearing by {{data.item.method}}.<br>
+                                :style="data.field.cellStyle"><b>{{ data.item.role }}</b> is appearing by {{data.item.method}}<br>
                                 </span>
                                 <span 
                                 v-if="data.item.phoneNumber.length>0" 
@@ -195,9 +195,6 @@
             </div>                
         </template>
         </b-overlay>
-        
-
-
       </b-card>       
     </b-card>
     <b-modal v-if= "isMounted" v-model="showNotes" id="bv-modal-comment" hide-footer>
@@ -219,26 +216,24 @@
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { namespace } from "vuex-class";
-
+import {criminalFileInformationType, appearanceAdditionalInfoType, appearanceMethodDetailsInfoType, appearanceChargesInfoType, criminalAppearanceInfoType, criminalAppearanceMethodsInfoType} from '../../types/criminal';
 import "@store/modules/CriminalFileInformation";
 const criminalState = namespace("CriminalFileInformation");
 
 
 @Component
 export default class CriminalAppearanceDetails extends Vue {
-
-    /* eslint-disable */
-    @criminalState.State
-    public criminalFileInformation!: any;
-
-    @criminalState.State
-    public appearanceInfo!: any;
     
-    appearanceAdditionalInfo: any[] = [];
-    appearanceCharges: any[] = [];    
-    appearanceMethods: any[] = [];
-    appearanceMethodDetails: any[] = [];
-    /* eslint-enable */ 
+    @criminalState.State
+    public criminalFileInformation!: criminalFileInformationType;
+
+    @criminalState.State
+    public appearanceInfo!: criminalAppearanceInfoType;
+    
+    appearanceAdditionalInfo: appearanceAdditionalInfoType[] = [];
+    appearanceCharges: appearanceChargesInfoType[] = [];    
+    appearanceMethods: criminalAppearanceMethodsInfoType[] = [];
+    appearanceMethodDetails: appearanceMethodDetailsInfoType[] = [];    
   
     loadingPdf = false;
     loadingROP = false;
@@ -270,7 +265,7 @@ export default class CriminalAppearanceDetails extends Vue {
 
     appearanceMethodsField = 
     [
-        {key:'Key', cellClass:'text-danger', cellStyle:'white-space: pre'}
+        {key:'Key', cellClass:'text-danger', cellStyle:'white-space: pre-line'}
     ]
 
     appearanceFields =  
@@ -289,16 +284,13 @@ export default class CriminalAppearanceDetails extends Vue {
 
     @Prop() tagcasename
     public getAppearanceDetails(): void {      
-    
-        this.$http.get('/api/files/criminal/'+ this.appearanceInfo.fileNo+'/appearance-detail/'+this.appearanceInfo.appearanceId+ '/'+this.appearanceInfo.partId)
+        this.$http.get('api/files/criminal/'+ this.appearanceInfo.fileNo+'/appearance-detail/'+this.appearanceInfo.appearanceId+ '/'+this.appearanceInfo.partId)
             .then(Response => Response.json(), err => {console.log(err);window.alert("bad data!");} )        
             .then(data => {
                 if(data){  
                     this.appearanceDetailsJson = data;              
                     this.ExtractAppearanceDetailsInfo();
-                    const element = document.getElementById(this.tagcasename);                        
-                        // console.log(this.tagcasename)
-                        // console.log(element)
+                    const element = document.getElementById(this.tagcasename);
                     if(element !=null)
                         setTimeout(() => {element.scrollIntoView(); }, 100);         
                 }
@@ -333,7 +325,7 @@ export default class CriminalAppearanceDetails extends Vue {
              
         for(const charge of this.appearanceDetailsJson.charges)
         {              
-            const chargeInfo = {};             
+            const chargeInfo = {} as appearanceChargesInfoType;             
             chargeInfo["Count"] = charge.printSeqNo;
 
             chargeInfo["Criminal Code"]= charge.statuteSectionDsc                 
@@ -350,7 +342,7 @@ export default class CriminalAppearanceDetails extends Vue {
 
         for(const appearanceMethod of this.appearanceDetailsJson.appearanceMethods)
         {                         
-            const methodInfo = {};             
+            const methodInfo = {} as criminalAppearanceMethodsInfoType;             
             methodInfo["role"] = appearanceMethod.roleTypeDsc;
             methodInfo["method"] = appearanceMethod.appearanceMethodDesc;
             methodInfo["instruction"] = appearanceMethod.instructionTxt? appearanceMethod.instructionTxt: '';
@@ -411,9 +403,8 @@ export default class CriminalAppearanceDetails extends Vue {
     public openDocumentsPdf(): void {
         this.loadingPdf = true;
         const imageId = this.initiatingDocuments[0]
-        console.log(imageId)
         const filename = 'doc'+imageId+'.pdf';
-        window.open(`/api/files/document/${imageId}/${filename}?isCriminal=true`)
+        window.open(`${process.env.BASE_URL}api/files/document/${imageId}/${filename}?isCriminal=true`)
         this.loadingPdf = false;
     }
 
@@ -425,11 +416,11 @@ export default class CriminalAppearanceDetails extends Vue {
         const courtLevel = this.appearanceInfo.courtLevel;
         const courtClass = this.appearanceInfo.courtClass;
       
-        const url =`/api/files/criminal/record-of-proceedings/${partID}/${filename}?profSequenceNumber=${profSeqNo}&courtLevelCode=${courtLevel}&courtClassCode=${courtClass}`;
+        const url =`api/files/criminal/record-of-proceedings/${partID}/${filename}?profSequenceNumber=${profSeqNo}&courtLevelCode=${courtLevel}&courtClassCode=${courtClass}`;
 
         this.$http.get(url)
-            .then(Response => {
-                window.open(url);
+            .then(() => {
+                window.open(`${process.env.BASE_URL}${url}`);
                 this.loadingROP = false;},
               err => {
                 console.log(err); 

@@ -20,7 +20,7 @@
             <span v-else> Server is not responding. <b>({{errorText}})</b> </span>
         </b-card>
         <b-card>         
-            <b-button variant="info" @click="navigateToLandingPage">Back to the Landing Page</b-button>
+            <b-button id="backToLandingPage" variant="info" @click="navigateToLandingPage">Back to the Landing Page</b-button>
         </b-card>
     </b-card>
 
@@ -75,6 +75,8 @@ import CriminalFutureAppearances from '@components/criminal/CriminalFutureAppear
 import CriminalCrownNotes from '@components/criminal/CriminalCrownNotes.vue';
 import CriminalWitnesses from '@components/criminal/CriminalWitnesses.vue';
 import CriminalSentence from '@components/criminal/CriminalSentence.vue';
+import {bansInfoType, chargesInfoType, participantListInfoType, criminalFileInformationType} from '../../types/criminal';
+import {inputNamesType, adjudicatorRestrictionsInfoType } from '../../types/common'
 import '@store/modules/CriminalFileInformation';
 import "@store/modules/CommonInformation";
 const criminalState = namespace('CriminalFileInformation');
@@ -110,22 +112,20 @@ export default class CriminalCaseDetails extends Vue {
     
     @commonState.State
     public displayName!: string;
-
-    /* eslint-disable */
+    
     @criminalState.State
-    public criminalFileInformation!: any
+    public criminalFileInformation!: criminalFileInformationType
 
     @criminalState.Action
-    public UpdateCriminalFile!: (newCriminalFileInformation: any) => void
+    public UpdateCriminalFile!: (newCriminalFileInformation: criminalFileInformationType) => void
     
     @commonState.Action
-    public UpdateDisplayName!: (newInputNames: any) => void
+    public UpdateDisplayName!: (newInputNames: inputNamesType) => void
    
-    participantList: any[] = [];
-    adjudicatorRestrictionsInfo: any[] = [];
-    bans: any[] = [];
-    /* eslint-enable */
-
+    participantList: participantListInfoType[] = [];
+    adjudicatorRestrictionsInfo: adjudicatorRestrictionsInfoType[] = [];
+    bans: bansInfoType [] = [];
+    
     isDataReady = false
     isMounted = false
     banExists = false
@@ -150,7 +150,7 @@ export default class CriminalCaseDetails extends Vue {
         {key:'Interpreter Required',abbr:'INT', code:'interpreterYN'}
     ];
 
-    mounted () { 
+    mounted () {
         this.criminalFileInformation.fileNumber = this.$route.params.fileNumber
         this.UpdateCriminalFile(this.criminalFileInformation);        
         this.getFileDetails();
@@ -158,7 +158,7 @@ export default class CriminalCaseDetails extends Vue {
 
     public getFileDetails(): void {
         this.errorCode=0;
-        this.$http.get('/api/files/criminal/'+ this.criminalFileInformation.fileNumber)
+        this.$http.get('api/files/criminal/'+ this.criminalFileInformation.fileNumber)
             .then(Response => Response.json(), err => {this.errorCode= err.status;this.errorText= err.statusText;console.log(err);}        
             ).then(data => {
                 if(data){
@@ -185,8 +185,7 @@ export default class CriminalCaseDetails extends Vue {
                         this.errorCode=200;                    
                 }
                 else
-                    if(this.errorCode==0) this.errorCode=200;
-                    
+                    if(this.errorCode==0) this.errorCode=200;                    
                 
                 this.isMounted = true;
                        
@@ -235,7 +234,7 @@ export default class CriminalCaseDetails extends Vue {
     public ExtractFileInfo(): void {
 
         for (const partIndex in this.participantJson) {
-            const participantInfo = {};
+            const participantInfo = {} as participantListInfoType;
             const jParticipant = this.participantJson[partIndex];
             participantInfo["Index"] = partIndex;
             participantInfo["First Name"] = jParticipant.givenNm.trim().length>0 ? jParticipant.givenNm : "";
@@ -247,10 +246,10 @@ export default class CriminalCaseDetails extends Vue {
             participantInfo["Part ID"] = jParticipant.partId;
             participantInfo["Prof Seq No"] = jParticipant.profSeqNo;
             participantInfo["Charges"] = [];         
-            const charges: any[] = [];         
+            const charges: chargesInfoType[] = [];         
             for(const charge of jParticipant.charge)
             {              
-                const chargeInfo = {};                   
+                const chargeInfo = {} as chargesInfoType;                   
                 chargeInfo["Description"]= charge.sectionDscTxt
                 chargeInfo["Code"]= charge.sectionTxt
                 charges.push(chargeInfo);
@@ -266,7 +265,7 @@ export default class CriminalCaseDetails extends Vue {
             
             for(const ban of jParticipant.ban)
             {              
-                const banInfo = {};
+                const banInfo = {} as bansInfoType;
                 banInfo["Ban Participant"] = participantInfo["Name"];                   
                 banInfo["Ban Type"] = ban.banTypeDescription;
                 banInfo["Order Date"] = ban.banOrderedDate;                   
@@ -288,7 +287,7 @@ export default class CriminalCaseDetails extends Vue {
         }
 
         for (const jRestriction of this.adjudicatorRestrictionsJson) {
-            const restrictionInfo = {};     
+            const restrictionInfo = {} as adjudicatorRestrictionsInfoType;     
             restrictionInfo["Adj Restriction"] = jRestriction.adjInitialsTxt?jRestriction.hearingRestrictionTypeDsc+ ": " + jRestriction.adjInitialsTxt:jRestriction.hearingRestrictionTypeDsc;
             restrictionInfo["Full Name"] = jRestriction.adjFullNm;                 
             restrictionInfo["Adjudicator"] =   jRestriction.adjInitialsTxt?jRestriction.adjInitialsTxt +" - " + jRestriction.adjFullNm: jRestriction.adjFullNm;

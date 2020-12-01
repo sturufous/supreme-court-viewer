@@ -195,7 +195,7 @@
                     responsive="sm"
                     >
                         <template v-for="(field,index) in appearanceMethodsField" v-slot:[`cell(${field.key})`]="data" >                   
-                            <span v-bind:key="index" :class="data.field.cellClass" :style="data.field.cellStyle"><b>{{ data.item.role }}</b> is appearing by {{data.item.method}}. </span>
+                            <span v-bind:key="index" :class="data.field.cellClass" :style="data.field.cellStyle"><b>{{ data.item.role }}</b> is appearing by {{data.item.method}} </span>
                         </template>
                 </b-table>                                       
             </b-col>          
@@ -278,6 +278,8 @@ import { Component, Vue, Prop } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import "@store/modules/CommonInformation";
 import "@store/modules/CivilFileInformation";
+import {appearanceAdditionalInfoType, civilAppearanceInfoType, appearancePartiesType, appearanceMethodsType, appearanceDocumentsType} from '../../types/civil';
+import {inputNamesType } from '../../types/common'
 const civilState = namespace("CivilFileInformation");
 const commonState = namespace("CommonInformation");
 
@@ -285,23 +287,18 @@ const commonState = namespace("CommonInformation");
 export default class CivilAppearanceDetails extends Vue {
 
     @commonState.State
-    public displayName!: string;
-
-     /* eslint-disable */
-    @civilState.State
-    public civilFileInformation!: any;
+    public displayName!: string;   
 
     @civilState.State
-    public appearanceInfo!: any;        
+    public appearanceInfo!: civilAppearanceInfoType;        
 
     @commonState.Action
-    public UpdateDisplayName!: (newInputNames: any) => void
+    public UpdateDisplayName!: (newInputNames: inputNamesType) => void
 
-    appearanceAdditionalInfo: any[] = [];
-    appearanceDocuments: any[] = [];
-    appearanceParties: any[] = [];
-    appearanceMethods: any[] = [];
-    /* eslint-enable */
+    appearanceAdditionalInfo: appearanceAdditionalInfoType[] = [];
+    appearanceDocuments: appearanceDocumentsType[] = [];
+    appearanceParties: appearancePartiesType[] = [];
+    appearanceMethods: appearanceMethodsType[] = [];    
     
     loadingPdf = false; 
     isMounted = false;
@@ -345,7 +342,7 @@ export default class CivilAppearanceDetails extends Vue {
 
     appearanceMethodsField = 
     [
-        {key:'Key', cellClass:'text-danger', cellStyle:'white-space: pre'}
+        {key:'Key', cellClass:'text-danger', cellStyle:'white-space: pre-line'}
     ]
 
 
@@ -358,7 +355,7 @@ export default class CivilAppearanceDetails extends Vue {
 
     public getAppearanceDetails(): void {      
             
-        this.$http.get('/api/files/civil/'+ this.appearanceInfo.fileNo +'/appearance-detail/'+this.appearanceInfo.appearanceId)
+        this.$http.get('api/files/civil/'+ this.appearanceInfo.fileNo +'/appearance-detail/'+this.appearanceInfo.appearanceId)
             .then(Response => Response.json(), err => {console.log(err);window.alert("bad data!");} )        
             .then(data => {
                 if(data){ 
@@ -393,7 +390,7 @@ export default class CivilAppearanceDetails extends Vue {
         this.adjudicatorComment = this.appearanceDetailsJson.adjudicatorComment? this.appearanceDetailsJson.adjudicatorComment: '';
         for(const documentIndex in this.appearanceDetailsJson.document)
         {              
-            const docInfo = {};
+            const docInfo = {} as appearanceDocumentsType;
             const document = this.appearanceDetailsJson.document[documentIndex]              
             docInfo["Seq."] = document.fileSeqNo;
             docInfo["Document Type"]= document.documentTypeDescription
@@ -429,7 +426,7 @@ export default class CivilAppearanceDetails extends Vue {
 
         for(const party of this.appearanceDetailsJson.party)
         {              
-            const partyInfo = {};             
+            const partyInfo = {} as appearancePartiesType;             
             partyInfo["First Name"] = party.givenNm? party.givenNm: '';
             partyInfo["Last Name"] =  party.lastNm? party.lastNm: party.orgNm ;
             this.UpdateDisplayName({'lastName': partyInfo["Last Name"], 'givenName': partyInfo["First Name"]});
@@ -507,7 +504,7 @@ export default class CivilAppearanceDetails extends Vue {
         
         for(const appearanceMethod of this.appearanceDetailsJson.appearanceMethod)
         {              
-            const methodInfo = {};             
+            const methodInfo = {} as appearanceMethodsType;             
             methodInfo["role"] = appearanceMethod.roleTypeDesc;
             methodInfo["method"] = appearanceMethod.appearanceMethodDesc;
             this.appearanceMethods.push(methodInfo)
@@ -526,7 +523,7 @@ export default class CivilAppearanceDetails extends Vue {
     public openDocumentsPdf(documentId): void {
         this.loadingPdf = true;
         const filename = 'doc'+documentId+'.pdf';
-        window.open(`/api/files/document/${documentId}/${filename}?isCriminal=false`)
+        window.open(`${process.env.BASE_URL}api/files/document/${documentId}/${filename}?isCriminal=false`)
         this.loadingPdf = false;
     }
 
@@ -534,7 +531,7 @@ export default class CivilAppearanceDetails extends Vue {
 
         this.loadingPdf = true;        
         const filename = 'court summary_'+appearanceId+'.pdf';
-        window.open(`/api/files/civil/court-summary-report/${appearanceId}/${filename}`)
+        window.open(`${process.env.BASE_URL}api/files/civil/court-summary-report/${appearanceId}/${filename}`)
         this.loadingPdf = false;
     }
 
