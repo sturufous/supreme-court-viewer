@@ -20,6 +20,7 @@ Vue.config.productionTip = true;
 Vue.component('loading-spinner', LoadingSpinner);
 
 Vue.http.options.root = process.env.BASE_URL;
+//Vue.http.headers.common['Authorization'] = 'Basic VEVTVDpURVNU'; TEST:TEST
 
 //Redirect from / to /scjscv/
 if (location.pathname == "/")
