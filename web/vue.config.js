@@ -1,14 +1,25 @@
 const path = require("path");
 const vueSrc = "src";
+
+//I noticed when we don't have publicPath set to /, it becomes problematic using vue-cli-tools - it doesn't seem to respect history paths.
+//EX. scjscv/civil-files/5555 wont work when you navigate directly to it with vue-cli-tools versus NGINX it works fine. 
+//When deployed over NGINX this problem seems to go away. So I've left it as / for now in local development environments. 
+const webBaseHref = process.env.WEB_BASE_HREF || '/scjscv/';
 module.exports = {
+	publicPath: webBaseHref,
 	configureWebpack: {
 		devServer: {
 			historyApiFallback: true,
+			host: 'localhost',
+			port: 1337,
 			proxy: {
+				//This is for WEB_BASE_HREF = '/' specifically. 
 				'^/api': {
 					target: "https://localhost:44369",
 					headers: {
-						Connection: 'keep-alive'
+						Connection: 'keep-alive',
+						'X-Forwarded-Host': 'localhost',
+						'X-Forwarded-Port': '1337'
 					},
 					changeOrigin: true
 				}

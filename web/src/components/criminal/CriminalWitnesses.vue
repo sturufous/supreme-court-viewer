@@ -71,6 +71,8 @@ import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import "@store/modules/CriminalFileInformation";
 import "@store/modules/CommonInformation";
+import {witnessListInfoType, witnessCountInfoType, criminalFileInformationType} from '../../types/criminal';
+import {inputNamesType} from '../../types/common'
 const criminalState = namespace("CriminalFileInformation");
 const commonState = namespace("CommonInformation");
 
@@ -78,18 +80,16 @@ const commonState = namespace("CommonInformation");
 export default class CriminalWitnesses extends Vue {
 
     @commonState.State
-    public displayName!: string;    
-    
-    /* eslint-disable */
+    public displayName!: string;
+   
     @criminalState.State
-    public criminalFileInformation!: any;      
+    public criminalFileInformation!: criminalFileInformationType;      
 
     @commonState.Action
-    public UpdateDisplayName!: (newInputNames: any) => void
+    public UpdateDisplayName!: (newInputNames: inputNamesType) => void
 
-    witnessList: any[] = [];
-    witnessCounts: any[] = [];
-    /* eslint-enable */    
+    witnessList: witnessListInfoType[] = [];
+    witnessCounts: witnessCountInfoType[] = [];
   
     isMounted = false;
     witnessesJson;
@@ -128,7 +128,7 @@ export default class CriminalWitnesses extends Vue {
     public ExtractWitnessInfo(): void {
         
         for (const witnessIndex in this.witnessesJson) {
-            const witnessInfo = {};
+            const witnessInfo = {} as witnessListInfoType;
             const jWitness = this.witnessesJson[witnessIndex];
             
             witnessInfo["First Name"] = jWitness.givenNm ? jWitness.givenNm : '';
@@ -154,19 +154,19 @@ export default class CriminalWitnesses extends Vue {
             this.witnessList.push(witnessInfo);
         }
         this.numberOfTotalWitnesses = this.witnessList.length;
-        let countInfo = {};
+        let countInfo = {} as witnessCountInfoType;
         countInfo['WitnessCountFieldName'] = "Personnel Witnesses";
         countInfo['WitnessCountValue'] = this.numberOfPersonnelWitnesses;
         this.witnessCounts.push(countInfo);
-        countInfo = {};
+        countInfo = {} as witnessCountInfoType;
         countInfo['WitnessCountFieldName'] = "Civilian Witnesses";
         countInfo['WitnessCountValue'] = this.numberOfCivilianWitnesses;
         this.witnessCounts.push(countInfo);
-        countInfo = {};
+        countInfo = {} as witnessCountInfoType;
         countInfo['WitnessCountFieldName'] = "Expert Witnesses";
         countInfo['WitnessCountValue'] = this.numberOfExpertWitnesses;
         this.witnessCounts.push(countInfo);
-        countInfo = {};
+        countInfo = {} as witnessCountInfoType;
         countInfo['WitnessCountFieldName'] = "Total";
         countInfo['WitnessCountValue'] = this.numberOfTotalWitnesses;
         this.witnessCounts.push(countInfo);

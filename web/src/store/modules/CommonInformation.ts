@@ -1,4 +1,7 @@
 import { VuexModule, Module, Mutation, Action } from 'vuex-module-decorators'
+import {iconStyleType} from '../../types/common'
+
+enum appearanceStatus {UNCF='Unconfirmed', CNCL='Canceled', SCHD='Scheduled' }
 
 @Module({
   namespaced: true
@@ -8,7 +11,8 @@ class CommonInformation extends VuexModule {
   public displayName = ''
   public time = ''
   public duration = ''
-  public statusStyle = ''  
+  public statusStyle = ''
+  public iconStyles: iconStyleType[] = [];
 
   @Mutation
   public setDisplayName(displayName): void {   
@@ -84,9 +88,8 @@ class CommonInformation extends VuexModule {
 
   @Action
   public UpdateStatusStyle(status) {
-    enum appearanceStatus {UNCF='Unconfirmed', CNCL='Canceled', SCHD='Scheduled' }
-    let style = '';
 
+    let style = '';
     if(status == appearanceStatus.UNCF) {
       style = "badge badge-danger mt-2";
     } else if(status == appearanceStatus.CNCL) {
@@ -98,6 +101,29 @@ class CommonInformation extends VuexModule {
     this.context.commit('setStatusStyle', style)
   }
 
+  @Mutation
+  public setIconStyle(iconStyles): void {   
+    this.iconStyles = iconStyles
+  }
+
+  @Action
+  public UpdateIconStyle(newIconsInfo) {
+    const iconStyles: iconStyleType[] = [];
+    for (const iconInfo of newIconsInfo) {
+      if(iconInfo["info"] == "UNCF") {
+        iconStyles.push({"icon":'circle-half', "desc":appearanceStatus.UNCF});
+      } else if(iconInfo["info"] == "CNCL") {
+        iconStyles.push({"icon":'trash', "desc":appearanceStatus.CNCL});
+      } else if(iconInfo["info"] == "SCHD") {
+        iconStyles.push({"icon":'calendar', "desc":appearanceStatus.SCHD})
+      } else if(iconInfo["info"] == "Video") {
+        iconStyles.push({"icon":'camera-video-fill', "desc": "video"})
+      } else if(iconInfo["info"] == "Home") {
+        iconStyles.push({"icon":'house-door-fill', "desc": iconInfo["desc"]})
+      } 
+    }   
+    this.context.commit('setIconStyle', iconStyles)
+  }  
 }
 
 export default CommonInformation 

@@ -20,18 +20,17 @@
 import { Component, Vue } from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
 import '@store/modules/CriminalFileInformation';
+import {showSectionsInfoType} from '../../types/criminal';
 const criminalState = namespace('CriminalFileInformation');
 
 @Component
 export default class CriminalSidePanel extends Vue {
 
     @criminalState.State
-    public showSections
+    public showSections    
     
-    /* eslint-disable */
     @criminalState.Action
-    public UpdateShowSections!: (newShowSections: any) => void
-    /* eslint-enable */
+    public UpdateShowSections!: (newShowSections: showSectionsInfoType) => void    
 
     panelItems = [ 
        'Case Details', 'Future Appearances', 'Past Appearances', 'Witnesses', 'Documents', 'Sentence/Order Details'    
