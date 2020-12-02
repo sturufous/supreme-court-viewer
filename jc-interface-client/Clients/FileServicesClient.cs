@@ -5020,6 +5020,9 @@ namespace JCCommon.Clients.FileServices
         [Newtonsoft.Json.JsonProperty("EnterDtm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string EnterDtm { get; set; }
 
+        [Newtonsoft.Json.JsonProperty("ReferenceDocumentTypeDsc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string ReferenceDocumentTypeDsc { get; set; }
+
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
         [Newtonsoft.Json.JsonExtensionData]

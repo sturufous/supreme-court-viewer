@@ -4169,6 +4169,9 @@
           },
           "EnterDtm": {
             "type": "string"
+          },
+          "ReferenceDocumentTypeDsc": {
+            "type": "string"
           }
         }
       },
