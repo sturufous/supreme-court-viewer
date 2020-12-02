@@ -1,6 +1,8 @@
 const path = require("path");
 const vueSrc = "src";
 
+//I noticed when we don't have publicPath set to /, it becomes problematic using vue-cli-tools - it doesn't seem to respect history paths. 
+//When deployed over NGINX this problem seems to go away. So I've left it as / for now in local development environments. 
 const webBaseHref = process.env.WEB_BASE_HREF || '/scjscv/';
 module.exports = {
 	publicPath: webBaseHref,
@@ -14,6 +16,15 @@ module.exports = {
 				'^/scjscv/api': {
 					target: "https://localhost:44369",
 					pathRewrite: { '^/scjscv/api': '/api' },
+					headers: {
+						Connection: 'keep-alive',
+						'X-Forwarded-Host': 'localhost',
+						'X-Forwarded-Port': '1337'
+					},
+					changeOrigin: true
+				},
+				'^/api': {
+					target: "https://localhost:44369",
 					headers: {
 						Connection: 'keep-alive',
 						'X-Forwarded-Host': 'localhost',
