@@ -6,6 +6,51 @@
   },
   "servers": [],
   "paths": {
+    "/admin/reloadLookups": {
+      "put": {
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Success"
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/adminMessage"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Unauthorized"
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/adminMessage"
+                }
+              }
+            }
+          }
+        },
+        "description": "Used to reload lookups and thus locations manually. Requires a password to execute. \n",
+        "operationId": "PUT_admin-reloadLookups",
+        "parameters": [
+          {
+            "name": "reloadPassword",
+            "in": "header",
+            "required": true,
+            "description": "Valid password to trigger lookup reload.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
     "/codes/adjudicators": {
       "get": {
         "responses": {
@@ -3067,6 +3112,14 @@
   },
   "components": {
     "schemas": {
+      "adminMessage": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      },
       "lookupCode": {
         "description": "A code value as defined in the JUSTIN/CEIS web services.",
         "type": "object",

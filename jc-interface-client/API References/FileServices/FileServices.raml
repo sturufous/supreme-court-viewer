@@ -3,7 +3,7 @@
 title: JC-Interface - File Services
 version: 0.0.1
 protocols: [HTTPS]
-baseUri: 
+baseUri:
 mediaType: application/json
 securedBy: [basic]
 
@@ -3890,6 +3890,10 @@ schemas:
             displayName: physicalFileId
             type: string
             required: false
+          applicationCd:
+            description: The code for the calling application
+            type: string
+            required: false
         responses:
           200:
             body:
@@ -3914,6 +3918,10 @@ schemas:
             description: Requesting Participant Id
             type: string
             required: true
+          applicationCd:
+            description: The code for the calling application
+            type: string
+            required: false
         responses:
           200:
             body:
