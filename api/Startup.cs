@@ -11,8 +11,12 @@ using Scv.Api.Helpers.ContractResolver;
 using Scv.Api.Helpers.Mapping;
 using Scv.Api.Helpers.Middleware;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using Microsoft.AspNetCore.Http;
+using Microsoft.OpenApi.Models;
+using Scv.Api.Helpers;
 
 namespace Scv.Api
 {
@@ -69,6 +73,25 @@ namespace Scv.Api
 
             services.AddSwaggerGen(options =>
             {
+                options.AddSecurityDefinition("Basic", new OpenApiSecurityScheme
+                {
+                    Description = "Basic auth added to authorization header",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Scheme = "basic",
+                    Type = SecuritySchemeType.Http
+                });
+
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement{
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Basic" }
+                        },
+                        new List<string>()
+                    }
+                });
+
                 options.EnableAnnotations(true);
                 options.CustomSchemaIds(o => o.FullName);
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
@@ -91,11 +114,33 @@ namespace Scv.Api
                 app.UseDeveloperExceptionPage();
             }
 
+            var baseUrl = Configuration.GetNonEmptyValue("WebBaseHref");
+            app.Use((context, next) =>
+            {
+                context.Request.Scheme = "https";
+                if (context.Request.Headers.ContainsKey("X-Forwarded-Host"))
+                    context.Request.PathBase = new PathString(baseUrl.Remove(baseUrl.Length - 1));
+                return next();
+            });
+
+            app.UseForwardedHeaders();
             app.UseCors();
 
             app.UseSwagger(options =>
             {
                 options.RouteTemplate = "api/swagger/{documentname}/swagger.json";
+                options.PreSerializeFilters.Add((swaggerDoc, httpReq) =>
+                {
+                    if (!httpReq.Headers.ContainsKey("X-Forwarded-Host"))
+                        return;
+
+                    var forwardedHost = httpReq.Headers["X-Forwarded-Host"];
+                    var forwardedPort = httpReq.Headers["X-Forwarded-Port"];
+                    swaggerDoc.Servers = new List<OpenApiServer>
+                    {
+                        new OpenApiServer { Url = XForwardedForHelper.BuildUrlString(forwardedHost, forwardedPort, baseUrl) }
+                    };
+                });
             });
 
             app.UseSwaggerUI(options =>
@@ -104,6 +149,7 @@ namespace Scv.Api
                 options.RoutePrefix = "api";
             });
 
+            app.UseMiddleware<AuthenticationMiddleware>();
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
 
             app.UseHttpsRedirection();

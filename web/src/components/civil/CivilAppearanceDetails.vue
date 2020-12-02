@@ -195,7 +195,7 @@
                     responsive="sm"
                     >
                         <template v-for="(field,index) in appearanceMethodsField" v-slot:[`cell(${field.key})`]="data" >                   
-                            <span v-bind:key="index" :class="data.field.cellClass" :style="data.field.cellStyle"><b>{{ data.item.role }}</b> is appearing by {{data.item.method}}. </span>
+                            <span v-bind:key="index" :class="data.field.cellClass" :style="data.field.cellStyle"><b>{{ data.item.role }}</b> is appearing by {{data.item.method}} </span>
                         </template>
                 </b-table>                                       
             </b-col>          
@@ -342,7 +342,7 @@ export default class CivilAppearanceDetails extends Vue {
 
     appearanceMethodsField = 
     [
-        {key:'Key', cellClass:'text-danger', cellStyle:'white-space: pre'}
+        {key:'Key', cellClass:'text-danger', cellStyle:'white-space: pre-line'}
     ]
 
 
@@ -355,7 +355,7 @@ export default class CivilAppearanceDetails extends Vue {
 
     public getAppearanceDetails(): void {      
             
-        this.$http.get('/api/files/civil/'+ this.appearanceInfo.fileNo +'/appearance-detail/'+this.appearanceInfo.appearanceId)
+        this.$http.get('api/files/civil/'+ this.appearanceInfo.fileNo +'/appearance-detail/'+this.appearanceInfo.appearanceId)
             .then(Response => Response.json(), err => {console.log(err);window.alert("bad data!");} )        
             .then(data => {
                 if(data){ 
@@ -523,7 +523,7 @@ export default class CivilAppearanceDetails extends Vue {
     public openDocumentsPdf(documentId): void {
         this.loadingPdf = true;
         const filename = 'doc'+documentId+'.pdf';
-        window.open(`/api/files/document/${documentId}/${filename}?isCriminal=false`)
+        window.open(`${process.env.BASE_URL}api/files/document/${documentId}/${filename}?isCriminal=false`)
         this.loadingPdf = false;
     }
 
@@ -531,7 +531,7 @@ export default class CivilAppearanceDetails extends Vue {
 
         this.loadingPdf = true;        
         const filename = 'court summary_'+appearanceId+'.pdf';
-        window.open(`/api/files/civil/court-summary-report/${appearanceId}/${filename}`)
+        window.open(`${process.env.BASE_URL}api/files/civil/court-summary-report/${appearanceId}/${filename}`)
         this.loadingPdf = false;
     }
 

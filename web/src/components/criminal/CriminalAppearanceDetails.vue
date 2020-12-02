@@ -125,7 +125,7 @@
                             <span v-bind:key="index">
                                 <span 
                                 :class="data.field.cellClass"
-                                :style="data.field.cellStyle"><b>{{ data.item.role }}</b> is appearing by {{data.item.method}}.<br>
+                                :style="data.field.cellStyle"><b>{{ data.item.role }}</b> is appearing by {{data.item.method}}<br>
                                 </span>
                                 <span 
                                 v-if="data.item.phoneNumber.length>0" 
@@ -195,9 +195,6 @@
             </div>                
         </template>
         </b-overlay>
-        
-
-
       </b-card>       
     </b-card>
     <b-modal v-if= "isMounted" v-model="showNotes" id="bv-modal-comment" hide-footer>
@@ -268,7 +265,7 @@ export default class CriminalAppearanceDetails extends Vue {
 
     appearanceMethodsField = 
     [
-        {key:'Key', cellClass:'text-danger', cellStyle:'white-space: pre'}
+        {key:'Key', cellClass:'text-danger', cellStyle:'white-space: pre-line'}
     ]
 
     appearanceFields =  
@@ -287,8 +284,7 @@ export default class CriminalAppearanceDetails extends Vue {
 
     @Prop() tagcasename
     public getAppearanceDetails(): void {      
-    
-        this.$http.get('/api/files/criminal/'+ this.appearanceInfo.fileNo+'/appearance-detail/'+this.appearanceInfo.appearanceId+ '/'+this.appearanceInfo.partId)
+        this.$http.get('api/files/criminal/'+ this.appearanceInfo.fileNo+'/appearance-detail/'+this.appearanceInfo.appearanceId+ '/'+this.appearanceInfo.partId)
             .then(Response => Response.json(), err => {console.log(err);window.alert("bad data!");} )        
             .then(data => {
                 if(data){  
@@ -408,7 +404,7 @@ export default class CriminalAppearanceDetails extends Vue {
         this.loadingPdf = true;
         const imageId = this.initiatingDocuments[0]
         const filename = 'doc'+imageId+'.pdf';
-        window.open(`/api/files/document/${imageId}/${filename}?isCriminal=true`)
+        window.open(`${process.env.BASE_URL}api/files/document/${imageId}/${filename}?isCriminal=true`)
         this.loadingPdf = false;
     }
 
@@ -420,11 +416,11 @@ export default class CriminalAppearanceDetails extends Vue {
         const courtLevel = this.appearanceInfo.courtLevel;
         const courtClass = this.appearanceInfo.courtClass;
       
-        const url =`/api/files/criminal/record-of-proceedings/${partID}/${filename}?profSequenceNumber=${profSeqNo}&courtLevelCode=${courtLevel}&courtClassCode=${courtClass}`;
+        const url =`api/files/criminal/record-of-proceedings/${partID}/${filename}?profSequenceNumber=${profSeqNo}&courtLevelCode=${courtLevel}&courtClassCode=${courtClass}`;
 
         this.$http.get(url)
             .then(() => {
-                window.open(url);
+                window.open(`${process.env.BASE_URL}${url}`);
                 this.loadingROP = false;},
               err => {
                 console.log(err); 

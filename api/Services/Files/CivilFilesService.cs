@@ -60,31 +60,52 @@ namespace Scv.Api.Services.Files
         {
             fcq.FilePermissions =
                 "[\"A\", \"Y\", \"T\", \"F\", \"C\", \"M\", \"L\", \"R\", \"B\", \"D\", \"E\", \"G\", \"H\", \"N\", \"O\", \"P\", \"S\", \"V\"]"; // for now, use all types - TODO: determine proper list of types?
+            //TODO remove A2A and replace with SCV, when the applicationCode has been generated. 
             return await _filesClient.FilesCivilAsync(_requestAgencyIdentifierId, _requestPartId,
-                _requestApplicationCode, fcq.SearchMode, fcq.FileHomeAgencyId, fcq.FileNumber, fcq.FilePrefix,
+                "A2A", fcq.SearchMode, fcq.FileHomeAgencyId, fcq.FileNumber, fcq.FilePrefix,
                 fcq.FilePermissions, fcq.FileSuffixNumber, fcq.MDocReferenceTypeCode, fcq.CourtClass, fcq.CourtLevel,
                 fcq.NameSearchType, fcq.LastName, fcq.OrgName, fcq.GivenName, fcq.Birth?.ToString("yyyy-MM-dd"),
                 fcq.SearchByCrownPartId, fcq.SearchByCrownActiveOnly, fcq.SearchByCrownFileDesignation,
                 fcq.MdocJustinNumberSet, fcq.PhysicalFileIdSet);
         }
 
-        public async Task<RedactedCivilFileDetailResponse> FileDetailByAgencyIdCodeAndFileNumberText(string location,
+        public async Task<List<RedactedCivilFileDetailResponse>> GetFilesByAgencyIdCodeAndFileNumberText(string location,
             string fileNumber)
         {
-            if (!fileNumber.Contains("-"))
-                return null;
-            
-            Enum.TryParse(fileNumber.Split("-")[0], out FileDetailCourtClassCd courtClass);
-            fileNumber = fileNumber.Split("-")[1];
+            var fileDetails = new List<RedactedCivilFileDetailResponse>();
+            FileDetailCourtClassCd courtClass = FileDetailCourtClassCd.A;
+            var courtClassSet = fileNumber.Contains("-") && Enum.TryParse(fileNumber.Split("-")[0], out courtClass);
+            fileNumber = fileNumber.Contains("-") ? fileNumber.Split("-")[1] : fileNumber;
 
-            var fileSearchResponse = await SearchAsync(new FilesCivilQuery { FileHomeAgencyId = location, FileNumber = fileNumber, SearchMode = SearchMode2.FILENO, });
+            var fileSearchResponse = await SearchAsync(new FilesCivilQuery
+            {
+                FileHomeAgencyId = location,
+                FileNumber = fileNumber,
+                SearchMode = SearchMode2.FILENO
+            });
 
-            var targetFile = fileSearchResponse?.FileDetail?.Single(fd => fd.CourtClassCd == courtClass);
-            if (targetFile == null)
-                return null;
+            var targetIds = fileSearchResponse?.FileDetail?.Where(fd => !courtClassSet || fd.CourtClassCd == courtClass)
+                                                           .SelectToList(fd => fd.PhysicalFileId);
 
-            var civilFileDetailResponse = await FileIdAsync(fileSearchResponse.FileDetail.First().PhysicalFileId);
-            return civilFileDetailResponse?.PhysicalFileId == null ? null : civilFileDetailResponse;
+            if (targetIds == null || targetIds.Count == 0)
+                return fileDetails;
+
+            //Return the basic entry without doing a lookup.
+            if (targetIds.Count == 1)
+                return new List<RedactedCivilFileDetailResponse> { new RedactedCivilFileDetailResponse { PhysicalFileId = targetIds.First() }} ;
+
+            var fileDetailTasks = new List<Task<CivilFileDetailResponse>>();
+            foreach (var fileId in targetIds)
+            {
+                async Task<CivilFileDetailResponse> FileDetails() =>
+                    await _filesClient.FilesCivilFileIdAsync(_requestAgencyIdentifierId, _requestPartId, fileId);
+                fileDetailTasks.Add(_cache.GetOrAddAsync($"CivilFileDetail-{fileId}", FileDetails));
+            }
+
+            var fileDetailResponses = await fileDetailTasks.WhenAll();
+            fileDetails = fileDetailResponses.SelectToList(fdr => _mapper.Map<RedactedCivilFileDetailResponse>(fdr));
+
+            return fileDetails;
         }
 
         public async Task<RedactedCivilFileDetailResponse> FileIdAsync(string fileId)
@@ -110,9 +131,11 @@ namespace Scv.Api.Services.Files
 
             detail = await PopulateBaseDetail(detail);
             detail.Appearances = appearances;
-            detail.FileCommentText = fileContent?.CivilFile?.First(cf => cf.PhysicalFileID == fileId).FileCommentText;
+
+            var fileContentCivilFile = fileContent?.CivilFile?.First(cf => cf.PhysicalFileID == fileId);
+            detail.FileCommentText = fileContentCivilFile.FileCommentText;
             detail.Party = await PopulateDetailParties(detail.Party);
-            detail.Document = await PopulateDetailDocuments(detail.Document);
+            detail.Document = await PopulateDetailDocuments(detail.Document, fileContentCivilFile);
             detail.HearingRestriction = await PopulateDetailHearingRestrictions(fileDetail.HearingRestriction);
             return detail;
         }
@@ -156,7 +179,8 @@ namespace Scv.Api.Services.Files
 
             var appearanceDetail = appearances.ApprDetail?.FirstOrDefault(app => app.AppearanceId == appearanceId);
             var fileDetailDocuments = detail.Document.Where(doc => doc.Appearance != null && doc.Appearance.Any(app => app.AppearanceId == appearanceId)).ToList();
-            var previousAppearance = fileContent?.CivilFile?.FirstOrDefault(cf => cf.PhysicalFileID == fileId)?.PreviousAppearance.FirstOrDefault(pa => pa?.AppearanceId == appearanceId);
+            var fileContentCivilFile = fileContent?.CivilFile?.FirstOrDefault(cf => cf.PhysicalFileID == fileId);
+            var previousAppearance = fileContentCivilFile?.PreviousAppearance.FirstOrDefault(pa => pa?.AppearanceId == appearanceId);
 
             var detailedAppearance = new CivilAppearanceDetail
             {
@@ -246,12 +270,14 @@ namespace Scv.Api.Services.Files
             return detail;
         }
 
-        private async Task<ICollection<CivilDocument>> PopulateDetailDocuments(ICollection<CivilDocument> documents)
+        private async Task<ICollection<CivilDocument>> PopulateDetailDocuments(ICollection<CivilDocument> documents, JCCommon.Clients.FileServices.CvfcCivilFile civilFileContent )
         {
             //TODO permission for documents.
             //Populate extra fields for document.
             foreach (var document in documents.Where(doc => doc.Category != "CSR"))
             {
+                var documentFromFileContent = civilFileContent?.Document?.FirstOrDefault(doc => doc.DocumentId == document.CivilDocumentId);
+                document.FiledBy = documentFromFileContent?.FiledBy;
                 document.Category = _lookupService.GetDocumentCategory(document.DocumentTypeCd);
                 document.DocumentTypeDescription = await _lookupService.GetDocumentDescriptionAsync(document.DocumentTypeCd);
                 document.ImageId = document.SealedYN != "N" ? null : document.ImageId;

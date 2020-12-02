@@ -13,8 +13,11 @@ using Scv.Api.Services;
 using Scv.Api.Services.Files;
 using System;
 using System.Linq;
+using System.Reflection.Metadata;
+using Scv.Api.Helpers.Exceptions;
 using tests.api.Helpers;
 using Xunit;
+using System.Diagnostics.CodeAnalysis;
 
 namespace tests.api.Controllers
 {
@@ -28,7 +31,7 @@ namespace tests.api.Controllers
         #region Variables
 
         private readonly FilesController _controller;
-
+        private readonly FileServicesClient _fileServicesClient;
         #endregion Variables
 
         #region Constructor
@@ -41,6 +44,7 @@ namespace tests.api.Controllers
             var lookupServiceClient = new LookupServiceClient(lookupServices.HttpClient);
             var locationServiceClient = new LocationServicesClient(locationServices.HttpClient);
             var fileServicesClient = new FileServicesClient(fileServices.HttpClient);
+            _fileServicesClient = fileServicesClient;
             var lookupService = new LookupService(lookupServices.Configuration, lookupServiceClient, new CachingService());
             var locationService = new LocationService(locationServices.Configuration, locationServiceClient, new CachingService());
             var filesService = new FilesService(fileServices.Configuration, fileServicesClient, new Mapper(), lookupService, locationService, new CachingService());
@@ -52,31 +56,129 @@ namespace tests.api.Controllers
 
         #region Tests
 
+
+        [Fact]
+        public async void Civil_File_Document_Filed_By_Name()
+        {
+            var actionResult = await _controller.GetCivilFileDetailByFileId("3834");
+
+            var fileDetailResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+
+            var document = fileDetailResponse.Document.FirstOrDefault(doc => doc.CivilDocumentId == "10672");
+            Assert.NotNull(document);
+            Assert.Equal(2, document.FiledBy.Count());
+            Assert.NotNull(document.FiledBy.FirstOrDefault());
+            Assert.Equal("CHAMBERS, Martin", document.FiledBy.FirstOrDefault().FiledByName);
+            Assert.Equal("PLA", document.FiledBy.FirstOrDefault().RoleTypeCode);
+        }
+
+
+        [Fact]
+        public async void Civil_File_Services_File_Content()
+        {
+            /* This is the largest civil file on dev. Unfortunately if the WSDL changes for this route, 
+             * it will always return back 200, but a null file. It would have been nice if the server 
+             * would return 500 etc on errors. */
+            var result = await _fileServicesClient.FilesCivilFilecontentAsync(null, null, null, null, "2222");
+            Assert.NotNull(result);
+        }
+
+
+        [Fact]
+        public async void Criminal_File_Details_ByFileNumberText_Three()
+        {
+            var actionResult = await _controller.GetCriminalFileIdsByAgencyIdCodeAndFileNumberText("83.0001", "98050101");
+
+            var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+            Assert.Equal(3, fileSearchResponse.Count);
+        }
+
+        [Fact]
+        public async void Civil_File_Details_ByFileNumberText_Multiple()
+        {
+            var actionResult =
+                await _controller.GetCivilFileIdsByAgencyIdCodeAndFileNumberText("83.0001", "1");
+
+            var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+            Assert.Equal(2, fileSearchResponse.Count);
+        }
+
+        [Fact]
+        public async void Criminal_File_Details_ByFileNumberText_Multiple()
+        {
+            var actionResult =
+                await _controller.GetCriminalFileIdsByAgencyIdCodeAndFileNumberText("83.0001", "58819");
+
+            var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+            Assert.Equal(3, fileSearchResponse.Count);
+        }
+
+        [Fact]
+        public async void Criminal_File_Details_By_FileNumberText_Empty()
+        {
+            var failed = false;
+            try
+            {
+                var actionResult =
+                    await _controller.GetCriminalFileIdsByAgencyIdCodeAndFileNumberText("83.0001", "500-24747474774");
+            }
+            catch (NotFoundException)
+            {
+                failed = true;
+            }
+
+            Assert.True(failed);
+        }
+
+        [Fact]
+        public async void Civil_File_Details_By_FileNumberText_Empty()
+        {
+            var failed = false;
+            try
+            {
+                var actionResult =
+                    await _controller.GetCivilFileIdsByAgencyIdCodeAndFileNumberText("104.0001", "P-24166666666");
+            }
+            catch (NotFoundException)
+            {
+                failed = true;
+            }
+            Assert.True(failed);
+        }
+
         [Fact]
         public async void Criminal_File_Details_By_FileNumberText()
         {
-            var actionResult = await _controller.GetCriminalFileDetailByAgencyIdCodeAndFileNumberText("83.0001","500-2");
+            var actionResult = await _controller.GetCriminalFileIdsByAgencyIdCodeAndFileNumberText("83.0001", "58819-1");
 
             var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
-            Assert.Equal("83.0001", fileSearchResponse.HomeLocationAgenId);
-            Assert.Equal("3001" ,fileSearchResponse.JustinNo);
+            Assert.Contains("3777", fileSearchResponse.First().JustinNo);
         }
 
+
+        [Fact]
+        public async void Civil_File_Details_By_FileNumberText_2()
+        {
+            var actionResult = await _controller.GetCivilFileIdsByAgencyIdCodeAndFileNumberText("83.0001", "S-1");
+
+            var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+            Assert.Contains("1619", fileSearchResponse.First().PhysicalFileId);
+        }
 
         [Fact]
         public async void Civil_File_Details_By_FileNumberText()
         {
-            var actionResult = await _controller.GetCivilFileDetailByAgencyIdCodeAndFileNumberText("104.0001", "P-241");
+            var actionResult = await _controller.GetCivilFileIdsByAgencyIdCodeAndFileNumberText("83.0001", "44459");
 
             var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
-            Assert.Equal("104.0001", fileSearchResponse.HomeLocationAgenId);
-            Assert.Equal("40", fileSearchResponse.PhysicalFileId);
+            Assert.Contains("3059", fileSearchResponse.First().PhysicalFileId);
         }
 
+        
         [Fact]
         public async void Criminal_File_Search_By_LastName()
         {
-            var fcq = new FilesCriminalQuery()
+            var fcq = new FilesCriminalQuery
             {
                 SearchMode = SearchMode.PARTNAME,
                 FileHomeAgencyId = "83.0001",
@@ -91,7 +193,7 @@ namespace tests.api.Controllers
         [Fact]
         public async void Civil_File_Search_By_LastName()
         {
-            var fcq = new FilesCivilQuery()
+            var fcq = new FilesCivilQuery
             {
                 SearchMode = SearchMode2.PARTNAME,
                 FileHomeAgencyId = "83.0001",
@@ -110,7 +212,7 @@ namespace tests.api.Controllers
         [Fact]
         public async void Criminal_File_Search_By_JustinNo()
         {
-            var fcq = new FilesCriminalQuery()
+            var fcq = new FilesCriminalQuery
             {
                 SearchMode = SearchMode.JUSTINNO,
                 FileHomeAgencyId = "83.00001",
@@ -125,7 +227,7 @@ namespace tests.api.Controllers
         [Fact]
         public async void Civil_File_Search_By_PhysicalFileId()
         {
-            var fcq = new FilesCivilQuery()
+            var fcq = new FilesCivilQuery
             {
                 SearchMode = SearchMode2.PHYSID,
                 FileHomeAgencyId = "83.0001",
@@ -250,7 +352,7 @@ namespace tests.api.Controllers
             var actionResult = await _controller.FilesCriminalSearchAsync(fcq);
 
             var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
-            Assert.Equal("2", fileSearchResponse.RecCount);
+            Assert.Equal("3", fileSearchResponse.RecCount);
         }
 
         [Fact]
@@ -474,7 +576,7 @@ namespace tests.api.Controllers
             var civilAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
 
             //Here we have AppearanceMethods, for adjudicator.  Note no data for name.
-            Assert.Equal("VC", civilAppearanceDetail.Adjudicator.AppearanceMethodCd);
+            Assert.Equal("VC", civilAppearanceDetail.Adjudicator?.AppearanceMethodCd);
             Assert.Equal("Video Conference", civilAppearanceDetail.Adjudicator.AppearanceMethodDesc);
             //Also data for applicant.
             Assert.True(civilAppearanceDetail.Party.Where(p => p.PartyRole.Any(pr => pr.RoleTypeCd == "APP"))

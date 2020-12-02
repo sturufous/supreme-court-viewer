@@ -252,7 +252,7 @@ export default class CourtList extends Vue {
     public getListOfAvailableCourts(): void 
     {
         this.errorCode = 0;
-        this.$http.get('/api/location/court-rooms')
+        this.$http.get('api/location/court-rooms')
             .then(Response => Response.json(), err => {this.errorCode= err.status;this.errorText= err.statusText;console.log(err);}        
             ).then(data => {
                 if(data){
@@ -283,7 +283,7 @@ export default class CourtList extends Vue {
         this.totalTimeUnit = 'Hours';
         this.errorCode = 0;
         
-        this.$http.get('/api/courtlist/court-list?agencyId='+ this.courtListLocationID +'&roomCode='+ this.courtListRoom+'&proceeding=' +this.validSelectedDate)
+        this.$http.get('api/courtlist/court-list?agencyId='+ this.courtListLocationID +'&roomCode='+ this.courtListRoom+'&proceeding=' +this.validSelectedDate)
             .then(Response => Response.json(), err => {this.errorCode= err.status;this.errorText= err.statusText;console.log(err);}        
             ).then(data => {
                 if(data){                    

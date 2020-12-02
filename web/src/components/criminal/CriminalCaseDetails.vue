@@ -158,7 +158,7 @@ export default class CriminalCaseDetails extends Vue {
 
     public getFileDetails(): void {
         this.errorCode=0;
-        this.$http.get('/api/files/criminal/'+ this.criminalFileInformation.fileNumber)
+        this.$http.get('api/files/criminal/'+ this.criminalFileInformation.fileNumber)
             .then(Response => Response.json(), err => {this.errorCode= err.status;this.errorText= err.statusText;console.log(err);}        
             ).then(data => {
                 if(data){
@@ -185,8 +185,7 @@ export default class CriminalCaseDetails extends Vue {
                         this.errorCode=200;                    
                 }
                 else
-                    if(this.errorCode==0) this.errorCode=200;
-                    
+                    if(this.errorCode==0) this.errorCode=200;                    
                 
                 this.isMounted = true;
                        

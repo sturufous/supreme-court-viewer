@@ -85,7 +85,6 @@
                             <span v-else>{{ issue }}</span>
                         </li>
                     </template>
-                    
                     <template v-slot:cell(Seq.)="data">
                         <span v-if="data.item.Sealed" class="ml-2 text-muted" :style="data.field.cellStyle"> 
                             {{data.value}}
@@ -94,13 +93,19 @@
                             {{data.value}}
                         </span>
                     </template>
-
-                    <template v-for="(field,index) in fields" v-slot:[`cell(${field.key})`]="data" >
-                    <span class="ml-2" :style="data.field.cellStyle" v-bind:key="index"> 
-                            {{data.value}}
-                    </span>
+                    
+                    <template v-slot:cell()="data">
+                        <span v-if="data.field.key == 'Filed By Name'" >
+                            <li 
+                                v-for="(filed, filedIndex) in data.value"  
+                                v-bind:key="filedIndex"
+                                :style="data.field.cellStyle">{{ filed }}
+                            </li>
+                        </span>
+                        <span v-else class="ml-2" :style="data.field.cellStyle"> 
+                                {{data.value}}
+                        </span>
                     </template>
-
                 </b-table>
             </b-card>
             <template v-slot:overlay>               
@@ -142,7 +147,7 @@ export default class CivilDocumentsView extends Vue {
     categories: string[] = []; 
     fieldsTab = fieldTab.Categories;
     documentPlace = [1,0,1,1]
-    datePlace = [3,1,2,4]
+    datePlace = [3,1,2,4]    
 
     fields = [ 
         [
@@ -151,7 +156,7 @@ export default class CivilDocumentsView extends Vue {
             {key:'Act',            sortable:false, headerStyle:'text',          cellStyle:'display: block; margin-top: 1px; font-size: 14px; max-width : 50px;'},
             {key:'Date Filed',     sortable:true,  headerStyle:'text-danger',   cellStyle:'font-size: 16px;'},
             {key:'Issues',         sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px;'},
-            {key:'Filed By Name',  sortable:false, headerStyle:'text',          cellStyle:'font-size: 16px;'},
+            {key:'Filed By Name',  sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px'},
             {key:'Comment',        sortable:false, headerStyle:'text',          cellStyle:'font-size: 16px;'}
         ],
         [
@@ -163,7 +168,7 @@ export default class CivilDocumentsView extends Vue {
             {key:'Document Type',  sortable:true,  headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 16px;'},
             {key:'Date Filed',     sortable:false, headerStyle:'text-primary',   cellStyle:'font-size: 16px;'},
             {key:'Order Made Date',sortable:true,  headerStyle:'text-primary',   cellStyle:'font-size: 16px;'},
-            {key:'Filed By Name',  sortable:false, headerStyle:'text',          cellStyle:'font-size: 16px;'},
+            {key:'Filed By Name',  sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px'},
             {key:'Comment',        sortable:false, headerStyle:'text',          cellStyle:'font-size: 16px;'}
         ],
         [
@@ -173,7 +178,7 @@ export default class CivilDocumentsView extends Vue {
             {key:'Next Appearance Date', sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
             {key:'Date Filed',           sortable:false, headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
             {key:'Issues',               sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px;'},
-            {key:'Filed By Name',        sortable:false, headerStyle:'text',          cellStyle:'font-size: 16px;'},
+            {key:'Filed By Name',        sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px;'},
             {key:'Comment',              sortable:false, headerStyle:'text',          cellStyle:'font-size: 16px;'}
         ]  
         
@@ -190,9 +195,7 @@ export default class CivilDocumentsView extends Vue {
         this.isMounted = true;
     }
 
-    mounted () { 
-        this.civilFileInformation.fileNumber = this.$route.params.fileNumber
-        this.UpdateCivilFile(this.civilFileInformation);        
+    mounted () {    
         this.getDocuments();        
     }
 
@@ -282,15 +285,15 @@ export default class CivilDocumentsView extends Vue {
     public openDocumentsPdf(documentId): void {
         this.loadingPdf = true;
         const filename = 'doc'+documentId+'.pdf';
-        window.open(`/api/files/document/${documentId}/${filename}?isCriminal=false`)
+        window.open(`${process.env.BASE_URL}api/files/document/${documentId}/${filename}?isCriminal=false`)
         this.loadingPdf = false;
     }
     
     public openCourtSummaryPdf(appearanceId): void {
 
-        this.loadingPdf = true;        
+        this.loadingPdf = true; 
         const filename = 'court summary_'+appearanceId+'.pdf';
-        window.open(`/api/files/civil/court-summary-report/${appearanceId}/${filename}`)
+        window.open(`${process.env.BASE_URL}api/files/civil/court-summary-report/${appearanceId}/${filename}`)
         this.loadingPdf = false;
     }
     

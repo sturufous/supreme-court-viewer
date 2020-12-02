@@ -96,11 +96,15 @@ build-web() {
     -f './nginx-runtime/Dockerfile' './nginx-runtime/'
   echo -e "===================================================================================================="
 
+  # Apparently vue-cli-tools wants WEB_BASE_HREF -> vue.config.js -> publicPath at compile time. 
+  # I tried using __webpack_public_path__, but the CSS file path and JS file path weren't correctly updated. 
+  # Also note we don't load in environment variables from the arguments here. 
   echo -e "\n\n===================================================================================================="
-  echo -e "Building the scv-web-artifacts image using s2i ..."
+  echo -e "Building the scv-web-artifacts image using s2i ... Using WEB_BASE_HREF: ${WEB_BASE_HREF-/scjscv/}"
   echo -e "----------------------------------------------------------------------------------------------------"
   ${S2I_EXE} build \
     --copy \
+	-e "WEB_BASE_HREF=${WEB_BASE_HREF-/scjscv/}" \
     '../web' \
     'centos/nodejs-10-centos7:10' \
     'scv-web-artifacts'
@@ -149,6 +153,7 @@ configureEnvironment () {
 
   # scv-web
   export API_URL=${API_URL-http://api:5000/api/}
+  export WEB_BASE_HREF=${WEB_BASE_HREF-/scjscv/}
 }
 
 getStartupParams() {
@@ -191,7 +196,7 @@ deleteVolumes() {
   docker-compose down -v
 
   _pattern="^${_projectName}_\|^docker_"
-  _volumes=$(docker volume ls -q | grep ${_pattern})
+  _volumes=$(docker volume ls -q | grep ${_pattern} | cat)
 
   if [ ! -z "${_volumes}" ]; then
     echo "Removing project volumes ..."
@@ -238,7 +243,7 @@ case "$COMMAND" in
     if functionExists "build-${buildImage}"; then
       eval "build-${buildImage}"
     else
-      echoError "\nThe build function, build-${buildImage}, does not exist.  Please check your build parameters and try again.\nUse '-h' to get full help details."
+      echo -e "Error:\nThe build function, build-${buildImage}, does not exist.  Please check your build parameters and try again.\nUse '-h' to get full help details."
       exit 1
     fi
     ;;
