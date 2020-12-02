@@ -56,6 +56,26 @@ namespace tests.api.Controllers
 
         #region Tests
 
+        [Fact]
+        public async void Civil_File_With_Reference_Documents()
+        {
+            var actionResult = await _controller.GetCivilFileDetailByFileId("3582");
+
+            var fileDetailResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+
+            var referenceDocuments = fileDetailResponse.ReferenceDocument;
+
+            Assert.NotNull(referenceDocuments);
+            Assert.Equal(2,referenceDocuments.Count);
+            var firstReferenceDocument = referenceDocuments.First();
+
+            Assert.Equal("2020-07-20 00:00:00.0", firstReferenceDocument.AppearanceDate);
+            Assert.Equal("13603", firstReferenceDocument.AppearanceId);
+            Assert.Equal("Reference Document", firstReferenceDocument.DescriptionText);
+            Assert.Equal("3768", firstReferenceDocument.PartyId);
+            Assert.Equal("SCOTSMAN, Flying", firstReferenceDocument.PartyName);
+        }
+
 
         [Fact]
         public async void Civil_File_Document_Filed_By_Name()

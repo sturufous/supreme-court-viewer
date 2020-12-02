@@ -4740,15 +4740,15 @@ namespace JCCommon.Clients.FileServices
         [Newtonsoft.Json.JsonProperty("issueDsc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string IssueDsc { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("concludedYn", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
-        public CvfcIssue2ConcludedYn ConcludedYn { get; set; }
-
         [Newtonsoft.Json.JsonProperty("issueResultCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string IssueResultCd { get; set; }
 
         [Newtonsoft.Json.JsonProperty("issueResultDsc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string IssueResultDsc { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("concludedYn", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        public CvfcIssue2ConcludedYn ConcludedYn { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
@@ -4812,6 +4812,42 @@ namespace JCCommon.Clients.FileServices
 
         [Newtonsoft.Json.JsonProperty("issue", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CvfcIssue2> Issue { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
+
+        [Newtonsoft.Json.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties; }
+            set { _additionalProperties = value; }
+        }
+
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.1.23.0 (Newtonsoft.Json v12.0.0.0)")]
+    public partial class CvfcRefDocument3
+    {
+        [Newtonsoft.Json.JsonProperty("PartyId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string PartyId { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("AppearanceId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string AppearanceId { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("PartyName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string PartyName { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("AppearanceDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string AppearanceDate { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("ObjectGuid", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string ObjectGuid { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("DescriptionText", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string DescriptionText { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("EnterDtm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string EnterDtm { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
@@ -4920,6 +4956,9 @@ namespace JCCommon.Clients.FileServices
 
         [Newtonsoft.Json.JsonProperty("document", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CvfcDocument3> Document { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("referenceDocument", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<CvfcRefDocument3> ReferenceDocument { get; set; }
 
         [Newtonsoft.Json.JsonProperty("appearance", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CvfcAppearance> Appearance { get; set; }
