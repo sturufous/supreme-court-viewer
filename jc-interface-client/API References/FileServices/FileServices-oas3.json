@@ -4053,17 +4053,17 @@
           "issueDsc": {
             "type": "string"
           },
+          "issueResultCd": {
+            "type": "string"
+          },
+          "issueResultDsc": {
+            "type": "string"
+          },
           "concludedYn": {
             "enum": [
               "Y",
               "N"
             ],
-            "type": "string"
-          },
-          "issueResultCd": {
-            "type": "string"
-          },
-          "issueResultDsc": {
             "type": "string"
           }
         }
@@ -4127,6 +4127,32 @@
             "items": {
               "$ref": "#/components/schemas/cvfcIssue2"
             }
+          }
+        }
+      },
+      "cvfcRefDocument3": {
+        "type": "object",
+        "properties": {
+          "PartyId": {
+            "type": "string"
+          },
+          "AppearanceId": {
+            "type": "string"
+          },
+          "PartyName": {
+            "type": "string"
+          },
+          "AppearanceDate": {
+            "type": "string"
+          },
+          "ObjectGuid": {
+            "type": "string"
+          },
+          "DescriptionText": {
+            "type": "string"
+          },
+          "EnterDtm": {
+            "type": "string"
           }
         }
       },
@@ -4249,6 +4275,12 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/cvfcDocument3"
+            }
+          },
+          "referenceDocument": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/cvfcRefDocument3"
             }
           },
           "appearance": {

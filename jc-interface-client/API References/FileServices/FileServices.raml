@@ -3,7 +3,7 @@
 title: JC-Interface - File Services
 version: 0.0.1
 protocols: [HTTPS]
-baseUri:
+baseUri: 
 mediaType: application/json
 securedBy: [basic]
 
@@ -2471,6 +2471,12 @@ schemas:
           "issueDsc" : {
             "type" : "string"
           },
+          "issueResultCd" : {
+            "type" : "string"
+          },
+          "issueResultDsc" : {
+            "type" : "string"
+          },
           "concludedYn" : {
             "type" : "string",
             "enum" : [ "Y", "N" ]
@@ -2542,6 +2548,35 @@ schemas:
           }
         }
       }
+
+  - cvfcRefDocument3: |
+      {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type" : "object",
+        "properties" : {
+          "PartyId" : {
+            "type" : "string"
+          },
+          "AppearanceId" : {
+            "type" : "string"
+          },
+          "PartyName" : {
+            "type" : "string"
+          },
+          "AppearanceDate" : {
+            "type" : "string"
+          },
+          "ObjectGuid" : {
+            "type" : "string"
+          },
+          "DescriptionText" : {
+            "type" : "string"
+          },
+          "EnterDtm" : {
+            "type" : "string"
+          }
+        }
+      }     
 
   - cvfcHearingRestriction2: |
       {
@@ -2635,6 +2670,10 @@ schemas:
           "document" : {
             "type" : "array",
             "items" : { "$ref" : "cvfcDocument3" }
+          },
+          "referenceDocument" : {
+            "type" : "array",
+            "items" : { "$ref" : "cvfcRefDocument3" }
           },
           "appearance" : {
             "type" : "array",
