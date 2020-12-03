@@ -5,11 +5,28 @@
             <h3 class="mx-4 font-weight-normal" v-if="!showSections['Provided Documents']"> Provided Documents ({{NumberOfDocuments}}) </h3>
             <hr class="mx-3 bg-light" style="height: 5px;"/>                   
         </div>
+
+        <b-card v-if="!isDataReady && isMounted">
+            <span class="text-muted ml-4 mb-5"> No provided documents. </span>
+        </b-card>
+
+        <b-card bg-variant="light" v-if= "!isMounted && !isDataReady">
+            <b-overlay :show= "true"> 
+                <b-card  style="min-height: 100px;"/>                   
+                <template v-slot:overlay>               
+                <div> 
+                        <loading-spinner/> 
+                        <p id="loading-label">Loading ...</p>
+                </div>                
+                </template> 
+            </b-overlay> 
+        </b-card>
        
         <b-tabs nav-wrapper-class = "bg-light text-dark"
                 active-nav-item-class="text-uppercase font-weight-bold text-white bg-primary"                     
                 pills
                 no-body
+                v-if="isDataReady"
                 class="mx-3"
                 >
             <b-tab 
@@ -22,7 +39,7 @@
         </b-tabs> 
         
         <b-overlay :show="loadingPdf" rounded="sm">  
-            <b-card bg-variant="light" style="max-height: 500px; overflow-y: auto;" no-body class="mx-3 mb-5">           
+            <b-card bg-variant="light" v-if="isDataReady" style="max-height: 500px; overflow-y: auto;" no-body class="mx-3 mb-5">           
                 <b-table
                 :items="FilteredDocuments"
                 :fields="fields[fieldsTab]"
@@ -112,6 +129,7 @@ export default class CivilProvidedDocumentsView extends Vue {
     documentsDetailsJson;
     loadingPdf = false;
     isMounted = false;
+    isDataReady = false;
     activetab = 'ALL';
     sortDesc = false;
     categories: string[] = []; 
@@ -134,7 +152,10 @@ export default class CivilProvidedDocumentsView extends Vue {
         this.documents = this.civilFileInformation.referenceDocumentInfo;
         this.categories = this.civilFileInformation.providedDocumentCategories;
         this.categories.sort()
-        if(this.categories.indexOf("ALL") < 0) this.categories.unshift("ALL")        
+        if(this.categories.indexOf("ALL") < 0) this.categories.unshift("ALL")
+        if (this.documents.length > 0){
+            this.isDataReady = true;
+        }        
         this.isMounted = true;
     }
 
