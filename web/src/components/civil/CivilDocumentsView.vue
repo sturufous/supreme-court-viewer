@@ -122,6 +122,7 @@
 <script lang="ts">
 import { Component, Vue} from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
+import base64url from "base64url";
 import '@store/modules/CivilFileInformation';
 import {civilFileInformationType, documentsInfoType, summaryDocumentsInfoType} from '../../types/civil';
 const civilState = namespace('CivilFileInformation');
@@ -284,7 +285,8 @@ export default class CivilDocumentsView extends Vue {
 
     public openDocumentsPdf(documentId): void {
         this.loadingPdf = true;
-        const filename = 'doc'+documentId+'.pdf';
+        const filename = 'doc' + documentId + '.pdf';
+        documentId = base64url(documentId);
         window.open(`${process.env.BASE_URL}api/files/document/${documentId}/${filename}?isCriminal=false`)
         this.loadingPdf = false;
     }

@@ -107,6 +107,7 @@
 <script lang="ts">
 import { Component, Vue} from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
+import base64url from "base64url";
 import '@store/modules/CivilFileInformation';
 import {civilFileInformationType, referenceDocumentsInfoType} from '../../types/civil';
 const civilState = namespace('CivilFileInformation');
@@ -165,7 +166,7 @@ export default class CivilProvidedDocumentsView extends Vue {
 
     public cellClick(data)
     {  
-        this.openDocumentsPdf(encodeURIComponent(data.item.objectGuid));
+        this.openDocumentsPdf(data.item.objectGuid);
     }
 
     public navigateToLandingPage() {
@@ -207,6 +208,7 @@ export default class CivilProvidedDocumentsView extends Vue {
     public openDocumentsPdf(documentId): void {
         this.loadingPdf = true;
         const filename = 'doc.pdf';
+        documentId = base64url(documentId);
         window.open(`${process.env.BASE_URL}api/files/document/${documentId}/${filename}?isCriminal=false`)
         this.loadingPdf = false;
     }    

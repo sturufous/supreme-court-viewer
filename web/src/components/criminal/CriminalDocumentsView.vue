@@ -94,6 +94,7 @@ import '@store/modules/CriminalFileInformation';
 import "@store/modules/CommonInformation";
 import {participantFilesInfoType, participantROPInfoType, participantListInfoType, participantDocumentsInfoType, criminalFileInformationType} from '../../types/criminal';
 import {inputNamesType} from '../../types/common'
+import base64url from 'base64url';
 const criminalState = namespace("CriminalFileInformation");
 const commonState = namespace("CommonInformation");
 
@@ -319,7 +320,8 @@ export default class CriminalDocumentsView extends Vue {
 
     public openDocumentsPdf(imageId): void {
         this.loadingPdf = true;
-        const filename = 'doc'+imageId+'.pdf';
+        const filename = 'doc' + imageId + '.pdf';
+        imageId = base64url(imageId);
         window.open(`${process.env.BASE_URL}api/files/document/${imageId}/${filename}?isCriminal=true`)
         this.loadingPdf = false;
     }
