@@ -190,8 +190,8 @@ export default class CivilDocumentsView extends Vue {
         this.summaryDocuments = this.civilFileInformation.summaryDocumentsInfo;
         this.categories = this.civilFileInformation.categories;
         this.categories.sort()
-        if(this.summaryDocuments.length > 0) this.categories.push("COURT SUMMARY")
-        this.categories.unshift("ALL")        
+        if((this.categories.indexOf("COURT SUMMARY") < 0) && this.summaryDocuments.length > 0) this.categories.push("COURT SUMMARY")
+        if(this.categories.indexOf("ALL") < 0) this.categories.unshift("ALL")        
         this.isMounted = true;
     }
 
