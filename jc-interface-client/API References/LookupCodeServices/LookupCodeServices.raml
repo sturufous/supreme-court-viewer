@@ -13,6 +13,18 @@ securitySchemes:
 
 schemas: 
 
+  - adminMessage: |
+     {
+       "$schema": "http://json-schema.org/draft-04/schema#",
+       "type": "object",
+       "properties": {
+         "message": {
+           "id": "message",
+           "type": "string"
+         }
+       }
+     }
+     
   - lookupCode: |
      {
        "$schema": "http://json-schema.org/draft-04/schema#",
@@ -56,7 +68,7 @@ schemas:
        "description": "lookupCodes",
        "items": { "$ref": "lookupCode" }
      }
-
+     
 resourceTypes:
   - readOnlyFilteredCollection:
       get:
@@ -108,11 +120,37 @@ resourceTypes:
                 example: |
                   {"message": "No items matching the given criteria were found."}
 
+/admin: 
+  displayName: Lookup Code Admin
+  
+  /reloadLookups: 
+    put:
+      description: |
+        Used to reload lookups and thus locations manually. Requires a password to execute. 
+      headers:  
+        reloadPassword:
+          description: Valid password to trigger lookup reload.
+          type: string
+          required: true
+      responses:
+        200:
+          body:
+            application/json:
+              schema: adminMessage
+              example: |
+                  {"message": "Success"}
+        403:
+          body:
+            application/json:
+              schema: adminMessage
+              example: |
+                  {"message": "Unauthorized"}
+
 /codes:
   displayName: Lookup Code Resources
   description: |
     A set of resources that provides lookup code information from Justin/CEIS.
-  
+
   /adjudicators:
     type:
       readOnlyCollection:

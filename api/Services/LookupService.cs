@@ -48,168 +48,168 @@ namespace Scv.Api.Services
         private async Task<CodeLookup> GetAgencyLocations()
         {
             return await GetDataFromCache("AgencyLocations",
-                async () => await _lookupClient.CodesAgencyLocationsAsync());
+                async () => await _lookupClient.CodesAgencylocationsAsync());
         }
 
         private async Task<CodeLookup> GetCivilAppearanceReasons()
         {
             return await GetDataFromCache("CivilAppearanceReasons",
-                async () => await _lookupClient.CodesCivilAppearanceReasonsAsync());
+                async () => await _lookupClient.CodesCivilAppearanceReasonsGetAsync());
         }
 
         private async Task<CodeLookup> GetCivilAppearanceResults()
         {
             return await GetDataFromCache("CivilAppearanceResults",
-                async () => await _lookupClient.CodesCivilAppearanceResultsAsync());
+                async () => await _lookupClient.CodesCivilAppearanceResultsGetAsync());
         }
 
         private async Task<CodeLookup> GetCivilAppearanceStatuses()
         {
             return await GetDataFromCache("CivilAppearanceStatuses",
-                async () => await _lookupClient.CodesCivilAppearanceStatusesAsync());
+                async () => await _lookupClient.CodesCivilAppearanceStatusesGetAsync());
         }
 
         private async Task<CodeLookup> GetCivilAssets()
         {
             return await GetDataFromCache("CivilAssetsDescriptions",
-                async () => await _lookupClient.CodesCivilAssetsAsync());
+                async () => await _lookupClient.CodesCivilAssetsGetAsync());
         }
 
         private async Task<CodeLookup> GetCivilCounselAttendanceTypes()
         {
             return await GetDataFromCache("CivilCounselAttendanceTypes", 
-                async () => await _lookupClient.CodesCivilPastAppearancePartyAppearanceMethodCounselAsync());
+                async () => await _lookupClient.CodesCivilPastappearancePartyappearancemethodCounselGetAsync());
         }
         private async Task<CodeLookup> GetCivilDocumentIssueTypes()
         {
             return await GetDataFromCache("GetCivilDocumentIssueTypes", 
-                async () => await _lookupClient.CodesCivilDocumentIssueTypesAsync());
+                async () => await _lookupClient.CodesCivilDocumentIssuetypesGetAsync());
         }
 
         private async Task<CodeLookup> GetCivilDocumentIssueResults()
         {
             return await GetDataFromCache("GetCivilDocumentIssueResults",
-                async () => await _lookupClient.CodesCivilDocumentIssueResultsAsync());
+                async () => await _lookupClient.CodesCivilDocumentIssueresultsGetAsync());
         }
 
         private async Task<CodeLookup> GetCivilPartyAttendanceTypes()
         {
             return await GetDataFromCache("CivilPartyAttendanceTypes",
-                async () => await _lookupClient.CodesCivilPastAppearancePartyAppearanceMethodPartyAttendanceTypesAsync());
+                async () => await _lookupClient.CodesCivilPastappearancePartyappearancemethodPartyattendancetypesGetAsync());
         }
 
         private async Task<CodeLookup> GetComplexityTypeDescription()
         {
             return await GetDataFromCache("ComplexityTypes",
-                async () => await _lookupClient.CodesFileComplexitiesAsync());
+                async () => await _lookupClient.CodesFileComplexitiesGetAsync());
         }
 
         private async Task<CodeLookup> GetCriminalAccusedAttends()
         {
             return await GetDataFromCache("CriminalAccusedAttends", 
-                async () => await _lookupClient.CodesCriminalPastAppearancePartyAppearanceMethodAccusedCounselAsync());
+                async () => await _lookupClient.CodesCriminalPastappearancePartyappearancemethodAccusedcounselGetAsync());
         }
 
         private async Task<CodeLookup> GetCriminalAdjudicatorAttends()
         {
             return await GetDataFromCache("CriminalAdjudicatorAttends", 
-                async () => await _lookupClient.CodesCriminalPastAppearancePartyAppearanceMethodAdjudicatorAsync());
+                async () => await _lookupClient.CodesCriminalPastappearancePartyappearancemethodAdjudicatorGetAsync());
         }
 
         private async Task<CodeLookup> GetCriminalCounselAttends()
         {
             return await GetDataFromCache("CriminalCounselAttends", 
-                async () => await _lookupClient.CodesCriminalPastAppearancePartyAppearanceMethodAccusedCounselAsync());
+                async () => await _lookupClient.CodesCriminalPastappearancePartyappearancemethodAccusedcounselGetAsync());
         }
 
         private async Task<CodeLookup> GetCriminalCrownAttends()
         {
             return await GetDataFromCache("CriminalCrownAttends", 
-                async () => await _lookupClient.CodesCriminalPastAppearancePartyAppearanceMethodCrownAsync());
+                async () => await _lookupClient.CodesCriminalPastappearancePartyappearancemethodCrownGetAsync());
         }
         
         private async Task<CodeLookup> GetCriminalAppearanceReasons()
         {
             return await GetDataFromCache("CriminalAppearanceReasons",
-                async () => await _lookupClient.CodesCriminalAppearanceReasonsAsync());
+                async () => await _lookupClient.CodesCriminalAppearanceReasonsGetAsync());
         }
 
         private async Task<CodeLookup> GetCriminalAppearanceResults()
         {
             return await GetDataFromCache("CriminalAppearanceResults",
-                async () => await _lookupClient.CodesCriminalAppearanceResultsAsync());
+                async () => await _lookupClient.CodesCriminalAppearanceResultsGetAsync());
         }
 
         private async Task<CodeLookup> GetCriminalAppearanceStatuses()
         {
             return await GetDataFromCache("CriminalAppearanceStatuses",
-                async () => await _lookupClient.CodesCriminalAppearanceStatusesAsync());
+                async () => await _lookupClient.CodesCriminalAppearanceStatusesGetAsync());
         }
 
         private async Task<CodeLookup> GetAppearanceDurations()
         {
             return await GetDataFromCache("AppearanceDurations",
-                async () => await _lookupClient.CodesCriminalAppearanceDurationAsync());
+                async () => await _lookupClient.CodesCriminalAppearanceDurationGetAsync());
         }
 
         private async Task<CodeLookup> GetFindings()
         {
             return await GetDataFromCache("Findings", 
-                async () => await _lookupClient.CodesFindingsAsync());
+                async () => await _lookupClient.CodesFindingsGetAsync());
         }
 
         private async Task<CodeLookup> GetCourtClass()
         {
             return await GetDataFromCache("CourtClasses", 
-                async () => await _lookupClient.CodesCourtClassesAsync());
+                async () => await _lookupClient.CodesCourtClassesGetAsync());
         }
 
         private async Task<CodeLookup> GetCourtLevel()
         {
             return await GetDataFromCache("CourtLevels", 
-                async () => await _lookupClient.CodesCourtLevelsAsync());
+                async () => await _lookupClient.CodesCourtLevelsGetAsync());
         }
 
         private async Task<CodeLookup> GetCriminalAssets()
         {
             return await GetDataFromCache("CriminalAssets", 
-                async () => await _lookupClient.CodesCriminalAssetsAsync());
+                async () => await _lookupClient.CodesCriminalAssetsGetAsync());
         }
 
         private async Task<CodeLookup> GetDocuments()
         {
             return await GetDataFromCache("Documents", 
-                async () => await _lookupClient.CodesDocumentsAsync());
+                async () => await _lookupClient.CodesDocumentsGetAsync());
         }
 
         private async Task<CodeLookup> GetRoles()
         {
             return await GetDataFromCache("Roles", 
-                async () => await _lookupClient.CodesRolesAsync());
+                async () => await _lookupClient.CodesRolesGetAsync());
         }
 
         private async Task<CodeLookup> GetParticipantRoles()
         {
             return await GetDataFromCache("ParticipantRoles",
-                async () => await _lookupClient.CodesParticipantRolesAsync());
+                async () => await _lookupClient.CodesParticipantRolesGetAsync());
         }
 
         private async Task<CodeLookup> GetWitnessRoles()
         {
             return await GetDataFromCache("WitnessRoles", 
-                async () => await _lookupClient.CodesWitnessRolesAsync());
+                async () => await _lookupClient.CodesWitnessRolesGetAsync());
         }
 
         private async Task<CodeLookup> GetHearingRestrictions()
         {
             return await GetDataFromCache("HearingRestrictions",
-                async () => await _lookupClient.CodesHearingRestrictionsAsync());
+                async () => await _lookupClient.CodesHearingRestrictionsGetAsync());
         }
 
         private async Task<CodeLookup> GetCriminalSentences()
         {
             return await GetDataFromCache("CriminalSentences",
-                async () => await _lookupClient.CodesCriminalSentencesAsync());
+                async () => await _lookupClient.CodesCriminalSentencesGetAsync());
         }
 
         #endregion Collection Methods

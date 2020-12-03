@@ -1381,6 +1381,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "applicationCd",
+            "in": "query",
+            "description": "The code for the calling application",
+            "schema": {
+              "type": "string"
+            }
           }
         ]
       }
@@ -1428,6 +1436,14 @@
             "in": "header",
             "required": true,
             "description": "Requesting Participant Id",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "applicationCd",
+            "in": "header",
+            "description": "The code for the calling application",
             "schema": {
               "type": "string"
             }
@@ -4152,6 +4168,9 @@
             "type": "string"
           },
           "EnterDtm": {
+            "type": "string"
+          },
+          "ReferenceDocumentTypeDsc": {
             "type": "string"
           }
         }
