@@ -91,6 +91,21 @@ export interface civilDocumentType {
     "additionalProp3": {}        
 }
 
+export interface civilReferenceDocumentJsonType {    
+    PartyId: string,
+    AppearanceId: string,
+    PartyName: string,
+    AppearanceDate: string,
+    ObjectGuid: string,
+    DescriptionText: string,
+    EnterDtm: string,
+    ReferenceDocumentTypeDsc: string,
+    additionalProperties: additionalProperties,
+    additionalProp1: {},
+    additionalProp2: {},
+    additionalProp3: {}
+}
+
 export interface civilHearingRestrictionType {
     "hearingRestrictionTypeDsc": string,
     "hearingRestrictionId": string,
@@ -172,6 +187,7 @@ export interface civilFileDetailsType {
     "fileCommentText": string,
     "party": partyType[],
     "document": civilDocumentType[],
+    "referenceDocument": civilReferenceDocumentJsonType[],
     "hearingRestriction": civilHearingRestrictionType[],
     "appearances": civilAppearancesType
 }
