@@ -127,7 +127,7 @@ namespace Scv.Api.Services
             var fileDetailTasks = new List<Task<CivilFileDetailResponse>>();
             foreach (var fileId in fileIds)
             {
-                async Task<CivilFileDetailResponse> FileDetails() => await _filesClient.FilesCivilFileIdAsync(_requestAgencyIdentifierId, _requestPartId, fileId);
+                async Task<CivilFileDetailResponse> FileDetails() => await _filesClient.FilesCivilFileIdAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode, fileId);
                 fileDetailTasks.Add(_cache.GetOrAddAsync($"CivilFileDetail-{fileId}", FileDetails));
             }
 
@@ -157,7 +157,7 @@ namespace Scv.Api.Services
             foreach (var fileId in fileIds)
             {
                 async Task<CivilFileContent> FileContent() =>
-                    await _filesClient.FilesCivilFilecontentAsync(null, null, null, null, fileId);
+                    await _filesClient.FilesCivilFilecontentAsync(null, null, null, null, fileId, _requestApplicationCode);
                 fileContentTasks.Add(_cache.GetOrAddAsync($"CivilFileContent-{fileId}", FileContent));
             }
 

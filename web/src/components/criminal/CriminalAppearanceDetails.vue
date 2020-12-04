@@ -216,6 +216,7 @@
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { namespace } from "vuex-class";
+import base64url from "base64url";
 import {criminalFileInformationType, appearanceAdditionalInfoType, appearanceMethodDetailsInfoType, appearanceChargesInfoType, criminalAppearanceInfoType, criminalAppearanceMethodsInfoType} from '../../types/criminal';
 import "@store/modules/CriminalFileInformation";
 const criminalState = namespace("CriminalFileInformation");
@@ -402,8 +403,9 @@ export default class CriminalAppearanceDetails extends Vue {
 
     public openDocumentsPdf(): void {
         this.loadingPdf = true;
-        const imageId = this.initiatingDocuments[0]
-        const filename = 'doc'+imageId+'.pdf';
+        let imageId = this.initiatingDocuments[0]
+        const filename = 'doc' + imageId + '.pdf';
+        imageId = base64url(imageId);
         window.open(`${process.env.BASE_URL}api/files/document/${imageId}/${filename}?isCriminal=true`)
         this.loadingPdf = false;
     }

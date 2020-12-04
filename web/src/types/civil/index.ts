@@ -20,7 +20,6 @@ export interface actType {
 }
 
 export interface documentsInfoType {
-
     "Seq.": string,
     "Document Type": string,
     "Concluded": string,
@@ -35,6 +34,17 @@ export interface documentsInfoType {
     "Comment": string,
     "Filed By Name": string[],
     "Date Granted": string
+}
+
+export interface referenceDocumentsInfoType {
+    partyId: string,
+    appearanceId: string,
+    partyName: string,
+    appearanceDate: string,
+    descriptionText: string,
+    enterDtm: string,
+    referenceDocumentTypeDsc: string,
+    objectGuid: string
 }
 
 export interface summaryDocumentsInfoType {
@@ -52,8 +62,10 @@ export interface civilFileInformationType {
     "rightPartiesInfo": partiesInfoType[],
     "isSealed": boolean,
     "documentsInfo": documentsInfoType[],
+    "referenceDocumentInfo": referenceDocumentsInfoType[],
     "summaryDocumentsInfo": summaryDocumentsInfoType[],
-    "categories": string[]
+    "categories": string[],
+    "providedDocumentCategories": string[]
 }
 
 export interface civilAppearanceInfoType {
