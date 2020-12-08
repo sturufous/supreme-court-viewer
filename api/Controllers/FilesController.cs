@@ -9,12 +9,18 @@ using Scv.Api.Models.Civil.Detail;
 using Scv.Api.Models.Criminal.Detail;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
 using System.Threading.Tasks;
+using Scv.Api.Helpers.Extensions;
 using Scv.Api.Services.Files;
 using CivilAppearanceDetail = Scv.Api.Models.Civil.AppearanceDetail.CivilAppearanceDetail;
 using CriminalAppearanceDetail = Scv.Api.Models.Criminal.AppearanceDetail.CriminalAppearanceDetail;
 using System.Text;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.WebUtilities;
+using Scv.Api.Models.Document;
 
 namespace Scv.Api.Controllers
 {
@@ -126,7 +132,14 @@ namespace Scv.Api.Controllers
             if (justinReportResponse.ReportContent == null || justinReportResponse.ReportContent.Length <= 0)
                 throw new NotFoundException("Couldn't find CSR with this appearance id.");
 
-            return BuildFileResponse(justinReportResponse.ReportContent);
+            return BuildPdfFileResponse(justinReportResponse.ReportContent);
+        }
+
+        [HttpPost]
+        [Route("civil/court-summary-report/batch")]
+        public async Task<IActionResult> GetCivilCourtSummaryReports()
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -247,7 +260,14 @@ namespace Scv.Api.Controllers
             if (recordsOfProceeding.B64Content == null || recordsOfProceeding.B64Content.Length <= 0)
                 throw new NotFoundException("Couldn't find ROP with this part id.");
 
-            return BuildFileResponse(recordsOfProceeding.B64Content);
+            return BuildPdfFileResponse(recordsOfProceeding.B64Content);
+        }
+
+        [HttpPost]
+        [Route("criminal/record-of-proceedings/batch")]
+        public async Task<IActionResult> GetRecordsOfProceedings()
+        {
+            throw new NotImplementedException();
         }
 
         #endregion Criminal Only
@@ -269,12 +289,57 @@ namespace Scv.Api.Controllers
             if (documentResponse.B64Content == null || documentResponse.B64Content.Length <= 0)
                 throw new NotFoundException("Couldn't find document with this id.");
 
-            return BuildFileResponse(documentResponse.B64Content);
+            return BuildPdfFileResponse(documentResponse.B64Content);
+        }
+
+        [HttpPost]
+        [Route("document/batch")]
+        public async Task<IActionResult> GetDocuments(DocumentArchiveRequest documentArchiveRequest)
+        {
+            if (string.IsNullOrEmpty(documentArchiveRequest.ZipName))
+                return BadRequest($"Missing {nameof(documentArchiveRequest.ZipName)}.");
+
+            var documentRequest = documentArchiveRequest.DocumentRequest;
+            if (documentRequest.Count >= 50)
+                return BadRequest("Only can support up to 50 documents.");
+
+            var documentIds = documentRequest.SelectToList(dr =>
+                Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(dr.DocumentId)));
+            
+            var documentTasks = documentIds.Select(document => _filesService.DocumentAsync(document, documentArchiveRequest.IsCriminal));
+            var documents = (await documentTasks.WhenAll()).ToList();
+
+            if (documents.Any(d => d.ResultCd == "0"))
+                return BadRequest("One of the documents didn't return correctly.");
+
+            using var outStream = new MemoryStream();
+            using (var archive = new ZipArchive(outStream, ZipArchiveMode.Create, true))
+            {
+                foreach (var document in documents)
+                {
+                    var currentIndex = documents.IndexOf(document);
+                    var documentContent = Convert.FromBase64String(documents[currentIndex].B64Content);
+                    var documentName = documentRequest[currentIndex].PdfFileName;
+                    documentName = documentName.EndsWith(".pdf") ? documentName : $"{documentName}.pdf";
+
+                    await using var entryStream = archive.CreateEntry(documentName, CompressionLevel.Optimal).Open();
+                    await using var fileToCompressStream = new MemoryStream(documentContent);
+                    fileToCompressStream.WriteTo(entryStream);
+                }
+            }
+            return BuildZipFileResponse(outStream.ToArray(), documentArchiveRequest.ZipName);
         }
 
         #region Helpers
 
-        private FileContentResult BuildFileResponse(string content)
+        private FileContentResult BuildZipFileResponse(byte[] content, string name)
+        {
+            Response.Headers.Add("X-Content-Type-Options", "nosniff");
+            name = name.EndsWith(".zip") ? name : $"{name}.zip";
+            return File(content, "application/octet-stream", name);
+        }
+
+        private FileContentResult BuildPdfFileResponse(string content)
         {
             Response.Headers.Add("X-Content-Type-Options", "nosniff");
             return File(Convert.FromBase64String(content), "application/pdf");
