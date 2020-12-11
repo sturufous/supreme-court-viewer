@@ -20,7 +20,7 @@ using CriminalAppearanceDetail = Scv.Api.Models.Criminal.AppearanceDetail.Crimin
 using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.WebUtilities;
-using Scv.Api.Models.Document;
+using Scv.Api.Models.archive;
 
 namespace Scv.Api.Controllers
 {
@@ -137,9 +137,27 @@ namespace Scv.Api.Controllers
 
         [HttpPost]
         [Route("civil/court-summary-report/batch")]
-        public async Task<IActionResult> GetCivilCourtSummaryReports()
+        public async Task<IActionResult> GetCivilCourtSummaryReports(CsrArchiveRequest csrArchiveRequest)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(csrArchiveRequest.ZipName))
+                return BadRequest($"Missing {nameof(csrArchiveRequest.ZipName)}.");
+
+            var courtSummaryRequests = csrArchiveRequest.CSRRequest;
+            if (courtSummaryRequests.Count >= 50)
+                return BadRequest("Only can support up to 50 CSRs.");
+
+            var appearanceIds = courtSummaryRequests.SelectToList(dr => dr.AppearanceId);
+
+            var courtSummaryReportsTasks = appearanceIds.Select(a => _civilFilesService.CourtSummaryReportAsync(a, JustinReportName.CEISR035));
+            var courtSummaryReports = (await courtSummaryReportsTasks.WhenAll()).ToList();
+
+            if (courtSummaryReports.Any(d => d.ResponseCd == "0"))
+                return BadRequest("One of the documents didn't return correctly.");
+
+            var pdfDocuments = courtSummaryReports.Select(d => new PdfDocument
+                { Content = d.ReportContent, FileName = courtSummaryRequests[courtSummaryReports.IndexOf(d)].PdfFileName });
+
+            return await BuildArchiveWithPdfFiles(pdfDocuments, csrArchiveRequest.ZipName);
         }
 
         /// <summary>
@@ -265,9 +283,29 @@ namespace Scv.Api.Controllers
 
         [HttpPost]
         [Route("criminal/record-of-proceedings/batch")]
-        public async Task<IActionResult> GetRecordsOfProceedings()
+        public async Task<IActionResult> GetRecordsOfProceedings(RopArchiveRequest ropArchiveRequest)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(ropArchiveRequest.ZipName)) 
+                return BadRequest($"Missing {nameof(ropArchiveRequest.ZipName)}.");
+            if (ropArchiveRequest.ROPRequest.Count >= 50) 
+                return BadRequest("Only can support up to 50 ROPs.");
+
+            var ropRequests = ropArchiveRequest.ROPRequest;
+            var ropRequestTasks = ropRequests.SelectToList(dr => 
+                _criminalFilesService.RecordOfProceedingsAsync(dr.PartId,
+                dr.ProfSequenceNumber,
+                dr.CourtLevelCode,
+                dr.CourtClassCode));
+
+            var rops = (await ropRequestTasks.WhenAll()).ToList();
+
+            if (rops.Any(d => d.ResultCd == "0"))
+                return BadRequest("One of the documents didn't return correctly.");
+
+            var pdfDocuments = rops.Select(d => new PdfDocument
+                { Content = d.B64Content, FileName = ropRequests[rops.IndexOf(d)].PdfFileName });
+
+            return await BuildArchiveWithPdfFiles(pdfDocuments, ropArchiveRequest.ZipName);
         }
 
         #endregion Criminal Only
@@ -296,13 +334,10 @@ namespace Scv.Api.Controllers
         [Route("document/batch")]
         public async Task<IActionResult> GetDocuments(DocumentArchiveRequest documentArchiveRequest)
         {
-            if (string.IsNullOrEmpty(documentArchiveRequest.ZipName))
-                return BadRequest($"Missing {nameof(documentArchiveRequest.ZipName)}.");
+            if (string.IsNullOrEmpty(documentArchiveRequest.ZipName)) return BadRequest($"Missing {nameof(documentArchiveRequest.ZipName)}.");
+            if (documentArchiveRequest.DocumentRequest.Count >= 50)   return BadRequest("Only can support up to 50 documents.");
 
             var documentRequest = documentArchiveRequest.DocumentRequest;
-            if (documentRequest.Count >= 50)
-                return BadRequest("Only can support up to 50 documents.");
-
             var documentIds = documentRequest.SelectToList(dr =>
                 Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(dr.DocumentId)));
             
@@ -312,14 +347,23 @@ namespace Scv.Api.Controllers
             if (documents.Any(d => d.ResultCd == "0"))
                 return BadRequest("One of the documents didn't return correctly.");
 
-            using var outStream = new MemoryStream();
+            var pdfDocuments = documents.Select(d => new PdfDocument
+                {Content = d.B64Content, FileName = documentRequest[documents.IndexOf(d)].PdfFileName});
+
+            return await BuildArchiveWithPdfFiles(pdfDocuments, documentArchiveRequest.ZipName);
+        }
+
+        #region Helpers
+
+        private async Task<FileContentResult> BuildArchiveWithPdfFiles(IEnumerable<PdfDocument> pdfDocuments, string zipName)
+        {
+            await using var outStream = new MemoryStream();
             using (var archive = new ZipArchive(outStream, ZipArchiveMode.Create, true))
             {
-                foreach (var document in documents)
+                foreach (var document in pdfDocuments)
                 {
-                    var currentIndex = documents.IndexOf(document);
-                    var documentContent = Convert.FromBase64String(documents[currentIndex].B64Content);
-                    var documentName = documentRequest[currentIndex].PdfFileName;
+                    var documentContent = Convert.FromBase64String(document.Content);
+                    var documentName = document.FileName;
                     documentName = documentName.EndsWith(".pdf") ? documentName : $"{documentName}.pdf";
 
                     await using var entryStream = archive.CreateEntry(documentName, CompressionLevel.Optimal).Open();
@@ -327,10 +371,8 @@ namespace Scv.Api.Controllers
                     fileToCompressStream.WriteTo(entryStream);
                 }
             }
-            return BuildZipFileResponse(outStream.ToArray(), documentArchiveRequest.ZipName);
+            return BuildZipFileResponse(outStream.ToArray(), zipName);
         }
-
-        #region Helpers
 
         private FileContentResult BuildZipFileResponse(byte[] content, string name)
         {
