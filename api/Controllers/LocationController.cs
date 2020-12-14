@@ -40,7 +40,7 @@ namespace Scv.Api.Controllers
 
             foreach (var location in locationList)
             {
-                location.CourtRooms = courtRooms.Where(cr => cr.Flex == location.LocationId && cr.ShortDesc == "CRT")
+                location.CourtRooms = courtRooms.Where(cr => cr.Flex == location.LocationId)
                     .Select(cr => new CourtRoom {LocationId = cr.Flex, Room = cr.Code, Type = cr.ShortDesc}).ToList();
             }
 
