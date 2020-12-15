@@ -2,7 +2,7 @@
 <div>
    <b-card  v-if= "isMounted" no-body>
         <div>         
-            <h3 class="mx-4 font-weight-normal"> Documents ({{NumberOfDocuments}}) </h3>
+            <h3 class="mx-4 font-weight-normal" v-if="!showSections['Documents']"> Documents ({{NumberOfDocuments}}) </h3>
             <hr class="mx-3 bg-light" style="height: 5px;"/>                   
         </div>
        
@@ -132,6 +132,9 @@ enum fieldTab {Categories=0, Summary, Orders, Scheduled}
 @Component
 export default class CivilDocumentsView extends Vue {
 
+    @civilState.State
+    public showSections
+    
     @civilState.State
     public civilFileInformation!: civilFileInformationType
 

@@ -40,8 +40,8 @@
                 <civil-parties v-if="showCaseDetails"/>
                 <civil-adjudicator-restrictions v-if="showCaseDetails"/>
                 <civil-comment-notes v-if="showCaseDetails"/>
-                <civil-documents-view v-if="showCaseDetails"/>
-                <civil-provided-documents-view v-if="showProvidedDocuments"/>            
+                <civil-documents-view v-if="showDocuments || showAllDocuments"/>
+                <civil-provided-documents-view v-if="showProvidedDocuments || showAllDocuments"/>            
                 <civil-past-appearances v-if="showPastAppearances" />
                 <civil-future-appearances v-if="showFutureAppearances" />
                 <b-card><br></b-card>  
@@ -134,7 +134,7 @@ export default class CivilCaseDetails extends Vue {
     categories: string[] = [];
     providedDocumentCategories: string[] = [];
     sidePanelTitles = [ 
-       'Case Details', 'Future Appearances', 'Past Appearances', 'Provided Documents'   
+       'Case Details', 'Future Appearances', 'Past Appearances', 'All Documents', 'Documents', 'Provided Documents'   
     ];
     
     mounted () {
@@ -214,6 +214,16 @@ export default class CivilCaseDetails extends Vue {
     get showProvidedDocuments()
     {        
         return ((this.showSections['Case Details'] || this.showSections['Provided Documents'] ) && this.isDataReady)
+    }
+
+    get showDocuments()
+    {        
+        return ((this.showSections['Case Details'] || this.showSections['Documents'] ) && this.isDataReady)
+    }
+
+    get showAllDocuments()
+    {        
+        return ((this.showSections['Case Details'] || this.showSections['All Documents'] ) && this.isDataReady)
     }
 
     public ExtractCaseInfo(): void {
