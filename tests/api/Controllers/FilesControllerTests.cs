@@ -11,13 +11,17 @@ using Scv.Api.Controllers;
 using Scv.Api.Services;
 using Scv.Api.Services.Files;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Scv.Api.Helpers.Exceptions;
 using tests.api.Helpers;
 using Xunit;
 using System.Text;
+using System.Threading.Tasks;
 using JCCommon.Clients.LookupCodeServices;
 using Microsoft.AspNetCore.WebUtilities;
+using Newtonsoft.Json;
+using Scv.Api.Models.archive;
 
 namespace tests.api.Controllers
 {
@@ -674,6 +678,54 @@ namespace tests.api.Controllers
             Assert.NotNull(party);
             Assert.Equal("P", party.PartyAppearanceMethod);
             Assert.Equal("Present", party.PartyAppearanceMethodDesc);
+        }
+
+        [Fact]
+        public async Task Get_Archive()
+        {
+            var archiveRequest = new ArchiveRequest
+            {
+                ZipName = "Hello.zip",
+                CsrRequests = new List<CsrRequest>
+                {
+                    new CsrRequest
+                    {
+                        AppearanceId = "984",
+                        PdfFileName = "test123.pdf"
+                    }
+                },
+                DocumentRequests = new List<DocumentRequest>
+                {
+                    new DocumentRequest
+                    {
+                        Base64UrlEncodedDocumentId = "MzUyMi4wNzM0",
+                        IsCriminal = true,
+                        PdfFileName = "55"
+                    },
+                    new DocumentRequest
+                    {
+                        Base64UrlEncodedDocumentId = "R2VXekdJRG1HTVV1LiNDR01LdjkuaWBFfGFoUCdQXl56PnFLKltzZlV3PU0iOlp4ZilmIydBSSg5Mk8yYWRFJ1ZHQTlfNy4zNjgyNDYwMDAuMDc0NzExLjI0NTkxODQuLiNDNA",
+                        IsCriminal = false,
+                        PdfFileName = "4646363"
+                    }
+                },
+                RopRequests = new List<RopRequest>
+                {
+                    new RopRequest
+                    {
+                        CourtLevelCode = CourtLevelCd.P,
+                        CourtClassCode = CourtClassCd.A,
+                        PartId = "12971.0026",
+                        PdfFileName = "ropTest.pdf",
+                        ProfSequenceNumber = "24"
+                    }
+                }
+            };
+
+            var actionResult = await _controller.GetArchive(archiveRequest) as FileContentResult;
+            Assert.NotNull(actionResult);
+            Assert.Equal("Hello.zip", actionResult.FileDownloadName);
+            Assert.True(actionResult.FileContents.Length > 0);
         }
 
         [Fact(Skip = "Adhoc Test")]
