@@ -20,6 +20,7 @@ using CriminalAppearanceDetail = Scv.Api.Models.Criminal.AppearanceDetail.Crimin
 using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.WebUtilities;
+using Scv.Api.Helpers;
 using Scv.Api.Models.archive;
 
 namespace Scv.Api.Controllers
@@ -133,31 +134,6 @@ namespace Scv.Api.Controllers
                 throw new NotFoundException("Couldn't find CSR with this appearance id.");
 
             return BuildPdfFileResponse(justinReportResponse.ReportContent);
-        }
-
-        [HttpPost]
-        [Route("civil/court-summary-report/batch")]
-        public async Task<IActionResult> GetCivilCourtSummaryReports(CsrArchiveRequest csrArchiveRequest)
-        {
-            if (string.IsNullOrEmpty(csrArchiveRequest.ZipName))
-                return BadRequest($"Missing {nameof(csrArchiveRequest.ZipName)}.");
-
-            var courtSummaryRequests = csrArchiveRequest.CSRRequest;
-            if (courtSummaryRequests.Count >= 50)
-                return BadRequest("Only can support up to 50 CSRs.");
-
-            var appearanceIds = courtSummaryRequests.SelectToList(dr => dr.AppearanceId);
-
-            var courtSummaryReportsTasks = appearanceIds.Select(a => _civilFilesService.CourtSummaryReportAsync(a, JustinReportName.CEISR035));
-            var courtSummaryReports = (await courtSummaryReportsTasks.WhenAll()).ToList();
-
-            if (courtSummaryReports.Any(d => d.ResponseCd == "0"))
-                return BadRequest("One of the documents didn't return correctly.");
-
-            var pdfDocuments = courtSummaryReports.Select(d => new PdfDocument
-                { Content = d.ReportContent, FileName = courtSummaryRequests[courtSummaryReports.IndexOf(d)].PdfFileName });
-
-            return await BuildArchiveWithPdfFiles(pdfDocuments, csrArchiveRequest.ZipName);
         }
 
         /// <summary>
@@ -281,32 +257,6 @@ namespace Scv.Api.Controllers
             return BuildPdfFileResponse(recordsOfProceeding.B64Content);
         }
 
-        [HttpPost]
-        [Route("criminal/record-of-proceedings/batch")]
-        public async Task<IActionResult> GetRecordsOfProceedings(RopArchiveRequest ropArchiveRequest)
-        {
-            if (string.IsNullOrEmpty(ropArchiveRequest.ZipName)) 
-                return BadRequest($"Missing {nameof(ropArchiveRequest.ZipName)}.");
-            if (ropArchiveRequest.ROPRequest.Count >= 50) 
-                return BadRequest("Only can support up to 50 ROPs.");
-
-            var ropRequests = ropArchiveRequest.ROPRequest;
-            var ropRequestTasks = ropRequests.SelectToList(dr => 
-                _criminalFilesService.RecordOfProceedingsAsync(dr.PartId,
-                dr.ProfSequenceNumber,
-                dr.CourtLevelCode,
-                dr.CourtClassCode));
-
-            var rops = (await ropRequestTasks.WhenAll()).ToList();
-
-            if (rops.Any(d => d.ResultCd == "0"))
-                return BadRequest("One of the documents didn't return correctly.");
-
-            var pdfDocuments = rops.Select(d => new PdfDocument
-                { Content = d.B64Content, FileName = ropRequests[rops.IndexOf(d)].PdfFileName });
-
-            return await BuildArchiveWithPdfFiles(pdfDocuments, ropArchiveRequest.ZipName);
-        }
 
         #endregion Criminal Only
 
@@ -331,26 +281,47 @@ namespace Scv.Api.Controllers
         }
 
         [HttpPost]
-        [Route("document/batch")]
-        public async Task<IActionResult> GetDocuments(DocumentArchiveRequest documentArchiveRequest)
+        [Route("archive")]
+        public async Task<IActionResult> GetArchive(ArchiveRequest archiveRequest)
         {
-            if (string.IsNullOrEmpty(documentArchiveRequest.ZipName)) return BadRequest($"Missing {nameof(documentArchiveRequest.ZipName)}.");
-            if (documentArchiveRequest.DocumentRequest.Count >= 50)   return BadRequest("Only can support up to 50 documents.");
+            var maximumArchiveDocumentCount = _configuration.GetNonEmptyValue("MaximumArchiveDocumentCount");
+            if (string.IsNullOrEmpty(archiveRequest.ZipName)) return BadRequest($"Missing {nameof(archiveRequest.ZipName)}.");
+            if (archiveRequest.TotalDocuments >= int.Parse(maximumArchiveDocumentCount))   return BadRequest($"Only can support up to {maximumArchiveDocumentCount} documents.");
 
-            var documentRequest = documentArchiveRequest.DocumentRequest;
-            var documentIds = documentRequest.SelectToList(dr =>
-                Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(dr.DocumentId)));
-            
-            var documentTasks = documentIds.Select(document => _filesService.DocumentAsync(document, documentArchiveRequest.IsCriminal));
+            var courtSummaryRequests = archiveRequest.CsrRequests;
+            var documentRequest = archiveRequest.DocumentRequests;
+            var ropRequests = archiveRequest.RopRequests;
+
+            var courtSummaryReportsTasks = courtSummaryRequests.Select(a => _civilFilesService.CourtSummaryReportAsync(
+                a.AppearanceId,
+                JustinReportName.CEISR035));
+            var documentTasks = documentRequest.Select(d => _filesService.DocumentAsync(
+                Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(d.Base64UrlEncodedDocumentId)),
+                d.IsCriminal));
+            var ropRequestTasks = ropRequests.SelectToList(dr =>
+                _criminalFilesService.RecordOfProceedingsAsync(dr.PartId,
+                    dr.ProfSequenceNumber,
+                    dr.CourtLevelCode,
+                    dr.CourtClassCode));
+
+            var courtSummaryReports = (await courtSummaryReportsTasks.WhenAll()).ToList();
             var documents = (await documentTasks.WhenAll()).ToList();
+            var rops = (await ropRequestTasks.WhenAll()).ToList();
 
-            if (documents.Any(d => d.ResultCd == "0"))
-                return BadRequest("One of the documents didn't return correctly.");
+            if (courtSummaryReports.Any(d => d.ResponseCd != "0")) return BadRequest("One of the CSRS didn't return correctly.");
+            if (documents.Any(d => d.ResultCd == "0")) return BadRequest("One of the documents didn't return correctly.");
+            if (rops.Any(d => d.ResultCd == "0")) return BadRequest("One of the ROPs didn't return correctly.");
 
-            var pdfDocuments = documents.Select(d => new PdfDocument
-                {Content = d.B64Content, FileName = documentRequest[documents.IndexOf(d)].PdfFileName});
+            var pdfDocuments = courtSummaryReports.SelectToList(d => new PdfDocument
+                { Content = d.ReportContent, FileName = courtSummaryRequests[courtSummaryReports.IndexOf(d)].PdfFileName });
 
-            return await BuildArchiveWithPdfFiles(pdfDocuments, documentArchiveRequest.ZipName);
+            pdfDocuments.AddRange(documents.SelectToList(d => new PdfDocument
+                {Content = d.B64Content, FileName = documentRequest[documents.IndexOf(d)].PdfFileName}));
+
+            pdfDocuments.AddRange(rops.Select(d => new PdfDocument
+                { Content = d.B64Content, FileName = ropRequests[rops.IndexOf(d)].PdfFileName }));
+
+            return await BuildArchiveWithPdfFiles(pdfDocuments, archiveRequest.ZipName);
         }
 
         #region Helpers

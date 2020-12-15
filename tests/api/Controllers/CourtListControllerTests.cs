@@ -2,7 +2,7 @@
 using System.Linq;
 using JCCommon.Clients.FileServices;
 using JCCommon.Clients.LocationServices;
-using JCCommon.Clients.LookupServices;
+using JCCommon.Clients.LookupCodeServices;
 using LazyCache;
 using MapsterMapper;
 using Scv.Api.Controllers;
@@ -27,7 +27,7 @@ namespace tests.api.Controllers
             var fileServices = new EnvironmentBuilder("FileServicesClient:Username", "FileServicesClient:Password", "FileServicesClient:Url");
             var lookupServices = new EnvironmentBuilder("LookupServicesClient:Username", "LookupServicesClient:Password", "LookupServicesClient:Url");
             var locationServices = new EnvironmentBuilder("LocationServicesClient:Username", "LocationServicesClient:Password", "LocationServicesClient:Url");
-            var lookupServiceClient = new LookupServiceClient(lookupServices.HttpClient);
+            var lookupServiceClient = new LookupCodeServicesClient(lookupServices.HttpClient);
             var locationServiceClient = new LocationServicesClient(locationServices.HttpClient);
             var fileServicesClient = new FileServicesClient(fileServices.HttpClient);
             var lookupService = new LookupService(lookupServices.Configuration, lookupServiceClient, new CachingService());

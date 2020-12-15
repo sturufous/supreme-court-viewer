@@ -14,45 +14,45 @@
 namespace JCCommon.Clients.FileServices
 {
     using System = global::System;
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.9.4.0 (NJsonSchema v10.3.1.0 (Newtonsoft.Json v12.0.0.0))")]
-    public partial class FileServicesClient
+    public partial class FileServicesClient 
     {
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<Newtonsoft.Json.JsonSerializerSettings> _settings;
-
+    
         public FileServicesClient(System.Net.Http.HttpClient httpClient)
         {
-            _httpClient = httpClient;
+            _httpClient = httpClient; 
             _settings = new System.Lazy<Newtonsoft.Json.JsonSerializerSettings>(CreateSerializerSettings);
         }
-
+    
         private Newtonsoft.Json.JsonSerializerSettings CreateSerializerSettings()
         {
             var settings = new Newtonsoft.Json.JsonSerializerSettings();
             UpdateJsonSerializerSettings(settings);
             return settings;
         }
-
-
+    
+    
         public Newtonsoft.Json.JsonSerializerSettings JsonSerializerSettings { get { return _settings.Value; } }
-
+    
         partial void UpdateJsonSerializerSettings(Newtonsoft.Json.JsonSerializerSettings settings);
         partial void PrepareRequest(System.Net.Http.HttpClient client, System.Net.Http.HttpRequestMessage request, string url);
         partial void PrepareRequest(System.Net.Http.HttpClient client, System.Net.Http.HttpRequestMessage request, System.Text.StringBuilder urlBuilder);
         partial void ProcessResponse(System.Net.Http.HttpClient client, System.Net.Http.HttpResponseMessage response);
-
+    
         /// <param name="requestAgencyId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
         /// <param name="agencyCode">Agency Code; for example 83.0001 (Kelowna).</param>
         /// <param name="appearanceDt">The appearance date in the format YYYY-MM-dd</param>
         /// <param name="roomCd">Court room code</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<CourtCalendarDetailByDay> FilesCourtCalendarDetailsByDayAsync(string requestAgencyId, string requestPartId, string agencyCode, string appearanceDt, string roomCd)
+        public System.Threading.Tasks.Task<CourtCalendarDetailByDay> FilesCourtcalendardetailsbydayAsync(string requestAgencyId, string requestPartId, string agencyCode, string appearanceDt, string roomCd)
         {
-            return FilesCourtCalendarDetailsByDayAsync(requestAgencyId, requestPartId, agencyCode, appearanceDt, roomCd, System.Threading.CancellationToken.None);
+            return FilesCourtcalendardetailsbydayAsync(requestAgencyId, requestPartId, agencyCode, appearanceDt, roomCd, System.Threading.CancellationToken.None);
         }
-
+    
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="requestAgencyId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
@@ -60,23 +60,23 @@ namespace JCCommon.Clients.FileServices
         /// <param name="appearanceDt">The appearance date in the format YYYY-MM-dd</param>
         /// <param name="roomCd">Court room code</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<CourtCalendarDetailByDay> FilesCourtCalendarDetailsByDayAsync(string requestAgencyId, string requestPartId, string agencyCode, string appearanceDt, string roomCd, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<CourtCalendarDetailByDay> FilesCourtcalendardetailsbydayAsync(string requestAgencyId, string requestPartId, string agencyCode, string appearanceDt, string roomCd, System.Threading.CancellationToken cancellationToken)
         {
             if (requestAgencyId == null)
                 throw new System.ArgumentNullException("requestAgencyId");
-
+    
             if (requestPartId == null)
                 throw new System.ArgumentNullException("requestPartId");
-
+    
             if (agencyCode == null)
                 throw new System.ArgumentNullException("agencyCode");
-
+    
             if (appearanceDt == null)
                 throw new System.ArgumentNullException("appearanceDt");
-
+    
             if (roomCd == null)
                 throw new System.ArgumentNullException("roomCd");
-
+    
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("files/courtCalendarDetailsByDay?");
             urlBuilder_.Append(System.Uri.EscapeDataString("requestAgencyId") + "=").Append(System.Uri.EscapeDataString(ConvertToString(requestAgencyId, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
@@ -85,7 +85,7 @@ namespace JCCommon.Clients.FileServices
             urlBuilder_.Append(System.Uri.EscapeDataString("appearanceDt") + "=").Append(System.Uri.EscapeDataString(ConvertToString(appearanceDt, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             urlBuilder_.Append(System.Uri.EscapeDataString("roomCd") + "=").Append(System.Uri.EscapeDataString(ConvertToString(roomCd, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             urlBuilder_.Length--;
-
+    
             var client_ = _httpClient;
             var disposeClient_ = false;
             try
@@ -94,12 +94,12 @@ namespace JCCommon.Clients.FileServices
                 {
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
+    
                     PrepareRequest(client_, request_, urlBuilder_);
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
                     PrepareRequest(client_, request_, url_);
-
+    
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
                     try
@@ -110,9 +110,9 @@ namespace JCCommon.Clients.FileServices
                             foreach (var item_ in response_.Content.Headers)
                                 headers_[item_.Key] = item_.Value;
                         }
-
+    
                         ProcessResponse(client_, response_);
-
+    
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
@@ -135,7 +135,7 @@ namespace JCCommon.Clients.FileServices
                         }
                         else
                         {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
                             throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
@@ -152,7 +152,7 @@ namespace JCCommon.Clients.FileServices
                     client_.Dispose();
             }
         }
-
+    
         /// <param name="agencyId">Agency Identifier Code (Location Code); for example 4801 (Kelowna).</param>
         /// <param name="proceedingDt">The proceeding date in the format YYYY-MM-dd</param>
         /// <param name="divisionCd">The division code; CR, or CV.</param>
@@ -162,7 +162,7 @@ namespace JCCommon.Clients.FileServices
         {
             return FilesCourtlistAsync(agencyId, roomCd, proceedingDt, divisionCd, fileNumber, System.Threading.CancellationToken.None);
         }
-
+    
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="agencyId">Agency Identifier Code (Location Code); for example 4801 (Kelowna).</param>
         /// <param name="proceedingDt">The proceeding date in the format YYYY-MM-dd</param>
@@ -173,28 +173,28 @@ namespace JCCommon.Clients.FileServices
         {
             if (agencyId == null)
                 throw new System.ArgumentNullException("agencyId");
-
+    
             if (roomCd == null)
                 throw new System.ArgumentNullException("roomCd");
-
+    
             if (proceedingDt == null)
                 throw new System.ArgumentNullException("proceedingDt");
-
+    
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("files/courtlist?");
             urlBuilder_.Append(System.Uri.EscapeDataString("agencyId") + "=").Append(System.Uri.EscapeDataString(ConvertToString(agencyId, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             urlBuilder_.Append(System.Uri.EscapeDataString("roomCd") + "=").Append(System.Uri.EscapeDataString(ConvertToString(roomCd, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             urlBuilder_.Append(System.Uri.EscapeDataString("proceedingDt") + "=").Append(System.Uri.EscapeDataString(ConvertToString(proceedingDt, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
-            if (divisionCd != null)
+            if (divisionCd != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("divisionCd") + "=").Append(System.Uri.EscapeDataString(ConvertToString(divisionCd, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (fileNumber != null)
+            if (fileNumber != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("fileNumber") + "=").Append(System.Uri.EscapeDataString(ConvertToString(fileNumber, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
             urlBuilder_.Length--;
-
+    
             var client_ = _httpClient;
             var disposeClient_ = false;
             try
@@ -203,12 +203,12 @@ namespace JCCommon.Clients.FileServices
                 {
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
+    
                     PrepareRequest(client_, request_, urlBuilder_);
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
                     PrepareRequest(client_, request_, url_);
-
+    
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
                     try
@@ -219,9 +219,9 @@ namespace JCCommon.Clients.FileServices
                             foreach (var item_ in response_.Content.Headers)
                                 headers_[item_.Key] = item_.Value;
                         }
-
+    
                         ProcessResponse(client_, response_);
-
+    
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
@@ -244,7 +244,7 @@ namespace JCCommon.Clients.FileServices
                         }
                         else
                         {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
                             throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
@@ -261,33 +261,33 @@ namespace JCCommon.Clients.FileServices
                     client_.Dispose();
             }
         }
-
+    
         /// <param name="partId">The participant id associated to the Record Of Proceedings.</param>
         /// <param name="courtLevelCd">The associated court level code.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<RopResponse> FilesRecordOfProceedingsAsync(string partId, string profSeqNo, CourtLevelCd courtLevelCd, CourtClassCd courtClassCd)
+        public System.Threading.Tasks.Task<RopResponse> FilesRecordofproceedingsAsync(string partId, string profSeqNo, CourtLevelCd courtLevelCd, CourtClassCd courtClassCd)
         {
-            return FilesRecordOfProceedingsAsync(partId, profSeqNo, courtLevelCd, courtClassCd, System.Threading.CancellationToken.None);
+            return FilesRecordofproceedingsAsync(partId, profSeqNo, courtLevelCd, courtClassCd, System.Threading.CancellationToken.None);
         }
-
+    
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="partId">The participant id associated to the Record Of Proceedings.</param>
         /// <param name="courtLevelCd">The associated court level code.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<RopResponse> FilesRecordOfProceedingsAsync(string partId, string profSeqNo, CourtLevelCd courtLevelCd, CourtClassCd courtClassCd, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<RopResponse> FilesRecordofproceedingsAsync(string partId, string profSeqNo, CourtLevelCd courtLevelCd, CourtClassCd courtClassCd, System.Threading.CancellationToken cancellationToken)
         {
             if (partId == null)
                 throw new System.ArgumentNullException("partId");
-
+    
             if (profSeqNo == null)
                 throw new System.ArgumentNullException("profSeqNo");
-
+    
             if (courtLevelCd == null)
                 throw new System.ArgumentNullException("courtLevelCd");
-
+    
             if (courtClassCd == null)
                 throw new System.ArgumentNullException("courtClassCd");
-
+    
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("files/recordOfProceedings?");
             urlBuilder_.Append(System.Uri.EscapeDataString("partId") + "=").Append(System.Uri.EscapeDataString(ConvertToString(partId, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
@@ -295,7 +295,7 @@ namespace JCCommon.Clients.FileServices
             urlBuilder_.Append(System.Uri.EscapeDataString("courtLevelCd") + "=").Append(System.Uri.EscapeDataString(ConvertToString(courtLevelCd, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             urlBuilder_.Append(System.Uri.EscapeDataString("courtClassCd") + "=").Append(System.Uri.EscapeDataString(ConvertToString(courtClassCd, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             urlBuilder_.Length--;
-
+    
             var client_ = _httpClient;
             var disposeClient_ = false;
             try
@@ -304,12 +304,12 @@ namespace JCCommon.Clients.FileServices
                 {
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
+    
                     PrepareRequest(client_, request_, urlBuilder_);
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
                     PrepareRequest(client_, request_, url_);
-
+    
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
                     try
@@ -320,9 +320,9 @@ namespace JCCommon.Clients.FileServices
                             foreach (var item_ in response_.Content.Headers)
                                 headers_[item_.Key] = item_.Value;
                         }
-
+    
                         ProcessResponse(client_, response_);
-
+    
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
@@ -345,7 +345,7 @@ namespace JCCommon.Clients.FileServices
                         }
                         else
                         {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
                             throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
@@ -362,7 +362,7 @@ namespace JCCommon.Clients.FileServices
                     client_.Dispose();
             }
         }
-
+    
         /// <param name="documentId">cfcAccusedFile.document array element's imageId, or cvfcCivilFile document array element's imageId</param>
         /// <param name="courtDivisionCd">R for criminal, I for non-criminal</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
@@ -370,7 +370,7 @@ namespace JCCommon.Clients.FileServices
         {
             return FilesDocumentAsync(documentId, courtDivisionCd, System.Threading.CancellationToken.None);
         }
-
+    
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="documentId">cfcAccusedFile.document array element's imageId, or cvfcCivilFile document array element's imageId</param>
         /// <param name="courtDivisionCd">R for criminal, I for non-criminal</param>
@@ -379,16 +379,16 @@ namespace JCCommon.Clients.FileServices
         {
             if (documentId == null)
                 throw new System.ArgumentNullException("documentId");
-
+    
             if (courtDivisionCd == null)
                 throw new System.ArgumentNullException("courtDivisionCd");
-
+    
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("files/document?");
             urlBuilder_.Append(System.Uri.EscapeDataString("documentId") + "=").Append(System.Uri.EscapeDataString(ConvertToString(documentId, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             urlBuilder_.Append(System.Uri.EscapeDataString("courtDivisionCd") + "=").Append(System.Uri.EscapeDataString(ConvertToString(courtDivisionCd, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             urlBuilder_.Length--;
-
+    
             var client_ = _httpClient;
             var disposeClient_ = false;
             try
@@ -397,12 +397,12 @@ namespace JCCommon.Clients.FileServices
                 {
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
+    
                     PrepareRequest(client_, request_, urlBuilder_);
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
                     PrepareRequest(client_, request_, url_);
-
+    
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
                     try
@@ -413,9 +413,9 @@ namespace JCCommon.Clients.FileServices
                             foreach (var item_ in response_.Content.Headers)
                                 headers_[item_.Key] = item_.Value;
                         }
-
+    
                         ProcessResponse(client_, response_);
-
+    
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
@@ -438,7 +438,7 @@ namespace JCCommon.Clients.FileServices
                         }
                         else
                         {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
                             throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
@@ -455,18 +455,18 @@ namespace JCCommon.Clients.FileServices
                     client_.Dispose();
             }
         }
-
+    
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
         /// <param name="applicationCd">The code for the calling applicaiton.</param>
         /// <param name="fileHomeAgencyId">File home Agency Identifier; the Justin Agency ID.  Equates to a location code.</param>
         /// <param name="filePermissions">A list of one or more of the courtClassCd codes indicating the files to which the requesting user has permissions.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<FileSearchResponse> FilesCriminalAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, SearchMode searchMode, string fileHomeAgencyId, string fileNumberTxt, string filePrefixTxt, string filePermissions, string fileSuffixNo, string mdocRefTypeCd, CourtClassCd2? courtClassCd, CourtLevelCd2? courtLevelCd, NameSearchTypeCd? nameSearchTypeCd, string lastNm, string orgNm, string givenNm, string birthDt, string searchByCrownPartId, SearchByCrownActiveOnlyYN? searchByCrownActiveOnlyYN, SearchByCrownFileDesignationCd? searchByCrownFileDesignationCd, string mdocJustinNoSet, string physicalFileIdSet)
+        public System.Threading.Tasks.Task<FileSearchResponse> FilesCriminalGetAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, SearchMode searchMode, string fileHomeAgencyId, string fileNumberTxt, string filePrefixTxt, string filePermissions, string fileSuffixNo, string mdocRefTypeCd, CourtClassCd2? courtClassCd, CourtLevelCd2? courtLevelCd, NameSearchTypeCd? nameSearchTypeCd, string lastNm, string orgNm, string givenNm, string birthDt, string searchByCrownPartId, SearchByCrownActiveOnlyYN? searchByCrownActiveOnlyYN, SearchByCrownFileDesignationCd? searchByCrownFileDesignationCd, string mdocJustinNoSet, string physicalFileIdSet)
         {
-            return FilesCriminalAsync(requestAgencyIdentifierId, requestPartId, applicationCd, searchMode, fileHomeAgencyId, fileNumberTxt, filePrefixTxt, filePermissions, fileSuffixNo, mdocRefTypeCd, courtClassCd, courtLevelCd, nameSearchTypeCd, lastNm, orgNm, givenNm, birthDt, searchByCrownPartId, searchByCrownActiveOnlyYN, searchByCrownFileDesignationCd, mdocJustinNoSet, physicalFileIdSet, System.Threading.CancellationToken.None);
+            return FilesCriminalGetAsync(requestAgencyIdentifierId, requestPartId, applicationCd, searchMode, fileHomeAgencyId, fileNumberTxt, filePrefixTxt, filePermissions, fileSuffixNo, mdocRefTypeCd, courtClassCd, courtLevelCd, nameSearchTypeCd, lastNm, orgNm, givenNm, birthDt, searchByCrownPartId, searchByCrownActiveOnlyYN, searchByCrownFileDesignationCd, mdocJustinNoSet, physicalFileIdSet, System.Threading.CancellationToken.None);
         }
-
+    
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
@@ -474,88 +474,88 @@ namespace JCCommon.Clients.FileServices
         /// <param name="fileHomeAgencyId">File home Agency Identifier; the Justin Agency ID.  Equates to a location code.</param>
         /// <param name="filePermissions">A list of one or more of the courtClassCd codes indicating the files to which the requesting user has permissions.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<FileSearchResponse> FilesCriminalAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, SearchMode searchMode, string fileHomeAgencyId, string fileNumberTxt, string filePrefixTxt, string filePermissions, string fileSuffixNo, string mdocRefTypeCd, CourtClassCd2? courtClassCd, CourtLevelCd2? courtLevelCd, NameSearchTypeCd? nameSearchTypeCd, string lastNm, string orgNm, string givenNm, string birthDt, string searchByCrownPartId, SearchByCrownActiveOnlyYN? searchByCrownActiveOnlyYN, SearchByCrownFileDesignationCd? searchByCrownFileDesignationCd, string mdocJustinNoSet, string physicalFileIdSet, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<FileSearchResponse> FilesCriminalGetAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, SearchMode searchMode, string fileHomeAgencyId, string fileNumberTxt, string filePrefixTxt, string filePermissions, string fileSuffixNo, string mdocRefTypeCd, CourtClassCd2? courtClassCd, CourtLevelCd2? courtLevelCd, NameSearchTypeCd? nameSearchTypeCd, string lastNm, string orgNm, string givenNm, string birthDt, string searchByCrownPartId, SearchByCrownActiveOnlyYN? searchByCrownActiveOnlyYN, SearchByCrownFileDesignationCd? searchByCrownFileDesignationCd, string mdocJustinNoSet, string physicalFileIdSet, System.Threading.CancellationToken cancellationToken)
         {
             if (searchMode == null)
                 throw new System.ArgumentNullException("searchMode");
-
+    
             if (fileHomeAgencyId == null)
                 throw new System.ArgumentNullException("fileHomeAgencyId");
-
+    
             if (filePermissions == null)
                 throw new System.ArgumentNullException("filePermissions");
-
+    
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("files/criminal?");
             urlBuilder_.Append(System.Uri.EscapeDataString("searchMode") + "=").Append(System.Uri.EscapeDataString(ConvertToString(searchMode, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             urlBuilder_.Append(System.Uri.EscapeDataString("fileHomeAgencyId") + "=").Append(System.Uri.EscapeDataString(ConvertToString(fileHomeAgencyId, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
-            if (fileNumberTxt != null)
+            if (fileNumberTxt != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("fileNumberTxt") + "=").Append(System.Uri.EscapeDataString(ConvertToString(fileNumberTxt, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (filePrefixTxt != null)
+            if (filePrefixTxt != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("filePrefixTxt") + "=").Append(System.Uri.EscapeDataString(ConvertToString(filePrefixTxt, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
             urlBuilder_.Append(System.Uri.EscapeDataString("filePermissions") + "=").Append(System.Uri.EscapeDataString(ConvertToString(filePermissions, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
-            if (fileSuffixNo != null)
+            if (fileSuffixNo != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("fileSuffixNo") + "=").Append(System.Uri.EscapeDataString(ConvertToString(fileSuffixNo, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (mdocRefTypeCd != null)
+            if (mdocRefTypeCd != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("mdocRefTypeCd") + "=").Append(System.Uri.EscapeDataString(ConvertToString(mdocRefTypeCd, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (courtClassCd != null)
+            if (courtClassCd != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("courtClassCd") + "=").Append(System.Uri.EscapeDataString(ConvertToString(courtClassCd, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (courtLevelCd != null)
+            if (courtLevelCd != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("courtLevelCd") + "=").Append(System.Uri.EscapeDataString(ConvertToString(courtLevelCd, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (nameSearchTypeCd != null)
+            if (nameSearchTypeCd != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("nameSearchTypeCd") + "=").Append(System.Uri.EscapeDataString(ConvertToString(nameSearchTypeCd, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (lastNm != null)
+            if (lastNm != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("lastNm") + "=").Append(System.Uri.EscapeDataString(ConvertToString(lastNm, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (orgNm != null)
+            if (orgNm != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("orgNm") + "=").Append(System.Uri.EscapeDataString(ConvertToString(orgNm, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (givenNm != null)
+            if (givenNm != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("givenNm") + "=").Append(System.Uri.EscapeDataString(ConvertToString(givenNm, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (birthDt != null)
+            if (birthDt != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("birthDt") + "=").Append(System.Uri.EscapeDataString(ConvertToString(birthDt, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (searchByCrownPartId != null)
+            if (searchByCrownPartId != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("searchByCrownPartId") + "=").Append(System.Uri.EscapeDataString(ConvertToString(searchByCrownPartId, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (searchByCrownActiveOnlyYN != null)
+            if (searchByCrownActiveOnlyYN != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("searchByCrownActiveOnlyYN") + "=").Append(System.Uri.EscapeDataString(ConvertToString(searchByCrownActiveOnlyYN, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (searchByCrownFileDesignationCd != null)
+            if (searchByCrownFileDesignationCd != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("searchByCrownFileDesignationCd") + "=").Append(System.Uri.EscapeDataString(ConvertToString(searchByCrownFileDesignationCd, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (mdocJustinNoSet != null)
+            if (mdocJustinNoSet != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("mdocJustinNoSet") + "=").Append(System.Uri.EscapeDataString(ConvertToString(mdocJustinNoSet, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (physicalFileIdSet != null)
+            if (physicalFileIdSet != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("physicalFileIdSet") + "=").Append(System.Uri.EscapeDataString(ConvertToString(physicalFileIdSet, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
             urlBuilder_.Length--;
-
+    
             var client_ = _httpClient;
             var disposeClient_ = false;
             try
@@ -572,12 +572,12 @@ namespace JCCommon.Clients.FileServices
                         request_.Headers.TryAddWithoutValidation("applicationCd", ConvertToString(applicationCd, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
+    
                     PrepareRequest(client_, request_, urlBuilder_);
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
                     PrepareRequest(client_, request_, url_);
-
+    
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
                     try
@@ -588,9 +588,9 @@ namespace JCCommon.Clients.FileServices
                             foreach (var item_ in response_.Content.Headers)
                                 headers_[item_.Key] = item_.Value;
                         }
-
+    
                         ProcessResponse(client_, response_);
-
+    
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
@@ -613,7 +613,7 @@ namespace JCCommon.Clients.FileServices
                         }
                         else
                         {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
                             throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
@@ -630,28 +630,28 @@ namespace JCCommon.Clients.FileServices
                     client_.Dispose();
             }
         }
-
+    
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<CriminalFileAppearanceCountResponse> FilesCriminalAppearanceAppearanceIdCountsAsync(string requestAgencyIdentifierId, string requestPartId, string appearanceId)
+        public System.Threading.Tasks.Task<CriminalFileAppearanceCountResponse> FilesCriminalAppearanceCountsAsync(string requestAgencyIdentifierId, string requestPartId, string appearanceId)
         {
-            return FilesCriminalAppearanceAppearanceIdCountsAsync(requestAgencyIdentifierId, requestPartId, appearanceId, System.Threading.CancellationToken.None);
+            return FilesCriminalAppearanceCountsAsync(requestAgencyIdentifierId, requestPartId, appearanceId, System.Threading.CancellationToken.None);
         }
-
+    
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<CriminalFileAppearanceCountResponse> FilesCriminalAppearanceAppearanceIdCountsAsync(string requestAgencyIdentifierId, string requestPartId, string appearanceId, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<CriminalFileAppearanceCountResponse> FilesCriminalAppearanceCountsAsync(string requestAgencyIdentifierId, string requestPartId, string appearanceId, System.Threading.CancellationToken cancellationToken)
         {
             if (appearanceId == null)
                 throw new System.ArgumentNullException("appearanceId");
-
+    
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("files/criminal/appearance/{appearanceId}/counts");
             urlBuilder_.Replace("{appearanceId}", System.Uri.EscapeDataString(ConvertToString(appearanceId, System.Globalization.CultureInfo.InvariantCulture)));
-
+    
             var client_ = _httpClient;
             var disposeClient_ = false;
             try
@@ -666,12 +666,12 @@ namespace JCCommon.Clients.FileServices
                     request_.Headers.TryAddWithoutValidation("requestPartId", ConvertToString(requestPartId, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
+    
                     PrepareRequest(client_, request_, urlBuilder_);
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
                     PrepareRequest(client_, request_, url_);
-
+    
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
                     try
@@ -682,9 +682,9 @@ namespace JCCommon.Clients.FileServices
                             foreach (var item_ in response_.Content.Headers)
                                 headers_[item_.Key] = item_.Value;
                         }
-
+    
                         ProcessResponse(client_, response_);
-
+    
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
@@ -707,7 +707,7 @@ namespace JCCommon.Clients.FileServices
                         }
                         else
                         {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
                             throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
@@ -724,28 +724,28 @@ namespace JCCommon.Clients.FileServices
                     client_.Dispose();
             }
         }
-
+    
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<CriminalFileAppearanceApprMethodResponse> FilesCriminalAppearanceAppearanceIdAppearancemethodsAsync(string requestAgencyIdentifierId, string requestPartId, string appearanceId)
+        public System.Threading.Tasks.Task<CriminalFileAppearanceApprMethodResponse> FilesCriminalAppearanceAppearancemethodsAsync(string requestAgencyIdentifierId, string requestPartId, string appearanceId)
         {
-            return FilesCriminalAppearanceAppearanceIdAppearancemethodsAsync(requestAgencyIdentifierId, requestPartId, appearanceId, System.Threading.CancellationToken.None);
+            return FilesCriminalAppearanceAppearancemethodsAsync(requestAgencyIdentifierId, requestPartId, appearanceId, System.Threading.CancellationToken.None);
         }
-
+    
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<CriminalFileAppearanceApprMethodResponse> FilesCriminalAppearanceAppearanceIdAppearancemethodsAsync(string requestAgencyIdentifierId, string requestPartId, string appearanceId, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<CriminalFileAppearanceApprMethodResponse> FilesCriminalAppearanceAppearancemethodsAsync(string requestAgencyIdentifierId, string requestPartId, string appearanceId, System.Threading.CancellationToken cancellationToken)
         {
             if (appearanceId == null)
                 throw new System.ArgumentNullException("appearanceId");
-
+    
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("files/criminal/appearance/{appearanceId}/appearancemethods");
             urlBuilder_.Replace("{appearanceId}", System.Uri.EscapeDataString(ConvertToString(appearanceId, System.Globalization.CultureInfo.InvariantCulture)));
-
+    
             var client_ = _httpClient;
             var disposeClient_ = false;
             try
@@ -760,12 +760,12 @@ namespace JCCommon.Clients.FileServices
                     request_.Headers.TryAddWithoutValidation("requestPartId", ConvertToString(requestPartId, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
+    
                     PrepareRequest(client_, request_, urlBuilder_);
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
                     PrepareRequest(client_, request_, url_);
-
+    
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
                     try
@@ -776,9 +776,9 @@ namespace JCCommon.Clients.FileServices
                             foreach (var item_ in response_.Content.Headers)
                                 headers_[item_.Key] = item_.Value;
                         }
-
+    
                         ProcessResponse(client_, response_);
-
+    
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
@@ -801,7 +801,7 @@ namespace JCCommon.Clients.FileServices
                         }
                         else
                         {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
                             throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
@@ -818,7 +818,7 @@ namespace JCCommon.Clients.FileServices
                     client_.Dispose();
             }
         }
-
+    
         /// <param name="agencyId">Agency Identifier Code (Location Code); for example 4801 (Kelona).</param>
         /// <param name="proceedingDt">The proceeding date in the format YYYY-MM-dd</param>
         /// <param name="appearanceId">The full appeance Id in the for 00000.0000</param>
@@ -827,7 +827,7 @@ namespace JCCommon.Clients.FileServices
         {
             return FilesCriminalFilecontentAsync(agencyId, roomCd, proceedingDt, appearanceId, mdocJustinNo, System.Threading.CancellationToken.None);
         }
-
+    
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="agencyId">Agency Identifier Code (Location Code); for example 4801 (Kelona).</param>
         /// <param name="proceedingDt">The proceeding date in the format YYYY-MM-dd</param>
@@ -837,28 +837,28 @@ namespace JCCommon.Clients.FileServices
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("files/criminal/filecontent?");
-            if (agencyId != null)
+            if (agencyId != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("agencyId") + "=").Append(System.Uri.EscapeDataString(ConvertToString(agencyId, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (roomCd != null)
+            if (roomCd != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("roomCd") + "=").Append(System.Uri.EscapeDataString(ConvertToString(roomCd, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (proceedingDt != null)
+            if (proceedingDt != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("proceedingDt") + "=").Append(System.Uri.EscapeDataString(ConvertToString(proceedingDt, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (appearanceId != null)
+            if (appearanceId != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("appearanceId") + "=").Append(System.Uri.EscapeDataString(ConvertToString(appearanceId, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (mdocJustinNo != null)
+            if (mdocJustinNo != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("mdocJustinNo") + "=").Append(System.Uri.EscapeDataString(ConvertToString(mdocJustinNo, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
             urlBuilder_.Length--;
-
+    
             var client_ = _httpClient;
             var disposeClient_ = false;
             try
@@ -867,12 +867,12 @@ namespace JCCommon.Clients.FileServices
                 {
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
+    
                     PrepareRequest(client_, request_, urlBuilder_);
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
                     PrepareRequest(client_, request_, url_);
-
+    
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
                     try
@@ -883,9 +883,9 @@ namespace JCCommon.Clients.FileServices
                             foreach (var item_ in response_.Content.Headers)
                                 headers_[item_.Key] = item_.Value;
                         }
-
+    
                         ProcessResponse(client_, response_);
-
+    
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
@@ -908,7 +908,7 @@ namespace JCCommon.Clients.FileServices
                         }
                         else
                         {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
                             throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
@@ -925,30 +925,30 @@ namespace JCCommon.Clients.FileServices
                     client_.Dispose();
             }
         }
-
+    
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
         /// <param name="applicationCd">The code for the calling applicaiton.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<CriminalFileDetailResponse> FilesCriminalFileIdAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, string fileId)
+        public System.Threading.Tasks.Task<CriminalFileDetailResponse> FilesCriminalGetAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, string fileId)
         {
-            return FilesCriminalFileIdAsync(requestAgencyIdentifierId, requestPartId, applicationCd, fileId, System.Threading.CancellationToken.None);
+            return FilesCriminalGetAsync(requestAgencyIdentifierId, requestPartId, applicationCd, fileId, System.Threading.CancellationToken.None);
         }
-
+    
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
         /// <param name="applicationCd">The code for the calling applicaiton.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<CriminalFileDetailResponse> FilesCriminalFileIdAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, string fileId, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<CriminalFileDetailResponse> FilesCriminalGetAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, string fileId, System.Threading.CancellationToken cancellationToken)
         {
             if (fileId == null)
                 throw new System.ArgumentNullException("fileId");
-
+    
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("files/criminal/{fileId}");
             urlBuilder_.Replace("{fileId}", System.Uri.EscapeDataString(ConvertToString(fileId, System.Globalization.CultureInfo.InvariantCulture)));
-
+    
             var client_ = _httpClient;
             var disposeClient_ = false;
             try
@@ -965,12 +965,12 @@ namespace JCCommon.Clients.FileServices
                         request_.Headers.TryAddWithoutValidation("applicationCd", ConvertToString(applicationCd, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
+    
                     PrepareRequest(client_, request_, urlBuilder_);
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
                     PrepareRequest(client_, request_, url_);
-
+    
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
                     try
@@ -981,9 +981,9 @@ namespace JCCommon.Clients.FileServices
                             foreach (var item_ in response_.Content.Headers)
                                 headers_[item_.Key] = item_.Value;
                         }
-
+    
                         ProcessResponse(client_, response_);
-
+    
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
@@ -1006,7 +1006,7 @@ namespace JCCommon.Clients.FileServices
                         }
                         else
                         {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
                             throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
@@ -1023,37 +1023,37 @@ namespace JCCommon.Clients.FileServices
                     client_.Dispose();
             }
         }
-
+    
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<CriminalFileAppearancesResponse> FilesCriminalFileIdAppearancesAsync(string requestAgencyIdentifierId, string requestPartId, FutureYN? futureYN, HistoryYN? historyYN, string fileId)
+        public System.Threading.Tasks.Task<CriminalFileAppearancesResponse> FilesCriminalAppearancesAsync(string requestAgencyIdentifierId, string requestPartId, FutureYN? futureYN, HistoryYN? historyYN, string fileId)
         {
-            return FilesCriminalFileIdAppearancesAsync(requestAgencyIdentifierId, requestPartId, futureYN, historyYN, fileId, System.Threading.CancellationToken.None);
+            return FilesCriminalAppearancesAsync(requestAgencyIdentifierId, requestPartId, futureYN, historyYN, fileId, System.Threading.CancellationToken.None);
         }
-
+    
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<CriminalFileAppearancesResponse> FilesCriminalFileIdAppearancesAsync(string requestAgencyIdentifierId, string requestPartId, FutureYN? futureYN, HistoryYN? historyYN, string fileId, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<CriminalFileAppearancesResponse> FilesCriminalAppearancesAsync(string requestAgencyIdentifierId, string requestPartId, FutureYN? futureYN, HistoryYN? historyYN, string fileId, System.Threading.CancellationToken cancellationToken)
         {
             if (fileId == null)
                 throw new System.ArgumentNullException("fileId");
-
+    
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("files/criminal/{fileId}/appearances?");
             urlBuilder_.Replace("{fileId}", System.Uri.EscapeDataString(ConvertToString(fileId, System.Globalization.CultureInfo.InvariantCulture)));
-            if (futureYN != null)
+            if (futureYN != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("futureYN") + "=").Append(System.Uri.EscapeDataString(ConvertToString(futureYN, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (historyYN != null)
+            if (historyYN != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("historyYN") + "=").Append(System.Uri.EscapeDataString(ConvertToString(historyYN, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
             urlBuilder_.Length--;
-
+    
             var client_ = _httpClient;
             var disposeClient_ = false;
             try
@@ -1068,12 +1068,12 @@ namespace JCCommon.Clients.FileServices
                     request_.Headers.TryAddWithoutValidation("requestPartId", ConvertToString(requestPartId, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
+    
                     PrepareRequest(client_, request_, urlBuilder_);
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
                     PrepareRequest(client_, request_, url_);
-
+    
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
                     try
@@ -1084,9 +1084,9 @@ namespace JCCommon.Clients.FileServices
                             foreach (var item_ in response_.Content.Headers)
                                 headers_[item_.Key] = item_.Value;
                         }
-
+    
                         ProcessResponse(client_, response_);
-
+    
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
@@ -1109,7 +1109,7 @@ namespace JCCommon.Clients.FileServices
                         }
                         else
                         {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
                             throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
@@ -1126,18 +1126,18 @@ namespace JCCommon.Clients.FileServices
                     client_.Dispose();
             }
         }
-
+    
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
         /// <param name="applicationCd">The code for the calling application.</param>
         /// <param name="fileHomeAgencyId">File home Agency Identifier; the Justin Agency ID.  Equates to a location code.</param>
         /// <param name="filePermissions">A list of one or more of the courtClassCd codes indicating the files to which the requesting user has permissions.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<FileSearchResponse> FilesCivilAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, SearchMode2 searchMode, string fileHomeAgencyId, string fileNumberTxt, string filePrefixTxt, string filePermissions, string fileSuffixNo, string mdocRefTypeCd, CourtClassCd3? courtClassCd, CourtLevelCd3? courtLevelCd, NameSearchTypeCd2? nameSearchTypeCd, string lastNm, string orgNm, string givenNm, string birthDt, string searchByCrownPartId, SearchByCrownActiveOnlyYN2? searchByCrownActiveOnlyYN, SearchByCrownFileDesignationCd2? searchByCrownFileDesignationCd, string mdocJustinNoSet, string physicalFileIdSet)
+        public System.Threading.Tasks.Task<FileSearchResponse> FilesCivilGetAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, SearchMode2 searchMode, string fileHomeAgencyId, string fileNumberTxt, string filePrefixTxt, string filePermissions, string fileSuffixNo, string mdocRefTypeCd, CourtClassCd3? courtClassCd, CourtLevelCd3? courtLevelCd, NameSearchTypeCd2? nameSearchTypeCd, string lastNm, string orgNm, string givenNm, string birthDt, string searchByCrownPartId, SearchByCrownActiveOnlyYN2? searchByCrownActiveOnlyYN, SearchByCrownFileDesignationCd2? searchByCrownFileDesignationCd, string mdocJustinNoSet, string physicalFileIdSet)
         {
-            return FilesCivilAsync(requestAgencyIdentifierId, requestPartId, applicationCd, searchMode, fileHomeAgencyId, fileNumberTxt, filePrefixTxt, filePermissions, fileSuffixNo, mdocRefTypeCd, courtClassCd, courtLevelCd, nameSearchTypeCd, lastNm, orgNm, givenNm, birthDt, searchByCrownPartId, searchByCrownActiveOnlyYN, searchByCrownFileDesignationCd, mdocJustinNoSet, physicalFileIdSet, System.Threading.CancellationToken.None);
+            return FilesCivilGetAsync(requestAgencyIdentifierId, requestPartId, applicationCd, searchMode, fileHomeAgencyId, fileNumberTxt, filePrefixTxt, filePermissions, fileSuffixNo, mdocRefTypeCd, courtClassCd, courtLevelCd, nameSearchTypeCd, lastNm, orgNm, givenNm, birthDt, searchByCrownPartId, searchByCrownActiveOnlyYN, searchByCrownFileDesignationCd, mdocJustinNoSet, physicalFileIdSet, System.Threading.CancellationToken.None);
         }
-
+    
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
@@ -1145,88 +1145,88 @@ namespace JCCommon.Clients.FileServices
         /// <param name="fileHomeAgencyId">File home Agency Identifier; the Justin Agency ID.  Equates to a location code.</param>
         /// <param name="filePermissions">A list of one or more of the courtClassCd codes indicating the files to which the requesting user has permissions.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<FileSearchResponse> FilesCivilAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, SearchMode2 searchMode, string fileHomeAgencyId, string fileNumberTxt, string filePrefixTxt, string filePermissions, string fileSuffixNo, string mdocRefTypeCd, CourtClassCd3? courtClassCd, CourtLevelCd3? courtLevelCd, NameSearchTypeCd2? nameSearchTypeCd, string lastNm, string orgNm, string givenNm, string birthDt, string searchByCrownPartId, SearchByCrownActiveOnlyYN2? searchByCrownActiveOnlyYN, SearchByCrownFileDesignationCd2? searchByCrownFileDesignationCd, string mdocJustinNoSet, string physicalFileIdSet, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<FileSearchResponse> FilesCivilGetAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, SearchMode2 searchMode, string fileHomeAgencyId, string fileNumberTxt, string filePrefixTxt, string filePermissions, string fileSuffixNo, string mdocRefTypeCd, CourtClassCd3? courtClassCd, CourtLevelCd3? courtLevelCd, NameSearchTypeCd2? nameSearchTypeCd, string lastNm, string orgNm, string givenNm, string birthDt, string searchByCrownPartId, SearchByCrownActiveOnlyYN2? searchByCrownActiveOnlyYN, SearchByCrownFileDesignationCd2? searchByCrownFileDesignationCd, string mdocJustinNoSet, string physicalFileIdSet, System.Threading.CancellationToken cancellationToken)
         {
             if (searchMode == null)
                 throw new System.ArgumentNullException("searchMode");
-
+    
             if (fileHomeAgencyId == null)
                 throw new System.ArgumentNullException("fileHomeAgencyId");
-
+    
             if (filePermissions == null)
                 throw new System.ArgumentNullException("filePermissions");
-
+    
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("files/civil?");
             urlBuilder_.Append(System.Uri.EscapeDataString("searchMode") + "=").Append(System.Uri.EscapeDataString(ConvertToString(searchMode, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             urlBuilder_.Append(System.Uri.EscapeDataString("fileHomeAgencyId") + "=").Append(System.Uri.EscapeDataString(ConvertToString(fileHomeAgencyId, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
-            if (fileNumberTxt != null)
+            if (fileNumberTxt != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("fileNumberTxt") + "=").Append(System.Uri.EscapeDataString(ConvertToString(fileNumberTxt, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (filePrefixTxt != null)
+            if (filePrefixTxt != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("filePrefixTxt") + "=").Append(System.Uri.EscapeDataString(ConvertToString(filePrefixTxt, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
             urlBuilder_.Append(System.Uri.EscapeDataString("filePermissions") + "=").Append(System.Uri.EscapeDataString(ConvertToString(filePermissions, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
-            if (fileSuffixNo != null)
+            if (fileSuffixNo != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("fileSuffixNo") + "=").Append(System.Uri.EscapeDataString(ConvertToString(fileSuffixNo, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (mdocRefTypeCd != null)
+            if (mdocRefTypeCd != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("mdocRefTypeCd") + "=").Append(System.Uri.EscapeDataString(ConvertToString(mdocRefTypeCd, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (courtClassCd != null)
+            if (courtClassCd != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("courtClassCd") + "=").Append(System.Uri.EscapeDataString(ConvertToString(courtClassCd, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (courtLevelCd != null)
+            if (courtLevelCd != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("courtLevelCd") + "=").Append(System.Uri.EscapeDataString(ConvertToString(courtLevelCd, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (nameSearchTypeCd != null)
+            if (nameSearchTypeCd != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("nameSearchTypeCd") + "=").Append(System.Uri.EscapeDataString(ConvertToString(nameSearchTypeCd, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (lastNm != null)
+            if (lastNm != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("lastNm") + "=").Append(System.Uri.EscapeDataString(ConvertToString(lastNm, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (orgNm != null)
+            if (orgNm != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("orgNm") + "=").Append(System.Uri.EscapeDataString(ConvertToString(orgNm, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (givenNm != null)
+            if (givenNm != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("givenNm") + "=").Append(System.Uri.EscapeDataString(ConvertToString(givenNm, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (birthDt != null)
+            if (birthDt != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("birthDt") + "=").Append(System.Uri.EscapeDataString(ConvertToString(birthDt, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (searchByCrownPartId != null)
+            if (searchByCrownPartId != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("searchByCrownPartId") + "=").Append(System.Uri.EscapeDataString(ConvertToString(searchByCrownPartId, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (searchByCrownActiveOnlyYN != null)
+            if (searchByCrownActiveOnlyYN != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("searchByCrownActiveOnlyYN") + "=").Append(System.Uri.EscapeDataString(ConvertToString(searchByCrownActiveOnlyYN, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (searchByCrownFileDesignationCd != null)
+            if (searchByCrownFileDesignationCd != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("searchByCrownFileDesignationCd") + "=").Append(System.Uri.EscapeDataString(ConvertToString(searchByCrownFileDesignationCd, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (mdocJustinNoSet != null)
+            if (mdocJustinNoSet != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("mdocJustinNoSet") + "=").Append(System.Uri.EscapeDataString(ConvertToString(mdocJustinNoSet, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (physicalFileIdSet != null)
+            if (physicalFileIdSet != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("physicalFileIdSet") + "=").Append(System.Uri.EscapeDataString(ConvertToString(physicalFileIdSet, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
             urlBuilder_.Length--;
-
+    
             var client_ = _httpClient;
             var disposeClient_ = false;
             try
@@ -1243,12 +1243,12 @@ namespace JCCommon.Clients.FileServices
                         request_.Headers.TryAddWithoutValidation("applicationCd", ConvertToString(applicationCd, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
+    
                     PrepareRequest(client_, request_, urlBuilder_);
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
                     PrepareRequest(client_, request_, url_);
-
+    
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
                     try
@@ -1259,9 +1259,9 @@ namespace JCCommon.Clients.FileServices
                             foreach (var item_ in response_.Content.Headers)
                                 headers_[item_.Key] = item_.Value;
                         }
-
+    
                         ProcessResponse(client_, response_);
-
+    
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
@@ -1284,7 +1284,7 @@ namespace JCCommon.Clients.FileServices
                         }
                         else
                         {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
                             throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
@@ -1301,28 +1301,28 @@ namespace JCCommon.Clients.FileServices
                     client_.Dispose();
             }
         }
-
+    
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<CivilFileAppearancePartyResponse> FilesCivilAppearanceAppearanceIdPartiesAsync(string requestAgencyIdentifierId, string requestPartId, string appearanceId)
+        public System.Threading.Tasks.Task<CivilFileAppearancePartyResponse> FilesCivilAppearancePartiesAsync(string requestAgencyIdentifierId, string requestPartId, string appearanceId)
         {
-            return FilesCivilAppearanceAppearanceIdPartiesAsync(requestAgencyIdentifierId, requestPartId, appearanceId, System.Threading.CancellationToken.None);
+            return FilesCivilAppearancePartiesAsync(requestAgencyIdentifierId, requestPartId, appearanceId, System.Threading.CancellationToken.None);
         }
-
+    
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<CivilFileAppearancePartyResponse> FilesCivilAppearanceAppearanceIdPartiesAsync(string requestAgencyIdentifierId, string requestPartId, string appearanceId, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<CivilFileAppearancePartyResponse> FilesCivilAppearancePartiesAsync(string requestAgencyIdentifierId, string requestPartId, string appearanceId, System.Threading.CancellationToken cancellationToken)
         {
             if (appearanceId == null)
                 throw new System.ArgumentNullException("appearanceId");
-
+    
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("files/civil/appearance/{appearanceId}/parties");
             urlBuilder_.Replace("{appearanceId}", System.Uri.EscapeDataString(ConvertToString(appearanceId, System.Globalization.CultureInfo.InvariantCulture)));
-
+    
             var client_ = _httpClient;
             var disposeClient_ = false;
             try
@@ -1337,12 +1337,12 @@ namespace JCCommon.Clients.FileServices
                     request_.Headers.TryAddWithoutValidation("requestPartId", ConvertToString(requestPartId, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
+    
                     PrepareRequest(client_, request_, urlBuilder_);
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
                     PrepareRequest(client_, request_, url_);
-
+    
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
                     try
@@ -1353,9 +1353,9 @@ namespace JCCommon.Clients.FileServices
                             foreach (var item_ in response_.Content.Headers)
                                 headers_[item_.Key] = item_.Value;
                         }
-
+    
                         ProcessResponse(client_, response_);
-
+    
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
@@ -1378,7 +1378,7 @@ namespace JCCommon.Clients.FileServices
                         }
                         else
                         {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
                             throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
@@ -1395,28 +1395,28 @@ namespace JCCommon.Clients.FileServices
                     client_.Dispose();
             }
         }
-
+    
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<CivilFileAppearanceApprMethodResponse> FilesCivilAppearanceAppearanceIdAppearancemethodsAsync(string requestAgencyIdentifierId, string requestPartId, string appearanceId)
+        public System.Threading.Tasks.Task<CivilFileAppearanceApprMethodResponse> FilesCivilAppearanceAppearancemethodsAsync(string requestAgencyIdentifierId, string requestPartId, string appearanceId)
         {
-            return FilesCivilAppearanceAppearanceIdAppearancemethodsAsync(requestAgencyIdentifierId, requestPartId, appearanceId, System.Threading.CancellationToken.None);
+            return FilesCivilAppearanceAppearancemethodsAsync(requestAgencyIdentifierId, requestPartId, appearanceId, System.Threading.CancellationToken.None);
         }
-
+    
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<CivilFileAppearanceApprMethodResponse> FilesCivilAppearanceAppearanceIdAppearancemethodsAsync(string requestAgencyIdentifierId, string requestPartId, string appearanceId, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<CivilFileAppearanceApprMethodResponse> FilesCivilAppearanceAppearancemethodsAsync(string requestAgencyIdentifierId, string requestPartId, string appearanceId, System.Threading.CancellationToken cancellationToken)
         {
             if (appearanceId == null)
                 throw new System.ArgumentNullException("appearanceId");
-
+    
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("files/civil/appearance/{appearanceId}/appearancemethods");
             urlBuilder_.Replace("{appearanceId}", System.Uri.EscapeDataString(ConvertToString(appearanceId, System.Globalization.CultureInfo.InvariantCulture)));
-
+    
             var client_ = _httpClient;
             var disposeClient_ = false;
             try
@@ -1431,12 +1431,12 @@ namespace JCCommon.Clients.FileServices
                     request_.Headers.TryAddWithoutValidation("requestPartId", ConvertToString(requestPartId, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
+    
                     PrepareRequest(client_, request_, urlBuilder_);
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
                     PrepareRequest(client_, request_, url_);
-
+    
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
                     try
@@ -1447,9 +1447,9 @@ namespace JCCommon.Clients.FileServices
                             foreach (var item_ in response_.Content.Headers)
                                 headers_[item_.Key] = item_.Value;
                         }
-
+    
                         ProcessResponse(client_, response_);
-
+    
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
@@ -1472,7 +1472,7 @@ namespace JCCommon.Clients.FileServices
                         }
                         else
                         {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
                             throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
@@ -1489,7 +1489,7 @@ namespace JCCommon.Clients.FileServices
                     client_.Dispose();
             }
         }
-
+    
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
         /// <param name="appearanceId">The full appearance Id in the for 00000.0000</param>
@@ -1498,7 +1498,7 @@ namespace JCCommon.Clients.FileServices
         {
             return FilesCivilCourtsummaryreportAsync(requestAgencyIdentifierId, requestPartId, appearanceId, reportName, System.Threading.CancellationToken.None);
         }
-
+    
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
@@ -1508,16 +1508,16 @@ namespace JCCommon.Clients.FileServices
         {
             if (appearanceId == null)
                 throw new System.ArgumentNullException("appearanceId");
-
+    
             if (reportName == null)
                 throw new System.ArgumentNullException("reportName");
-
+    
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("files/civil/courtsummaryreport?");
             urlBuilder_.Append(System.Uri.EscapeDataString("appearanceId") + "=").Append(System.Uri.EscapeDataString(ConvertToString(appearanceId, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             urlBuilder_.Append(System.Uri.EscapeDataString("reportName") + "=").Append(System.Uri.EscapeDataString(ConvertToString(reportName, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             urlBuilder_.Length--;
-
+    
             var client_ = _httpClient;
             var disposeClient_ = false;
             try
@@ -1532,12 +1532,12 @@ namespace JCCommon.Clients.FileServices
                     request_.Headers.TryAddWithoutValidation("requestPartId", ConvertToString(requestPartId, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
+    
                     PrepareRequest(client_, request_, urlBuilder_);
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
                     PrepareRequest(client_, request_, url_);
-
+    
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
                     try
@@ -1548,9 +1548,9 @@ namespace JCCommon.Clients.FileServices
                             foreach (var item_ in response_.Content.Headers)
                                 headers_[item_.Key] = item_.Value;
                         }
-
+    
                         ProcessResponse(client_, response_);
-
+    
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
@@ -1573,7 +1573,7 @@ namespace JCCommon.Clients.FileServices
                         }
                         else
                         {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
                             throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
@@ -1590,7 +1590,7 @@ namespace JCCommon.Clients.FileServices
                     client_.Dispose();
             }
         }
-
+    
         /// <param name="agencyId">Agency Identifier Code (Location Code); for example 4801 (Kelowna).</param>
         /// <param name="proceedingDt">The proceeding date in the format YYYY-MM-dd</param>
         /// <param name="appearanceId">The full appearance Id in the for 00000.0000</param>
@@ -1600,7 +1600,7 @@ namespace JCCommon.Clients.FileServices
         {
             return FilesCivilFilecontentAsync(agencyId, roomCd, proceedingDt, appearanceId, physicalFileId, applicationCd, System.Threading.CancellationToken.None);
         }
-
+    
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="agencyId">Agency Identifier Code (Location Code); for example 4801 (Kelowna).</param>
         /// <param name="proceedingDt">The proceeding date in the format YYYY-MM-dd</param>
@@ -1611,32 +1611,32 @@ namespace JCCommon.Clients.FileServices
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("files/civil/filecontent?");
-            if (agencyId != null)
+            if (agencyId != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("agencyId") + "=").Append(System.Uri.EscapeDataString(ConvertToString(agencyId, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (roomCd != null)
+            if (roomCd != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("roomCd") + "=").Append(System.Uri.EscapeDataString(ConvertToString(roomCd, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (proceedingDt != null)
+            if (proceedingDt != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("proceedingDt") + "=").Append(System.Uri.EscapeDataString(ConvertToString(proceedingDt, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (appearanceId != null)
+            if (appearanceId != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("appearanceId") + "=").Append(System.Uri.EscapeDataString(ConvertToString(appearanceId, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (physicalFileId != null)
+            if (physicalFileId != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("physicalFileId") + "=").Append(System.Uri.EscapeDataString(ConvertToString(physicalFileId, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (applicationCd != null)
+            if (applicationCd != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("applicationCd") + "=").Append(System.Uri.EscapeDataString(ConvertToString(applicationCd, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
             urlBuilder_.Length--;
-
+    
             var client_ = _httpClient;
             var disposeClient_ = false;
             try
@@ -1645,12 +1645,12 @@ namespace JCCommon.Clients.FileServices
                 {
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
+    
                     PrepareRequest(client_, request_, urlBuilder_);
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
                     PrepareRequest(client_, request_, url_);
-
+    
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
                     try
@@ -1661,9 +1661,9 @@ namespace JCCommon.Clients.FileServices
                             foreach (var item_ in response_.Content.Headers)
                                 headers_[item_.Key] = item_.Value;
                         }
-
+    
                         ProcessResponse(client_, response_);
-
+    
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
@@ -1686,7 +1686,7 @@ namespace JCCommon.Clients.FileServices
                         }
                         else
                         {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
                             throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
@@ -1703,30 +1703,30 @@ namespace JCCommon.Clients.FileServices
                     client_.Dispose();
             }
         }
-
+    
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
         /// <param name="applicationCd">The code for the calling application</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<CivilFileDetailResponse> FilesCivilFileIdAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, string fileId)
+        public System.Threading.Tasks.Task<CivilFileDetailResponse> FilesCivilGetAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, string fileId)
         {
-            return FilesCivilFileIdAsync(requestAgencyIdentifierId, requestPartId, applicationCd, fileId, System.Threading.CancellationToken.None);
+            return FilesCivilGetAsync(requestAgencyIdentifierId, requestPartId, applicationCd, fileId, System.Threading.CancellationToken.None);
         }
-
+    
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
         /// <param name="applicationCd">The code for the calling application</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<CivilFileDetailResponse> FilesCivilFileIdAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, string fileId, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<CivilFileDetailResponse> FilesCivilGetAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, string fileId, System.Threading.CancellationToken cancellationToken)
         {
             if (fileId == null)
                 throw new System.ArgumentNullException("fileId");
-
+    
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("files/civil/{fileId}");
             urlBuilder_.Replace("{fileId}", System.Uri.EscapeDataString(ConvertToString(fileId, System.Globalization.CultureInfo.InvariantCulture)));
-
+    
             var client_ = _httpClient;
             var disposeClient_ = false;
             try
@@ -1743,12 +1743,12 @@ namespace JCCommon.Clients.FileServices
                         request_.Headers.TryAddWithoutValidation("applicationCd", ConvertToString(applicationCd, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
+    
                     PrepareRequest(client_, request_, urlBuilder_);
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
                     PrepareRequest(client_, request_, url_);
-
+    
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
                     try
@@ -1759,9 +1759,9 @@ namespace JCCommon.Clients.FileServices
                             foreach (var item_ in response_.Content.Headers)
                                 headers_[item_.Key] = item_.Value;
                         }
-
+    
                         ProcessResponse(client_, response_);
-
+    
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
@@ -1784,7 +1784,7 @@ namespace JCCommon.Clients.FileServices
                         }
                         else
                         {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
                             throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
@@ -1801,37 +1801,37 @@ namespace JCCommon.Clients.FileServices
                     client_.Dispose();
             }
         }
-
+    
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<CivilFileAppearancesResponse> FilesCivilFileIdAppearancesAsync(string requestAgencyIdentifierId, string requestPartId, FutureYN2? futureYN, HistoryYN2? historyYN, string fileId)
+        public System.Threading.Tasks.Task<CivilFileAppearancesResponse> FilesCivilAppearancesAsync(string requestAgencyIdentifierId, string requestPartId, FutureYN2? futureYN, HistoryYN2? historyYN, string fileId)
         {
-            return FilesCivilFileIdAppearancesAsync(requestAgencyIdentifierId, requestPartId, futureYN, historyYN, fileId, System.Threading.CancellationToken.None);
+            return FilesCivilAppearancesAsync(requestAgencyIdentifierId, requestPartId, futureYN, historyYN, fileId, System.Threading.CancellationToken.None);
         }
-
+    
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<CivilFileAppearancesResponse> FilesCivilFileIdAppearancesAsync(string requestAgencyIdentifierId, string requestPartId, FutureYN2? futureYN, HistoryYN2? historyYN, string fileId, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<CivilFileAppearancesResponse> FilesCivilAppearancesAsync(string requestAgencyIdentifierId, string requestPartId, FutureYN2? futureYN, HistoryYN2? historyYN, string fileId, System.Threading.CancellationToken cancellationToken)
         {
             if (fileId == null)
                 throw new System.ArgumentNullException("fileId");
-
+    
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("files/civil/{fileId}/appearances?");
             urlBuilder_.Replace("{fileId}", System.Uri.EscapeDataString(ConvertToString(fileId, System.Globalization.CultureInfo.InvariantCulture)));
-            if (futureYN != null)
+            if (futureYN != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("futureYN") + "=").Append(System.Uri.EscapeDataString(ConvertToString(futureYN, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (historyYN != null)
+            if (historyYN != null) 
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("historyYN") + "=").Append(System.Uri.EscapeDataString(ConvertToString(historyYN, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
             urlBuilder_.Length--;
-
+    
             var client_ = _httpClient;
             var disposeClient_ = false;
             try
@@ -1846,12 +1846,12 @@ namespace JCCommon.Clients.FileServices
                     request_.Headers.TryAddWithoutValidation("requestPartId", ConvertToString(requestPartId, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
+    
                     PrepareRequest(client_, request_, urlBuilder_);
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
                     PrepareRequest(client_, request_, url_);
-
+    
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
                     try
@@ -1862,9 +1862,9 @@ namespace JCCommon.Clients.FileServices
                             foreach (var item_ in response_.Content.Headers)
                                 headers_[item_.Key] = item_.Value;
                         }
-
+    
                         ProcessResponse(client_, response_);
-
+    
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
@@ -1887,7 +1887,7 @@ namespace JCCommon.Clients.FileServices
                         }
                         else
                         {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
                             throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
                         }
                     }
@@ -1904,7 +1904,7 @@ namespace JCCommon.Clients.FileServices
                     client_.Dispose();
             }
         }
-
+    
         protected struct ObjectResponseResult<T>
         {
             public ObjectResponseResult(T responseObject, string responseText)
@@ -1912,21 +1912,21 @@ namespace JCCommon.Clients.FileServices
                 this.Object = responseObject;
                 this.Text = responseText;
             }
-
+    
             public T Object { get; }
-
+    
             public string Text { get; }
         }
-
+    
         public bool ReadResponseAsString { get; set; }
-
+        
         protected virtual async System.Threading.Tasks.Task<ObjectResponseResult<T>> ReadObjectResponseAsync<T>(System.Net.Http.HttpResponseMessage response, System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> headers)
         {
             if (response == null || response.Content == null)
             {
                 return new ObjectResponseResult<T>(default(T), string.Empty);
             }
-
+        
             if (ReadResponseAsString)
             {
                 var responseText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -1961,14 +1961,14 @@ namespace JCCommon.Clients.FileServices
                 }
             }
         }
-
+    
         private string ConvertToString(object value, System.Globalization.CultureInfo cultureInfo)
         {
             if (value == null)
             {
                 return "";
             }
-
+        
             if (value is System.Enum)
             {
                 var name = System.Enum.GetName(value.GetType(), value);
@@ -1977,5015 +1977,5015 @@ namespace JCCommon.Clients.FileServices
                     var field = System.Reflection.IntrospectionExtensions.GetTypeInfo(value.GetType()).GetDeclaredField(name);
                     if (field != null)
                     {
-                        var attribute = System.Reflection.CustomAttributeExtensions.GetCustomAttribute(field, typeof(System.Runtime.Serialization.EnumMemberAttribute))
+                        var attribute = System.Reflection.CustomAttributeExtensions.GetCustomAttribute(field, typeof(System.Runtime.Serialization.EnumMemberAttribute)) 
                             as System.Runtime.Serialization.EnumMemberAttribute;
                         if (attribute != null)
                         {
                             return attribute.Value != null ? attribute.Value : name;
                         }
                     }
-
+        
                     var converted = System.Convert.ToString(System.Convert.ChangeType(value, System.Enum.GetUnderlyingType(value.GetType()), cultureInfo));
                     return converted == null ? string.Empty : converted;
                 }
             }
-            else if (value is bool)
+            else if (value is bool) 
             {
                 return System.Convert.ToString((bool)value, cultureInfo).ToLowerInvariant();
             }
             else if (value is byte[])
             {
-                return System.Convert.ToBase64String((byte[])value);
+                return System.Convert.ToBase64String((byte[]) value);
             }
             else if (value.GetType().IsArray)
             {
-                var array = System.Linq.Enumerable.OfType<object>((System.Array)value);
+                var array = System.Linq.Enumerable.OfType<object>((System.Array) value);
                 return string.Join(",", System.Linq.Enumerable.Select(array, o => ConvertToString(o, cultureInfo)));
             }
-
+        
             var result = System.Convert.ToString(value, cultureInfo);
             return result == null ? "" : result;
         }
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class ClOrderToVary
+    public partial class ClOrderToVary 
     {
         [Newtonsoft.Json.JsonProperty("documentId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocumentId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("documentTypeDsc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocumentTypeDsc { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("adjudicatorName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AdjudicatorName { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("dateGranted", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DateGranted { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class ClFiledBy
+    public partial class ClFiledBy 
     {
         [Newtonsoft.Json.JsonProperty("filedByName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FiledByName { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("roleTypeCode", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string RoleTypeCode { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class ClUnscheduledDocument
+    public partial class ClUnscheduledDocument 
     {
         [Newtonsoft.Json.JsonProperty("documentId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocumentId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("fileSeqNumber", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FileSeqNumber { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("documentTypeDsc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocumentTypeDsc { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("filedBy", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<ClFiledBy> FiledBy { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class ClCivilArrestWarrant
+    public partial class ClCivilArrestWarrant 
     {
         [Newtonsoft.Json.JsonProperty("warrantTypeCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string WarrantTypeCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("warrantDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string WarrantDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("warrantTypeDsc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string WarrantTypeDsc { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class ClHearingRestriction
+    public partial class ClHearingRestriction 
     {
         [Newtonsoft.Json.JsonProperty("hearingRestrictiontype", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string HearingRestrictiontype { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("judgeName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string JudgeName { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("hearingRestrictionDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string HearingRestrictionDate { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class ClScheduledAppearance
+    public partial class ClScheduledAppearance 
     {
         [Newtonsoft.Json.JsonProperty("appearanceId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtAgencyIdentifier", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CourtAgencyIdentifier { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtRoom", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CourtRoom { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceTime { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceReasonCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceReasonCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("estDurationHours", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string EstDurationHours { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("estDurationMins", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string EstDurationMins { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class ClProtectedPartyName
+    public partial class ClProtectedPartyName 
     {
         [Newtonsoft.Json.JsonProperty("protectedPartyName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ProtectedPartyName { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class ClRestrainingPartyName
+    public partial class ClRestrainingPartyName 
     {
         [Newtonsoft.Json.JsonProperty("restrainingPartyName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string RestrainingPartyName { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class ClProtectionOrder
+    public partial class ClProtectionOrder 
     {
         [Newtonsoft.Json.JsonProperty("orderTypeDsc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string OrderTypeDsc { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("restrainingPartyName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<ClRestrainingPartyName> RestrainingPartyName { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("protectedPartyName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<ClProtectedPartyName> ProtectedPartyName { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("pororderIssueDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PororderIssueDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("porconditionText", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PorconditionText { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("pororderExpiryDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PororderExpiryDate { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class ClSpeakerEvent
+    public partial class ClSpeakerEvent 
     {
         [Newtonsoft.Json.JsonProperty("speakerEventDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SpeakerEventDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("speakerEventTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SpeakerEventTime { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("speakerEventText", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SpeakerEventText { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class ClSpeaker
+    public partial class ClSpeaker 
     {
         [Newtonsoft.Json.JsonProperty("speakerId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SpeakerId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("speakerTypeCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SpeakerTypeCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("speakerSeqNo", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SpeakerSeqNo { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("voirDireSeqNo", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string VoirDireSeqNo { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("speakerName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SpeakerName { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("speakerStatusCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SpeakerStatusCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("speakerStatusDsc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SpeakerStatusDsc { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("speakerEvent", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<ClSpeakerEvent> SpeakerEvent { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class ClPartyRole
+    public partial class ClPartyRole 
     {
         [Newtonsoft.Json.JsonProperty("roleTypeCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string RoleTypeCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("roleTypeDsc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string RoleTypeDsc { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class ClPartyName
+    public partial class ClPartyName 
     {
         [Newtonsoft.Json.JsonProperty("nameTypeCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string NameTypeCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("nameTypeDsc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string NameTypeDsc { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("surnameNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SurnameNm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("firstGivenNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FirstGivenNm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("secondGivenNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SecondGivenNm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("thirdGivenNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ThirdGivenNm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("organizationNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string OrganizationNm { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class ClLegalRepresentative
+    public partial class ClLegalRepresentative 
     {
         [Newtonsoft.Json.JsonProperty("legalRepTypeDsc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string LegalRepTypeDsc { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("legalRepFullName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string LegalRepFullName { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class ClRepresentative
+    public partial class ClRepresentative 
     {
         [Newtonsoft.Json.JsonProperty("repFullName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string RepFullName { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("attendanceMethodCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AttendanceMethodCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("phoneNumber", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PhoneNumber { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("instruction", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Instruction { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class ClCounsel
+    public partial class ClCounsel 
     {
         [Newtonsoft.Json.JsonProperty("counselFullName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CounselFullName { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("counselId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CounselId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("phoneNumber", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PhoneNumber { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class ClParty
+    public partial class ClParty 
     {
         [Newtonsoft.Json.JsonProperty("partyId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PartyId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("partyScheduled", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PartyScheduled { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("partyRoleType", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PartyRoleType { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("partyFullName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PartyFullName { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("attendanceMethodCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AttendanceMethodCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("partyTypeCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PartyTypeCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("leftRightParty", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string LeftRightParty { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("birthDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string BirthDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("phoneNumber", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PhoneNumber { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("instruction", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Instruction { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("partyFullAddressText", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PartyFullAddressText { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("warrantIssueDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string WarrantIssueDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("activeYN", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ActiveYN { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("counsel", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<ClCounsel> Counsel { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("representative", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<ClRepresentative> Representative { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("legalRepresentative", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<ClLegalRepresentative> LegalRepresentative { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("partyRole", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<ClPartyRole> PartyRole { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("partyName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<ClPartyName> PartyName { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class ClIssueType
+    public partial class ClIssueType 
     {
         [Newtonsoft.Json.JsonProperty("issueDescription", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string IssueDescription { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("issueNumber", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string IssueNumber { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("issueType", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string IssueType { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class ClDocument
+    public partial class ClDocument 
     {
         [Newtonsoft.Json.JsonProperty("appearanceID", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceID { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("documentId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocumentId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("fileSeqNumber", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FileSeqNumber { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("roleTypeCode", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string RoleTypeCode { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("documentTypeDescription", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocumentTypeDescription { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("estimatedDocumentMinutes", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string EstimatedDocumentMinutes { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("documentTypeCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocumentTypeCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("dateGranted", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DateGranted { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("dateVaried", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DateVaried { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("cancelledDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CancelledDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("adjudicatorPartId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AdjudicatorPartId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("adjudicatorName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AdjudicatorName { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("orderDocumentYN", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string OrderDocumentYN { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("documentAccessLevelCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocumentAccessLevelCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("documentSealStartDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocumentSealStartDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("documentSealEndDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocumentSealEndDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceReasonCode", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceReasonCode { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("issue", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<ClIssueType> Issue { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("filedBy", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<ClFiledBy> FiledBy { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class ClAsset
+    public partial class ClAsset 
     {
         [Newtonsoft.Json.JsonProperty("assetTypeDescription", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AssetTypeDescription { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class ClPhysicalFile
+    public partial class ClPhysicalFile 
     {
         [Newtonsoft.Json.JsonProperty("physicalFileID", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PhysicalFileID { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("fileAccessLevelCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FileAccessLevelCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("fileNumber", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FileNumber { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("styleOfCause", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string StyleOfCause { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("leftPartyLastName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string LeftPartyLastName { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("leftPartyGivenName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string LeftPartyGivenName { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("leftPartyOtherCount", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string LeftPartyOtherCount { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("rightPartyLastName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string RightPartyLastName { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("rightPartyGivenName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string RightPartyGivenName { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("rightPartyOtherCount", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string RightPartyOtherCount { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("thirdPartyLastName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ThirdPartyLastName { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("thirdPartyGivenName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ThirdPartyGivenName { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("thirdPartyOtherCount", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ThirdPartyOtherCount { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("homeAgencyCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string HomeAgencyCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("civilAgencyCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CivilAgencyCd { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class ClCivilCourtList
+    public partial class ClCivilCourtList 
     {
         [Newtonsoft.Json.JsonProperty("appearanceId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceTime { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("binderText", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string BinderText { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtListPrintSortNumber", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CourtListPrintSortNumber { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("civilDocumentsAvailable", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CivilDocumentsAvailable { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("externalFileNumberText", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ExternalFileNumberText { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtListTypeCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CourtListTypeCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtRoomCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CourtRoomCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtLevelCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CourtLevelCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtClassCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CourtClassCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("fileAccessLevelCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FileAccessLevelCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("sealStartDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SealStartDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("sealEndDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SealEndDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("sheriffCommentText", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SheriffCommentText { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("sealFileSOCText", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SealFileSOCText { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("estimatedAppearanceMinutes", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string EstimatedAppearanceMinutes { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("physicalFile", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public ClPhysicalFile PhysicalFile { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("asset", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<ClAsset> Asset { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("document", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<ClDocument> Document { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("parties", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<ClParty> Parties { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("speaker", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<ClSpeaker> Speaker { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("protectionOrder", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<ClProtectionOrder> ProtectionOrder { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("scheduledAppearance", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<ClScheduledAppearance> ScheduledAppearance { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("hearingRestriction", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<ClHearingRestriction> HearingRestriction { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("arrestWarrant", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<ClArrestWarrant> ArrestWarrant { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("unscheduledDocument", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<ClUnscheduledDocument> UnscheduledDocument { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("orderToVary", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<ClOrderToVary> OrderToVary { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class ClCFCOrder
+    public partial class ClCFCOrder 
     {
         [Newtonsoft.Json.JsonProperty("orderTypeDsc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string OrderTypeDsc { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("cfcorderIssueDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CfcorderIssueDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("cfcconditionText", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CfcconditionText { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class ClCRProtectionOrder
+    public partial class ClCRProtectionOrder 
     {
         [Newtonsoft.Json.JsonProperty("orderTypeDsc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string OrderTypeDsc { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("pororderIssueDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PororderIssueDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("porconditionText", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PorconditionText { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class ClArrestWarrant
+    public partial class ClArrestWarrant 
     {
         [Newtonsoft.Json.JsonProperty("fileNumberText", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FileNumberText { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("warrantDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string WarrantDate { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class ClAgeNotice
+    public partial class ClAgeNotice 
     {
         [Newtonsoft.Json.JsonProperty("eventDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string EventDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("eventTypeDsc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string EventTypeDsc { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("detailText", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DetailText { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("dOB", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DOB { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("relationship", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Relationship { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("provenBy", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ProvenBy { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("noticeTo", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string NoticeTo { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class ClSentOrderToVary
+    public partial class ClSentOrderToVary 
     {
         [Newtonsoft.Json.JsonProperty("formTypeCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FormTypeCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("docmTypeDsc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocmTypeDsc { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("docmId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocmId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("docmIssueDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocmIssueDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("docmImageId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocmImageId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("docmStatus", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocmStatus { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class ClBailOrderToVary
+    public partial class ClBailOrderToVary 
     {
         [Newtonsoft.Json.JsonProperty("formTypeCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FormTypeCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("docmTypeDsc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocmTypeDsc { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("docmId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocmId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("docmIssueDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocmIssueDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("docmImageId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocmImageId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("docmStatus", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocmStatus { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class ClBans
+    public partial class ClBans 
     {
         [Newtonsoft.Json.JsonProperty("banTypeCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string BanTypeCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("banTypeDescription", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string BanTypeDescription { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("banTypeAct", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string BanTypeAct { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("banTypeSection", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string BanTypeSection { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("banTypeSubSection", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string BanTypeSubSection { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("banStatuteId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string BanStatuteId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("banCommentText", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string BanCommentText { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("banAcprId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string BanAcprId { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class ClAppearanceCount
+    public partial class ClAppearanceCount 
     {
         [Newtonsoft.Json.JsonProperty("appearanceCountId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceCountId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("countPrintSequenceNumber", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CountPrintSequenceNumber { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("chargeStatuteCode", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ChargeStatuteCode { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("chargeStatuteDescription", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ChargeStatuteDescription { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("lesserIncludedChargeStatuteCode", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string LesserIncludedChargeStatuteCode { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceCountCancelledYN", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceCountCancelledYN { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("lesserIncludedChargeStatuteDescription", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string LesserIncludedChargeStatuteDescription { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceReasonCode", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceReasonCode { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("pleaCode", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PleaCode { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("pleaDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PleaDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("electionCode", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ElectionCode { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("electionDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ElectionDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("mdctSeqNo", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string MdctSeqNo { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("offenceAgeDaysNumber", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string OffenceAgeDaysNumber { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("issuingOfficerPoliceForceCode", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string IssuingOfficerPoliceForceCode { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("issuingOfficerPINText", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string IssuingOfficerPINText { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("issuingOfficerSurnameName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string IssuingOfficerSurnameName { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("findingCode", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FindingCode { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("findingDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FindingDate { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class ClAttendanceMethod
+    public partial class ClAttendanceMethod 
     {
         [Newtonsoft.Json.JsonProperty("apprId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ApprId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("assetUsageSeqNo", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AssetUsageSeqNo { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("roleType", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string RoleType { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("attendanceMethodCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AttendanceMethodCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("phoneNumber", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PhoneNumber { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("instruction", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Instruction { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("otherRoleName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string OtherRoleName { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class ClAccusedFormattedName
+    public partial class ClAccusedFormattedName 
     {
         [Newtonsoft.Json.JsonProperty("lastName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string LastName { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("given1Name", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Given1Name { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("given2Name", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Given2Name { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("given3Name", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Given3Name { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("orgName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string OrgName { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class ClIssue
+    public partial class ClIssue 
     {
         [Newtonsoft.Json.JsonProperty("countPrntSeqNo", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CountPrntSeqNo { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("statuteActCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string StatuteActCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("statuteSectionCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string StatuteSectionCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("statuteSectionDsc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string StatuteSectionDsc { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class ClFileInformation
+    public partial class ClFileInformation 
     {
         [Newtonsoft.Json.JsonProperty("fileLocaAgencyIdentifierCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FileLocaAgencyIdentifierCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("phyFileFolderNo", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PhyFileFolderNo { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("physTicketSeriesTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PhysTicketSeriesTxt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("mdocInfoSeqNo", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string MdocInfoSeqNo { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("partId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PartId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("profSeqNo", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ProfSeqNo { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("mdocJustinNo", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string MdocJustinNo { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtLevelCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CourtLevelCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtClassCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CourtClassCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("mdocTypeCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string MdocTypeCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("mdocTypeDsc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string MdocTypeDsc { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("mdocImageId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string MdocImageId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("mdocAmendedYN", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string MdocAmendedYN { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("mdocAmendedText", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string MdocAmendedText { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("issue", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<ClIssue> Issue { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class ClCriminalCourtList
+    public partial class ClCriminalCourtList 
     {
         [Newtonsoft.Json.JsonProperty("criminalAppearanceID", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CriminalAppearanceID { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtListTypeCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CourtListTypeCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceSequenceNumber", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceSequenceNumber { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceTime { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("fileInformation", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public ClFileInformation FileInformation { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("fileNumberText", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FileNumberText { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("fileHomeLocationName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FileHomeLocationName { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("sealTypeCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SealTypeCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("sealTypeDsc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SealTypeDsc { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("otherFileInformationText", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string OtherFileInformationText { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("accusedFullName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AccusedFullName { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("accusedFormattedName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public ClAccusedFormattedName AccusedFormattedName { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("accusedBirthDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AccusedBirthDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("accusedCurrentBailProcessText", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AccusedCurrentBailProcessText { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("accusedInCustodyFlag", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AccusedInCustodyFlag { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("counselFullName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CounselFullName { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("counselDesignationYN", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CounselDesignationYN { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("counselPartId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CounselPartId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("caseAgeDaysNumber", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CaseAgeDaysNumber { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("crownTypeCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CrownTypeCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("crownLocationCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CrownLocationCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("participantRoleCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ParticipantRoleCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("participantRoleDsc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ParticipantRoleDsc { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("attendanceMethod", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<ClAttendanceMethod> AttendanceMethod { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceCount", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<ClAppearanceCount> AppearanceCount { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("bans", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<ClBans> Bans { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("bailOrderToVary", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<ClBailOrderToVary> BailOrderToVary { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("sentOrderToVary", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<ClSentOrderToVary> SentOrderToVary { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("ageNotice", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<ClAgeNotice> AgeNotice { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("speaker", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<ClSpeaker> Speaker { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("arrestWarrant", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<ClArrestWarrant> ArrestWarrant { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("protectionOrder", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<ClProtectionOrder> ProtectionOrder { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("scheduledAppearance", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<ClScheduledAppearance> ScheduledAppearance { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("hearingRestriction", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<ClHearingRestriction> HearingRestriction { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("cfcorder", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<ClCFCOrder> Cfcorder { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class ClFileSearchParameter
+    public partial class ClFileSearchParameter 
     {
         [Newtonsoft.Json.JsonProperty("courtDivisionCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CourtDivisionCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("fileNumber", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FileNumber { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CourtList
+    public partial class CourtList 
     {
         [Newtonsoft.Json.JsonProperty("courtLocationName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CourtLocationName { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtRoomCode", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CourtRoomCode { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtProceedingsDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CourtProceedingsDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("fileSearchParameter", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<ClFileSearchParameter> FileSearchParameter { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("criminalCourtList", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<ClCriminalCourtList> CriminalCourtList { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("civilCourtList", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<ClCivilCourtList> CivilCourtList { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CfcProtectionOrder
+    public partial class CfcProtectionOrder 
     {
         [Newtonsoft.Json.JsonProperty("pOROrderIssueDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string POROrderIssueDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("orderTypeDsc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string OrderTypeDsc { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("pORConditionText", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PORConditionText { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CfcCFCOrder
+    public partial class CfcCFCOrder 
     {
         [Newtonsoft.Json.JsonProperty("cFCOrderIssueDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CFCOrderIssueDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("orderTypeDsc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string OrderTypeDsc { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("cFCConditionText", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CFCConditionText { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CfcHearingRestriction
+    public partial class CfcHearingRestriction 
     {
         [Newtonsoft.Json.JsonProperty("hearingRestrictiontype", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string HearingRestrictiontype { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("judgeName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string JudgeName { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("hearingRestrictionDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string HearingRestrictionDate { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CfcDocument
+    public partial class CfcDocument 
     {
         [Newtonsoft.Json.JsonProperty("docmClassification", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocmClassification { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("docmId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocmId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("issueDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string IssueDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("docmFormId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocmFormId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("docmFormDsc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocmFormDsc { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("docmDispositionDsc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocmDispositionDsc { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("docmDispositionDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocmDispositionDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("imageId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ImageId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("documentPageCount", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocumentPageCount { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CfcAppearance
+    public partial class CfcAppearance 
     {
         [Newtonsoft.Json.JsonProperty("appearanceId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtAgencyIdentifier", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CourtAgencyIdentifier { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtRoom", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CourtRoom { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceNote", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceNote { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("estimatedTimeHour", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string EstimatedTimeHour { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("estimatedTimeMin", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string EstimatedTimeMin { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("confirmStatusDsc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ConfirmStatusDsc { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("judgesRecommendation", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string JudgesRecommendation { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceCount", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CfcAppearanceCount> AppearanceCount { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("partyAppearanceMethod", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CfcPartyAppearanceMethod> PartyAppearanceMethod { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CfcAppearanceCount
+    public partial class CfcAppearanceCount 
     {
         [Newtonsoft.Json.JsonProperty("appcId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppcId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("countNumber", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CountNumber { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceReason", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceReason { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceResult", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceResult { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("finding", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Finding { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("sectionTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SectionTxt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("sectionDscTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SectionDscTxt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("sentence", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CfcSentence> Sentence { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CfcSentence
+    public partial class CfcSentence 
     {
         [Newtonsoft.Json.JsonProperty("sntpCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SntpCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("sentTermPeriodQty", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SentTermPeriodQty { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("sentTermCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SentTermCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("sentSubtermPeriodQty", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SentSubtermPeriodQty { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("sentSubtermCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SentSubtermCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("sentTertiaryTermPeriodQty", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SentTertiaryTermPeriodQty { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("sentTertiaryTermCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SentTertiaryTermCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("sentIntermittentYn", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SentIntermittentYn { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("sentMonetaryAmt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SentMonetaryAmt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("sentDueTtpDt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SentDueTtpDt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("sentEffectiveDt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SentEffectiveDt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("sentDetailTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SentDetailTxt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("sentYcjaAdultYouthCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SentYcjaAdultYouthCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("sentCustodySecureYn", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SentCustodySecureYn { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CfcPartyAppearanceMethod
+    public partial class CfcPartyAppearanceMethod 
     {
         [Newtonsoft.Json.JsonProperty("partyName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PartyName { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("partyRole", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PartyRole { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("partId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PartId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("partyAppearanceMethod", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PartyAppearanceMethod { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CfcBan
+    public partial class CfcBan 
     {
         [Newtonsoft.Json.JsonProperty("banTypeCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string BanTypeCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("banTypeDescription", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string BanTypeDescription { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("banTypeAct", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string BanTypeAct { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("banTypeSection", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string BanTypeSection { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("banTypeSubSection", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string BanTypeSubSection { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("banStatuteId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string BanStatuteId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("banCommentText", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string BanCommentText { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("banOrderedDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string BanOrderedDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("banSeqNo", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string BanSeqNo { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CfcArrestWarrant
+    public partial class CfcArrestWarrant 
     {
         [Newtonsoft.Json.JsonProperty("fileNumberText", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FileNumberText { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("warrantDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string WarrantDate { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CfcAccusedFile
+    public partial class CfcAccusedFile 
     {
         [Newtonsoft.Json.JsonProperty("fileNumber", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FileNumber { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("fileLocaAgencyIdentifierCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FileLocaAgencyIdentifierCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("mdocJustinNo", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string MdocJustinNo { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("mdocInfoSeqNo", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string MdocInfoSeqNo { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("physTicketSeriesTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PhysTicketSeriesTxt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("phyFileFolderNo", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PhyFileFolderNo { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtClassCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CourtClassCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtLevelCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CourtLevelCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("partId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PartId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("profSeqNo", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ProfSeqNo { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("sealTypeCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SealTypeCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("filedDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FiledDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("arrestWarrant", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CfcArrestWarrant> ArrestWarrant { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("ban", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CfcBan> Ban { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("protectionOrder", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CfcProtectionOrder> ProtectionOrder { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("cfcorder", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CfcCFCOrder> Cfcorder { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("hearingRestriction", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CfcHearingRestriction> HearingRestriction { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("document", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CfcDocument> Document { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearance", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CfcAppearance> Appearance { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CriminalFileContent
+    public partial class CriminalFileContent 
     {
         [Newtonsoft.Json.JsonProperty("courtLocaCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CourtLocaCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtRoomCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CourtRoomCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtProceedingDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CourtProceedingDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<string> AppearanceId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("mdocJustinNo", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string MdocJustinNo { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("accusedFile", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CfcAccusedFile> AccusedFile { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CvfcSpecialProgram
+    public partial class CvfcSpecialProgram 
     {
         [Newtonsoft.Json.JsonProperty("specialProgramDsc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SpecialProgramDsc { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("programEntryDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ProgramEntryDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("programEntryReasonDsc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ProgramEntryReasonDsc { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("programExitDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ProgramExitDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("programExitReasonDsc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ProgramExitReasonDsc { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CvfcIssue
+    public partial class CvfcIssue 
     {
         [Newtonsoft.Json.JsonProperty("issueDsc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string IssueDsc { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("issueNumber", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string IssueNumber { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("concludedYN", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ConcludedYN { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CvfcDocumentHearing
+    public partial class CvfcDocumentHearing 
     {
         [Newtonsoft.Json.JsonProperty("documentId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocumentId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("fileSeqNumber", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FileSeqNumber { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("documentTypeCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocumentTypeCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("documentTypeDescription", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocumentTypeDescription { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("filedByName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FiledByName { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("roleTypeCode", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string RoleTypeCode { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("orderDocumentYN", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string OrderDocumentYN { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceReasonCode", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceReasonCode { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceResultCode", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceResultCode { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("issue", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CvfcIssue> Issue { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CvfcCounsel
+    public partial class CvfcCounsel 
     {
         [Newtonsoft.Json.JsonProperty("counselId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CounselId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("fullNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FullNm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("phoneNumberTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PhoneNumberTxt { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CvfcGeneralAttendee
+    public partial class CvfcGeneralAttendee 
     {
         [Newtonsoft.Json.JsonProperty("attendeeName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AttendeeName { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("counselName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CounselName { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CvfcCourtParticipant
+    public partial class CvfcCourtParticipant 
     {
         [Newtonsoft.Json.JsonProperty("partyName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PartyName { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("partyRole", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PartyRole { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("partId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PartId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("partyAppearanceMethod", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PartyAppearanceMethod { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("leftRightParty", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string LeftRightParty { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("counsel", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CvfcCounsel> Counsel { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CvfcPreviousAppearance
+    public partial class CvfcPreviousAppearance 
     {
         [Newtonsoft.Json.JsonProperty("appearanceId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtAgencyIdentifier", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CourtAgencyIdentifier { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtRoom", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CourtRoom { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("adjudicatorName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AdjudicatorName { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("adjudicatorComment", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AdjudicatorComment { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("adjudicatorAppearanceMethod", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AdjudicatorAppearanceMethod { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("documentHearing", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CvfcDocumentHearing> DocumentHearing { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtParticipant", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CvfcCourtParticipant> CourtParticipant { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("generalAttendee", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CvfcGeneralAttendee> GeneralAttendee { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CvfcAppearance
+    public partial class CvfcAppearance 
     {
         [Newtonsoft.Json.JsonProperty("appearanceId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtAgencyIdentifier", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CourtAgencyIdentifier { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtRoom", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CourtRoom { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceReason", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceReason { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CvfcPartyInterest
+    public partial class CvfcPartyInterest 
     {
         [Newtonsoft.Json.JsonProperty("orderRoleTypeDsc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string OrderRoleTypeDsc { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("partyName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PartyName { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("partyBirthDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PartyBirthDate { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CvfcDocument
+    public partial class CvfcDocument 
     {
         [Newtonsoft.Json.JsonProperty("documentId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocumentId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("fileSeqNumber", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FileSeqNumber { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("filedByName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FiledByName { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("roleTypeCode", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string RoleTypeCode { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("documentTypeCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocumentTypeCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("documentTypeDescription", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocumentTypeDescription { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("documentAccessLevelCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocumentAccessLevelCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("documentSealEndDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocumentSealEndDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("documentSealStartDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocumentSealStartDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("dateGranted", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DateGranted { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("estimatedDocumentMinutes", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string EstimatedDocumentMinutes { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("endedDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string EndedDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("dateVaried", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DateVaried { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("cancelledDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CancelledDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("documentCommentText", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocumentCommentText { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("orderDocumentYN", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string OrderDocumentYN { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("pOROrderYN", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string POROrderYN { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("cFCOrderYN", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CFCOrderYN { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("imageId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ImageId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("sealedYN", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SealedYN { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("documentPageCount", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocumentPageCount { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("issue", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CvfcIssue> Issue { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearance", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CvfcAppearance> Appearance { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("partyInterest", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CvfcPartyInterest> PartyInterest { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("filedBy", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<ClFiledBy> FiledBy { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CvfcCivilFile
+    public partial class CvfcCivilFile 
     {
         [Newtonsoft.Json.JsonProperty("physicalFileID", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PhysicalFileID { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("fileNumber", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FileNumber { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtLevelCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CourtLevelCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtClassCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CourtClassCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("indigencyGrantedYN", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string IndigencyGrantedYN { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("infantFileYN", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string InfantFileYN { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("cFCSAFileYN", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CFCSAFileYN { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("marriagePlaceText", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string MarriagePlaceText { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("marriageDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string MarriageDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("divorceDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DivorceDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("federalClearanceDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FederalClearanceDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("centralRegNumber", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CentralRegNumber { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("caveatExpiryDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CaveatExpiryDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("probateFileNumber", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ProbateFileNumber { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("caveatCancelledYN", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CaveatCancelledYN { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("assetDeclaredAmt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AssetDeclaredAmt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("probateFeeAmt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ProbateFeeAmt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("probateEnteredDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ProbateEnteredDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("additionalAssetDeclaredAmt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AdditionalAssetDeclaredAmt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("additionalProbateFeeAmt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AdditionalProbateFeeAmt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("estateValueAmt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string EstateValueAmt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("outsideBCAssetAmt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string OutsideBCAssetAmt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("assetCommentText", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AssetCommentText { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("fileCommentText", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FileCommentText { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("sealedYN", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SealedYN { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("sheriffCommentText", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SheriffCommentText { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("fileLocaAgencyIdentifierCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FileLocaAgencyIdentifierCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("specialProgram", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CvfcSpecialProgram> SpecialProgram { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("previousAppearance", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CvfcPreviousAppearance> PreviousAppearance { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("document", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CvfcDocument> Document { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CivilFileContent
+    public partial class CivilFileContent 
     {
         [Newtonsoft.Json.JsonProperty("courtLocaCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CourtLocaCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtRoomCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CourtRoomCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtProceedingDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CourtProceedingDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<string> AppearanceId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("physicalFileId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PhysicalFileId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("civilFile", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CvfcCivilFile> CivilFile { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class Charge
+    public partial class Charge 
     {
         [Newtonsoft.Json.JsonProperty("sectionTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SectionTxt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("sectionDscTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SectionDscTxt { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class Participant
+    public partial class Participant 
     {
         [Newtonsoft.Json.JsonProperty("fullNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FullNm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("charge", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<Charge> Charge { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class FileDetail
+    public partial class FileDetail 
     {
         [Newtonsoft.Json.JsonProperty("mdocJustinNo", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string MdocJustinNo { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("physicalFileId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PhysicalFileId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("fileHomeAgencyId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FileHomeAgencyId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("fileNumberTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FileNumberTxt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("mdocSeqNo", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string MdocSeqNo { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("ticketSeriesTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string TicketSeriesTxt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("mdocRefTypeCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string MdocRefTypeCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtLevelCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public FileDetailCourtLevelCd CourtLevelCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtClassCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public FileDetailCourtClassCd CourtClassCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("warrantYN", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public FileDetailWarrantYN WarrantYN { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("inCustodyYN", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public FileDetailInCustodyYN InCustodyYN { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("nextApprDt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string NextApprDt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("pcssCourtDivisionCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public FileDetailPcssCourtDivisionCd PcssCourtDivisionCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("sealStatusCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public FileDetailSealStatusCd SealStatusCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("approvalCrownAgencyTypeCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ApprovalCrownAgencyTypeCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("participant", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<Participant> Participant { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class FileSearchResponse
+    public partial class FileSearchResponse 
     {
         [Newtonsoft.Json.JsonProperty("responseCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ResponseCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("responseMessageTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ResponseMessageTxt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("recCount", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string RecCount { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("fileDetail", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<FileDetail> FileDetail { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class Rcc
+    public partial class Rcc 
     {
         [Newtonsoft.Json.JsonProperty("rccId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string RccId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("rccAgencyId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string RccAgencyId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("rccAgencyFileNo", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string RccAgencyFileNo { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("synopsisTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SynopsisTxt { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CrownFileNote
+    public partial class CrownFileNote 
     {
         [Newtonsoft.Json.JsonProperty("fileNoteId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FileNoteId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("noteTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string NoteTxt { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class HearingRestriction2
+    public partial class HearingRestriction2 
     {
         [Newtonsoft.Json.JsonProperty("hearingRestrictionId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string HearingRestrictionId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("adjPartId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AdjPartId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("adjFullNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AdjFullNm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("hearingRestrictionTypeCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public HearingRestriction2HearingRestrictionTypeCd HearingRestrictionTypeCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("partId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PartId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("profSeqNo", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ProfSeqNo { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("partNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PartNm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("adjInitialsTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AdjInitialsTxt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("justinNo", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string JustinNo { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("hearingRestrictionCcn", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string HearingRestrictionCcn { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CriminalWitness
+    public partial class CriminalWitness 
     {
         [Newtonsoft.Json.JsonProperty("partId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PartId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("lastNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string LastNm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("givenNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string GivenNm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("witnessTypeCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string WitnessTypeCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("roleTypeCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public CriminalWitnessRoleTypeCd RoleTypeCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("requiredYN", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public CriminalWitnessRequiredYN RequiredYN { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("confidentialYN", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public CriminalWitnessConfidentialYN ConfidentialYN { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("pinCodeTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PinCodeTxt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("agencyId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AgencyId { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CriminalParticipant
+    public partial class CriminalParticipant 
     {
         [Newtonsoft.Json.JsonProperty("partId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PartId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("profSeqNo", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ProfSeqNo { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("lastNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string LastNm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("givenNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string GivenNm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("orgNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string OrgNm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("warrantYN", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public CriminalParticipantWarrantYN? WarrantYN { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("inCustodyYN", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public CriminalParticipantInCustodyYN? InCustodyYN { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("interpreterYN", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public CriminalParticipantInterpreterYN? InterpreterYN { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("detainedYN", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public CriminalParticipantDetainedYN? DetainedYN { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("birthDt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string BirthDt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("counselRrepId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CounselRrepId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("counselPartId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CounselPartId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("counselLastNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CounselLastNm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("counselGivenNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CounselGivenNm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("counselRelatedRepTypeCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CounselRelatedRepTypeCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("counselEnteredDt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CounselEnteredDt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("designatedCounselYN", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public CriminalParticipantDesignatedCounselYN? DesignatedCounselYN { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("charge", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<Charge> Charge { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class TrialRemark
+    public partial class TrialRemark 
     {
         [Newtonsoft.Json.JsonProperty("commentTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CommentTxt { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CriminalFileDetailResponse
+    public partial class CriminalFileDetailResponse 
     {
         [Newtonsoft.Json.JsonProperty("responseCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ResponseCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("responseMessageTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ResponseMessageTxt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("justinNo", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string JustinNo { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("fileNumberTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FileNumberTxt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("homeLocationAgenId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string HomeLocationAgenId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtLevelCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public CriminalFileDetailResponseCourtLevelCd CourtLevelCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtClassCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public CriminalFileDetailResponseCourtClassCd CourtClassCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("currentEstimateLenQty", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CurrentEstimateLenQty { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("currentEstimateLenUnit", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public CriminalFileDetailResponseCurrentEstimateLenUnit CurrentEstimateLenUnit { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("initialEstimateLenQty", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string InitialEstimateLenQty { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("initialEstimateLenUnit", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public CriminalFileDetailResponseInitialEstimateLenUnit InitialEstimateLenUnit { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("trialStartDt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string TrialStartDt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("witnessCount", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string WitnessCount { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("mdocSubCategoryDsc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string MdocSubCategoryDsc { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("approvedByAgencyCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ApprovedByAgencyCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("approvedByPartNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ApprovedByPartNm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("assignedPartNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AssignedPartNm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("crownEstimateLenQty", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CrownEstimateLenQty { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("crownEstimateLenUnit", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public CriminalFileDetailResponseCrownEstimateLenUnit? CrownEstimateLenUnit { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("caseAgeDays", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CaseAgeDays { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("indictableYN", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public CriminalFileDetailResponseIndictableYN IndictableYN { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("complexityTypeCd", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public CriminalFileDetailResponseComplexityTypeCd? ComplexityTypeCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("personnelWitnessRecCount", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PersonnelWitnessRecCount { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("expertWitnessRecCount", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ExpertWitnessRecCount { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("civilianWitnessRecCount", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CivilianWitnessRecCount { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("enforcementAgencyFileNoTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string EnforcementAgencyFileNoTxt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("trialRemarkTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string TrialRemarkTxt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("commentToJudgeTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CommentToJudgeTxt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("approvalCrownAgencyCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ApprovalCrownAgencyCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("mdocCcn", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string MdocCcn { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("trialRemark", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<TrialRemark> TrialRemark { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("participant", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CriminalParticipant> Participant { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("witness", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CriminalWitness> Witness { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("hearingRestriction", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<HearingRestriction2> HearingRestriction { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("crownFileNote", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CrownFileNote> CrownFileNote { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("rcc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<Rcc> Rcc { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CvfcParty3
+    public partial class CvfcParty3 
     {
         [Newtonsoft.Json.JsonProperty("partyId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PartyId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("lastNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string LastNm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("givenNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string GivenNm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("orgNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string OrgNm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("roleTypeCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string RoleTypeCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("leftRightCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public CvfcParty3LeftRightCd LeftRightCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("selfRepresentedYN", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SelfRepresentedYN { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("counsel", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CvfcCounsel> Counsel { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CvfcDocumentSupport
+    public partial class CvfcDocumentSupport 
     {
         [Newtonsoft.Json.JsonProperty("actCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ActCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("actDsc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ActDsc { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CvfcIssue2
+    public partial class CvfcIssue2 
     {
         [Newtonsoft.Json.JsonProperty("issueNumber", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string IssueNumber { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("issueTypeCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string IssueTypeCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("issueDsc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string IssueDsc { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("issueResultCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string IssueResultCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("issueResultDsc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string IssueResultDsc { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("concludedYn", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public CvfcIssue2ConcludedYn ConcludedYn { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CvfcDocument3
+    public partial class CvfcDocument3 
     {
         [Newtonsoft.Json.JsonProperty("civilDocumentId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CivilDocumentId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("imageId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ImageId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("fileSeqNo", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FileSeqNo { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("documentTypeCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocumentTypeCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("filedDt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FiledDt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("filedByName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FiledByName { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("commentTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CommentTxt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("concludedYn", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ConcludedYn { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("lastAppearanceId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string LastAppearanceId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("lastAppearanceDt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string LastAppearanceDt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("lastAppearanceTm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string LastAppearanceTm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("sealedYN", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SealedYN { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("DateGranted", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DateGranted { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("documentSupport", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CvfcDocumentSupport> DocumentSupport { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearance", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CvfcAppearance> Appearance { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("issue", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CvfcIssue2> Issue { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CvfcRefDocument3
+    public partial class CvfcRefDocument3 
     {
         [Newtonsoft.Json.JsonProperty("PartyId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PartyId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("AppearanceId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("PartyName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PartyName { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("AppearanceDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceDate { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("ObjectGuid", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ObjectGuid { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("DescriptionText", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DescriptionText { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("EnterDtm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string EnterDtm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("ReferenceDocumentTypeDsc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ReferenceDocumentTypeDsc { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CvfcHearingRestriction2
+    public partial class CvfcHearingRestriction2 
     {
         [Newtonsoft.Json.JsonProperty("hearingRestrictionId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string HearingRestrictionId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("adjPartId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AdjPartId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("adjFullNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AdjFullNm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("hearingRestrictionTypeCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public CvfcHearingRestriction2HearingRestrictionTypeCd HearingRestrictionTypeCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("applyToNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ApplyToNm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("civilDocumentId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CivilDocumentId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("physicalFileId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PhysicalFileId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("adjInitialsTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AdjInitialsTxt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("hearingRestrictionCcn", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string HearingRestrictionCcn { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CivilFileDetailResponse
+    public partial class CivilFileDetailResponse 
     {
         [Newtonsoft.Json.JsonProperty("responseCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ResponseCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("responseMessageTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ResponseMessageTxt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("physicalFileId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PhysicalFileId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("fileNumberTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FileNumberTxt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("homeLocationAgenId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string HomeLocationAgenId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtLevelCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public CivilFileDetailResponseCourtLevelCd CourtLevelCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtClassCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public CivilFileDetailResponseCourtClassCd CourtClassCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("socTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SocTxt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("leftRoleDsc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string LeftRoleDsc { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("rightRoleDsc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string RightRoleDsc { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("trialRemarkTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string TrialRemarkTxt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("commentToJudgeTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CommentToJudgeTxt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("sheriffCommentText", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SheriffCommentText { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("sealedYN", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SealedYN { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("party", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CvfcParty3> Party { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("document", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CvfcDocument3> Document { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("referenceDocument", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CvfcRefDocument3> ReferenceDocument { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearance", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CvfcAppearance> Appearance { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("hearingRestriction", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CvfcHearingRestriction2> HearingRestriction { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CriminalAppearanceDetail
+    public partial class CriminalAppearanceDetail 
     {
         [Newtonsoft.Json.JsonProperty("historyYN", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public CriminalAppearanceDetailHistoryYN HistoryYN { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceDt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceDt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceTm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceTm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceReasonCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceReasonCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtAgencyId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CourtAgencyId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtRoomCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CourtRoomCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("judgeFullNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string JudgeFullNm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("judgeInitials", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string JudgeInitials { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("counselFullNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CounselFullNm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("estimatedTimeHour", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string EstimatedTimeHour { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("estimatedTimeMin", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string EstimatedTimeMin { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("partOfTrialYN", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public CriminalAppearanceDetailPartOfTrialYN PartOfTrialYN { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceStatusCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public CriminalAppearanceDetailAppearanceStatusCd AppearanceStatusCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("partId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PartId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("profSeqNo", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ProfSeqNo { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("lastNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string LastNm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("givenNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string GivenNm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("orgNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string OrgNm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceResultCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceResultCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceCcn", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceCcn { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("supplementalEquipmentTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SupplementalEquipmentTxt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("securityRestrictionTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SecurityRestrictionTxt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("outOfTownJudgeTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string OutOfTownJudgeTxt { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CivilAppearanceDetail
+    public partial class CivilAppearanceDetail 
     {
         [Newtonsoft.Json.JsonProperty("historyYN", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public CivilAppearanceDetailHistoryYN HistoryYN { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceDt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceDt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceTm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceTm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceReasonCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceReasonCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtAgencyId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CourtAgencyId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtRoomCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CourtRoomCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("judgeFullNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string JudgeFullNm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("judgeInitials", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string JudgeInitials { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("estimatedTimeHour", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string EstimatedTimeHour { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("estimatedTimeMin", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string EstimatedTimeMin { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("partOfTrialYN", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public CivilAppearanceDetailPartOfTrialYN PartOfTrialYN { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceStatusCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public CivilAppearanceDetailAppearanceStatusCd AppearanceStatusCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceResultCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceResultCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceCcn", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceCcn { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("documentTypeCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocumentTypeCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("documentRecCount", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocumentRecCount { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("supplementalEquipmentTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SupplementalEquipmentTxt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("securityRestrictionTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SecurityRestrictionTxt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("outOfTownJudgeTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string OutOfTownJudgeTxt { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CriminalFileAppearancesResponse
+    public partial class CriminalFileAppearancesResponse 
     {
         [Newtonsoft.Json.JsonProperty("responseCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ResponseCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("responseMessageTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ResponseMessageTxt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("futureRecCount", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FutureRecCount { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("historyRecCount", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string HistoryRecCount { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("apprDetail", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CriminalAppearanceDetail> ApprDetail { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CivilFileAppearancesResponse
+    public partial class CivilFileAppearancesResponse 
     {
         [Newtonsoft.Json.JsonProperty("responseCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ResponseCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("responseMessageTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ResponseMessageTxt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("futureRecCount", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FutureRecCount { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("historyRecCount", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string HistoryRecCount { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("apprDetail", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CivilAppearanceDetail> ApprDetail { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class RopResponse
+    public partial class RopResponse 
     {
         [Newtonsoft.Json.JsonProperty("resultCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ResultCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("resultMessage", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ResultMessage { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("b64Content", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string B64Content { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class DocumentResponse
+    public partial class DocumentResponse 
     {
         [Newtonsoft.Json.JsonProperty("resultCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ResultCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("resultMessage", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ResultMessage { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("b64Content", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string B64Content { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class JustinReportResponse
+    public partial class JustinReportResponse 
     {
         [Newtonsoft.Json.JsonProperty("responseCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ResponseCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("responseMessageTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ResponseMessageTxt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("reportContent", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ReportContent { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CivilAppearanceParty
+    public partial class CivilAppearanceParty 
     {
         [Newtonsoft.Json.JsonProperty("partyId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PartyId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("partyRoleTypeCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PartyRoleTypeCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("lastNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string LastNm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("givenNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string GivenNm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("orgNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string OrgNm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("counselNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CounselNm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtParticipantId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CourtParticipantId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtParticipantCcn", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CourtParticipantCcn { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CivilFileAppearancePartyResponse
+    public partial class CivilFileAppearancePartyResponse 
     {
         [Newtonsoft.Json.JsonProperty("responseCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ResponseCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("responseMessageTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ResponseMessageTxt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("party", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CivilAppearanceParty> Party { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CivilAppearanceMethod
+    public partial class CivilAppearanceMethod 
     {
         [Newtonsoft.Json.JsonProperty("roleTypeCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string RoleTypeCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceMethodCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceMethodCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("apprMethodCcn", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ApprMethodCcn { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CivilFileAppearanceApprMethodResponse
+    public partial class CivilFileAppearanceApprMethodResponse 
     {
         [Newtonsoft.Json.JsonProperty("responseCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ResponseCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("responseMessageTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ResponseMessageTxt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceMethod", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CivilAppearanceMethod> AppearanceMethod { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CriminalAppearanceMethod
+    public partial class CriminalAppearanceMethod 
     {
         [Newtonsoft.Json.JsonProperty("assetUsageSeqNo", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AssetUsageSeqNo { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("roleTypeCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string RoleTypeCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceMethodCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceMethodCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("phoneNumberTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PhoneNumberTxt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("instructionTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string InstructionTxt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("apprMethodCcn", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ApprMethodCcn { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CriminalFileAppearanceApprMethodResponse
+    public partial class CriminalFileAppearanceApprMethodResponse 
     {
         [Newtonsoft.Json.JsonProperty("responseCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ResponseCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("responseMessageTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ResponseMessageTxt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceMethod", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CriminalAppearanceMethod> AppearanceMethod { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CriminalAppearanceCount
+    public partial class CriminalAppearanceCount 
     {
         [Newtonsoft.Json.JsonProperty("printSeqNo", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PrintSeqNo { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("statuteSectionDsc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string StatuteSectionDsc { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("statuteDsc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string StatuteDsc { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceReasonCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceReasonCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceResultCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceResultCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("findingCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string FindingCd { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CriminalFileAppearanceCountResponse
+    public partial class CriminalFileAppearanceCountResponse 
     {
         [Newtonsoft.Json.JsonProperty("responseCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ResponseCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("responseMessageTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ResponseMessageTxt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("apprCount", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CriminalAppearanceCount> ApprCount { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CourtCalendarDetailAppearanceParty
+    public partial class CourtCalendarDetailAppearanceParty 
     {
         [Newtonsoft.Json.JsonProperty("partyId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PartyId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("partyNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PartyNm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("counselNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CounselNm { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CourtCalendarDetailByDay
+    public partial class CourtCalendarDetailByDay 
     {
         [Newtonsoft.Json.JsonProperty("responseCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ResponseCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("responseMessageTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ResponseMessageTxt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearance", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CourtCalendarDetailAppearance> Appearance { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class CourtCalendarDetailAppearance
+    public partial class CourtCalendarDetailAppearance 
     {
         [Newtonsoft.Json.JsonProperty("courtDivisionCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public CourtCalendarDetailAppearanceCourtDivisionCd CourtDivisionCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtClassCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public CourtCalendarDetailAppearanceCourtClassCd CourtClassCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtRoomCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CourtRoomCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceDt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceDt { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceTm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceTm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceReasonCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceReasonCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("durationHour", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DurationHour { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("durationMin", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DurationMin { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtFileNumber", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CourtFileNumber { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("styleOfCause", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string StyleOfCause { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("adjudicatorInitials", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AdjudicatorInitials { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("adjudicatorNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AdjudicatorNm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("hearingRestrictionCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public CourtCalendarDetailAppearanceHearingRestrictionCd HearingRestrictionCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("caseAgeDays", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CaseAgeDays { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("videoYn", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public CourtCalendarDetailAppearanceVideoYn VideoYn { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("inCustodyYn", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public CourtCalendarDetailAppearanceInCustodyYn? InCustodyYn { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("apprId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ApprId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("accusedNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AccusedNm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("accusedCounselNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AccusedCounselNm { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("profPartId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ProfPartId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("profSeqNo", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ProfSeqNo { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("appearanceStatusCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public CourtCalendarDetailAppearanceAppearanceStatusCd AppearanceStatusCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("remoteVideoYn", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public CourtCalendarDetailAppearanceRemoteVideoYn RemoteVideoYn { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("homeLocationAgenId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string HomeLocationAgenId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtlistRefNumber", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CourtlistRefNumber { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("mdocJustinNo", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string MdocJustinNo { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("physicalFileId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PhysicalFileId { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("courtLevelCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public CourtCalendarDetailAppearanceCourtLevelCd CourtLevelCd { get; set; }
-
+    
         [Newtonsoft.Json.JsonProperty("party", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CourtCalendarDetailAppearanceParty> Party { get; set; }
-
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
+    
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
             set { _additionalProperties = value; }
         }
-
-
+    
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum CourtLevelCd
     {
         [System.Runtime.Serialization.EnumMember(Value = @"P")]
         P = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"S")]
         S = 1,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"A")]
         A = 2,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum CourtClassCd
     {
         [System.Runtime.Serialization.EnumMember(Value = @"A")]
         A = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"Y")]
         Y = 1,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"T")]
         T = 2,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"F")]
         F = 3,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"C")]
         C = 4,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"M")]
         M = 5,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"L")]
         L = 6,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"R")]
         R = 7,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"B")]
         B = 8,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"D")]
         D = 9,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"E")]
         E = 10,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"G")]
         G = 11,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"H")]
         H = 12,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"N")]
         N = 13,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"O")]
         O = 14,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"P")]
         P = 15,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"S")]
         S = 16,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"V")]
         V = 17,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum SearchMode
     {
         [System.Runtime.Serialization.EnumMember(Value = @"FILENO")]
         FILENO = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"PARTNAME")]
         PARTNAME = 1,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"CROWN")]
         CROWN = 2,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"JUSTINNO")]
         JUSTINNO = 3,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"PHYSID")]
         PHYSID = 4,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum CourtClassCd2
     {
         [System.Runtime.Serialization.EnumMember(Value = @"A")]
         A = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"Y")]
         Y = 1,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"T")]
         T = 2,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"F")]
         F = 3,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"C")]
         C = 4,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"M")]
         M = 5,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"L")]
         L = 6,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"R")]
         R = 7,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"B")]
         B = 8,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"D")]
         D = 9,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"E")]
         E = 10,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"G")]
         G = 11,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"H")]
         H = 12,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"N")]
         N = 13,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"O")]
         O = 14,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"P")]
         P = 15,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"S")]
         S = 16,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"V")]
         V = 17,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum CourtLevelCd2
     {
         [System.Runtime.Serialization.EnumMember(Value = @"P")]
         P = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"S")]
         S = 1,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"A")]
         A = 2,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum NameSearchTypeCd
     {
         [System.Runtime.Serialization.EnumMember(Value = @"E")]
         E = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"P")]
         P = 1,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"S")]
         S = 2,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum SearchByCrownActiveOnlyYN
     {
         [System.Runtime.Serialization.EnumMember(Value = @"Y")]
         Y = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"N")]
         N = 1,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum SearchByCrownFileDesignationCd
     {
         [System.Runtime.Serialization.EnumMember(Value = @"SPC")]
         SPC = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"GA")]
         GA = 1,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"SA")]
         SA = 2,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"ALL")]
         ALL = 3,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"SG")]
         SG = 4,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum FutureYN
     {
         [System.Runtime.Serialization.EnumMember(Value = @"Y")]
         Y = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"N")]
         N = 1,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum HistoryYN
     {
         [System.Runtime.Serialization.EnumMember(Value = @"Y")]
         Y = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"N")]
         N = 1,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum SearchMode2
     {
         [System.Runtime.Serialization.EnumMember(Value = @"FILENO")]
         FILENO = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"PARTNAME")]
         PARTNAME = 1,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"CROWN")]
         CROWN = 2,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"JUSTINNO")]
         JUSTINNO = 3,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"PHYSID")]
         PHYSID = 4,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum CourtClassCd3
     {
         [System.Runtime.Serialization.EnumMember(Value = @"A")]
         A = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"Y")]
         Y = 1,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"T")]
         T = 2,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"F")]
         F = 3,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"C")]
         C = 4,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"M")]
         M = 5,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"L")]
         L = 6,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"R")]
         R = 7,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"B")]
         B = 8,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"D")]
         D = 9,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"E")]
         E = 10,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"G")]
         G = 11,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"H")]
         H = 12,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"N")]
         N = 13,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"O")]
         O = 14,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"P")]
         P = 15,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"S")]
         S = 16,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"V")]
         V = 17,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum CourtLevelCd3
     {
         [System.Runtime.Serialization.EnumMember(Value = @"P")]
         P = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"S")]
         S = 1,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"A")]
         A = 2,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum NameSearchTypeCd2
     {
         [System.Runtime.Serialization.EnumMember(Value = @"E")]
         E = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"P")]
         P = 1,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"S")]
         S = 2,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum SearchByCrownActiveOnlyYN2
     {
         [System.Runtime.Serialization.EnumMember(Value = @"Y")]
         Y = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"N")]
         N = 1,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum SearchByCrownFileDesignationCd2
     {
         [System.Runtime.Serialization.EnumMember(Value = @"SPC")]
         SPC = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"GA")]
         GA = 1,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"SA")]
         SA = 2,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"ALL")]
         ALL = 3,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"SG")]
         SG = 4,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum FutureYN2
     {
         [System.Runtime.Serialization.EnumMember(Value = @"Y")]
         Y = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"N")]
         N = 1,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum HistoryYN2
     {
         [System.Runtime.Serialization.EnumMember(Value = @"Y")]
         Y = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"N")]
         N = 1,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum FileDetailCourtLevelCd
     {
         [System.Runtime.Serialization.EnumMember(Value = @"P")]
         P = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"S")]
         S = 1,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"A")]
         A = 2,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum FileDetailCourtClassCd
     {
         [System.Runtime.Serialization.EnumMember(Value = @"A")]
         A = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"Y")]
         Y = 1,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"T")]
         T = 2,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"F")]
         F = 3,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"C")]
         C = 4,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"M")]
         M = 5,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"L")]
         L = 6,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"R")]
         R = 7,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"B")]
         B = 8,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"D")]
         D = 9,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"E")]
         E = 10,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"G")]
         G = 11,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"H")]
         H = 12,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"N")]
         N = 13,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"O")]
         O = 14,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"P")]
         P = 15,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"S")]
         S = 16,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"V")]
         V = 17,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum FileDetailWarrantYN
     {
         [System.Runtime.Serialization.EnumMember(Value = @"Y")]
         Y = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"N")]
         N = 1,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum FileDetailInCustodyYN
     {
         [System.Runtime.Serialization.EnumMember(Value = @"Y")]
         Y = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"N")]
         N = 1,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum FileDetailPcssCourtDivisionCd
     {
         [System.Runtime.Serialization.EnumMember(Value = @"I")]
         I = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"R")]
         R = 1,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"F")]
         F = 2,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum FileDetailSealStatusCd
     {
         [System.Runtime.Serialization.EnumMember(Value = @"NA")]
         NA = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"SD")]
         SD = 1,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"EF")]
         EF = 2,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum HearingRestriction2HearingRestrictionTypeCd
     {
         [System.Runtime.Serialization.EnumMember(Value = @"S")]
         S = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"D")]
         D = 1,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"A")]
         A = 2,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"G")]
         G = 3,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum CriminalWitnessRoleTypeCd
     {
         [System.Runtime.Serialization.EnumMember(Value = @"WIT")]
         WIT = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"CRN")]
         CRN = 1,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum CriminalWitnessRequiredYN
     {
         [System.Runtime.Serialization.EnumMember(Value = @"Y")]
         Y = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"N")]
         N = 1,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum CriminalWitnessConfidentialYN
     {
         [System.Runtime.Serialization.EnumMember(Value = @"Y")]
         Y = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"N")]
         N = 1,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum CriminalParticipantWarrantYN
     {
         [System.Runtime.Serialization.EnumMember(Value = @"Y")]
         Y = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"N")]
         N = 1,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum CriminalParticipantInCustodyYN
     {
         [System.Runtime.Serialization.EnumMember(Value = @"Y")]
         Y = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"N")]
         N = 1,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum CriminalParticipantInterpreterYN
     {
         [System.Runtime.Serialization.EnumMember(Value = @"Y")]
         Y = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"N")]
         N = 1,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum CriminalParticipantDetainedYN
     {
         [System.Runtime.Serialization.EnumMember(Value = @"Y")]
         Y = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"N")]
         N = 1,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum CriminalParticipantDesignatedCounselYN
     {
         [System.Runtime.Serialization.EnumMember(Value = @"Y")]
         Y = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"N")]
         N = 1,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum CriminalFileDetailResponseCourtLevelCd
     {
         [System.Runtime.Serialization.EnumMember(Value = @"P")]
         P = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"S")]
         S = 1,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"A")]
         A = 2,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum CriminalFileDetailResponseCourtClassCd
     {
         [System.Runtime.Serialization.EnumMember(Value = @"A")]
         A = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"Y")]
         Y = 1,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"T")]
         T = 2,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"F")]
         F = 3,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"C")]
         C = 4,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"M")]
         M = 5,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"L")]
         L = 6,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"R")]
         R = 7,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"B")]
         B = 8,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"D")]
         D = 9,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"E")]
         E = 10,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"G")]
         G = 11,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"H")]
         H = 12,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"N")]
         N = 13,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"O")]
         O = 14,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"P")]
         P = 15,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"S")]
         S = 16,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"V")]
         V = 17,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum CriminalFileDetailResponseCurrentEstimateLenUnit
     {
         [System.Runtime.Serialization.EnumMember(Value = @"HRS")]
         HRS = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"DYS")]
         DYS = 1,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"MTH")]
         MTH = 2,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"MTHS")]
         MTHS = 3,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"YRS")]
         YRS = 4,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"MIN")]
         MIN = 5,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"WKS")]
         WKS = 6,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"HR")]
         HR = 7,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum CriminalFileDetailResponseInitialEstimateLenUnit
     {
         [System.Runtime.Serialization.EnumMember(Value = @"HRS")]
         HRS = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"DYS")]
         DYS = 1,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"MTH")]
         MTH = 2,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"MTHS")]
         MTHS = 3,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"YRS")]
         YRS = 4,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"MIN")]
         MIN = 5,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"WKS")]
         WKS = 6,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"HR")]
         HR = 7,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum CriminalFileDetailResponseCrownEstimateLenUnit
     {
         [System.Runtime.Serialization.EnumMember(Value = @"HRS")]
         HRS = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"DYS")]
         DYS = 1,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"MTH")]
         MTH = 2,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"MTHS")]
         MTHS = 3,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"YRS")]
         YRS = 4,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"MIN")]
         MIN = 5,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"WKS")]
         WKS = 6,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"HR")]
         HR = 7,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum CriminalFileDetailResponseIndictableYN
     {
         [System.Runtime.Serialization.EnumMember(Value = @"Y")]
         Y = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"N")]
         N = 1,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum CriminalFileDetailResponseComplexityTypeCd
     {
         [System.Runtime.Serialization.EnumMember(Value = @"SPC")]
         SPC = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"GA")]
         GA = 1,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"SA")]
         SA = 2,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"ALL")]
         ALL = 3,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"SG")]
         SG = 4,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum CvfcParty3LeftRightCd
     {
         [System.Runtime.Serialization.EnumMember(Value = @"L")]
         L = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"R")]
         R = 1,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum CvfcIssue2ConcludedYn
     {
         [System.Runtime.Serialization.EnumMember(Value = @"Y")]
         Y = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"N")]
         N = 1,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum CvfcHearingRestriction2HearingRestrictionTypeCd
     {
         [System.Runtime.Serialization.EnumMember(Value = @"S")]
         S = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"D")]
         D = 1,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"A")]
         A = 2,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"G")]
         G = 3,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"XXX")]
         XXX = 4,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum CivilFileDetailResponseCourtLevelCd
     {
         [System.Runtime.Serialization.EnumMember(Value = @"P")]
         P = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"S")]
         S = 1,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"A")]
         A = 2,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum CivilFileDetailResponseCourtClassCd
     {
         [System.Runtime.Serialization.EnumMember(Value = @"A")]
         A = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"Y")]
         Y = 1,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"T")]
         T = 2,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"F")]
         F = 3,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"C")]
         C = 4,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"M")]
         M = 5,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"L")]
         L = 6,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"R")]
         R = 7,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"B")]
         B = 8,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"D")]
         D = 9,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"E")]
         E = 10,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"G")]
         G = 11,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"H")]
         H = 12,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"N")]
         N = 13,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"O")]
         O = 14,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"P")]
         P = 15,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"S")]
         S = 16,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"V")]
         V = 17,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum CriminalAppearanceDetailHistoryYN
     {
         [System.Runtime.Serialization.EnumMember(Value = @"Y")]
         Y = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"N")]
         N = 1,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum CriminalAppearanceDetailPartOfTrialYN
     {
         [System.Runtime.Serialization.EnumMember(Value = @"Y")]
         Y = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"N")]
         N = 1,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum CriminalAppearanceDetailAppearanceStatusCd
     {
         [System.Runtime.Serialization.EnumMember(Value = @"SCHD")]
         SCHD = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"CNCL")]
         CNCL = 1,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"UNCF")]
         UNCF = 2,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum CivilAppearanceDetailHistoryYN
     {
         [System.Runtime.Serialization.EnumMember(Value = @"Y")]
         Y = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"N")]
         N = 1,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum CivilAppearanceDetailPartOfTrialYN
     {
         [System.Runtime.Serialization.EnumMember(Value = @"Y")]
         Y = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"N")]
         N = 1,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum CivilAppearanceDetailAppearanceStatusCd
     {
         [System.Runtime.Serialization.EnumMember(Value = @"SCHD")]
         SCHD = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"CNCL")]
         CNCL = 1,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"UNCF")]
         UNCF = 2,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum CourtCalendarDetailAppearanceCourtDivisionCd
     {
         [System.Runtime.Serialization.EnumMember(Value = @"R")]
         R = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"I")]
         I = 1,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum CourtCalendarDetailAppearanceCourtClassCd
     {
         [System.Runtime.Serialization.EnumMember(Value = @"A")]
         A = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"Y")]
         Y = 1,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"T")]
         T = 2,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"F")]
         F = 3,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"C")]
         C = 4,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"M")]
         M = 5,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"L")]
         L = 6,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"R")]
         R = 7,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"B")]
         B = 8,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"D")]
         D = 9,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"E")]
         E = 10,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"G")]
         G = 11,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"H")]
         H = 12,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"N")]
         N = 13,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"O")]
         O = 14,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"P")]
         P = 15,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"S")]
         S = 16,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"V")]
         V = 17,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum CourtCalendarDetailAppearanceHearingRestrictionCd
     {
         [System.Runtime.Serialization.EnumMember(Value = @"S")]
         S = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"D")]
         D = 1,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"A")]
         A = 2,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"G")]
         G = 3,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"XXX")]
         XXX = 4,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum CourtCalendarDetailAppearanceVideoYn
     {
         [System.Runtime.Serialization.EnumMember(Value = @"Y")]
         Y = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"N")]
         N = 1,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum CourtCalendarDetailAppearanceInCustodyYn
     {
         [System.Runtime.Serialization.EnumMember(Value = @"Y")]
         Y = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"N")]
         N = 1,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum CourtCalendarDetailAppearanceAppearanceStatusCd
     {
         [System.Runtime.Serialization.EnumMember(Value = @"SCHD")]
         SCHD = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"CNCL")]
         CNCL = 1,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"UNCF")]
         UNCF = 2,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum CourtCalendarDetailAppearanceRemoteVideoYn
     {
         [System.Runtime.Serialization.EnumMember(Value = @"Y")]
         Y = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"N")]
         N = 1,
-
+    
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public enum CourtCalendarDetailAppearanceCourtLevelCd
     {
         [System.Runtime.Serialization.EnumMember(Value = @"P")]
         P = 0,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"S")]
         S = 1,
-
+    
         [System.Runtime.Serialization.EnumMember(Value = @"A")]
         A = 2,
-
+    
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.9.4.0 (NJsonSchema v10.3.1.0 (Newtonsoft.Json v12.0.0.0))")]
@@ -7001,7 +7001,7 @@ namespace JCCommon.Clients.FileServices
             : base(message + "\n\nStatus: " + statusCode + "\nResponse: \n" + ((response == null) ? "(null)" : response.Substring(0, response.Length >= 512 ? 512 : response.Length)), innerException)
         {
             StatusCode = statusCode;
-            Response = response;
+            Response = response; 
             Headers = headers;
         }
 
@@ -7027,6 +7027,6 @@ namespace JCCommon.Clients.FileServices
 
 #pragma warning restore 1591
 #pragma warning restore 1573
-#pragma warning restore 472
-#pragma warning restore 114
-#pragma warning restore 108
+#pragma warning restore  472
+#pragma warning restore  114
+#pragma warning restore  108
