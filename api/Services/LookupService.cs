@@ -1,5 +1,4 @@
-﻿using JCCommon.Clients.LookupServices;
-using LazyCache;
+﻿using LazyCache;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Serialization;
 using Scv.Api.Helpers;
@@ -9,7 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CodeLookup = System.Collections.Generic.ICollection<JCCommon.Clients.LookupServices.LookupCode>;
+using JCCommon.Clients.LookupCodeServices;
+using CodeLookup = System.Collections.Generic.ICollection<JCCommon.Clients.LookupCodeServices.LookupCode>;
 
 namespace Scv.Api.Services
 {
@@ -22,7 +22,7 @@ namespace Scv.Api.Services
 
         private readonly IAppCache _cache;
         private readonly IConfiguration _configuration;
-        private readonly LookupServiceClient _lookupClient;
+        private readonly LookupCodeServicesClient _lookupClient;
 
         #endregion Variables
 
@@ -32,7 +32,7 @@ namespace Scv.Api.Services
 
         #region Constructor
 
-        public LookupService(IConfiguration configuration, LookupServiceClient lookupClient, IAppCache cache)
+        public LookupService(IConfiguration configuration, LookupCodeServicesClient lookupClient, IAppCache cache)
         {
             _configuration = configuration;
             _lookupClient = lookupClient;

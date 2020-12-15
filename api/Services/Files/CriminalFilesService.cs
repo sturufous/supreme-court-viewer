@@ -61,7 +61,7 @@ namespace Scv.Api.Services.Files
 
             //CourtLevel = "S"  Supreme court data, CourtLevel = "P" - Province.
             //TODO remove A2A and replace with SCV, when the applicationCode has been generated. 
-            return await _filesClient.FilesCriminalAsync(_requestAgencyIdentifierId,
+            return await _filesClient.FilesCriminalGetAsync(_requestAgencyIdentifierId,
                 _requestPartId, "A2A", fcq.SearchMode, fcq.FileHomeAgencyId, fcq.FileNumberTxt,
                 fcq.FilePrefixTxt, fcq.FilePermissions, fcq.FileSuffixNo, fcq.MdocRefTypeCode, fcq.CourtClass,
                 fcq.CourtLevel, fcq.NameSearchTypeCd, fcq.LastName, fcq.OrgName, fcq.GivenName,
@@ -97,7 +97,7 @@ namespace Scv.Api.Services.Files
             foreach (var fileId in targetIds)
             {
                 async Task<CriminalFileDetailResponse> FileDetails() =>
-                    await _filesClient.FilesCriminalFileIdAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode,
+                    await _filesClient.FilesCriminalGetAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode,
                         fileId);
                 fileDetailTasks.Add(_cache.GetOrAddAsync($"CriminalFileDetail-{fileId}", FileDetails));
             }
@@ -110,7 +110,7 @@ namespace Scv.Api.Services.Files
 
         public async Task<RedactedCriminalFileDetailResponse> FileIdAsync(string fileId)
         {
-            async Task<CriminalFileDetailResponse> FileDetails() => await _filesClient.FilesCriminalFileIdAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode, fileId);
+            async Task<CriminalFileDetailResponse> FileDetails() => await _filesClient.FilesCriminalGetAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode, fileId);
             async Task<CriminalFileContent> FileContent() => await _filesClient.FilesCriminalFilecontentAsync(null, null, null, null, fileId);
             async Task<CriminalFileAppearances> FileAppearances() => await PopulateDetailsAppearancesAsync(fileId, FutureYN.Y, HistoryYN.Y);
 
@@ -139,11 +139,11 @@ namespace Scv.Api.Services.Files
 
         public async Task<CriminalAppearanceDetail> AppearanceDetailAsync(string fileId, string appearanceId, string partId)
         {
-            async Task<CriminalFileDetailResponse> FileDetails() => await _filesClient.FilesCriminalFileIdAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode, fileId);
+            async Task<CriminalFileDetailResponse> FileDetails() => await _filesClient.FilesCriminalGetAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode, fileId);
             async Task<CriminalFileContent> FileContent() => await _filesClient.FilesCriminalFilecontentAsync(null, null, null, null, fileId);
             async Task<CriminalFileAppearances> Appearances() => await PopulateDetailsAppearancesAsync(fileId, FutureYN.Y, HistoryYN.Y);
-            async Task<CriminalFileAppearanceCountResponse> AppearanceCounts() => await _filesClient.FilesCriminalAppearanceAppearanceIdCountsAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
-            async Task<CriminalFileAppearanceApprMethodResponse> AppearanceMethods() => await _filesClient.FilesCriminalAppearanceAppearanceIdAppearancemethodsAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
+            async Task<CriminalFileAppearanceCountResponse> AppearanceCounts() => await _filesClient.FilesCriminalAppearanceCountsAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
+            async Task<CriminalFileAppearanceApprMethodResponse> AppearanceMethods() => await _filesClient.FilesCriminalAppearanceAppearancemethodsAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
 
             var appearancesTask = _cache.GetOrAddAsync($"CriminalAppearancesFull-{fileId}", Appearances);
             var fileDetailTask = _cache.GetOrAddAsync($"CriminalFileDetail-{fileId}", FileDetails);
@@ -217,7 +217,7 @@ namespace Scv.Api.Services.Files
 
         private async Task<CriminalFileAppearances> PopulateDetailsAppearancesAsync(string fileId, FutureYN? future, HistoryYN? history)
         {
-            var criminalFileIdAppearances = await _filesClient.FilesCriminalFileIdAppearancesAsync(_requestAgencyIdentifierId, _requestPartId, future, history, fileId);
+            var criminalFileIdAppearances = await _filesClient.FilesCriminalAppearancesAsync(_requestAgencyIdentifierId, _requestPartId, future, history, fileId);
             var criminalAppearances = _mapper.Map<CriminalFileAppearances>(criminalFileIdAppearances);
             foreach (var appearance in criminalAppearances.ApprDetail)
             {
@@ -448,7 +448,7 @@ namespace Scv.Api.Services.Files
 
         public async Task<RopResponse> RecordOfProceedingsAsync(string partId, string profSequenceNumber, CourtLevelCd courtLevelCode, CourtClassCd courtClassCode)
         {
-            return await _filesClient.FilesRecordOfProceedingsAsync(partId, profSequenceNumber, courtLevelCode, courtClassCode);
+            return await _filesClient.FilesRecordofproceedingsAsync(partId, profSequenceNumber, courtLevelCode, courtClassCode);
         }
 
         private async Task<ICollection<CriminalCharges>> PopulateCharges(ICollection<CriminalAppearanceCount> appearanceCount)

@@ -61,7 +61,7 @@ namespace Scv.Api.Services.Files
             fcq.FilePermissions =
                 "[\"A\", \"Y\", \"T\", \"F\", \"C\", \"M\", \"L\", \"R\", \"B\", \"D\", \"E\", \"G\", \"H\", \"N\", \"O\", \"P\", \"S\", \"V\"]"; // for now, use all types - TODO: determine proper list of types?
             //TODO remove A2A and replace with SCV, when the applicationCode has been generated. 
-            return await _filesClient.FilesCivilAsync(_requestAgencyIdentifierId, _requestPartId,
+            return await _filesClient.FilesCivilGetAsync(_requestAgencyIdentifierId, _requestPartId,
                 "A2A", fcq.SearchMode, fcq.FileHomeAgencyId, fcq.FileNumber, fcq.FilePrefix,
                 fcq.FilePermissions, fcq.FileSuffixNumber, fcq.MDocReferenceTypeCode, fcq.CourtClass, fcq.CourtLevel,
                 fcq.NameSearchType, fcq.LastName, fcq.OrgName, fcq.GivenName, fcq.Birth?.ToString("yyyy-MM-dd"),
@@ -98,7 +98,7 @@ namespace Scv.Api.Services.Files
             foreach (var fileId in targetIds)
             {
                 async Task<CivilFileDetailResponse> FileDetails() =>
-                    await _filesClient.FilesCivilFileIdAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode, fileId);
+                    await _filesClient.FilesCivilGetAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode, fileId);
                 fileDetailTasks.Add(_cache.GetOrAddAsync($"CivilFileDetail-{fileId}", FileDetails));
             }
 
@@ -110,7 +110,7 @@ namespace Scv.Api.Services.Files
 
         public async Task<RedactedCivilFileDetailResponse> FileIdAsync(string fileId)
         {
-            async Task<CivilFileDetailResponse> FileDetails() => await _filesClient.FilesCivilFileIdAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode, fileId);
+            async Task<CivilFileDetailResponse> FileDetails() => await _filesClient.FilesCivilGetAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode, fileId);
             async Task<CivilFileContent> FileContent() => await _filesClient.FilesCivilFilecontentAsync(null, null, null, null, fileId, _requestApplicationCode);
             async Task<CivilFileAppearancesResponse> Appearances() => await PopulateDetailAppearancesAsync(FutureYN2.Y, HistoryYN2.Y, fileId);
 
@@ -142,10 +142,10 @@ namespace Scv.Api.Services.Files
 
         public async Task<CivilAppearanceDetail> DetailedAppearanceAsync(string fileId, string appearanceId)
         {
-            async Task<CivilFileDetailResponse> FileDetails() => await _filesClient.FilesCivilFileIdAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode, fileId);
+            async Task<CivilFileDetailResponse> FileDetails() => await _filesClient.FilesCivilGetAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode, fileId);
             async Task<CivilFileContent> FileContent() => await _filesClient.FilesCivilFilecontentAsync(null, null, null, null, fileId, _requestApplicationCode);
-            async Task<CivilFileAppearancePartyResponse> AppearanceParty() => await _filesClient.FilesCivilAppearanceAppearanceIdPartiesAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
-            async Task<CivilFileAppearanceApprMethodResponse> AppearanceMethods() => await _filesClient.FilesCivilAppearanceAppearanceIdAppearancemethodsAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
+            async Task<CivilFileAppearancePartyResponse> AppearanceParty() => await _filesClient.FilesCivilAppearancePartiesAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
+            async Task<CivilFileAppearanceApprMethodResponse> AppearanceMethods() => await _filesClient.FilesCivilAppearanceAppearancemethodsAsync(_requestAgencyIdentifierId, _requestPartId, appearanceId);
             async Task<CivilFileAppearancesResponse> Appearances() => await PopulateDetailAppearancesAsync(FutureYN2.Y, HistoryYN2.Y, fileId);
 
             var fileDetailTask = _cache.GetOrAddAsync($"CivilFileDetail-{fileId}", FileDetails);
@@ -225,7 +225,7 @@ namespace Scv.Api.Services.Files
 
         private async Task<CivilFileAppearancesResponse> PopulateDetailAppearancesAsync(FutureYN2? future, HistoryYN2? history, string fileId)
         {
-            var civilFileAppearancesResponse = await _filesClient.FilesCivilFileIdAppearancesAsync(_requestAgencyIdentifierId, _requestPartId, future, history,
+            var civilFileAppearancesResponse = await _filesClient.FilesCivilAppearancesAsync(_requestAgencyIdentifierId, _requestPartId, future, history,
                 fileId);
             if (civilFileAppearancesResponse == null)
                 return null;

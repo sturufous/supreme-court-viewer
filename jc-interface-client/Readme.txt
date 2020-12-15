@@ -16,3 +16,5 @@ Download the latest NSwagStudio: https://github.com/RicoSuter/NSwag/wiki/NSwagSt
 9. Copy output into appropriate .cs file under Clients/
 10. Repeat for each client
 11. Run tests
+
+Alternatively just run generate-jc-clients after adjusting the paths.
