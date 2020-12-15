@@ -13,6 +13,8 @@ using System.Threading.Tasks;
 using Scv.Api.Services.Files;
 using CivilAppearanceDetail = Scv.Api.Models.Civil.AppearanceDetail.CivilAppearanceDetail;
 using CriminalAppearanceDetail = Scv.Api.Models.Criminal.AppearanceDetail.CriminalAppearanceDetail;
+using System.Text;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace Scv.Api.Controllers
 {
@@ -261,6 +263,7 @@ namespace Scv.Api.Controllers
         [Route("document/{documentId}/{fileNameAndExtension}")]
         public async Task<IActionResult> GetDocument(string documentId, string fileNameAndExtension, bool isCriminal = false)
         {
+            documentId = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(documentId));
             var documentResponse = await _filesService.DocumentAsync(documentId, isCriminal);
 
             if (documentResponse.B64Content == null || documentResponse.B64Content.Length <= 0)

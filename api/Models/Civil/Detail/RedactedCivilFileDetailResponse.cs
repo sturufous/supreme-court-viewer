@@ -40,6 +40,8 @@ namespace Scv.Api.Models.Civil.Detail
         /// Extended document object.
         /// </summary>
         public ICollection<CivilDocument> Document { get; set; }
+
+        public ICollection<CvfcRefDocument3> ReferenceDocument { get; set; }
         /// <summary>
         /// Extended hearing restriction object. 
         /// </summary>

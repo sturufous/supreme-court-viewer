@@ -10,7 +10,8 @@ class CivilFileInformation extends VuexModule {
   public showSections = {
     'Case Details': true,
     'Future Appearances': false,
-    'Past Appearances': false
+    'Past Appearances': false,
+    'Provided Documents': false
   }
 
   public appearanceInfo = {}

@@ -56,6 +56,43 @@ namespace tests.api.Controllers
 
         #region Tests
 
+        [Fact]
+        public async void Civil_Document_With_Reference_Document()
+        {
+            var actionResult = await _controller.GetCivilFileDetailByFileId("3582");
+
+            var fileDetailResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+
+            var referenceDocuments = fileDetailResponse.ReferenceDocument;
+
+            Assert.NotNull(referenceDocuments);
+            Assert.Equal(2, referenceDocuments.Count);
+            var firstReferenceDocument = referenceDocuments.First();
+
+            var document = await _controller.GetDocument(firstReferenceDocument.ObjectGuid, "hello.txt", false);
+        }
+
+
+        [Fact]
+        public async void Civil_File_With_Reference_Documents()
+        {
+            var actionResult = await _controller.GetCivilFileDetailByFileId("3582");
+
+            var fileDetailResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+
+            var referenceDocuments = fileDetailResponse.ReferenceDocument;
+
+            Assert.NotNull(referenceDocuments);
+            Assert.Equal(2,referenceDocuments.Count);
+            var firstReferenceDocument = referenceDocuments.First();
+
+            Assert.Equal("2020-07-20 00:00:00.0", firstReferenceDocument.AppearanceDate);
+            Assert.Equal("13603", firstReferenceDocument.AppearanceId);
+            Assert.Equal("Reference Document", firstReferenceDocument.DescriptionText);
+            Assert.Equal("3768", firstReferenceDocument.PartyId);
+            Assert.Equal("SCOTSMAN, Flying", firstReferenceDocument.PartyName);
+        }
+
 
         [Fact]
         public async void Civil_File_Document_Filed_By_Name()
@@ -79,7 +116,7 @@ namespace tests.api.Controllers
             /* This is the largest civil file on dev. Unfortunately if the WSDL changes for this route, 
              * it will always return back 200, but a null file. It would have been nice if the server 
              * would return 500 etc on errors. */
-            var result = await _fileServicesClient.FilesCivilFilecontentAsync(null, null, null, null, "2222");
+            var result = await _fileServicesClient.FilesCivilFilecontentAsync(null, null, null, null, "2222", "SCV");
             Assert.NotNull(result);
         }
 
@@ -424,7 +461,7 @@ namespace tests.api.Controllers
 
             var fileContentResult = actionResult as FileContentResult;
             Assert.NotNull(fileContentResult);
-            Assert.Equal(782434, fileContentResult.FileContents.Length);
+            Assert.Equal(146972, fileContentResult.FileContents.Length);
         }
 
         [Fact]
