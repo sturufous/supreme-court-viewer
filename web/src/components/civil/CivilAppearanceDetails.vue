@@ -276,6 +276,7 @@
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { namespace } from "vuex-class";
+import base64url from "base64url";
 import "@store/modules/CommonInformation";
 import "@store/modules/CivilFileInformation";
 import {appearanceAdditionalInfoType, civilAppearanceInfoType, appearancePartiesType, appearanceMethodsType, appearanceDocumentsType} from '../../types/civil';
@@ -522,7 +523,8 @@ export default class CivilAppearanceDetails extends Vue {
 
     public openDocumentsPdf(documentId): void {
         this.loadingPdf = true;
-        const filename = 'doc'+documentId+'.pdf';
+        const filename = 'doc' + documentId + '.pdf';
+        documentId = base64url(documentId);
         window.open(`${process.env.BASE_URL}api/files/document/${documentId}/${filename}?isCriminal=false`)
         this.loadingPdf = false;
     }

@@ -40,7 +40,8 @@
                 <civil-parties v-if="showCaseDetails"/>
                 <civil-adjudicator-restrictions v-if="showCaseDetails"/>
                 <civil-comment-notes v-if="showCaseDetails"/>
-                <civil-documents-view v-if="showCaseDetails"/>            
+                <civil-documents-view v-if="showCaseDetails"/>
+                <civil-provided-documents-view v-if="showProvidedDocuments"/>            
                 <civil-past-appearances v-if="showPastAppearances" />
                 <civil-future-appearances v-if="showFutureAppearances" />
                 <b-card><br></b-card>  
@@ -64,6 +65,7 @@ import { Component, Vue } from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
 import * as _ from 'underscore';
 import CivilDocumentsView from '@components/civil/CivilDocumentsView.vue';
+import CivilProvidedDocumentsView from '@components/civil/CivilProvidedDocumentsView.vue';
 import CivilPastAppearances from '@components/civil/CivilPastAppearances.vue';
 import CivilFutureAppearances from '@components/civil/CivilFutureAppearances.vue';
 import CivilAdjudicatorRestrictions from '@components/civil/CivilAdjudicatorRestrictions.vue';
@@ -72,10 +74,11 @@ import CivilParties from '@components/civil/CivilParties.vue';
 import CivilHeaderTop from '@components/civil/CivilHeaderTop.vue';
 import CivilHeader from '@components/civil/CivilHeader.vue';
 import CivilSidePanel from '@components/civil/CivilSidePanel.vue';
-import {civilFileInformationType, partiesInfoType, documentsInfoType, summaryDocumentsInfoType} from '../../types/civil';
+import {civilFileInformationType, partiesInfoType, documentsInfoType, summaryDocumentsInfoType, referenceDocumentsInfoType} from '../../types/civil';
 import {inputNamesType, adjudicatorRestrictionsInfoType } from '../../types/common'
 import "@store/modules/CommonInformation";
 import "@store/modules/CivilFileInformation";
+import { civilReferenceDocumentJsonType } from '../../types/civil/jsonTypes';
 const civilState = namespace("CivilFileInformation");
 const commonState = namespace("CommonInformation");
 
@@ -84,6 +87,7 @@ const commonState = namespace("CommonInformation");
         CivilAdjudicatorRestrictions,
         CivilCommentNotes,
         CivilDocumentsView,
+        CivilProvidedDocumentsView,
         CivilPastAppearances,
         CivilFutureAppearances,
         CivilParties,
@@ -113,6 +117,7 @@ export default class CivilCaseDetails extends Vue {
     rightPartiesInfo: partiesInfoType[] = [];
     adjudicatorRestrictionsInfo: adjudicatorRestrictionsInfoType[] = [];
     documentsInfo: documentsInfoType[] = [];
+    providedDocumentsInfo: referenceDocumentsInfoType[] = [];
     summaryDocumentsInfo: summaryDocumentsInfoType[] = [];
     
     isDataReady = false
@@ -125,12 +130,14 @@ export default class CivilCaseDetails extends Vue {
     partiesJson;    
     adjudicatorRestrictionsJson;
     documentsDetailsJson;
+    providedDocumentsDetailsJson: civilReferenceDocumentJsonType[] = [];
     categories: string[] = [];
+    providedDocumentCategories: string[] = [];
     sidePanelTitles = [ 
-       'Case Details', 'Future Appearances', 'Past Appearances'    
+       'Case Details', 'Future Appearances', 'Past Appearances', 'Provided Documents'   
     ];
     
-    mounted () { 
+    mounted () {
         this.civilFileInformation.fileNumber = this.$route.params.fileNumber
         this.UpdateCivilFile(this.civilFileInformation);        
         this.getFileDetails();
@@ -147,6 +154,7 @@ export default class CivilCaseDetails extends Vue {
                     this.partiesJson = data.party
                     this.adjudicatorRestrictionsJson = data.hearingRestriction;
                     this.documentsDetailsJson = data.document;
+                    this.providedDocumentsDetailsJson = data.referenceDocument;
                     if (data.sealedYN == "Y") {
                         this.isSealed = true;
                     } 
@@ -161,7 +169,9 @@ export default class CivilCaseDetails extends Vue {
                         this.civilFileInformation.adjudicatorRestrictionsInfo = this.adjudicatorRestrictionsInfo;
                         this.civilFileInformation.documentsInfo = this.documentsInfo;
                         this.civilFileInformation.summaryDocumentsInfo = this.summaryDocumentsInfo;
+                        this.civilFileInformation.referenceDocumentInfo = this.providedDocumentsInfo;
                         this.civilFileInformation.categories = this.categories;
+                        this.civilFileInformation.providedDocumentCategories = this.providedDocumentCategories;
                         this.UpdateCivilFile(this.civilFileInformation);
                         if (this.isSealed || this.docIsSealed) {
                             this.showSealedWarning = true;
@@ -199,7 +209,12 @@ export default class CivilCaseDetails extends Vue {
     get showPastAppearances()
     {        
         return ((this.showSections['Case Details'] || this.showSections['Past Appearances'] ) && this.isDataReady)
-    }    
+    }
+    
+    get showProvidedDocuments()
+    {        
+        return ((this.showSections['Case Details'] || this.showSections['Provided Documents'] ) && this.isDataReady)
+    }
 
     public ExtractCaseInfo(): void {
         let partyIndex = 0       
@@ -241,7 +256,7 @@ export default class CivilCaseDetails extends Vue {
             restrictionInfo["Applies to"] = jRestriction.applyToNm ? jRestriction.applyToNm: 'All Documents' 
                     
             this.adjudicatorRestrictionsInfo.push(restrictionInfo);      
-        }
+        }   
 
         for(const docIndex in this.documentsDetailsJson)
         {             
@@ -303,6 +318,24 @@ export default class CivilCaseDetails extends Vue {
                 this.summaryDocumentsInfo.push(docInfo);
             }
         } 
+
+        for(const providedDocIndex in this.providedDocumentsDetailsJson)
+        {             
+            const jDoc =  this.providedDocumentsDetailsJson[providedDocIndex];            
+            const providedDocInfo = {} as referenceDocumentsInfoType;
+            providedDocInfo.partyId = jDoc.PartyId;
+            providedDocInfo.appearanceId = jDoc.AppearanceId;
+            providedDocInfo.partyName = jDoc.PartyName;
+            providedDocInfo.appearanceDate = jDoc.AppearanceDate;
+            providedDocInfo.descriptionText = jDoc.DescriptionText;
+            providedDocInfo.enterDtm = jDoc.EnterDtm;
+            providedDocInfo.referenceDocumentTypeDsc = jDoc.ReferenceDocumentTypeDsc;
+            providedDocInfo.objectGuid = jDoc.ObjectGuid;
+            if((this.providedDocumentCategories.indexOf(providedDocInfo.referenceDocumentTypeDsc) < 0) && providedDocInfo.referenceDocumentTypeDsc.length > 0) {
+                this.providedDocumentCategories.push(providedDocInfo.referenceDocumentTypeDsc);
+            }
+            this.providedDocumentsInfo.push(providedDocInfo);          
+        }
     }
 
     public SortParties(partiesList) {
