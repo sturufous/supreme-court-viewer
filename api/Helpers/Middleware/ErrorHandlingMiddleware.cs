@@ -124,7 +124,7 @@ namespace Scv.Api.Helpers.Middleware
                     _logger.LogError(ex, ex.Message);
                     break;
 
-                case JCCommon.Clients.LookupServices.ApiException exception:
+                case JCCommon.Clients.LookupCodeServices.ApiException exception:
                     code = (HttpStatusCode)exception.StatusCode;
                     message = exception.Message;
                     _logger.LogError(ex, ex.Message);
