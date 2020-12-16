@@ -68,6 +68,32 @@ export interface civilFileInformationType {
     "providedDocumentCategories": string[]
 }
 
+export interface archiveInfoType {
+    zipName: string,
+    csrRequests: csrRequestsInfoType[],
+    documentRequests: documentRequestsInfoType[],
+    ropRequests: ropRequestsInfoType[]
+}
+
+export interface csrRequestsInfoType {
+    pdfFileName: string,
+    appearanceId: string
+}
+
+export interface documentRequestsInfoType {
+    isCriminal: boolean,
+    pdfFileName: string,
+    base64UrlEncodedDocumentId: string
+}
+
+export interface ropRequestsInfoType {
+    pdfFileName: string,
+    partId: string,
+    profSequenceNumber: string,
+    courtLevelCode: string,
+    courtClassCode: string
+}
+
 export interface civilAppearanceInfoType {
     "fileNo": string,
     "appearanceId": string

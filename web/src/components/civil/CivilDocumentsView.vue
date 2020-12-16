@@ -64,6 +64,15 @@
                         </span>
                     </template>
 
+                    <template v-slot:cell(Select)="data" >                                  
+                        <b-form-checkbox style="width:3.32rem;"
+                            size="sm"
+                            class="ml-auto mr-4"
+                            @change="toggleSelectedDocuments(true, data.item)"                                            					
+                            >{{data.item}}
+                        </b-form-checkbox>
+                    </template>
+
                     <template v-slot:cell(Act)="data" >
                         <b-badge 
                             variant="secondary"
@@ -124,7 +133,7 @@ import { Component, Vue} from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
 import base64url from "base64url";
 import '@store/modules/CivilFileInformation';
-import {civilFileInformationType, documentsInfoType, summaryDocumentsInfoType} from '../../types/civil';
+import {archiveInfoType, civilFileInformationType, csrRequestsInfoType, documentRequestsInfoType, documentsInfoType, summaryDocumentsInfoType} from '../../types/civil';
 const civilState = namespace('CivilFileInformation');
 
 enum fieldTab {Categories=0, Summary, Orders, Scheduled}
@@ -151,10 +160,12 @@ export default class CivilDocumentsView extends Vue {
     categories: string[] = []; 
     fieldsTab = fieldTab.Categories;
     documentPlace = [1,0,1,1]
-    datePlace = [3,1,2,4]    
+    datePlace = [3,1,2,4]
+    selectedDocuments = {} as archiveInfoType;    
 
     fields = [ 
         [
+            {key:'Select',         sortable:false,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},
             {key:'Seq.',           sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
             {key:'Document Type',  sortable:true,  headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 16px;'},
             {key:'Act',            sortable:false, headerStyle:'text',          cellStyle:'display: block; margin-top: 1px; font-size: 14px; max-width : 50px;'},
@@ -164,10 +175,12 @@ export default class CivilDocumentsView extends Vue {
             {key:'Comment',        sortable:false, headerStyle:'text',          cellStyle:'font-size: 16px;'}
         ],
         [
+            {key:'Select',         sortable:false,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},            
             {key:'Document Type',    sortable:false, headerStyle:'text-primary',    cellStyle:'border:0px; font-size: 16px;'},
             {key:'Appearance Date',  sortable:true,  headerStyle:'text-danger',     cellStyle:'font-size: 16px;'}
         ],
         [
+            {key:'Select',         sortable:false,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},            
             {key:'Seq.',           sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
             {key:'Document Type',  sortable:true,  headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 16px;'},
             {key:'Date Filed',     sortable:false, headerStyle:'text-primary',   cellStyle:'font-size: 16px;'},
@@ -176,6 +189,7 @@ export default class CivilDocumentsView extends Vue {
             {key:'Comment',        sortable:false, headerStyle:'text',          cellStyle:'font-size: 16px;'}
         ],
         [
+            {key:'Select',         sortable:false,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},            
             {key:'Seq.',                 sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
             {key:'Document Type',        sortable:true,  headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 16px;'},
             {key:'Act',                  sortable:false, headerStyle:'text',          cellStyle:'display: block; margin-top: 1px; font-size: 14px; max-width : 50px;'},
@@ -200,7 +214,8 @@ export default class CivilDocumentsView extends Vue {
     }
 
     mounted () {    
-        this.getDocuments();        
+        this.getDocuments(); 
+        this.selectedDocuments = {zipName: "", csrRequests: [], documentRequests: [], ropRequests: []}       
     }
 
     public cellClick(data)
@@ -210,6 +225,45 @@ export default class CivilDocumentsView extends Vue {
         else        
             this.openCourtSummaryPdf(data.item['Appearance ID'])              
     }
+
+    public toggleSelectedDocuments(checked, document) {
+        const csr = document["Document Type"] == "CourtSummary";
+        const id = document["Document ID"]
+        console.log(document)
+
+        if (checked) {
+            if (csr) {               
+                const csrRequest = {} as csrRequestsInfoType;
+                csrRequest.appearanceId = id;
+                csrRequest.pdfFileName = 'court summary_'+id+'.pdf';
+                this.selectedDocuments.csrRequests.push(csrRequest);
+            } else {
+                const documentRequest = {} as documentRequestsInfoType;
+                documentRequest.isCriminal = false;
+                documentRequest.pdfFileName = 'doc' + id + '.pdf';
+                documentRequest.base64UrlEncodedDocumentId = base64url(id);
+                this.selectedDocuments.documentRequests.push(documentRequest);
+            }
+        } else {
+            if (csr) {               
+                const csrRequest = {} as csrRequestsInfoType;
+                csrRequest.appearanceId = id;
+                csrRequest.pdfFileName = 'court summary_'+id+'.pdf';
+                const index = this.selectedDocuments.csrRequests.indexOf(csrRequest);
+                this.selectedDocuments.csrRequests.splice(index, 1);
+            } else {
+                const documentRequest = {} as documentRequestsInfoType;
+                documentRequest.isCriminal = false;
+                documentRequest.pdfFileName = 'doc' + id + '.pdf';
+                documentRequest.base64UrlEncodedDocumentId = base64url(id);
+                const index = this.selectedDocuments.documentRequests.indexOf(documentRequest);                
+                this.selectedDocuments.documentRequests.splice(index, 1);
+            }
+        }
+        console.log(this.selectedDocuments)
+        
+        
+	}
 
     public navigateToLandingPage() {
         this.$router.push({name:'Home'})
