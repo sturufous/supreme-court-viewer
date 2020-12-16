@@ -33,7 +33,9 @@ export interface documentsInfoType {
     "Issues": string[],
     "Comment": string,
     "Filed By Name": string[],
-    "Date Granted": string
+    "Date Granted": string,
+    "isChecked":boolean,
+    "isEnabled":boolean
 }
 
 export interface referenceDocumentsInfoType {

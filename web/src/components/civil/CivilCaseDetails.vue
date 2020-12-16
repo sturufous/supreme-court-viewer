@@ -316,6 +316,9 @@ export default class CivilCaseDetails extends Vue {
                     }
                 } 
                 docInfo["Order Made Date"] = jDoc.DateGranted? Vue.filter('beautify-date')(jDoc.DateGranted) : '';                
+                docInfo.isChecked = false;
+                docInfo.isEnabled = docInfo["PdfAvail"] && !docInfo["Sealed"];
+                
                 this.documentsInfo.push(docInfo);                
 
             } else {
