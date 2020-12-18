@@ -21,7 +21,7 @@
             v-for="(tabMapping, index) in categories" 
             :key="index"                 
             :title="tabMapping"                 
-            v-on:click="activetab = tabMapping" 
+            v-on:click="switchTab(tabMapping)" 
             v-bind:class="[ activetab === tabMapping ? 'active mb-3' : 'mb-3' ]"
             ></b-tab>
         </b-tabs> 
@@ -148,10 +148,11 @@ import { Component, Vue} from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
 import base64url from "base64url";
 import '@store/modules/CivilFileInformation';
-import {archiveInfoType, civilFileInformationType, csrRequestsInfoType, documentRequestsInfoType, documentsInfoType, summaryDocumentsInfoType} from '../../types/civil';
+import {civilFileInformationType, csrRequestsInfoType, documentsInfoType, summaryDocumentsInfoType} from '../../types/civil';
 const civilState = namespace('CivilFileInformation');
 
 import CustomOverlay from "../CustomOverlay.vue"
+import { archiveInfoType, documentRequestsInfoType } from '../../types/common';
 
 enum fieldTab {Categories=0, Summary, Orders, Scheduled}
 
@@ -242,6 +243,11 @@ export default class CivilDocumentsView extends Vue {
         this.selectedDocuments = {zipName: "", csrRequests: [], documentRequests: [], ropRequests: []}       
     }
 
+    public switchTab(tabMapping) {        
+        this.allDocumentsChecked = false;
+        this.activetab = tabMapping;
+    }
+
     public cellClick(data)
     {          
         if(data.value !='CourtSummary')        
@@ -256,24 +262,26 @@ export default class CivilDocumentsView extends Vue {
         this.selectedDocuments = {zipName: fileName, csrRequests: [], documentRequests: [], ropRequests: []};
         for(const doc of this.documents){
             if (doc.isChecked && doc.isEnabled) {
-                const csr = doc["Document Type"] == "CourtSummary";
-                const id = doc["Document ID"]
-                if (csr) {               
-                    const csrRequest = {} as csrRequestsInfoType;
-                    csrRequest.appearanceId = id;
-                    csrRequest.pdfFileName = 'court summary_'+id+'.pdf';
-                    this.selectedDocuments.csrRequests.push(csrRequest);
-                } else {
-                    const documentRequest = {} as documentRequestsInfoType;
-                    documentRequest.isCriminal = false;
-                    documentRequest.pdfFileName = 'doc' + id + '.pdf';
-                    documentRequest.base64UrlEncodedDocumentId = base64url(id);
-                    this.selectedDocuments.documentRequests.push(documentRequest);
-                }
+                const id = doc["Document ID"]                
+                const documentRequest = {} as documentRequestsInfoType;
+                documentRequest.isCriminal = false;
+                documentRequest.pdfFileName = 'doc' + id + '.pdf';
+                documentRequest.base64UrlEncodedDocumentId = base64url(id);
+                this.selectedDocuments.documentRequests.push(documentRequest);                
             }        
         }
 
-        if(this.selectedDocuments.csrRequests.length>0 ||this.selectedDocuments.documentRequests.length>0 ||this.selectedDocuments.ropRequests.length>0 ){
+        for(const doc of this.summaryDocuments){
+            if (doc.isChecked && doc.isEnabled) {                
+                const id = doc["Appearance ID"]                      
+                const csrRequest = {} as csrRequestsInfoType;
+                csrRequest.appearanceId = id;
+                csrRequest.pdfFileName = 'court summary_'+id+'.pdf';
+                this.selectedDocuments.csrRequests.push(csrRequest);
+            }        
+        }
+
+        if(this.selectedDocuments.csrRequests.length>0 ||this.selectedDocuments.documentRequests.length>0){
             const options =  {
                 responseType: "blob",
                 headers: {
@@ -296,21 +304,68 @@ export default class CivilDocumentsView extends Vue {
     }
 
     public checkAllDocuments(checked){
-        for(const docInx in this.documents){
-            if (this.documents[docInx].isEnabled) {
-              this.documents[docInx].isChecked = checked
-            }        
+
+        if(this.activetab == 'COURT SUMMARY')
+        {
+            for(const docInx in this.summaryDocuments){
+                if (this.summaryDocuments[docInx].isEnabled) {
+                this.summaryDocuments[docInx].isChecked = checked
+                }        
+            }
+        } else {      
+           
+            if(this.activetab == 'CONCLUDED') {
+                for(const docInx in this.documents){
+                    if (this.documents[docInx]["Concluded"] === "Y" && this.documents[docInx].isEnabled) {
+                        this.documents[docInx].isChecked = checked
+                    }        
+                }                
+            } else if(this.activetab == 'SCHEDULED') {
+                for(const docInx in this.documents){
+                    if (this.documents[docInx]["Next Appearance Date"] && this.documents[docInx]["Concluded"] !== "Y" && this.documents[docInx].isEnabled) {
+                        this.documents[docInx].isChecked = checked
+                    }        
+                }                    
+            } else if(this.activetab == 'ORDERS') {
+                for(const docInx in this.documents){
+                    if (this.documents[docInx]["Category"].toUpperCase() == this.activetab.toUpperCase() && this.documents[docInx].isEnabled) {
+                        this.documents[docInx].isChecked = checked
+                    }        
+                }
+            } else if ( this.activetab != 'ALL' ) {
+                for(const docInx in this.documents) {
+                    if (this.documents[docInx]["Category"].toUpperCase() == this.activetab.toUpperCase() && this.documents[docInx].isEnabled) {
+                        this.documents[docInx].isChecked = checked
+                    }        
+                }                
+            } else {
+                for(const docInx in this.documents) {
+                    if (this.documents[docInx].isEnabled) {
+                        this.documents[docInx].isChecked = checked
+                    }        
+                }
+            }
         }
     }
 
     public toggleSelectedDocuments(checked) {  
         Vue.nextTick(()=>{
-            const checkedDocs = this.documents.filter(doc=>{return doc.isChecked})
-            const enabledDocs = this.documents.filter(doc=>{return doc.isEnabled})
-            if(checkedDocs.length == enabledDocs.length)
-                this.allDocumentsChecked = true
-            else
-                this.allDocumentsChecked = false
+            if(this.activetab == 'COURT SUMMARY') {
+                const checkedDocs = this.summaryDocuments.filter(doc=>{return doc.isChecked})
+                const enabledDocs = this.summaryDocuments.filter(doc=>{return doc.isEnabled})
+                if(checkedDocs.length == enabledDocs.length)
+                    this.allDocumentsChecked = true
+                else
+                    this.allDocumentsChecked = false
+
+            } else {
+                const checkedDocs = this.documents.filter(doc=>{return doc.isChecked})
+                const enabledDocs = this.documents.filter(doc=>{return doc.isEnabled})
+                if(checkedDocs.length == enabledDocs.length)
+                    this.allDocumentsChecked = true
+                else
+                    this.allDocumentsChecked = false
+                }            
         })        
 	}
 
