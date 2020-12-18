@@ -68,7 +68,17 @@ export interface participantDocumentsInfoType {
     "PdfAvail": boolean,
     "Image ID": string,
     "Status": string,
-    "Status Date": string 
+    "Status Date": string,
+    "isChecked":boolean,
+    "isEnabled":boolean 
+}
+
+export interface ropRequestsInfoType {
+    pdfFileName: string,
+    partId: string,
+    profSequenceNumber: string,
+    courtLevelCode: string,
+    courtClassCode: string
 }
 
 export interface participantROPInfoType {    
@@ -76,7 +86,11 @@ export interface participantROPInfoType {
     "Category": string,
     "Pages": string,
     "PdfAvail": boolean,
-    "Index": string
+    "Index": string,
+    "Part ID": string,
+    "Prof Seq No": string,
+    "isChecked":boolean,
+    "isEnabled":boolean 
 } 
 
 export interface participantFilesInfoType {

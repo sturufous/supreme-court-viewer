@@ -11,6 +11,8 @@ class CivilFileInformation extends VuexModule {
     'Case Details': true,
     'Future Appearances': false,
     'Past Appearances': false,
+    'All Documents': false,
+    'Documents': false,
     'Provided Documents': false
   }
 

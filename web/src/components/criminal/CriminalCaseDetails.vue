@@ -31,9 +31,18 @@
         <b-col col md="10" cols="10" style="overflow: auto;">
 
             <criminal-header-top v-if="isDataReady"/> 
-            <criminal-header v-if="isDataReady"/> 
+            <criminal-header v-if="isDataReady"/>
 
-            <h2 style= "white-space: pre" v-if="isDataReady">
+            <b-row v-if="showDocuments">
+                    <h2 style= "white-space: pre" v-if="isDataReady">
+                        {{selectedSideBar}}
+                    </h2>         
+                    <custom-overlay v-if="isDataReady" :show="!downloadCompleted" style="padding: 0 1rem; margin-left:auto; margin-right:2rem;">
+                        <b-button @click="downloadDocuments()" size="md" variant="info" style="padding: 0 1rem; margin-left:auto; margin-right:2rem;"> Download All Documents </b-button>
+                    </custom-overlay>
+            </b-row>  
+
+            <h2 style= "white-space: pre" v-if="!showDocuments && isDataReady">
                 {{selectedSideBar}}
             </h2>
 
@@ -75,10 +84,12 @@ import CriminalFutureAppearances from '@components/criminal/CriminalFutureAppear
 import CriminalCrownNotes from '@components/criminal/CriminalCrownNotes.vue';
 import CriminalWitnesses from '@components/criminal/CriminalWitnesses.vue';
 import CriminalSentence from '@components/criminal/CriminalSentence.vue';
-import {bansInfoType, chargesInfoType, participantListInfoType, criminalFileInformationType} from '../../types/criminal';
-import {inputNamesType, adjudicatorRestrictionsInfoType } from '../../types/common'
+import CustomOverlay from "../CustomOverlay.vue";
+import {bansInfoType, chargesInfoType, participantListInfoType, criminalFileInformationType, ropRequestsInfoType} from '../../types/criminal';
+import {inputNamesType, adjudicatorRestrictionsInfoType, documentRequestsInfoType, archiveInfoType } from '../../types/common'
 import '@store/modules/CriminalFileInformation';
 import "@store/modules/CommonInformation";
+import base64url from 'base64url';
 const criminalState = namespace('CriminalFileInformation');
 const commonState = namespace("CommonInformation");
 
@@ -102,7 +113,8 @@ enum DecodeCourtClass {
         CriminalFutureAppearances,
         CriminalCrownNotes,
         CriminalWitnesses,
-        CriminalSentence
+        CriminalSentence,
+        CustomOverlay
     }
 })
 export default class CriminalCaseDetails extends Vue {
@@ -126,9 +138,10 @@ export default class CriminalCaseDetails extends Vue {
     adjudicatorRestrictionsInfo: adjudicatorRestrictionsInfoType[] = [];
     bans: bansInfoType [] = [];
     
-    isDataReady = false
-    isMounted = false
-    banExists = false
+    isDataReady = false;
+    isMounted = false;
+    downloadCompleted = true;
+    banExists = false;
     errorCode =0;
     errorText ='';
     
@@ -187,9 +200,64 @@ export default class CriminalCaseDetails extends Vue {
                 else
                     if(this.errorCode==0) this.errorCode=200;                    
                 
-                this.isMounted = true;
-                       
+                this.isMounted = true;                       
             });
+    }
+
+    public downloadDocuments(){
+
+        const fileName = 'file'+this.criminalFileInformation.fileNumber+'documents.zip'
+        const documentsToDownload = {zipName: fileName, csrRequests: [], documentRequests: [], ropRequests: []} as archiveInfoType;
+
+        for(const partIndex in this.participantList)
+        {         
+            const partInfo = this.participantList[partIndex];
+            
+            for(const doc of partInfo.DocumentsJson)
+            {
+                if(doc.category != 'rop') {                    
+                    if (doc.imageId) {
+                        const id = doc.imageId;                
+                        const documentRequest = {} as documentRequestsInfoType;
+                        documentRequest.isCriminal = true;
+                        documentRequest.pdfFileName = 'doc' + id + '.pdf';
+                        documentRequest.base64UrlEncodedDocumentId = base64url(id);
+                        documentsToDownload.documentRequests.push(documentRequest);                
+                    } 
+                }
+                else {
+                    const ropRequest = {} as ropRequestsInfoType;
+                    const partId = doc.partId;
+                    ropRequest.pdfFileName = 'ROP_'+partId+'.pdf';
+                    ropRequest.partId = partId;
+                    ropRequest.profSequenceNumber = partInfo['Prof Seq No'];
+                    ropRequest.courtLevelCode = this.criminalFileInformation.courtLevel;
+                    ropRequest.courtClassCode = this.criminalFileInformation.courtClass;
+                    documentsToDownload.ropRequests.push(ropRequest);                    
+                }
+            }            
+        }        
+
+        if(documentsToDownload.ropRequests.length>0 || documentsToDownload.documentRequests.length>0){
+            const options =  {
+                responseType: "blob",
+                headers: {
+                "Content-Type": "application/json",
+                }
+            }
+            this.downloadCompleted = false
+            this.$http.post('api/files/archive',documentsToDownload, options )
+            .then( response =>{
+                const blob = response.data;
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                document.body.appendChild(link);
+                link.download = documentsToDownload.zipName;
+                link.click();
+                setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+                this.downloadCompleted = true;
+            }, err =>{this.downloadCompleted = true;})
+        }
     }
     
     get selectedSideBar()

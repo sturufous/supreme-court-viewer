@@ -1,8 +1,13 @@
 <template>
 
    <b-card  v-if= "isMounted" no-body>
-        <div>         
-            <h3 class="mx-4 font-weight-normal"> Documents ({{NumberOfDocuments}}) </h3>
+        <div>
+            <b-row>         
+                <h3 class="mx-4 font-weight-normal"> Documents ({{NumberOfDocuments}}) </h3>
+                <custom-overlay :show="!downloadCompleted" style="padding: 0 1rem; margin-left:auto; margin-right:2rem;">
+                    <b-button @click="downloadDocuments()" size="sm" variant="success" style="padding: 0 1rem; margin-left:auto; margin-right:2rem;"> Download Selected </b-button>
+                </custom-overlay>
+            </b-row>
             <hr class="mx-3 mb-0 bg-light" style="height: 5px;"/>         
         </div>
         <b-card>
@@ -13,7 +18,7 @@
                 v-for="(tabMapping, index) in categories"                 
                 :key="index"                 
                 :title="tabMapping"                 
-                v-on:click="activetab = tabMapping" 
+                v-on:click="switchTab(tabMapping)" 
                 v-bind:class="[ activetab === tabMapping ? 'active' : '' ]"
                 ></b-tab>
             </b-tabs>
@@ -51,9 +56,27 @@
 
                     <template  v-slot:head(Date) > 
                          <b class="text-danger" >{{getNameOfDateInTabs}}</b>
+                    </template>
+
+                    <template v-slot:head(Select) >                                  
+                        <b-form-checkbox                            
+                            class="m-0"
+                            v-model="allDocumentsChecked"
+                            @change="checkAllDocuments"                                                                       					
+                            size="sm"/>
+                    </template>
+
+                    <template v-slot:[`cell(${fields[fieldsTab][0].key})`]="data" >                                  
+                        <b-form-checkbox
+                            size="sm"
+                            class="m-0"
+                            :disabled="!data.item.isEnabled"
+                            v-model="data.item.isChecked"
+                            @change="toggleSelectedDocuments"                                            					
+                            />
                     </template> 
 
-                    <template v-slot:[`cell(${fields[0][0].key})`]="data" >
+                    <template v-slot:[`cell(${fields[0][1].key})`]="data" >
                          {{ data.value | beautify-date}}
                     </template> 
 
@@ -92,15 +115,23 @@ import { namespace } from 'vuex-class';
 import * as _ from 'underscore';
 import '@store/modules/CriminalFileInformation';
 import "@store/modules/CommonInformation";
-import {participantFilesInfoType, participantROPInfoType, participantListInfoType, participantDocumentsInfoType, criminalFileInformationType} from '../../types/criminal';
+import {participantFilesInfoType, participantROPInfoType, participantListInfoType, participantDocumentsInfoType, criminalFileInformationType, ropRequestsInfoType} from '../../types/criminal';
 import {inputNamesType} from '../../types/common'
 import base64url from 'base64url';
 const criminalState = namespace("CriminalFileInformation");
 const commonState = namespace("CommonInformation");
 
+import CustomOverlay from "../CustomOverlay.vue"
+import { archiveInfoType, documentRequestsInfoType } from '../../types/common';
+
+
 enum fieldTab {Categories=0, Summary, Bail}
 
-@Component
+@Component({
+    components: {
+       CustomOverlay
+    }
+})
 export default class CriminalDocumentsView extends Vue {    
 
     @criminalState.State
@@ -140,21 +171,27 @@ export default class CriminalDocumentsView extends Vue {
     isDataValid = false     
 
     fieldsTab = fieldTab.Categories;
-    documentPlace = [1,0,1]
+    documentPlace = [2,1,2]
+    selectedDocuments = {} as archiveInfoType; 
+    downloadCompleted = true;
+    allDocumentsChecked = false; 
 
     fields = [ 
         [
+            {key:'Select',label:'',sortable:false,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},
             {key:'Date',               sortable:true,   tdClass: 'border-top',  headerStyle:'text-danger'},
             {key:'Document Type',      sortable:true,   tdClass: 'border-top',  headerStyle:'text-primary'},
             {key:'Category',           sortable:false,  tdClass: 'border-top',  headerStyle:'text'},
             {key:'Pages',              sortable:false,  tdClass: 'border-top',  headerStyle:'text'},
         ],
         [
+            {key:'Select',label:'',sortable:false,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},
             {key:'Document Type',    sortable:false,  tdClass: 'border-top', headerStyle:'text-primary'},
             {key:'Category',         sortable:true,   tdClass: 'border-top', headerStyle:'text'},
             {key:'Pages',            sortable:false,  tdClass: 'border-top', headerStyle:'text'},
         ],
         [
+            {key:'Select',label:'',sortable:false,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},
             {key:'Date',               sortable:true,   tdClass: 'border-top',  headerStyle:'text-danger'},
             {key:'Document Type',      sortable:true,   tdClass: 'border-top',  headerStyle:'text-primary'},
             {key:'Status',             sortable:true,   tdClass: 'border-top',  headerStyle:'text-primary'},
@@ -176,7 +213,14 @@ export default class CriminalDocumentsView extends Vue {
     }    
 
     mounted () {       
-        this.getDocuments();  
+        this.getDocuments();
+        this.downloadCompleted = true
+        this.selectedDocuments = {zipName: "", csrRequests: [], documentRequests: [], ropRequests: []}  
+    }
+
+    public switchTab(tabMapping) {        
+        this.allDocumentsChecked = false;
+        this.activetab = tabMapping;
     }
 
     public setActiveParticipantIndex(index)
@@ -193,6 +237,108 @@ export default class CriminalDocumentsView extends Vue {
         this.UpdateDisplayName({'lastName': this.participantFiles[num]["Last Name"], 'givenName': this.participantFiles[num]["First Name"]});
         return this.displayName;
     }
+
+    public downloadDocuments() {
+        // console.log(this.participantFiles["Documents"])
+
+        const fileName = 'file'+this.criminalFileInformation.fileNumber+'documents.zip';
+        this.selectedDocuments = {zipName: fileName, csrRequests: [], documentRequests: [], ropRequests: []};
+        for(const doc of this.participantFiles[this.activeCriminalParticipantIndex]["Documents"]){
+            if (doc.isChecked && doc.isEnabled) {
+                const id = doc["Image ID"];                
+                const documentRequest = {} as documentRequestsInfoType;
+                documentRequest.isCriminal = true;
+                documentRequest.pdfFileName = 'doc' + id + '.pdf';
+                documentRequest.base64UrlEncodedDocumentId = base64url(id);
+                this.selectedDocuments.documentRequests.push(documentRequest);                
+            }        
+        }
+
+        for(const doc of this.participantFiles[this.activeCriminalParticipantIndex]["Record of Proceedings"]){
+            if (doc.isChecked && doc.isEnabled) {                
+                const ropRequest = {} as ropRequestsInfoType;
+                const partId = doc['Part ID'];
+                ropRequest.pdfFileName = 'ROP_'+partId+'.pdf';
+                ropRequest.partId = partId;
+                ropRequest.profSequenceNumber = doc['Prof Seq No'];
+                ropRequest.courtLevelCode = this.criminalFileInformation.courtLevel;
+                ropRequest.courtClassCode = this.criminalFileInformation.courtClass;
+                this.selectedDocuments.ropRequests.push(ropRequest); 
+            }        
+        }
+
+        if(this.selectedDocuments.ropRequests.length>0 ||this.selectedDocuments.documentRequests.length>0){
+            const options =  {
+                responseType: "blob",
+                headers: {
+                "Content-Type": "application/json",
+                }
+            }
+            this.downloadCompleted = false
+            this.$http.post('api/files/archive',this.selectedDocuments, options )
+            .then( response =>{
+                const blob = response.data;
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                document.body.appendChild(link);
+                link.download = this.selectedDocuments.zipName;
+                link.click();
+                setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+                this.downloadCompleted = true;
+            }, err =>{this.downloadCompleted = true;})
+        }
+    }
+
+    public checkAllDocuments(checked){       
+        if(this.activetab == 'ROP')
+        {
+            for(const docInx in this.participantFiles[this.activeCriminalParticipantIndex]["Record of Proceedings"]){
+                if (this.participantFiles[this.activeCriminalParticipantIndex]["Record of Proceedings"][docInx].isEnabled) {
+                    this.participantFiles[this.activeCriminalParticipantIndex]["Record of Proceedings"][docInx].isChecked = checked
+                }        
+            }
+        }
+        else {
+            if(this.activetab != 'ALL')
+            { 
+                if (this.participantFiles[this.activeCriminalParticipantIndex]["Documents"]["Category"].toUpperCase() == this.activetab.toUpperCase()){
+                    for(const docInx in this.participantFiles[this.activeCriminalParticipantIndex]["Documents"]){
+                        if (this.participantFiles[this.activeCriminalParticipantIndex]["Documents"][docInx].isEnabled) {
+                            this.participantFiles[this.activeCriminalParticipantIndex]["Documents"][docInx].isChecked = checked
+                        }        
+                    }
+                }
+            } else {
+                for(const docInx in this.participantFiles[this.activeCriminalParticipantIndex]["Documents"]){
+                    if (this.participantFiles[this.activeCriminalParticipantIndex]["Documents"][docInx].isEnabled) {
+                        this.participantFiles[this.activeCriminalParticipantIndex]["Documents"][docInx].isChecked = checked
+                    }        
+                }
+            }
+        }    
+    }
+
+    public toggleSelectedDocuments(checked) {  
+        Vue.nextTick(()=>{
+            if(this.activetab == 'ROP') {
+                const checkedDocs = this.participantFiles[this.activeCriminalParticipantIndex]["Record of Proceedings"].filter(doc=>{return doc.isChecked})
+                const enabledDocs = this.participantFiles[this.activeCriminalParticipantIndex]["Record of Proceedings"].filter(doc=>{return doc.isEnabled})
+                if(checkedDocs.length == enabledDocs.length)
+                    this.allDocumentsChecked = true
+                else
+                    this.allDocumentsChecked = false
+
+            } else {
+                const checkedDocs = this.participantFiles[this.activeCriminalParticipantIndex]["Documents"].filter(doc=>{return doc.isChecked})
+                const enabledDocs = this.participantFiles[this.activeCriminalParticipantIndex]["Documents"].filter(doc=>{return doc.isEnabled})
+                if(checkedDocs.length == enabledDocs.length)
+                    this.allDocumentsChecked = true
+                else
+                    this.allDocumentsChecked = false
+            }
+            
+        })        
+	}
    
     public ExtractDocumentInfo(): void {
         let ropExists = false 
@@ -217,6 +363,8 @@ export default class CriminalDocumentsView extends Vue {
                     docInfo["Image ID"]= doc.imageId;
                     docInfo["Status"] = doc.docmDispositionDsc;
                     docInfo["Status Date"] = doc.docmDispositionDate;
+                    docInfo.isEnabled = docInfo["PdfAvail"];
+                    docInfo.isChecked = false;
                     if (docInfo["Category"] != "PSR") {
                         docInfo["Category"] = docInfo["Category"].charAt(0).toUpperCase() + docInfo["Category"].slice(1).toLowerCase();                        
                     }                                                     
@@ -231,6 +379,10 @@ export default class CriminalDocumentsView extends Vue {
                     docInfo["Pages"]= doc.documentPageCount;
                     docInfo["PdfAvail"]= true 
                     docInfo["Index"] = partIndex;
+                    docInfo["Prof Seq No"] = partInfo["Prof Seq No"];
+                    docInfo["Part ID"] = partInfo["Part ID"];
+                    docInfo.isEnabled = docInfo["PdfAvail"];
+                    docInfo.isChecked = false;
                     rop.push(docInfo);
                     ropExists = true
                 }

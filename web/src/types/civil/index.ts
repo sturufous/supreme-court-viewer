@@ -1,4 +1,4 @@
-import {adjudicatorRestrictionsInfoType} from '../common';
+import {adjudicatorRestrictionsInfoType, documentRequestsInfoType} from '../common';
 import {civilFileDetailsType} from '../civil/jsonTypes';
 
 export interface partiesInfoType {
@@ -33,7 +33,9 @@ export interface documentsInfoType {
     "Issues": string[],
     "Comment": string,
     "Filed By Name": string[],
-    "Date Granted": string
+    "Date Granted": string,
+    "isChecked":boolean,
+    "isEnabled":boolean
 }
 
 export interface referenceDocumentsInfoType {
@@ -44,14 +46,18 @@ export interface referenceDocumentsInfoType {
     descriptionText: string,
     enterDtm: string,
     referenceDocumentTypeDsc: string,
-    objectGuid: string
+    objectGuid: string,
+    isChecked: boolean,
+    isEnabled: boolean
 }
 
 export interface summaryDocumentsInfoType {
     "Document Type": string,
     "Appearance Date": string,
     "Appearance ID": string,
-    "PdfAvail": boolean    
+    "PdfAvail": boolean,
+    "isChecked":boolean,
+    "isEnabled":boolean    
 }
 
 export interface civilFileInformationType {
@@ -66,6 +72,11 @@ export interface civilFileInformationType {
     "summaryDocumentsInfo": summaryDocumentsInfoType[],
     "categories": string[],
     "providedDocumentCategories": string[]
+}
+
+export interface csrRequestsInfoType {
+    pdfFileName: string,
+    appearanceId: string
 }
 
 export interface civilAppearanceInfoType {
