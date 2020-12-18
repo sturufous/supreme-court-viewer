@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using JCCommon.Clients.LookupServices;
+using JCCommon.Clients.LookupCodeServices;
 using LazyCache;
 using Scv.Api.Services;
 using tests.api.Helpers;
@@ -46,7 +46,7 @@ namespace tests.api.Services
         private void SetupLookupServiceTests()
         {
             var environmentBuilder = new EnvironmentBuilder("LookupServicesClient:Username", "LookupServicesClient:Password", "LookupServicesClient:Url");
-            _lookupService = new LookupService(environmentBuilder.Configuration, new LookupServiceClient(environmentBuilder.HttpClient), new CachingService());
+            _lookupService = new LookupService(environmentBuilder.Configuration, new LookupCodeServicesClient(environmentBuilder.HttpClient), new CachingService());
         }
         #endregion
     }

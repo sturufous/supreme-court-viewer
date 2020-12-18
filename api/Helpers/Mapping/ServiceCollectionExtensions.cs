@@ -5,7 +5,7 @@ using System;
 using System.Reflection;
 using JCCommon.Clients.FileServices;
 using JCCommon.Clients.LocationServices;
-using JCCommon.Clients.LookupServices;
+using JCCommon.Clients.LookupCodeServices;
 using JCCommon.Framework;
 using Microsoft.Extensions.Configuration;
 using Scv.Api.Helpers.Extensions;
@@ -39,7 +39,7 @@ namespace Scv.Api.Helpers.Mapping
                 client.BaseAddress = new Uri(configuration.GetNonEmptyValue("FileServicesClient:Url").EnsureEndingForwardSlash());
             });
 
-            services.AddHttpClient<LookupServiceClient>(client =>
+            services.AddHttpClient<LookupCodeServicesClient>(client =>
             {
                 client.DefaultRequestHeaders.Authorization = new BasicAuthenticationHeaderValue(
                     configuration.GetNonEmptyValue("LookupServicesClient:Username"),
