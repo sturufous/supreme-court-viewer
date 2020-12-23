@@ -1,8 +1,13 @@
 <template>
 <div>
    <b-card  v-if= "isMounted" no-body>
-        <div>         
-            <h3 class="mx-4 font-weight-normal"> Documents ({{NumberOfDocuments}}) </h3>
+        <div>
+            <b-row>         
+                <h3 class="ml-5 my-1 p-0 font-weight-normal" v-if="!showSections['Documents']"> Documents ({{NumberOfDocuments}})</h3>
+                <custom-overlay :show="!downloadCompleted" style="padding: 0 1rem; margin-left:auto; margin-right:2rem;">
+                    <b-button @click="downloadDocuments()" size="sm" variant="success" style="padding: 0 1rem; margin-left:auto; margin-right:2rem;"> Download Selected </b-button>
+                </custom-overlay>
+            </b-row>
             <hr class="mx-3 bg-light" style="height: 5px;"/>                   
         </div>
        
@@ -16,7 +21,7 @@
             v-for="(tabMapping, index) in categories" 
             :key="index"                 
             :title="tabMapping"                 
-            v-on:click="activetab = tabMapping" 
+            v-on:click="switchTab(tabMapping)" 
             v-bind:class="[ activetab === tabMapping ? 'active mb-3' : 'mb-3' ]"
             ></b-tab>
         </b-tabs> 
@@ -33,7 +38,8 @@
                 small
                 striped
                 responsive="sm"
-                >   
+                > 
+                
                     <template v-for="(field,index) in fields[fieldsTab]" v-slot:[`head(${field.key})`]="data">
                         <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
                     </template>
@@ -64,6 +70,24 @@
                         </span>
                     </template>
 
+                    <template v-slot:head(Select) >                                  
+                        <b-form-checkbox                            
+                            class="m-0"
+                            v-model="allDocumentsChecked"
+                            @change="checkAllDocuments"                                                                       					
+                            size="sm"/>
+                    </template>
+
+                    <template v-slot:cell(Select)="data" >                                  
+                        <b-form-checkbox
+                            size="sm"
+                            class="m-0"
+                            :disabled="!data.item.isEnabled"
+                            v-model="data.item.isChecked"
+                            @change="toggleSelectedDocuments"                                            					
+                            />
+                    </template>
+
                     <template v-slot:cell(Act)="data" >
                         <b-badge 
                             variant="secondary"
@@ -85,7 +109,7 @@
                             <span v-else>{{ issue }}</span>
                         </li>
                     </template>
-                    <template v-slot:cell(Seq.)="data">
+                    <template v-slot:cell(Seq)="data">
                         <span v-if="data.item.Sealed" class="ml-2 text-muted" :style="data.field.cellStyle"> 
                             {{data.value}}
                         </span>
@@ -124,14 +148,24 @@ import { Component, Vue} from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
 import base64url from "base64url";
 import '@store/modules/CivilFileInformation';
-import {civilFileInformationType, documentsInfoType, summaryDocumentsInfoType} from '../../types/civil';
+import {civilFileInformationType, csrRequestsInfoType, documentsInfoType, summaryDocumentsInfoType} from '../../types/civil';
 const civilState = namespace('CivilFileInformation');
+
+import CustomOverlay from "../CustomOverlay.vue"
+import { archiveInfoType, documentRequestsInfoType } from '../../types/common';
 
 enum fieldTab {Categories=0, Summary, Orders, Scheduled}
 
-@Component
+@Component({
+    components: {
+       CustomOverlay
+    }
+})
 export default class CivilDocumentsView extends Vue {
 
+    @civilState.State
+    public showSections
+    
     @civilState.State
     public civilFileInformation!: civilFileInformationType
 
@@ -147,12 +181,16 @@ export default class CivilDocumentsView extends Vue {
     sortDesc = false;
     categories: string[] = []; 
     fieldsTab = fieldTab.Categories;
-    documentPlace = [1,0,1,1]
-    datePlace = [3,1,2,4]    
+    documentPlace = [2,1,2,2]
+    datePlace = [4,2,3,5]
+    selectedDocuments = {} as archiveInfoType; 
+    downloadCompleted = true;
+    allDocumentsChecked = false; 
 
     fields = [ 
         [
-            {key:'Seq.',           sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
+            {key:'Select',label:'',sortable:false,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},
+            {key:'Seq',label:'Seq.',  sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
             {key:'Document Type',  sortable:true,  headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 16px;'},
             {key:'Act',            sortable:false, headerStyle:'text',          cellStyle:'display: block; margin-top: 1px; font-size: 14px; max-width : 50px;'},
             {key:'Date Filed',     sortable:true,  headerStyle:'text-danger',   cellStyle:'font-size: 16px;'},
@@ -161,11 +199,13 @@ export default class CivilDocumentsView extends Vue {
             {key:'Comment',        sortable:false, headerStyle:'text',          cellStyle:'font-size: 16px;'}
         ],
         [
+            {key:'Select',label:'',  sortable:false,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},            
             {key:'Document Type',    sortable:false, headerStyle:'text-primary',    cellStyle:'border:0px; font-size: 16px;'},
             {key:'Appearance Date',  sortable:true,  headerStyle:'text-danger',     cellStyle:'font-size: 16px;'}
         ],
         [
-            {key:'Seq.',           sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
+            {key:'Select',label:'',sortable:false,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},            
+            {key:'Seq',label:'Seq.',  sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
             {key:'Document Type',  sortable:true,  headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 16px;'},
             {key:'Date Filed',     sortable:false, headerStyle:'text-primary',   cellStyle:'font-size: 16px;'},
             {key:'Order Made Date',sortable:true,  headerStyle:'text-primary',   cellStyle:'font-size: 16px;'},
@@ -173,7 +213,8 @@ export default class CivilDocumentsView extends Vue {
             {key:'Comment',        sortable:false, headerStyle:'text',          cellStyle:'font-size: 16px;'}
         ],
         [
-            {key:'Seq.',                 sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
+            {key:'Select',label:'',      sortable:false,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},            
+            {key:'Seq',label:'Seq.',        sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
             {key:'Document Type',        sortable:true,  headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 16px;'},
             {key:'Act',                  sortable:false, headerStyle:'text',          cellStyle:'display: block; margin-top: 1px; font-size: 14px; max-width : 50px;'},
             {key:'Next Appearance Date', sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
@@ -197,7 +238,14 @@ export default class CivilDocumentsView extends Vue {
     }
 
     mounted () {    
-        this.getDocuments();        
+        this.getDocuments(); 
+        this.downloadCompleted = true
+        this.selectedDocuments = {zipName: "", csrRequests: [], documentRequests: [], ropRequests: []}       
+    }
+
+    public switchTab(tabMapping) {        
+        this.allDocumentsChecked = false;
+        this.activetab = tabMapping;
     }
 
     public cellClick(data)
@@ -207,6 +255,119 @@ export default class CivilDocumentsView extends Vue {
         else        
             this.openCourtSummaryPdf(data.item['Appearance ID'])              
     }
+
+    public downloadDocuments(){
+
+        const fileName = 'file'+this.civilFileInformation.fileNumber+'documents.zip'
+        this.selectedDocuments = {zipName: fileName, csrRequests: [], documentRequests: [], ropRequests: []};
+        for(const doc of this.documents){
+            if (doc.isChecked && doc.isEnabled) {
+                const id = doc["Document ID"]                
+                const documentRequest = {} as documentRequestsInfoType;
+                documentRequest.isCriminal = false;
+                documentRequest.pdfFileName = 'doc' + id + '.pdf';
+                documentRequest.base64UrlEncodedDocumentId = base64url(id);
+                this.selectedDocuments.documentRequests.push(documentRequest);                
+            }        
+        }
+
+        for(const doc of this.summaryDocuments){
+            if (doc.isChecked && doc.isEnabled) {                
+                const id = doc["Appearance ID"]                      
+                const csrRequest = {} as csrRequestsInfoType;
+                csrRequest.appearanceId = id;
+                csrRequest.pdfFileName = 'court summary_'+id+'.pdf';
+                this.selectedDocuments.csrRequests.push(csrRequest);
+            }        
+        }
+
+        if(this.selectedDocuments.csrRequests.length>0 ||this.selectedDocuments.documentRequests.length>0){
+            const options =  {
+                responseType: "blob",
+                headers: {
+                "Content-Type": "application/json",
+                }
+            }
+            this.downloadCompleted = false
+            this.$http.post('api/files/archive',this.selectedDocuments, options )
+            .then( response =>{
+                const blob = response.data;
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                document.body.appendChild(link);
+                link.download = this.selectedDocuments.zipName;
+                link.click();
+                setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+                this.downloadCompleted = true;
+            }, err =>{this.downloadCompleted = true;})
+        }
+    }
+
+    public checkAllDocuments(checked){
+
+        if(this.activetab == 'COURT SUMMARY')
+        {
+            for(const docInx in this.summaryDocuments){
+                if (this.summaryDocuments[docInx].isEnabled) {
+                this.summaryDocuments[docInx].isChecked = checked
+                }        
+            }
+        } else {      
+           
+            if(this.activetab == 'CONCLUDED') {
+                for(const docInx in this.documents){
+                    if (this.documents[docInx]["Concluded"] === "Y" && this.documents[docInx].isEnabled) {
+                        this.documents[docInx].isChecked = checked
+                    }        
+                }                
+            } else if(this.activetab == 'SCHEDULED') {
+                for(const docInx in this.documents){
+                    if (this.documents[docInx]["Next Appearance Date"] && this.documents[docInx]["Concluded"] !== "Y" && this.documents[docInx].isEnabled) {
+                        this.documents[docInx].isChecked = checked
+                    }        
+                }                    
+            } else if(this.activetab == 'ORDERS') {
+                for(const docInx in this.documents){
+                    if (this.documents[docInx]["Category"].toUpperCase() == this.activetab.toUpperCase() && this.documents[docInx].isEnabled) {
+                        this.documents[docInx].isChecked = checked
+                    }        
+                }
+            } else if ( this.activetab != 'ALL' ) {
+                for(const docInx in this.documents) {
+                    if (this.documents[docInx]["Category"].toUpperCase() == this.activetab.toUpperCase() && this.documents[docInx].isEnabled) {
+                        this.documents[docInx].isChecked = checked
+                    }        
+                }                
+            } else {
+                for(const docInx in this.documents) {
+                    if (this.documents[docInx].isEnabled) {
+                        this.documents[docInx].isChecked = checked
+                    }        
+                }
+            }
+        }
+    }
+
+    public toggleSelectedDocuments(checked) {  
+        Vue.nextTick(()=>{
+            if(this.activetab == 'COURT SUMMARY') {
+                const checkedDocs = this.summaryDocuments.filter(doc=>{return doc.isChecked})
+                const enabledDocs = this.summaryDocuments.filter(doc=>{return doc.isEnabled})
+                if(checkedDocs.length == enabledDocs.length)
+                    this.allDocumentsChecked = true
+                else
+                    this.allDocumentsChecked = false
+
+            } else {
+                const checkedDocs = this.documents.filter(doc=>{return doc.isChecked})
+                const enabledDocs = this.documents.filter(doc=>{return doc.isEnabled})
+                if(checkedDocs.length == enabledDocs.length)
+                    this.allDocumentsChecked = true
+                else
+                    this.allDocumentsChecked = false
+                }            
+        })        
+	}
 
     public navigateToLandingPage() {
         this.$router.push({name:'Home'})
@@ -279,7 +440,7 @@ export default class CivilDocumentsView extends Vue {
         else
         {
            this.sortDesc = false;
-           return 'Seq.'; 
+           return 'Seq'; 
         }
     }
 

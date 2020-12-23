@@ -9,12 +9,19 @@ using Scv.Api.Models.Civil.Detail;
 using Scv.Api.Models.Criminal.Detail;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
 using System.Threading.Tasks;
+using Scv.Api.Helpers.Extensions;
 using Scv.Api.Services.Files;
 using CivilAppearanceDetail = Scv.Api.Models.Civil.AppearanceDetail.CivilAppearanceDetail;
 using CriminalAppearanceDetail = Scv.Api.Models.Criminal.AppearanceDetail.CriminalAppearanceDetail;
 using System.Text;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.WebUtilities;
+using Scv.Api.Helpers;
+using Scv.Api.Models.archive;
 
 namespace Scv.Api.Controllers
 {
@@ -126,7 +133,7 @@ namespace Scv.Api.Controllers
             if (justinReportResponse.ReportContent == null || justinReportResponse.ReportContent.Length <= 0)
                 throw new NotFoundException("Couldn't find CSR with this appearance id.");
 
-            return BuildFileResponse(justinReportResponse.ReportContent);
+            return BuildPdfFileResponse(justinReportResponse.ReportContent);
         }
 
         /// <summary>
@@ -247,8 +254,9 @@ namespace Scv.Api.Controllers
             if (recordsOfProceeding.B64Content == null || recordsOfProceeding.B64Content.Length <= 0)
                 throw new NotFoundException("Couldn't find ROP with this part id.");
 
-            return BuildFileResponse(recordsOfProceeding.B64Content);
+            return BuildPdfFileResponse(recordsOfProceeding.B64Content);
         }
+
 
         #endregion Criminal Only
 
@@ -269,12 +277,82 @@ namespace Scv.Api.Controllers
             if (documentResponse.B64Content == null || documentResponse.B64Content.Length <= 0)
                 throw new NotFoundException("Couldn't find document with this id.");
 
-            return BuildFileResponse(documentResponse.B64Content);
+            return BuildPdfFileResponse(documentResponse.B64Content);
+        }
+
+        [HttpPost]
+        [Route("archive")]
+        public async Task<IActionResult> GetArchive(ArchiveRequest archiveRequest)
+        {
+            var maximumArchiveDocumentCount = _configuration.GetNonEmptyValue("MaximumArchiveDocumentCount");
+            if (string.IsNullOrEmpty(archiveRequest.ZipName)) return BadRequest($"Missing {nameof(archiveRequest.ZipName)}.");
+            if (archiveRequest.TotalDocuments >= int.Parse(maximumArchiveDocumentCount))   return BadRequest($"Only can support up to {maximumArchiveDocumentCount} documents.");
+
+            var courtSummaryRequests = archiveRequest.CsrRequests;
+            var documentRequest = archiveRequest.DocumentRequests;
+            var ropRequests = archiveRequest.RopRequests;
+
+            var courtSummaryReportsTasks = courtSummaryRequests.Select(a => _civilFilesService.CourtSummaryReportAsync(
+                a.AppearanceId,
+                JustinReportName.CEISR035));
+            var documentTasks = documentRequest.Select(d => _filesService.DocumentAsync(
+                Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(d.Base64UrlEncodedDocumentId)),
+                d.IsCriminal));
+            var ropRequestTasks = ropRequests.SelectToList(dr =>
+                _criminalFilesService.RecordOfProceedingsAsync(dr.PartId,
+                    dr.ProfSequenceNumber,
+                    dr.CourtLevelCode,
+                    dr.CourtClassCode));
+
+            var courtSummaryReports = (await courtSummaryReportsTasks.WhenAll()).ToList();
+            var documents = (await documentTasks.WhenAll()).ToList();
+            var rops = (await ropRequestTasks.WhenAll()).ToList();
+
+            if (courtSummaryReports.Any(d => d.ResponseCd != "0")) return BadRequest("One of the CSRS didn't return correctly.");
+            if (documents.Any(d => d.ResultCd == "0")) return BadRequest("One of the documents didn't return correctly.");
+            if (rops.Any(d => d.ResultCd == "0")) return BadRequest("One of the ROPs didn't return correctly.");
+
+            var pdfDocuments = courtSummaryReports.SelectToList(d => new PdfDocument
+                { Content = d.ReportContent, FileName = courtSummaryRequests[courtSummaryReports.IndexOf(d)].PdfFileName });
+
+            pdfDocuments.AddRange(documents.SelectToList(d => new PdfDocument
+                {Content = d.B64Content, FileName = documentRequest[documents.IndexOf(d)].PdfFileName}));
+
+            pdfDocuments.AddRange(rops.Select(d => new PdfDocument
+                { Content = d.B64Content, FileName = ropRequests[rops.IndexOf(d)].PdfFileName }));
+
+            return await BuildArchiveWithPdfFiles(pdfDocuments, archiveRequest.ZipName);
         }
 
         #region Helpers
 
-        private FileContentResult BuildFileResponse(string content)
+        private async Task<FileContentResult> BuildArchiveWithPdfFiles(IEnumerable<PdfDocument> pdfDocuments, string zipName)
+        {
+            await using var outStream = new MemoryStream();
+            using (var archive = new ZipArchive(outStream, ZipArchiveMode.Create, true))
+            {
+                foreach (var document in pdfDocuments)
+                {
+                    var documentContent = Convert.FromBase64String(document.Content);
+                    var documentName = document.FileName;
+                    documentName = documentName.EndsWith(".pdf") ? documentName : $"{documentName}.pdf";
+
+                    await using var entryStream = archive.CreateEntry(documentName, CompressionLevel.Optimal).Open();
+                    await using var fileToCompressStream = new MemoryStream(documentContent);
+                    fileToCompressStream.WriteTo(entryStream);
+                }
+            }
+            return BuildZipFileResponse(outStream.ToArray(), zipName);
+        }
+
+        private FileContentResult BuildZipFileResponse(byte[] content, string name)
+        {
+            Response.Headers.Add("X-Content-Type-Options", "nosniff");
+            name = name.EndsWith(".zip") ? name : $"{name}.zip";
+            return File(content, "application/octet-stream", name);
+        }
+
+        private FileContentResult BuildPdfFileResponse(string content)
         {
             Response.Headers.Add("X-Content-Type-Options", "nosniff");
             return File(Convert.FromBase64String(content), "application/pdf");

@@ -31,17 +31,26 @@
             <b-col col md="10" cols="10" style="overflow: auto;">
 
                 <civil-header-top v-if="isDataReady"/> 
-                <civil-header v-if="isDataReady"/> 
+                <civil-header v-if="isDataReady"/>
 
-                <h2 style= "white-space: pre" v-if="isDataReady">
+                <b-row v-if="showAllDocuments">
+                    <h2 style= "white-space: pre" v-if="isDataReady">
+                        {{selectedSideBar}}
+                    </h2>         
+                    <custom-overlay v-if="isDataReady" :show="!downloadCompleted" style="padding: 0 1rem; margin-left:auto; margin-right:2rem;">
+                        <b-button @click="downloadDocuments()" size="md" variant="info" style="padding: 0 1rem; margin-left:auto; margin-right:2rem;"> Download All Documents </b-button>
+                    </custom-overlay>
+                </b-row> 
+
+                <h2 v-if="!showAllDocuments && isDataReady" style= "white-space: pre">
                     {{selectedSideBar}}
                 </h2>
 
                 <civil-parties v-if="showCaseDetails"/>
                 <civil-adjudicator-restrictions v-if="showCaseDetails"/>
                 <civil-comment-notes v-if="showCaseDetails"/>
-                <civil-documents-view v-if="showCaseDetails"/>
-                <civil-provided-documents-view v-if="showProvidedDocuments"/>            
+                <civil-documents-view v-if="showDocuments || showAllDocuments"/>
+                <civil-provided-documents-view v-if="showProvidedDocuments || showAllDocuments"/>            
                 <civil-past-appearances v-if="showPastAppearances" />
                 <civil-future-appearances v-if="showFutureAppearances" />
                 <b-card><br></b-card>  
@@ -74,11 +83,13 @@ import CivilParties from '@components/civil/CivilParties.vue';
 import CivilHeaderTop from '@components/civil/CivilHeaderTop.vue';
 import CivilHeader from '@components/civil/CivilHeader.vue';
 import CivilSidePanel from '@components/civil/CivilSidePanel.vue';
-import {civilFileInformationType, partiesInfoType, documentsInfoType, summaryDocumentsInfoType, referenceDocumentsInfoType} from '../../types/civil';
-import {inputNamesType, adjudicatorRestrictionsInfoType } from '../../types/common'
+import {civilFileInformationType, partiesInfoType, documentsInfoType, summaryDocumentsInfoType, referenceDocumentsInfoType, csrRequestsInfoType} from '../../types/civil';
+import {inputNamesType, adjudicatorRestrictionsInfoType, archiveInfoType, documentRequestsInfoType } from '../../types/common'
 import "@store/modules/CommonInformation";
 import "@store/modules/CivilFileInformation";
+import CustomOverlay from "../CustomOverlay.vue"
 import { civilReferenceDocumentJsonType } from '../../types/civil/jsonTypes';
+import base64url from 'base64url';
 const civilState = namespace("CivilFileInformation");
 const commonState = namespace("CommonInformation");
 
@@ -93,7 +104,8 @@ const commonState = namespace("CommonInformation");
         CivilParties,
         CivilSidePanel,
         CivilHeaderTop,
-        CivilHeader
+        CivilHeader,
+        CustomOverlay
     }
 })
 export default class CivilCaseDetails extends Vue {
@@ -120,8 +132,9 @@ export default class CivilCaseDetails extends Vue {
     providedDocumentsInfo: referenceDocumentsInfoType[] = [];
     summaryDocumentsInfo: summaryDocumentsInfoType[] = [];
     
-    isDataReady = false
-    isMounted = false
+    isDataReady = false;
+    isMounted = false;
+    downloadCompleted = true;
     isSealed = false;
     docIsSealed = false;
     showSealedWarning = false;
@@ -134,7 +147,7 @@ export default class CivilCaseDetails extends Vue {
     categories: string[] = [];
     providedDocumentCategories: string[] = [];
     sidePanelTitles = [ 
-       'Case Details', 'Future Appearances', 'Past Appearances', 'Provided Documents'   
+       'Case Details', 'Future Appearances', 'Past Appearances', 'All Documents', 'Documents', 'Provided Documents'   
     ];
     
     mounted () {
@@ -185,7 +198,65 @@ export default class CivilCaseDetails extends Vue {
                     if(this.errorCode==0) this.errorCode=200;
                 this.isMounted = true;                       
             });
-    }    
+    }
+    
+    public downloadDocuments(){
+
+        const fileName = 'file'+this.civilFileInformation.fileNumber+'documents.zip'
+        const documentsToDownload = {zipName: fileName, csrRequests: [], documentRequests: [], ropRequests: []} as archiveInfoType;
+        for(const doc of this.providedDocumentsInfo){
+            if (doc.isEnabled) {
+                const id = doc.objectGuid;                
+                const documentRequest = {} as documentRequestsInfoType;
+                documentRequest.isCriminal = false;
+                documentRequest.pdfFileName = 'doc_' + doc.partyName + '_' + doc.referenceDocumentTypeDsc + '.pdf';
+                documentRequest.base64UrlEncodedDocumentId = base64url(id);
+                documentsToDownload.documentRequests.push(documentRequest);                
+            }        
+        }
+        
+        for(const doc of this.documentsInfo){
+            if (doc.isEnabled) {
+                const id = doc["Document ID"]                
+                const documentRequest = {} as documentRequestsInfoType;
+                documentRequest.isCriminal = false;
+                documentRequest.pdfFileName = 'doc' + id + '.pdf';
+                documentRequest.base64UrlEncodedDocumentId = base64url(id);
+                documentsToDownload.documentRequests.push(documentRequest);                
+            }        
+        }
+
+        for(const doc of this.summaryDocumentsInfo){
+            if (doc.isEnabled) {                
+                const id = doc["Appearance ID"];                      
+                const csrRequest = {} as csrRequestsInfoType;
+                csrRequest.appearanceId = id;
+                csrRequest.pdfFileName = 'court summary_'+id+'.pdf';
+                documentsToDownload.csrRequests.push(csrRequest);
+            }        
+        }
+
+        if(documentsToDownload.csrRequests.length>0 || documentsToDownload.documentRequests.length>0){
+            const options =  {
+                responseType: "blob",
+                headers: {
+                "Content-Type": "application/json",
+                }
+            }
+            this.downloadCompleted = false
+            this.$http.post('api/files/archive',documentsToDownload, options )
+            .then( response =>{
+                const blob = response.data;
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                document.body.appendChild(link);
+                link.download = documentsToDownload.zipName;
+                link.click();
+                setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+                this.downloadCompleted = true;
+            }, err =>{this.downloadCompleted = true;})
+        }
+    }
     
     get selectedSideBar()
     {
@@ -215,6 +286,17 @@ export default class CivilCaseDetails extends Vue {
     {        
         return ((this.showSections['Case Details'] || this.showSections['Provided Documents'] ) && this.isDataReady)
     }
+
+    get showDocuments()
+    {        
+        return ((this.showSections['Case Details'] || this.showSections['Documents'] ) && this.isDataReady)
+    }
+
+    get showAllDocuments()
+    {        
+        return ((this.showSections['Case Details'] || this.showSections['All Documents'] ) && this.isDataReady)
+    }
+
 
     public ExtractCaseInfo(): void {
         let partyIndex = 0       
@@ -306,6 +388,9 @@ export default class CivilCaseDetails extends Vue {
                     }
                 } 
                 docInfo["Order Made Date"] = jDoc.DateGranted? Vue.filter('beautify-date')(jDoc.DateGranted) : '';                
+                docInfo.isChecked = false;
+                docInfo.isEnabled = docInfo["PdfAvail"] && !docInfo["Sealed"];
+                
                 this.documentsInfo.push(docInfo);                
 
             } else {
@@ -315,6 +400,8 @@ export default class CivilCaseDetails extends Vue {
                 docInfo["Appearance Date"] = jDoc.lastAppearanceDt.split(' ')[0];
                 docInfo["Appearance ID"] = jDoc.imageId;
                 docInfo["PdfAvail"] = jDoc.imageId? true : false
+                docInfo.isChecked = false;
+                docInfo.isEnabled = docInfo["PdfAvail"];
                 this.summaryDocumentsInfo.push(docInfo);
             }
         } 
@@ -331,6 +418,8 @@ export default class CivilCaseDetails extends Vue {
             providedDocInfo.enterDtm = jDoc.EnterDtm;
             providedDocInfo.referenceDocumentTypeDsc = jDoc.ReferenceDocumentTypeDsc;
             providedDocInfo.objectGuid = jDoc.ObjectGuid;
+            providedDocInfo.isChecked = false;
+            providedDocInfo.isEnabled = jDoc.ObjectGuid? true:false;
             if((this.providedDocumentCategories.indexOf(providedDocInfo.referenceDocumentTypeDsc) < 0) && providedDocInfo.referenceDocumentTypeDsc.length > 0) {
                 this.providedDocumentCategories.push(providedDocInfo.referenceDocumentTypeDsc);
             }

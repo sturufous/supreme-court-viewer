@@ -57,7 +57,7 @@ namespace Scv.Api.Services
 
             async Task<CourtList> CourtList() => await _filesClient.FilesCourtlistAsync(agencyId, roomCode, proceedingDateString, divisionCode, fileNumber);
             async Task<CourtCalendarDetailByDay> CourtCalendarDetailByDay() =>
-                await _filesClient.FilesCourtCalendarDetailsByDayAsync(_requestAgencyIdentifierId, _requestPartId, agencyCode,
+                await _filesClient.FilesCourtcalendardetailsbydayAsync(_requestAgencyIdentifierId, _requestPartId, agencyCode,
                     proceeding.ToString("yyyy-MM-dd HH:mm:ss.S"), roomCode);
 
             var courtCalendarDetailsTask = _cache.GetOrAdd($"CourtCalendarDetails-{agencyId}-{roomCode}-{proceedingDateString}-{fileNumber}",
@@ -127,7 +127,7 @@ namespace Scv.Api.Services
             var fileDetailTasks = new List<Task<CivilFileDetailResponse>>();
             foreach (var fileId in fileIds)
             {
-                async Task<CivilFileDetailResponse> FileDetails() => await _filesClient.FilesCivilFileIdAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode, fileId);
+                async Task<CivilFileDetailResponse> FileDetails() => await _filesClient.FilesCivilGetAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode, fileId);
                 fileDetailTasks.Add(_cache.GetOrAddAsync($"CivilFileDetail-{fileId}", FileDetails));
             }
 
@@ -143,7 +143,7 @@ namespace Scv.Api.Services
             var appearanceTasks = new List<Task<CivilFileAppearancesResponse>>();
             foreach (var fileId in fileIds)
             {
-                async Task<CivilFileAppearancesResponse> Appearances() => await _filesClient.FilesCivilFileIdAppearancesAsync(_requestAgencyIdentifierId, _requestPartId, lookForFutureAppearances,
+                async Task<CivilFileAppearancesResponse> Appearances() => await _filesClient.FilesCivilAppearancesAsync(_requestAgencyIdentifierId, _requestPartId, lookForFutureAppearances,
                     lookForPastAppearances, fileId);
                 appearanceTasks.Add(_cache.GetOrAddAsync($"CivilAppearances-{fileId}-InPast-{targetDateInPast}", Appearances));
             }
@@ -172,7 +172,7 @@ namespace Scv.Api.Services
             foreach (var fileId in fileIds)
             {
                 async Task<CriminalFileDetailResponse> FileDetails() =>
-                    await _filesClient.FilesCriminalFileIdAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode,
+                    await _filesClient.FilesCriminalGetAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode,
                         fileId);
                 fileDetailTasks.Add(_cache.GetOrAddAsync($"CriminalFileDetail-{fileId}", FileDetails));
             }
@@ -189,7 +189,7 @@ namespace Scv.Api.Services
             var appearanceTasks = new List<Task<CriminalFileAppearancesResponse>>();
             foreach (var fileId in fileIds)
             {
-                async Task<CriminalFileAppearancesResponse> Appearances() => await _filesClient.FilesCriminalFileIdAppearancesAsync(
+                async Task<CriminalFileAppearancesResponse> Appearances() => await _filesClient.FilesCriminalAppearancesAsync(
                     _requestAgencyIdentifierId, _requestPartId, lookForFutureAppearances,
                     lookForPastAppearances, fileId);
                 appearanceTasks.Add(_cache.GetOrAddAsync($"CriminalAppearances-{fileId}-InPast-{targetDateInPast}", Appearances));
