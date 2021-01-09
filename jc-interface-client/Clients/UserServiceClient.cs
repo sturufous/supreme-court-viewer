@@ -45,26 +45,24 @@ namespace JCCommon.Clients.UserService
         /// <param name="domainNm">The domain name of the user</param>
         /// <param name="domainUserGuid">The user guid of the user</param>
         /// <param name="domainUserId">The user id of the user</param>
-        /// <param name="loginDtm">The login date time</param>
         /// <param name="deviceNm">The device name</param>
         /// <param name="ipAddressTxt">Ip address</param>
         /// <param name="temporaryAccessGuid">Temporary access guid</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<GetUserLoginResponseType> UserGetuserloginAsync(string domainNm, string domainUserGuid, string domainUserId, string loginDtm, string deviceNm, string ipAddressTxt, string temporaryAccessGuid)
+        public System.Threading.Tasks.Task<GetUserLoginResponseType> UserGetuserloginAsync(string domainNm, string domainUserGuid, string domainUserId, string deviceNm, string ipAddressTxt, string temporaryAccessGuid)
         {
-            return UserGetuserloginAsync(domainNm, domainUserGuid, domainUserId, loginDtm, deviceNm, ipAddressTxt, temporaryAccessGuid, System.Threading.CancellationToken.None);
+            return UserGetuserloginAsync(domainNm, domainUserGuid, domainUserId, deviceNm, ipAddressTxt, temporaryAccessGuid, System.Threading.CancellationToken.None);
         }
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="domainNm">The domain name of the user</param>
         /// <param name="domainUserGuid">The user guid of the user</param>
         /// <param name="domainUserId">The user id of the user</param>
-        /// <param name="loginDtm">The login date time</param>
         /// <param name="deviceNm">The device name</param>
         /// <param name="ipAddressTxt">Ip address</param>
         /// <param name="temporaryAccessGuid">Temporary access guid</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<GetUserLoginResponseType> UserGetuserloginAsync(string domainNm, string domainUserGuid, string domainUserId, string loginDtm, string deviceNm, string ipAddressTxt, string temporaryAccessGuid, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<GetUserLoginResponseType> UserGetuserloginAsync(string domainNm, string domainUserGuid, string domainUserId, string deviceNm, string ipAddressTxt, string temporaryAccessGuid, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("user/getUserLogin");
@@ -75,24 +73,17 @@ namespace JCCommon.Clients.UserService
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
-                    if (domainNm == null)
-                        throw new System.ArgumentNullException("domainNm");
-                    request_.Headers.TryAddWithoutValidation("domainNm", ConvertToString(domainNm, System.Globalization.CultureInfo.InvariantCulture));
+                    if (domainNm != null)
+                        request_.Headers.TryAddWithoutValidation("domainNm", ConvertToString(domainNm, System.Globalization.CultureInfo.InvariantCulture));
                     if (domainUserGuid == null)
                         throw new System.ArgumentNullException("domainUserGuid");
                     request_.Headers.TryAddWithoutValidation("domainUserGuid", ConvertToString(domainUserGuid, System.Globalization.CultureInfo.InvariantCulture));
-                    if (domainUserId == null)
-                        throw new System.ArgumentNullException("domainUserId");
-                    request_.Headers.TryAddWithoutValidation("domainUserId", ConvertToString(domainUserId, System.Globalization.CultureInfo.InvariantCulture));
-                    if (loginDtm == null)
-                        throw new System.ArgumentNullException("loginDtm");
-                    request_.Headers.TryAddWithoutValidation("loginDtm", ConvertToString(loginDtm, System.Globalization.CultureInfo.InvariantCulture));
-                    if (deviceNm == null)
-                        throw new System.ArgumentNullException("deviceNm");
-                    request_.Headers.TryAddWithoutValidation("deviceNm", ConvertToString(deviceNm, System.Globalization.CultureInfo.InvariantCulture));
-                    if (ipAddressTxt == null)
-                        throw new System.ArgumentNullException("ipAddressTxt");
-                    request_.Headers.TryAddWithoutValidation("ipAddressTxt", ConvertToString(ipAddressTxt, System.Globalization.CultureInfo.InvariantCulture));
+                    if (domainUserId != null)
+                        request_.Headers.TryAddWithoutValidation("domainUserId", ConvertToString(domainUserId, System.Globalization.CultureInfo.InvariantCulture));
+                    if (deviceNm != null)
+                        request_.Headers.TryAddWithoutValidation("deviceNm", ConvertToString(deviceNm, System.Globalization.CultureInfo.InvariantCulture));
+                    if (ipAddressTxt != null)
+                        request_.Headers.TryAddWithoutValidation("ipAddressTxt", ConvertToString(ipAddressTxt, System.Globalization.CultureInfo.InvariantCulture));
                     if (temporaryAccessGuid != null)
                         request_.Headers.TryAddWithoutValidation("temporaryAccessGuid", ConvertToString(temporaryAccessGuid, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");

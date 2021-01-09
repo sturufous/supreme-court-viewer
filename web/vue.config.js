@@ -12,6 +12,7 @@ module.exports = {
 			historyApiFallback: true,
 			host: 'localhost',
 			port: 1337,
+			https: true,
 			proxy: {
 				//This is for WEB_BASE_HREF = '/' specifically. 
 				'^/api': {

@@ -6,7 +6,9 @@ using System.Reflection;
 using JCCommon.Clients.FileServices;
 using JCCommon.Clients.LocationServices;
 using JCCommon.Clients.LookupCodeServices;
+using JCCommon.Clients.UserService;
 using JCCommon.Framework;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Scv.Api.Helpers.Extensions;
 using Scv.Api.Services;
@@ -55,10 +57,21 @@ namespace Scv.Api.Helpers.Mapping
                 client.BaseAddress = new Uri(configuration.GetNonEmptyValue("LocationServicesClient:Url").EnsureEndingForwardSlash());
             });
 
+            services.AddHttpClient<UserServiceClient>(client =>
+            {
+                client.DefaultRequestHeaders.Authorization = new BasicAuthenticationHeaderValue(
+                    configuration.GetNonEmptyValue("UserServicesClient:Username"),
+                    configuration.GetNonEmptyValue("UserServicesClient:Password"));
+                client.BaseAddress = new Uri(configuration.GetNonEmptyValue("UserServicesClient:Url")
+                    .EnsureEndingForwardSlash());
+            });
+            services.AddHttpContextAccessor();
+            //services.AddTransient(s => s.GetService<HttpContext>().User);
             services.AddScoped<FilesService>();
             services.AddScoped<LookupService>();
             services.AddScoped<LocationService>();
             services.AddScoped<CourtListService>();
+            services.AddSingleton<JCUserService>();
 
             return services;
         }

@@ -14,9 +14,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.OpenApi.Models;
 using Scv.Api.Helpers;
+using Scv.Api.Infrastructure.Middleware.Authorization;
 
 namespace Scv.Api
 {
@@ -33,6 +37,20 @@ namespace Scv.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMapster();
+
+            services.AddDataProtection()
+                .SetApplicationName("SCV");
+
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(o =>
+                {
+                    o.Cookie.Name = "SCV";
+                })
+                .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>(
+                    BasicAuthenticationHandler.BasicAuthentication, null)
+                .AddScheme<AuthenticationSchemeOptions, SiteMinderAuthenticationHandler>(
+                    SiteMinderAuthenticationHandler.SiteMinderAuthentication,null);
+        
 
             #region Cors
 
@@ -118,7 +136,7 @@ namespace Scv.Api
             app.Use((context, next) =>
             {
                 context.Request.Scheme = "https";
-                if (context.Request.Headers.ContainsKey("X-Forwarded-Host"))
+                if (context.Request.Headers.ContainsKey("X-Forwarded-Host") && !env.IsDevelopment())
                     context.Request.PathBase = new PathString(baseUrl.Remove(baseUrl.Length - 1));
                 return next();
             });
@@ -149,13 +167,13 @@ namespace Scv.Api
                 options.RoutePrefix = "api";
             });
 
-            app.UseMiddleware<AuthenticationMiddleware>();
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
 
             app.UseHttpsRedirection();
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

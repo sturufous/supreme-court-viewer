@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Scv.Api.Models.CourtList;
 using Scv.Api.Services;
-using Scv.Api.Services.Files;
 
 namespace Scv.Api.Controllers
 {
+    [Authorize(AuthenticationSchemes = "BasicAuthentication, SiteMinderAuthentication")]
     [Route("api/[controller]")]
     [ApiController]
     public class CourtListController : ControllerBase

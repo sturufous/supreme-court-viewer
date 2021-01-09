@@ -18,6 +18,7 @@ using Scv.Api.Services.Files;
 using CivilAppearanceDetail = Scv.Api.Models.Civil.AppearanceDetail.CivilAppearanceDetail;
 using CriminalAppearanceDetail = Scv.Api.Models.Criminal.AppearanceDetail.CriminalAppearanceDetail;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.WebUtilities;
 using Scv.Api.Helpers;
@@ -25,6 +26,7 @@ using Scv.Api.Models.archive;
 
 namespace Scv.Api.Controllers
 {
+    [Authorize(AuthenticationSchemes = "BasicAuthentication, SiteMinderAuthentication")]
     [Route("api/[controller]")]
     [ApiController]
     public class FilesController : ControllerBase

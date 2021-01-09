@@ -38,7 +38,6 @@
           {
             "name": "domainNm",
             "in": "header",
-            "required": true,
             "description": "The domain name of the user",
             "schema": {
               "type": "string"
@@ -56,17 +55,7 @@
           {
             "name": "domainUserId",
             "in": "header",
-            "required": true,
             "description": "The user id of the user",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "loginDtm",
-            "in": "header",
-            "required": true,
-            "description": "The login date time",
             "schema": {
               "type": "string"
             }
@@ -74,7 +63,6 @@
           {
             "name": "deviceNm",
             "in": "header",
-            "required": true,
             "description": "The device name",
             "schema": {
               "type": "string"
@@ -83,7 +71,6 @@
           {
             "name": "ipAddressTxt",
             "in": "header",
-            "required": true,
             "description": "Ip address",
             "schema": {
               "type": "string"

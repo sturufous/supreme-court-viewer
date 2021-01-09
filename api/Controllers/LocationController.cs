@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using Scv.Api.Models.Location;
 using Scv.Api.Services;
 
 namespace Scv.Api.Controllers
 {
+    [Authorize(AuthenticationSchemes = "BasicAuthentication, SiteMinderAuthentication")]
     [Route("api/[controller]")]
     [ApiController]
     public class LocationController : ControllerBase
