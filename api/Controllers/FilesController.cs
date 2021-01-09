@@ -13,20 +13,20 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Authorization;
 using Scv.Api.Helpers.Extensions;
 using Scv.Api.Services.Files;
 using CivilAppearanceDetail = Scv.Api.Models.Civil.AppearanceDetail.CivilAppearanceDetail;
 using CriminalAppearanceDetail = Scv.Api.Models.Criminal.AppearanceDetail.CriminalAppearanceDetail;
 using System.Text;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.WebUtilities;
 using Scv.Api.Helpers;
 using Scv.Api.Models.archive;
 
 namespace Scv.Api.Controllers
 {
-    [Authorize(AuthenticationSchemes = "BasicAuthentication, SiteMinderAuthentication")]
+    [Authorize(AuthenticationSchemes = "BasicAuthentication, SiteMinderAuthentication, OpenIdConnectDefaults.AuthenticationScheme")]
     [Route("api/[controller]")]
     [ApiController]
     public class FilesController : ControllerBase
@@ -80,6 +80,7 @@ namespace Scv.Api.Controllers
         /// <returns>List{RedactedCivilFileDetailResponse}</returns>
         [HttpGet]
         [Route("civil")]
+        [Authorize(AuthenticationSchemes = OpenIdConnectDefaults.AuthenticationScheme)]
         public async Task<ActionResult<List<RedactedCivilFileDetailResponse>>> GetCivilFileIdsByAgencyIdCodeAndFileNumberText(string location, string fileNumber)
         {
             var civilFiles = await _civilFilesService.GetFilesByAgencyIdCodeAndFileNumberText(location, fileNumber);

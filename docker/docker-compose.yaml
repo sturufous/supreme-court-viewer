@@ -37,3 +37,14 @@ services:
       - Auth__AllowSiteMinderUserType=${ALLOW_SITE_MINDER_USER_TYPE}
     ports:
       - 5000:5000
+  db:
+    image: centos/postgresql-12-centos8
+    environment:
+      - POSTGRESQL_USER=${POSTGRESQL_USER}
+      - POSTGRESQL_PASSWORD=${POSTGRESQL_PASSWORD}
+      - POSTGRESQL_DATABASE=${POSTGRESQL_DATABASE}
+      - POSTGRESQL_ADMIN_PASSWORD=${POSTGRESQL_ADMIN_PASSWORD}
+    ports:
+      - 5432:5432
+    volumes:
+      - ./tmp:/tmp2
