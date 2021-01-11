@@ -2,13 +2,15 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Scv.Api.Infrastructure.Authorization;
 using Scv.Api.Models.CourtList;
 using Scv.Api.Services;
 
 namespace Scv.Api.Controllers
 {
-    [Authorize(AuthenticationSchemes = "BasicAuthentication, SiteMinderAuthentication")]
+    [Authorize(AuthenticationSchemes = "SiteMinder, OpenIdConnect", Policy = nameof(ProviderAuthorizationHandler))]
     [Route("api/[controller]")]
+
     [ApiController]
     public class CourtListController : ControllerBase
     {

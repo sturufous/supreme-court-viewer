@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -11,14 +12,13 @@ using Scv.Api.Helpers.Extensions;
 using Scv.Api.Models.JCUserService;
 using Scv.Api.Services;
 
-namespace Scv.Api.Infrastructure.Middleware.Authorization
+namespace Scv.Api.Infrastructure.Authentication
 {
     public class SiteMinderAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
     {
         #region Properties 
-        public const string SiteMinderAuthentication = nameof(SiteMinderAuthentication);
+        public const string SiteMinder = nameof(SiteMinder);
         private JCUserService JCUserService { get; }
-        private string ValidSiteMinderGuid { get; }
         private string ValidSiteMinderUserType { get; }
         #endregion
 
@@ -30,7 +30,6 @@ namespace Scv.Api.Infrastructure.Middleware.Authorization
             IConfiguration configuration, JCUserService jcUserService) : base(options, logger, encoder, clock)
         {
             JCUserService = jcUserService;
-            ValidSiteMinderGuid = configuration.GetNonEmptyValue("Auth:SCSSServiceAccountGuid");
             ValidSiteMinderUserType = configuration.GetNonEmptyValue("Auth:AllowSiteMinderUserType");
         }
         #endregion
@@ -46,7 +45,7 @@ namespace Scv.Api.Infrastructure.Middleware.Authorization
             if (siteMinderUserTypeHeader != ValidSiteMinderUserType)
                 return AuthenticateResult.Fail("Invalid SiteMinder credentials.");
 
-            var authenticatedBySiteMinderPreviously = Context.User.Identity.AuthenticationType == SiteMinderAuthentication;
+            var authenticatedBySiteMinderPreviously = Context.User.Identity.AuthenticationType == SiteMinder;
             var participantId = Context.User.ParticipantId(); 
             var agencyCode = Context.User.AgencyCode();
             if (!authenticatedBySiteMinderPreviously)
@@ -56,14 +55,15 @@ namespace Scv.Api.Infrastructure.Middleware.Authorization
                     DeviceName = Environment.MachineName,
                     DomainUserGuid = siteMinderUserGuidHeader,
                     DomainUserId = Request.Headers["SM_USER"],
-                    IpAddress = Request.Headers["X-Real-IP"]
+                    IpAddress = Request.Headers["X-Real-IP"],
+                    TemporaryAccessGuid = ""
                 };
                 var jcUserInfo = await JCUserService.GetUserInfo(request);
                 if (jcUserInfo == null)
                     return AuthenticateResult.Fail("Couldn't authenticate through JC-Interface.");
 
                 participantId = jcUserInfo.UserPartId;
-                agencyCode = jcUserInfo.UserDefaultAgencyCd;
+                agencyCode = jcUserInfo.UserDefaultAgencyCd ?? "";
             }
 
             var claims = new[] {
@@ -74,7 +74,7 @@ namespace Scv.Api.Infrastructure.Middleware.Authorization
             var principal = new ClaimsPrincipal(identity);
 
             if (!authenticatedBySiteMinderPreviously)
-                await Context.SignInAsync(principal);
+                await Context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
             var ticket = new AuthenticationTicket(principal, Scheme.Name);
             return AuthenticateResult.Success(ticket);

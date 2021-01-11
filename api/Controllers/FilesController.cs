@@ -13,7 +13,6 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Scv.Api.Helpers.Extensions;
 using Scv.Api.Services.Files;
@@ -22,13 +21,15 @@ using CriminalAppearanceDetail = Scv.Api.Models.Criminal.AppearanceDetail.Crimin
 using System.Text;
 using Microsoft.AspNetCore.WebUtilities;
 using Scv.Api.Helpers;
+using Scv.Api.Infrastructure.Authorization;
 using Scv.Api.Models.archive;
 
 namespace Scv.Api.Controllers
 {
-    [Authorize(AuthenticationSchemes = "BasicAuthentication, SiteMinderAuthentication, OpenIdConnectDefaults.AuthenticationScheme")]
+    [Authorize(AuthenticationSchemes = "SiteMinder, OpenIdConnect", Policy = nameof(ProviderAuthorizationHandler))]
     [Route("api/[controller]")]
     [ApiController]
+
     public class FilesController : ControllerBase
     {
         #region Variables
@@ -80,7 +81,6 @@ namespace Scv.Api.Controllers
         /// <returns>List{RedactedCivilFileDetailResponse}</returns>
         [HttpGet]
         [Route("civil")]
-        [Authorize(AuthenticationSchemes = OpenIdConnectDefaults.AuthenticationScheme)]
         public async Task<ActionResult<List<RedactedCivilFileDetailResponse>>> GetCivilFileIdsByAgencyIdCodeAndFileNumberText(string location, string fileNumber)
         {
             var civilFiles = await _civilFilesService.GetFilesByAgencyIdCodeAndFileNumberText(location, fileNumber);
@@ -99,6 +99,9 @@ namespace Scv.Api.Controllers
         [Route("civil/{fileId}")]
         public async Task<ActionResult<RedactedCivilFileDetailResponse>> GetCivilFileDetailByFileId(string fileId)
         {
+            if (User.IsVcUser() && !User.HasVcCivilFileAccess(fileId))
+                return Forbid();
+
             var civilFileDetailResponse = await _civilFilesService.FileIdAsync(fileId);
             if (civilFileDetailResponse?.PhysicalFileId == null)
                 throw new NotFoundException("Couldn't find civil file with this id.");
@@ -115,6 +118,9 @@ namespace Scv.Api.Controllers
         [Route("civil/{fileId}/appearance-detail/{appearanceId}")]
         public async Task<ActionResult<CivilAppearanceDetail>> GetCivilAppearanceDetails(string fileId, string appearanceId)
         {
+            if (User.IsVcUser() && !User.HasVcCivilFileAccess(fileId))
+                return Forbid();
+
             var civilAppearanceDetail = await _civilFilesService.DetailedAppearanceAsync(fileId, appearanceId);
             if (civilAppearanceDetail == null)
                 throw new NotFoundException("Couldn't find appearance detail with the provided file id and appearance id.");
@@ -263,6 +269,8 @@ namespace Scv.Api.Controllers
 
         #endregion Criminal Only
 
+        #region Documents
+
         /// <summary>
         /// Gets a document.
         /// </summary>
@@ -274,6 +282,9 @@ namespace Scv.Api.Controllers
         [Route("document/{documentId}/{fileNameAndExtension}")]
         public async Task<IActionResult> GetDocument(string documentId, string fileNameAndExtension, bool isCriminal = false)
         {
+            if (User.IsVcUser() && isCriminal)
+                return Forbid();
+
             documentId = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(documentId));
             var documentResponse = await _filesService.DocumentAsync(documentId, isCriminal);
 
@@ -287,6 +298,9 @@ namespace Scv.Api.Controllers
         [Route("archive")]
         public async Task<IActionResult> GetArchive(ArchiveRequest archiveRequest)
         {
+            if (User.IsVcUser() && (archiveRequest.RopRequests.Any() || archiveRequest.DocumentRequests.Any(dr => dr.IsCriminal)))
+                return Forbid();
+
             var maximumArchiveDocumentCount = _configuration.GetNonEmptyValue("MaximumArchiveDocumentCount");
             if (string.IsNullOrEmpty(archiveRequest.ZipName)) return BadRequest($"Missing {nameof(archiveRequest.ZipName)}.");
             if (archiveRequest.TotalDocuments >= int.Parse(maximumArchiveDocumentCount))   return BadRequest($"Only can support up to {maximumArchiveDocumentCount} documents.");
@@ -319,13 +333,15 @@ namespace Scv.Api.Controllers
                 { Content = d.ReportContent, FileName = courtSummaryRequests[courtSummaryReports.IndexOf(d)].PdfFileName });
 
             pdfDocuments.AddRange(documents.SelectToList(d => new PdfDocument
-                {Content = d.B64Content, FileName = documentRequest[documents.IndexOf(d)].PdfFileName}));
+                { Content = d.B64Content, FileName = documentRequest[documents.IndexOf(d)].PdfFileName}));
 
             pdfDocuments.AddRange(rops.Select(d => new PdfDocument
                 { Content = d.B64Content, FileName = ropRequests[rops.IndexOf(d)].PdfFileName }));
 
             return await BuildArchiveWithPdfFiles(pdfDocuments, archiveRequest.ZipName);
         }
+
+        #endregion Documents 
 
         #region Helpers
 

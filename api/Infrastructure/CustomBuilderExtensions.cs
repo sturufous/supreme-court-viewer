@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.DataProtection.XmlEncryption;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace SS.Api.infrastructure
+namespace Scv.Api.Infrastructure
 {
     public static class CustomBuilderExtensions
     {

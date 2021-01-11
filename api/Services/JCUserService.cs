@@ -35,7 +35,11 @@ namespace Scv.Api.Services
                     userInfoRequest.IpAddress,
                     userInfoRequest.TemporaryAccessGuid);
 
-                if (response.ResponseCd != "1") return response;
+                if (response.ResponseCd != "1")
+                {
+                    Logger.LogDebug($"SMGOV_USERGUID: {userInfoRequest.DomainUserGuid}, UserAgencyCd: {response.UserDefaultAgencyCd}, UserPartId: {response.UserPartId}");
+                    return response;
+                }
                 Logger.LogDebug("Returned response 1 (failed) from getUserLogin");
                 return null;
             }

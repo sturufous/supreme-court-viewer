@@ -2,11 +2,12 @@
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Scv.Db.Models.Auth;
 using SS.Db;
 
-namespace SCV.Db.Models
+namespace Scv.Db.Models
 {
-    public partial class ScvDbContext : DbContext, IDataProtectionKeyContext
+    public class ScvDbContext : DbContext, IDataProtectionKeyContext
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
 
@@ -22,7 +23,8 @@ namespace SCV.Db.Models
         }
 
         // This maps to the table that stores keys.
-        public virtual DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
+        public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
+        public DbSet<RequestFileAccess> RequestFileAccess { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -32,9 +34,7 @@ namespace SCV.Db.Models
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
-            {
                 optionsBuilder.UseNpgsql("Name=DatabaseConnectionString");
-            }
         }
 
         public TEntity DetachedClone<TEntity>(TEntity entity) where TEntity : class

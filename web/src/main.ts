@@ -19,8 +19,16 @@ Vue.use(BootstrapVueIcons);
 Vue.config.productionTip = true;
 Vue.component('loading-spinner', LoadingSpinner);
 
+Vue.http.interceptors.push(function (request) {
+	return function (response) {
+		if (response.status == 401)
+			location.replace(`${process.env.BASE_URL}api/auth/login?redirectUri=${process.env.BASE_URL}`);
+	};
+});
+
 Vue.http.options.root = process.env.BASE_URL;
-//Vue.http.headers.common['Authorization'] = 'Basic VEVTVDpURVNU'; //TEST:TEST
+//Vue.http.headers.common['SMGOV_USERGUID'] = 'test';
+//Vue.http.headers.common['SMGOV_USERTYPE'] = 'UserType';
 
 //Redirect from / to /scjscv/
 if (location.pathname == "/")
