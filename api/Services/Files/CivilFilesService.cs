@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using JCCommon.Clients.FileServices;
 using JCCommon.Models;
@@ -39,7 +39,13 @@ namespace Scv.Api.Services.Files
 
         #region Constructor
 
-        public CivilFilesService(IConfiguration configuration, FileServicesClient filesClient, IMapper mapper, LookupService lookupService, LocationService locationService, IAppCache cache)
+        public CivilFilesService(IConfiguration configuration,
+            FileServicesClient filesClient,
+            IMapper mapper,
+            LookupService lookupService,
+            LocationService locationService,
+            IAppCache cache,
+            ClaimsPrincipal user)
         {
             _filesClient = filesClient;
             _filesClient.JsonSerializerSettings.ContractResolver = new SafeContractResolver { NamingStrategy = new CamelCaseNamingStrategy() };
@@ -47,9 +53,9 @@ namespace Scv.Api.Services.Files
             _locationService = locationService;
             _mapper = mapper;
             _requestApplicationCode = configuration.GetNonEmptyValue("Request:ApplicationCd");
-            _requestAgencyIdentifierId = configuration.GetNonEmptyValue("Request:AgencyIdentifierId");
-            _requestPartId = configuration.GetNonEmptyValue("Request:PartId");
             _cache = cache;
+            _requestAgencyIdentifierId = user.AgencyCode();
+            _requestPartId = user.ParticipantId();
         }
 
         #endregion Constructor

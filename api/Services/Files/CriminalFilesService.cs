@@ -13,6 +13,7 @@ using Scv.Api.Models.Criminal.Detail;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using CriminalAppearanceDetail = Scv.Api.Models.Criminal.AppearanceDetail.CriminalAppearanceDetail;
 using CriminalAppearanceMethod = Scv.Api.Models.Criminal.AppearanceDetail.CriminalAppearanceMethod;
@@ -38,7 +39,8 @@ namespace Scv.Api.Services.Files
 
         #region Constructor
 
-        public CriminalFilesService(IConfiguration configuration, FileServicesClient filesClient, IMapper mapper, LookupService lookupService, LocationService locationService, IAppCache cache)
+        public CriminalFilesService(IConfiguration configuration, FileServicesClient filesClient, IMapper mapper, LookupService lookupService, LocationService locationService, IAppCache cache,
+            ClaimsPrincipal user)
         {
             _filesClient = filesClient;
             _filesClient.JsonSerializerSettings.ContractResolver = new SafeContractResolver { NamingStrategy = new CamelCaseNamingStrategy() };
@@ -46,8 +48,8 @@ namespace Scv.Api.Services.Files
             _locationService = locationService;
             _mapper = mapper;
             _requestApplicationCode = configuration.GetNonEmptyValue("Request:ApplicationCd");
-            _requestAgencyIdentifierId = configuration.GetNonEmptyValue("Request:AgencyIdentifierId");
-            _requestPartId = configuration.GetNonEmptyValue("Request:PartId");
+            _requestAgencyIdentifierId = user.AgencyCode();
+            _requestPartId = user.ParticipantId();
             _cache = cache;
         }
 

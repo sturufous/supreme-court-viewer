@@ -33,7 +33,37 @@ services:
       - WebBaseHref=${WEB_BASE_HREF}
       - Auth__UserId=${USER_ID}
       - Auth__UserPassword=${USER_PASSWORD}
-      - Auth__SCSSServiceAccountGuid=${SCSS_SERVICE_ACCOUNT_GUID}
       - Auth__AllowSiteMinderUserType=${ALLOW_SITE_MINDER_USER_TYPE}
+      - DatabaseConnectionString=${DatabaseConnectionString}
+      - DataProtectionKeyEncryptionKey=${DataProtectionKeyEncryptionKey}
+      - Keycloak__Client=${KeycloakClient}
+      - Keycloak__Authority=${KeycloakAuthority}
+      - Keycloak__Secret=${KeycloakSecret}
+      - Keycloak__Audience=${KeycloakAudience}
+      - SiteMinderLogoutUrl=${SiteMinderLogoutUrl}
+      - UserServicesClient__Username=${UserServicesClientUsername}
+      - UserServicesClient__Password=${UserServicesClientPassword}
+      - UserServicesClient__Url=${UserServicesClientUrl}
     ports:
       - 5000:5000
+    volumes:
+      - ./seed:/opt/app-root/data
+    depends_on:
+      - db
+    command: >
+      /bin/bash -c "
+        echo Waiting for the database service to start up ...;
+        sleep 10;
+        /usr/libexec/s2i/run;"
+
+  db:
+    image: centos/postgresql-12-centos8
+    environment:
+      - POSTGRESQL_USER=${POSTGRESQL_USER}
+      - POSTGRESQL_PASSWORD=${POSTGRESQL_PASSWORD}
+      - POSTGRESQL_DATABASE=${POSTGRESQL_DATABASE}
+      - POSTGRESQL_ADMIN_PASSWORD=${POSTGRESQL_ADMIN_PASSWORD}
+    ports:
+      - 5432:5432
+    volumes:
+      - ./tmp:/tmp2
