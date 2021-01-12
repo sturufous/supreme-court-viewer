@@ -41,7 +41,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Infrastructure\Encryption\" />
-    <Folder Include="Models\auth\" />
     <Folder Include="Services\EF\" />
   </ItemGroup>
 </Project>

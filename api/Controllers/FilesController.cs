@@ -105,6 +105,10 @@ namespace Scv.Api.Controllers
             var civilFileDetailResponse = await _civilFilesService.FileIdAsync(fileId);
             if (civilFileDetailResponse?.PhysicalFileId == null)
                 throw new NotFoundException("Couldn't find civil file with this id.");
+
+            if (User.IsVcUser() && civilFileDetailResponse.SealedYN == "Y")
+                return Forbid();
+
             return Ok(civilFileDetailResponse);
         }
 
@@ -118,8 +122,17 @@ namespace Scv.Api.Controllers
         [Route("civil/{fileId}/appearance-detail/{appearanceId}")]
         public async Task<ActionResult<CivilAppearanceDetail>> GetCivilAppearanceDetails(string fileId, string appearanceId)
         {
-            if (User.IsVcUser() && !User.HasVcCivilFileAccess(fileId))
-                return Forbid();
+            if (User.IsVcUser())
+            {
+                if(!User.HasVcCivilFileAccess(fileId))
+                    return Forbid();
+
+                var civilFileDetailResponse = await _civilFilesService.FileIdAsync(fileId);
+                if (civilFileDetailResponse?.PhysicalFileId == null)
+                    throw new NotFoundException("Couldn't find civil file with this id.");
+                if (civilFileDetailResponse.SealedYN == "Y")
+                    return Forbid();
+            } 
 
             var civilAppearanceDetail = await _civilFilesService.DetailedAppearanceAsync(fileId, appearanceId);
             if (civilAppearanceDetail == null)
@@ -135,8 +148,20 @@ namespace Scv.Api.Controllers
         /// <returns>JustinReportResponse</returns>
         [HttpGet]
         [Route("civil/court-summary-report/{appearanceId}/{fileNameAndExtension}")]
-        public async Task<IActionResult> GetCivilCourtSummaryReport(string appearanceId, string fileNameAndExtension)
+        public async Task<IActionResult> GetCivilCourtSummaryReport(string appearanceId, string fileNameAndExtension, string vcCivilFileId = "")
         {
+            if (User.IsVcUser())
+            {
+                if (!User.HasVcCivilFileAccess(vcCivilFileId))
+                    return Forbid();
+
+                var civilFileDetailResponse = await _civilFilesService.FileIdAsync(vcCivilFileId);
+                if (civilFileDetailResponse?.PhysicalFileId == null)
+                    throw new NotFoundException("Couldn't find civil file with this id.");
+                if (civilFileDetailResponse.SealedYN == "Y" || civilFileDetailResponse.Appearances.ApprDetail.All(ad => ad.AppearanceId != appearanceId))
+                    return Forbid();
+            }
+
             var justinReportResponse = await _civilFilesService.CourtSummaryReportAsync(appearanceId, JustinReportName.CEISR035);
 
             if (justinReportResponse.ReportContent == null || justinReportResponse.ReportContent.Length <= 0)
@@ -280,12 +305,25 @@ namespace Scv.Api.Controllers
         /// <returns>DocumentResponse</returns>
         [HttpGet]
         [Route("document/{documentId}/{fileNameAndExtension}")]
-        public async Task<IActionResult> GetDocument(string documentId, string fileNameAndExtension, bool isCriminal = false)
+        public async Task<IActionResult> GetDocument(string documentId, string fileNameAndExtension, bool isCriminal = false, string vcCivilFileId = "")
         {
-            if (User.IsVcUser() && isCriminal)
-                return Forbid();
-
             documentId = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(documentId));
+            if (User.IsVcUser())
+            {
+                if (!User.HasVcCivilFileAccess(vcCivilFileId))
+                    return Forbid();
+
+                if (isCriminal)
+                    return Forbid();
+
+                var civilFileDetailResponse = await _civilFilesService.FileIdAsync(vcCivilFileId);
+                if (civilFileDetailResponse?.PhysicalFileId == null)
+                    throw new NotFoundException("Couldn't find civil file with this id.");
+
+                if (civilFileDetailResponse.SealedYN == "Y" || civilFileDetailResponse.Document.All(s => s.CivilDocumentId != documentId))
+                    return Forbid();
+            }
+
             var documentResponse = await _filesService.DocumentAsync(documentId, isCriminal);
 
             if (documentResponse.B64Content == null || documentResponse.B64Content.Length <= 0)
@@ -298,8 +336,26 @@ namespace Scv.Api.Controllers
         [Route("archive")]
         public async Task<IActionResult> GetArchive(ArchiveRequest archiveRequest)
         {
-            if (User.IsVcUser() && (archiveRequest.RopRequests.Any() || archiveRequest.DocumentRequests.Any(dr => dr.IsCriminal)))
-                return Forbid();
+            if (User.IsVcUser())
+            {
+                if (!User.HasVcCivilFileAccess(archiveRequest.VcCivilFileId))
+                    return Forbid();
+
+                if (archiveRequest.RopRequests.Any() || archiveRequest.DocumentRequests.Any(dr => dr.IsCriminal))
+                    return Forbid();
+
+                var civilFileDetailResponse = await _civilFilesService.FileIdAsync(archiveRequest.VcCivilFileId);
+                if (civilFileDetailResponse?.PhysicalFileId == null)
+                    throw new NotFoundException("Couldn't find civil file with this id.");
+
+                var documentIds = archiveRequest.DocumentRequests.SelectToList(d => Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(d.Base64UrlEncodedDocumentId)));
+                var appearanceIds = archiveRequest.CsrRequests.SelectToList(csr => csr.AppearanceId);
+
+                if (civilFileDetailResponse.SealedYN == "Y" || !documentIds.All(id => civilFileDetailResponse.Document.Any(d => d.CivilDocumentId == id))
+                || !appearanceIds.All(id => civilFileDetailResponse.Appearances.ApprDetail.Any(d => d.AppearanceId == id))
+                )
+                    return Forbid();
+            }
 
             var maximumArchiveDocumentCount = _configuration.GetNonEmptyValue("MaximumArchiveDocumentCount");
             if (string.IsNullOrEmpty(archiveRequest.ZipName)) return BadRequest($"Missing {nameof(archiveRequest.ZipName)}.");
@@ -325,7 +381,7 @@ namespace Scv.Api.Controllers
             var documents = (await documentTasks.WhenAll()).ToList();
             var rops = (await ropRequestTasks.WhenAll()).ToList();
 
-            if (courtSummaryReports.Any(d => d.ResponseCd != "0")) return BadRequest("One of the CSRS didn't return correctly.");
+            if (courtSummaryReports.Any(d => d.ResponseCd != "0")) return BadRequest("One of the CSRs didn't return correctly.");
             if (documents.Any(d => d.ResultCd == "0")) return BadRequest("One of the documents didn't return correctly.");
             if (rops.Any(d => d.ResultCd == "0")) return BadRequest("One of the ROPs didn't return correctly.");
 

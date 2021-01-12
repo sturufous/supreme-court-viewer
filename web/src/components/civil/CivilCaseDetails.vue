@@ -203,7 +203,7 @@ export default class CivilCaseDetails extends Vue {
     public downloadDocuments(){
 
         const fileName = 'file'+this.civilFileInformation.fileNumber+'documents.zip'
-        const documentsToDownload = {zipName: fileName, csrRequests: [], documentRequests: [], ropRequests: []} as archiveInfoType;
+        const documentsToDownload = { zipName: fileName, csrRequests: [], documentRequests: [], ropRequests: [], vcCivilFileId: this.civilFileInformation.fileNumber } as archiveInfoType;
         for(const doc of this.providedDocumentsInfo){
             if (doc.isEnabled) {
                 const id = doc.objectGuid;                
