@@ -19,7 +19,7 @@ Vue.use(BootstrapVueIcons);
 Vue.config.productionTip = true;
 Vue.component('loading-spinner', LoadingSpinner);
 
-Vue.http.interceptors.push(function (request) {
+Vue.http.interceptors.push(function () {
 	return function (response) {
 		if (response.status == 401)
 			location.replace(`${process.env.BASE_URL}api/auth/login?redirectUri=${process.env.BASE_URL}`);

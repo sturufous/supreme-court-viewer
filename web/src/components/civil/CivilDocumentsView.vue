@@ -448,7 +448,7 @@ export default class CivilDocumentsView extends Vue {
         this.loadingPdf = true;
         const filename = 'doc' + documentId + '.pdf';
         documentId = base64url(documentId);
-        window.open(`${process.env.BASE_URL}api/files/document/${documentId}/${filename}?isCriminal=false`)
+        window.open(`${process.env.BASE_URL}api/files/document/${documentId}/${filename}?isCriminal=false&vcCivilFileId=${this.civilFileInformation.fileNumber}`)
         this.loadingPdf = false;
     }
     
@@ -456,7 +456,7 @@ export default class CivilDocumentsView extends Vue {
 
         this.loadingPdf = true; 
         const filename = 'court summary_'+appearanceId+'.pdf';
-        window.open(`${process.env.BASE_URL}api/files/civil/court-summary-report/${appearanceId}/${filename}`)
+        window.open(`${process.env.BASE_URL}api/files/civil/court-summary-report/${appearanceId}/${filename}?vcCivilFileId=${this.civilFileInformation.fileNumber}`)
         this.loadingPdf = false;
     }
     

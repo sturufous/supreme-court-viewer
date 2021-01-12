@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Scv.Api.Helpers;
 using Scv.Api.Helpers.Extensions;
+using Scv.Api.Models.auth;
 using Scv.Db.Models;
 using Scv.Db.Models.Auth;
 
@@ -63,20 +64,32 @@ namespace Scv.Api.Controllers
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPost("request-civil-file-access")]
-        public async Task<IActionResult> RequestCivilFileAccess(string userId, string fileId)
+        public async Task<IActionResult> RequestCivilFileAccess([FromBody] RequestCivilFileAccess request)
         {
-            //Check if service account user. 
+            if (string.IsNullOrEmpty(request.FileId) || string.IsNullOrEmpty(request.UserId))
+                return BadRequest();
+
             if (!User.IsServiceAccountUser())
                 return Forbid();
+
+            var expiryMinutes = float.Parse(Configuration.GetNonEmptyValue("RequestCivilFileAccessMinutes"));
             await Db.RequestFileAccess.AddAsync(new RequestFileAccess
             {
-                FileId = fileId,
-                UserId = userId,
+                FileId = request.FileId,
+                UserId = request.UserId,
                 Requested = DateTimeOffset.Now,
-                Expires = DateTimeOffset.Now.AddMinutes(5)
+                Expires = DateTimeOffset.Now.AddMinutes(expiryMinutes)
             });
             await Db.SaveChangesAsync();
-            return Ok();
+
+            var forwardedHost = Request.Headers["X-Forwarded-Host"];
+            var forwardedPort = Request.Headers["X-Forwarded-Port"];
+            var baseUrl = Configuration.GetNonEmptyValue("WebBaseHref");
+
+            return Ok(new
+            {
+                Url = $"{XForwardedForHelper.BuildUrlString(forwardedHost, forwardedPort, baseUrl)}civil-file/{request.FileId}"
+            });
         }
 
         [Authorize(AuthenticationSchemes = "SiteMinder, OpenIdConnect")]
