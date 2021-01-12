@@ -145,6 +145,7 @@ namespace Scv.Api.Controllers
         /// </summary>
         /// <param name="appearanceId"></param>
         /// <param name="fileNameAndExtension"></param>
+        /// <param name="vcCivilFileId"></param>
         /// <returns>JustinReportResponse</returns>
         [HttpGet]
         [Route("civil/court-summary-report/{appearanceId}/{fileNameAndExtension}")]
@@ -302,6 +303,7 @@ namespace Scv.Api.Controllers
         /// <param name="documentId"></param>
         /// <param name="fileNameAndExtension">Name of the file and extension.</param>
         /// <param name="isCriminal">True if Criminal, False if Civil</param>
+        /// <param name="vcCivilFileId"></param>
         /// <returns>DocumentResponse</returns>
         [HttpGet]
         [Route("document/{documentId}/{fileNameAndExtension}")]

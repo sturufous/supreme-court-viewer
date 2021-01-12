@@ -35,7 +35,7 @@ namespace tests.api.Controllers
             var courtListService = new CourtListService(fileServices.Configuration, fileServicesClient, new Mapper(), lookupService, locationService, new CachingService());
             _controller = new CourtListController(courtListService)
             {
-                ControllerContext = HttpResponseTest.SetupMockControllerContext()
+                ControllerContext = HttpResponseTest.SetupMockControllerContext(fileServices.Configuration)
             };
         }
 
