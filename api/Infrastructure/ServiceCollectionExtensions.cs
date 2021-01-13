@@ -228,7 +228,7 @@ namespace Scv.Api.Infrastructure
                                 return Task.CompletedTask;
                             }
                         }
-                        context.ProtocolMessage.SetParameter("kc_idp_hint", "idir");
+                        //context.ProtocolMessage.SetParameter("kc_idp_hint", "idir");
                         if (context.HttpContext.Request.Headers["X-Forwarded-Host"].Count > 0)
                         {
                             var forwardedHost = context.HttpContext.Request.Headers["X-Forwarded-Host"];
