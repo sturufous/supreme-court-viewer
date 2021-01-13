@@ -45,6 +45,8 @@ services:
       - UserServicesClient__Username=${UserServicesClientUsername}
       - UserServicesClient__Password=${UserServicesClientPassword}
       - UserServicesClient__Url=${UserServicesClientUrl}
+      - Keycloak__PresReqConfId=${KeycloakPresReqConfId}
+      - Keycloak__VcIdpHint=${KeycloakVcIdpHint}
     ports:
       - 5000:5000
     volumes:
