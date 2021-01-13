@@ -39,8 +39,5 @@ namespace Scv.Api.Helpers.Extensions
         public static bool IsVcUser(this ClaimsPrincipal user)
             => user.HasClaim(c => c.Type == CustomClaimTypes.PreferredUsername) && 
                user.FindFirstValue(CustomClaimTypes.PreferredUsername).Contains("@vc");
-
-        public static bool HasVcCivilFileAccess(this ClaimsPrincipal user, string fileId) =>
-        user.HasClaim(c => c.Type == CustomClaimTypes.CivilFileAccess) && user.HasClaim(CustomClaimTypes.CivilFileAccess, fileId);
     }
 }

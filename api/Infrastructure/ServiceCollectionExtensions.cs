@@ -92,6 +92,7 @@ namespace Scv.Api.Infrastructure
             services.AddScoped<LookupService>();
             services.AddScoped<LocationService>();
             services.AddScoped<CourtListService>();
+            services.AddScoped<VcCivilFileAccessHandler>();
             services.AddSingleton<JCUserService>();
 
             return services;
@@ -205,17 +206,6 @@ namespace Scv.Api.Infrastructure
                             new Claim(CustomClaimTypes.JcAgencyCode, configuration.GetNonEmptyValue("Request:AgencyIdentifierId")),
                         });
 
-                        //Add claims for VC - for CivilFileAccess.
-                        if (context.Principal.IsVcUser())
-                        {
-                            var preferredUserName = context.Principal.PreferredUsername();
-                            var db = context.HttpContext.RequestServices.GetRequiredService<ScvDbContext>();
-                            var now = DateTimeOffset.Now;
-                            var fileAccess = await db.RequestFileAccess
-                                .Where(r => r.UserId == preferredUserName && r.Expires > now)
-                                .ToListAsync();
-                            claims.AddRange(fileAccess.SelectDistinctToList(p => new Claim(CustomClaimTypes.CivilFileAccess, p.FileId)));
-                        }
                         identity.AddClaims(claims);
                     },
                     OnRedirectToIdentityProvider = context =>
@@ -229,9 +219,13 @@ namespace Scv.Api.Infrastructure
                                 return Task.CompletedTask;
                             }
                         }
-                        //context.ProtocolMessage.SetParameter("kc_idp_hint", "idir");
-                        //context.ProtocolMessage.SetParameter("kc_idp_hint","vc");
-                        //context.ProtocolMessage.SetParameter("pres_req_conf_id", configuration.GetNonEmptyValue("Keycloak:PresReqConfId"));
+
+                        context.ProtocolMessage.SetParameter("kc_idp_hint",
+                            context.Request.Query["redirectUri"].ToString().Contains("fromA2A=true")
+                                ? configuration.GetNonEmptyValue("Keycloak:VcIdpHint")
+                                : "idir");
+
+                        context.ProtocolMessage.SetParameter("pres_req_conf_id", configuration.GetNonEmptyValue("Keycloak:PresReqConfId"));
                         if (context.HttpContext.Request.Headers["X-Forwarded-Host"].Count > 0)
                         {
                             var forwardedHost = context.HttpContext.Request.Headers["X-Forwarded-Host"];
