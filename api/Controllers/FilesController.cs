@@ -39,18 +39,20 @@ namespace Scv.Api.Controllers
         private readonly FilesService _filesService;
         private readonly CivilFilesService _civilFilesService;
         private readonly CriminalFilesService _criminalFilesService;
+        private readonly VcCivilFileAccessHandler _vcCivilFileAccessHandler;
 
         #endregion Variables
 
         #region Constructor
 
-        public FilesController(IConfiguration configuration, ILogger<FilesController> logger, FilesService filesService)
+        public FilesController(IConfiguration configuration, ILogger<FilesController> logger, FilesService filesService, VcCivilFileAccessHandler vcCivilFileAccessHandler)
         {
             _configuration = configuration;
             _logger = logger;
             _filesService = filesService;
             _civilFilesService = filesService.Civil;
             _criminalFilesService = filesService.Criminal;
+            _vcCivilFileAccessHandler = vcCivilFileAccessHandler;
         }
 
         #endregion Constructor
@@ -99,7 +101,7 @@ namespace Scv.Api.Controllers
         [Route("civil/{fileId}")]
         public async Task<ActionResult<RedactedCivilFileDetailResponse>> GetCivilFileDetailByFileId(string fileId)
         {
-            if (User.IsVcUser() && !User.HasVcCivilFileAccess(fileId))
+            if (User.IsVcUser() && !await _vcCivilFileAccessHandler.HasCivilFileAccess(User, fileId))
                 return Forbid();
 
             var civilFileDetailResponse = await _civilFilesService.FileIdAsync(fileId);
@@ -124,7 +126,7 @@ namespace Scv.Api.Controllers
         {
             if (User.IsVcUser())
             {
-                if(!User.HasVcCivilFileAccess(fileId))
+                if(!await _vcCivilFileAccessHandler.HasCivilFileAccess(User, fileId))
                     return Forbid();
 
                 var civilFileDetailResponse = await _civilFilesService.FileIdAsync(fileId);
@@ -153,7 +155,7 @@ namespace Scv.Api.Controllers
         {
             if (User.IsVcUser())
             {
-                if (!User.HasVcCivilFileAccess(vcCivilFileId))
+                if (!await _vcCivilFileAccessHandler.HasCivilFileAccess(User, vcCivilFileId))
                     return Forbid();
 
                 var civilFileDetailResponse = await _civilFilesService.FileIdAsync(vcCivilFileId);
@@ -312,7 +314,7 @@ namespace Scv.Api.Controllers
             documentId = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(documentId));
             if (User.IsVcUser())
             {
-                if (!User.HasVcCivilFileAccess(vcCivilFileId))
+                if (!await _vcCivilFileAccessHandler.HasCivilFileAccess(User, vcCivilFileId))
                     return Forbid();
 
                 if (isCriminal)
@@ -340,7 +342,7 @@ namespace Scv.Api.Controllers
         {
             if (User.IsVcUser())
             {
-                if (!User.HasVcCivilFileAccess(archiveRequest.VcCivilFileId))
+                if (!await _vcCivilFileAccessHandler.HasCivilFileAccess(User, archiveRequest.VcCivilFileId))
                     return Forbid();
 
                 if (archiveRequest.RopRequests.Any() || archiveRequest.DocumentRequests.Any(dr => dr.IsCriminal))
