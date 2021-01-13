@@ -61,10 +61,9 @@ namespace tests.api.Controllers
             var identity = new ClaimsIdentity(claims, "Cookies");
             var principal = new ClaimsPrincipal(identity);
 
-
             var filesService = new FilesService(fileServices.Configuration, fileServicesClient, new Mapper(), lookupService, locationService, new CachingService(), principal);
             _controller = new FilesController(fileServices.Configuration, fileServices.LogFactory.CreateLogger<FilesController>(), filesService);
-            _controller.ControllerContext = HttpResponseTest.SetupMockControllerContext();
+            _controller.ControllerContext = HttpResponseTest.SetupMockControllerContext(fileServices.Configuration);
         }
 
         #endregion Constructor
@@ -429,7 +428,7 @@ namespace tests.api.Controllers
 
             var fileContentResult = actionResult as FileContentResult;
             Assert.NotNull(fileContentResult);
-            Assert.True(fileContentResult.FileContents.Length > 5100);
+            Assert.True(fileContentResult.FileContents.Length > 3200);
         }
 
         [Fact]

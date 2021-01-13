@@ -103,9 +103,9 @@ namespace Scv.Api.Infrastructure
             var baseUrl = configuration.GetNonEmptyValue("WebBaseHref");
             services.AddAuthentication(options =>
             {
-                options.DefaultScheme = OpenIdConnectDefaults.AuthenticationScheme;
-                options.DefaultAuthenticateScheme = OpenIdConnectDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             })
             .AddCookie(options =>
             {
@@ -179,6 +179,7 @@ namespace Scv.Api.Infrastructure
                 options.SaveTokens = true;
                 options.CallbackPath = "/api/auth/signin-oidc";
                 options.Scope.Add("groups");
+                options.Scope.Add("vc_authn");
                 options.Events = new OpenIdConnectEvents
                 {
                     OnTicketReceived = context =>
@@ -228,7 +229,9 @@ namespace Scv.Api.Infrastructure
                                 return Task.CompletedTask;
                             }
                         }
-                        context.ProtocolMessage.SetParameter("kc_idp_hint", "idir");
+                        //context.ProtocolMessage.SetParameter("kc_idp_hint", "idir");
+                        //context.ProtocolMessage.SetParameter("kc_idp_hint","vc");
+                        //context.ProtocolMessage.SetParameter("pres_req_conf_id", configuration.GetNonEmptyValue("Keycloak:PresReqConfId"));
                         if (context.HttpContext.Request.Headers["X-Forwarded-Host"].Count > 0)
                         {
                             var forwardedHost = context.HttpContext.Request.Headers["X-Forwarded-Host"];
