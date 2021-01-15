@@ -149,7 +149,9 @@
                 .then(Response => Response.json(), err => {
                     this.errorCode= err.status;
                     this.errorText= err.statusText;
-                    this.openErrorModal=true; 
+                    if (this.errorCode != 401) {
+                        this.openErrorModal=true;
+                    }                     
                     console.log(this.errorCode);
                 }        
                 ).then(data => {
