@@ -13,6 +13,7 @@ using Scv.Api.Services.Files;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using Scv.Api.Helpers.Exceptions;
 using tests.api.Helpers;
 using Xunit;
@@ -21,6 +22,7 @@ using System.Threading.Tasks;
 using JCCommon.Clients.LookupCodeServices;
 using Microsoft.AspNetCore.WebUtilities;
 using Newtonsoft.Json;
+using Scv.Api.Helpers;
 using Scv.Api.Models.archive;
 
 namespace tests.api.Controllers
@@ -51,9 +53,17 @@ namespace tests.api.Controllers
             _fileServicesClient = fileServicesClient;
             var lookupService = new LookupService(lookupServices.Configuration, lookupServiceClient, new CachingService());
             var locationService = new LocationService(locationServices.Configuration, locationServiceClient, new CachingService());
-            var filesService = new FilesService(fileServices.Configuration, fileServicesClient, new Mapper(), lookupService, locationService, new CachingService());
+
+            var claims = new[] {
+                new Claim(CustomClaimTypes.JcParticipantId,  fileServices.Configuration.GetNonEmptyValue("Request:PartId")),
+                new Claim(CustomClaimTypes.JcAgencyCode, fileServices.Configuration.GetNonEmptyValue("Request:AgencyIdentifierId")),
+            };
+            var identity = new ClaimsIdentity(claims, "Cookies");
+            var principal = new ClaimsPrincipal(identity);
+
+            var filesService = new FilesService(fileServices.Configuration, fileServicesClient, new Mapper(), lookupService, locationService, new CachingService(), principal);
             _controller = new FilesController(fileServices.Configuration, fileServices.LogFactory.CreateLogger<FilesController>(), filesService);
-            _controller.ControllerContext = HttpResponseTest.SetupMockControllerContext();
+            _controller.ControllerContext = HttpResponseTest.SetupMockControllerContext(fileServices.Configuration);
         }
 
         #endregion Constructor
@@ -418,7 +428,7 @@ namespace tests.api.Controllers
 
             var fileContentResult = actionResult as FileContentResult;
             Assert.NotNull(fileContentResult);
-            Assert.True(fileContentResult.FileContents.Length > 5100);
+            Assert.True(fileContentResult.FileContents.Length > 3200);
         }
 
         [Fact]
@@ -461,7 +471,7 @@ namespace tests.api.Controllers
 
             var fileContentResult = actionResult as FileContentResult;
             Assert.NotNull(fileContentResult);
-            Assert.Equal(146972, fileContentResult.FileContents.Length);
+            Assert.True(fileContentResult.FileContents.Length > 100000);
         }
 
         [Fact]
@@ -568,7 +578,7 @@ namespace tests.api.Controllers
             Assert.Equal("1009", criminalAppearanceDetail.JustinNo);
             Assert.Equal("Stephen Frank Lewis", criminalAppearanceDetail.Accused.FullName);
             Assert.Equal("P", criminalAppearanceDetail.Accused.PartyAppearanceMethod);
-            Assert.Equal("Present", criminalAppearanceDetail.Accused.PartyAppearanceMethodDesc);
+            Assert.Equal("Present", criminalAppearanceDetail.Accused.PartyAppearanceMethodDesc);  //Doesn't seem to have any appearance methods
             Assert.Equal("Michael Jordan", criminalAppearanceDetail.Adjudicator.FullName);
             Assert.Equal("14007.0026", criminalAppearanceDetail.Adjudicator.PartId);
             Assert.Equal("Brad Bow Baggins Stez", criminalAppearanceDetail.Prosecutor.FullName);
@@ -677,7 +687,7 @@ namespace tests.api.Controllers
             var party = civilAppearanceDetail.Party.FirstOrDefault(p => p.PartyId == "21");
             Assert.NotNull(party);
             Assert.Equal("P", party.PartyAppearanceMethod);
-            Assert.Equal("Present", party.PartyAppearanceMethodDesc);
+            Assert.Equal("Present", party.PartyAppearanceMethodDesc); //Doesn't seem to have any appearance methods
         }
 
         [Fact]

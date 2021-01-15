@@ -175,9 +175,9 @@
     
             <b-card no-body v-if="isDataReady">
                 <b-row cols="1" class = "mx-2 mt-2 mb-5">
-                    <criminal-list/>
-                    <civil-list civilClass='family'/>
-                    <civil-list civilClass='civil'/>
+                    <criminal-list v-if="criminalCases>0"/>
+                    <civil-list v-if="familyCases>0" civilClass='family'/>
+                    <civil-list v-if="civilCases>0" civilClass='civil'/>
                     <b-card class="mb-5"/>
                     
                 </b-row> 
@@ -390,10 +390,10 @@ export default class CourtList extends Vue {
                 this.selectedCourtLocation = location.value;
                 this.selectedCourtLocationState=true;
                 this.selectedDate = this.$route.params.date;
-                const room = this.getRoomInLocationByRoomNo(location, this.$route.params.room)[0];
+                const room = true;//this.getRoomInLocationByRoomNo(location, this.$route.params.room)[0];
                 if(room)
                 {
-                    this.selectedCourtRoom= room.value;
+                    this.selectedCourtRoom= this.$route.params.room;
                     this.selectedCourtRoomState = true;
                     Vue.nextTick().then(() => {
                         this.searchForCourtList();

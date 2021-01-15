@@ -6,6 +6,7 @@ using System.Net.Http;
 using Scv.Api.Helpers;
 using Scv.Api.Helpers.Extensions;
 using tests.api.Controllers;
+using BasicAuthenticationHeaderValue = JCCommon.Framework.BasicAuthenticationHeaderValue;
 
 namespace tests.api.Helpers
 {

@@ -43,6 +43,7 @@ export interface documentRequestsInfoType {
 
 export interface archiveInfoType {
     zipName: string,
+    vcCivilFileId?: string,
     csrRequests: csrRequestsInfoType[],
     documentRequests: documentRequestsInfoType[],
     ropRequests: ropRequestsInfoType[]

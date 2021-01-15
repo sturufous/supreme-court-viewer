@@ -11,7 +11,8 @@ module.exports = {
 		devServer: {
 			historyApiFallback: true,
 			host: 'localhost',
-			port: 1337,
+			port: 1339,
+			https: true,
 			proxy: {
 				//This is for WEB_BASE_HREF = '/' specifically. 
 				'^/api': {
@@ -19,7 +20,7 @@ module.exports = {
 					headers: {
 						Connection: 'keep-alive',
 						'X-Forwarded-Host': 'localhost',
-						'X-Forwarded-Port': '1337'
+						'X-Forwarded-Port': '1339'
 					},
 					changeOrigin: true
 				}

@@ -8,36 +8,52 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using Scv.Api.Helpers.ContractResolver;
-using Scv.Api.Helpers.Mapping;
 using Scv.Api.Helpers.Middleware;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.OpenApi.Models;
 using Scv.Api.Helpers;
+using SS.Api.infrastructure.encryption;
+using Microsoft.EntityFrameworkCore;
+using Scv.Api.Infrastructure;
+using Scv.Api.Services.EF;
+using Scv.Db.Models;
 
 namespace Scv.Api
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private IWebHostEnvironment CurrentEnvironment { get; }
+
+        public Startup(IWebHostEnvironment env, IConfiguration configuration)
         {
             Configuration = configuration;
+            CurrentEnvironment = env;
         }
 
         private IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<MigrationAndSeedService>();
+
+            services.AddDbContext<ScvDbContext>(options =>
+                {
+                    options.UseNpgsql(Configuration.GetNonEmptyValue("DatabaseConnectionString"), npg => npg.MigrationsAssembly("db")).UseSnakeCaseNamingConvention();
+                    if (CurrentEnvironment.IsDevelopment())
+                        options.EnableSensitiveDataLogging();
+                }
+            );
+            
             services.AddMapster();
 
             #region Cors
 
             string corsDomain = Configuration.GetValue<string>("CORS_DOMAIN");
-            Console.WriteLine($"CORS_DOMAIN: {corsDomain}");
 
             services.AddCors(options =>
             {
@@ -57,6 +73,18 @@ namespace Scv.Api
 
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
+            #region Data Protection
+            services.AddSingleton(new AesGcmEncryptionOptions { Key = Configuration.GetNonEmptyValue("DataProtectionKeyEncryptionKey") });
+
+            services.AddDataProtection()
+                .PersistKeysToDbContext<ScvDbContext>()
+                .UseXmlEncryptor(s => new AesGcmXmlEncryptor(s))
+                .SetApplicationName("SCV");
+
+            #endregion Data Protection
+
+            services.AddAuthorizationAndAuthentication(CurrentEnvironment, Configuration);
+
             #region Newtonsoft
 
             services.AddControllers().AddNewtonsoftJson(options =>
@@ -73,25 +101,6 @@ namespace Scv.Api
 
             services.AddSwaggerGen(options =>
             {
-                options.AddSecurityDefinition("Basic", new OpenApiSecurityScheme
-                {
-                    Description = "Basic auth added to authorization header",
-                    Name = "Authorization",
-                    In = ParameterLocation.Header,
-                    Scheme = "basic",
-                    Type = SecuritySchemeType.Http
-                });
-
-                options.AddSecurityRequirement(new OpenApiSecurityRequirement{
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Basic" }
-                        },
-                        new List<string>()
-                    }
-                });
-
                 options.EnableAnnotations(true);
                 options.CustomSchemaIds(o => o.FullName);
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
@@ -118,7 +127,7 @@ namespace Scv.Api
             app.Use((context, next) =>
             {
                 context.Request.Scheme = "https";
-                if (context.Request.Headers.ContainsKey("X-Forwarded-Host"))
+                if (context.Request.Headers.ContainsKey("X-Forwarded-Host") && !env.IsDevelopment())
                     context.Request.PathBase = new PathString(baseUrl.Remove(baseUrl.Length - 1));
                 return next();
             });
@@ -149,13 +158,13 @@ namespace Scv.Api
                 options.RoutePrefix = "api";
             });
 
-            app.UseMiddleware<AuthenticationMiddleware>();
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
 
             app.UseHttpsRedirection();
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
