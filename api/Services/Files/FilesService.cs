@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using JCCommon.Clients.FileServices;
 using LazyCache;
@@ -26,14 +27,20 @@ namespace Scv.Api.Services.Files
 
         #region Constructor
 
-        public FilesService(IConfiguration configuration, FileServicesClient filesClient, IMapper mapper, LookupService lookupService, LocationService locationService, IAppCache cache)
+        public FilesService(IConfiguration configuration,
+            FileServicesClient filesClient,
+            IMapper mapper,
+            LookupService lookupService,
+            LocationService locationService,
+            IAppCache cache,
+            ClaimsPrincipal claimsPrincipal)
         {
             _filesClient = filesClient;
             _filesClient.JsonSerializerSettings.ContractResolver = new SafeContractResolver { NamingStrategy = new CamelCaseNamingStrategy() };
             _cache = cache;
             _cache.DefaultCachePolicy.DefaultCacheDurationSeconds = int.Parse(configuration.GetNonEmptyValue("Caching:FileExpiryMinutes")) * 60;
-            Civil = new CivilFilesService(configuration, filesClient, mapper, lookupService, locationService, _cache);
-            Criminal = new CriminalFilesService(configuration, filesClient, mapper, lookupService, locationService, _cache);
+            Civil = new CivilFilesService(configuration, filesClient, mapper, lookupService, locationService, _cache, claimsPrincipal);
+            Criminal = new CriminalFilesService(configuration, filesClient, mapper, lookupService, locationService, _cache, claimsPrincipal);
         }
 
         #endregion Constructor

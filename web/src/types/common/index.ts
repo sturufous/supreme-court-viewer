@@ -1,3 +1,6 @@
+import { csrRequestsInfoType } from "../civil";
+import { ropRequestsInfoType } from "../criminal";
+
 export interface inputNamesType {
     "lastName": string,
     "givenName": string
@@ -30,4 +33,18 @@ export interface adjudicatorRestrictionsInfoType {
     "Full Name": string,
     "Status": string,
     "Applies to": string
+}
+
+export interface documentRequestsInfoType {
+    isCriminal: boolean,
+    pdfFileName: string,
+    base64UrlEncodedDocumentId: string
+}
+
+export interface archiveInfoType {
+    zipName: string,
+    vcCivilFileId?: string,
+    csrRequests: csrRequestsInfoType[],
+    documentRequests: documentRequestsInfoType[],
+    ropRequests: ropRequestsInfoType[]
 }

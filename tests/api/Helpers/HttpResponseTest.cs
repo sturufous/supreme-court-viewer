@@ -1,6 +1,13 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Moq;
+using Scv.Api.Helpers;
+using Scv.Api.Helpers.Extensions;
 using Xunit;
 
 namespace tests.api.Helpers
@@ -18,7 +25,7 @@ namespace tests.api.Helpers
             return result;
         }
 
-        public static ControllerContext SetupMockControllerContext()
+        public static ControllerContext SetupMockControllerContext(IConfiguration configuration)
         {
             var headerDictionary = new HeaderDictionary();
             var response = new Mock<HttpResponse>();
@@ -27,7 +34,16 @@ namespace tests.api.Helpers
             var httpContext = new Mock<HttpContext>();
             httpContext.SetupGet(a => a.Response).Returns(response.Object);
 
-            return new ControllerContext()
+            var claims = new[] {
+                new Claim(CustomClaimTypes.JcParticipantId,  configuration.GetNonEmptyValue("Request:PartId")),
+                new Claim(CustomClaimTypes.JcAgencyCode, configuration.GetNonEmptyValue("Request:AgencyIdentifierId")),
+            };
+            var identity = new ClaimsIdentity(claims, "Cookies");
+            var principal = new ClaimsPrincipal(identity);
+
+            httpContext.SetupGet(a => a.User).Returns(principal);
+
+            return new ControllerContext
             {
                 HttpContext = httpContext.Object
             };

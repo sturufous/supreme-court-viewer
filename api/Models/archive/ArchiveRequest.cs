@@ -9,5 +9,6 @@ namespace Scv.Api.Models.archive
         public List<DocumentRequest> DocumentRequests { get; set; } = new List<DocumentRequest>();
         public List<RopRequest> RopRequests { get; set; } = new List<RopRequest>();
         public int TotalDocuments => CsrRequests.Count + DocumentRequests.Count + RopRequests.Count;
+        public string VcCivilFileId { get; set; }
     }
 }

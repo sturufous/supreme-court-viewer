@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Scv.Api.Controllers
 {
@@ -8,6 +9,7 @@ namespace Scv.Api.Controllers
     {
         [HttpGet]
         [Route("Headers")]
+        [AllowAnonymous]
 
         public ActionResult Headers()
         {
