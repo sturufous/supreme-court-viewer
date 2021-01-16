@@ -14,7 +14,10 @@
 
     <b-card bg-variant="light" v-else-if= "isLocationDataMounted && !isLocationDataReady">
         <b-card style="min-height: 40px;">
-            <span v-if="errorCode>0"> Server is not responding. <b>({{errorText}} "{{errorCode}}")</b> </span>
+            <span v-if="errorCode>0">
+                <span v-if="errorCode==403"> You are not authorized to access this page. </span>
+                <span v-else> Server is not responding. <b>({{errorText}} "{{errorCode}}")</b></span>
+            </span>
             <span v-else > No Court Location Found. </span>                    
         </b-card>
         <b-card>         

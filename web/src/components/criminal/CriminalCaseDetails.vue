@@ -17,6 +17,7 @@
         <b-card  style="min-height: 100px;">
             <span v-if="errorCode==404">This <b>File-Number '{{this.criminalFileInformation.fileNumber}}'</b> doesn't exist in the <b>criminal</b> records. </span>
             <span v-else-if="errorCode==200 || errorCode==204"> Bad Data in <b>File-Number '{{this.criminalFileInformation.fileNumber}}'</b> ! </span>
+            <span v-else-if="errorCode==403"> You are not authorized to access this file. </span>
             <span v-else> Server is not responding. <b>({{errorText}})</b> </span>
         </b-card>
         <b-card>         

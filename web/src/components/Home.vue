@@ -55,7 +55,21 @@
         </b-row>
         <b-card >
             <b-button @click="navigateToCourtList()">Court List</b-button>
-        </b-card>    
+        </b-card>
+
+        <b-modal v-model="openErrorModal" header-class="bg-warning text-light">
+            <b-card class="h4 mx-2 py-2">
+                <span v-if="errorCode==403" class="p-0"> You are not authorized to access this page.</span>            
+				<span v-else class="p-0">{{errorText}}</span>
+            </b-card>                        
+            <template v-slot:modal-footer>
+                <b-button variant="primary" @click="openErrorModal=false">Ok</b-button>
+            </template>            
+            <template v-slot:modal-header-close>                 
+                <b-button variant="outline-warning" class="text-light closeButton" @click="openErrorModal=false"
+                >&times;</b-button>
+            </template>
+        </b-modal>    
     </b-card>
 </template>
 
@@ -89,8 +103,9 @@
         
         fileInformation = {};
         fileSearch = {};        
-        errorCode=0
-        errorText=''
+        errorCode=0;
+        errorText='';
+        openErrorModal=false;        
         syncFlag = true
         searchingRequest = false;
         searchAllowed = true;
@@ -131,7 +146,14 @@
         {
             this.errorCode = 0;
             this.$http.get('api/location/court-rooms')
-                .then(Response => Response.json(), err => {this.errorCode= err.status;this.errorText= err.statusText;console.log(err);}        
+                .then(Response => Response.json(), err => {
+                    this.errorCode= err.status;
+                    this.errorText= err.statusText;
+                    if (this.errorCode != 401) {
+                        this.openErrorModal=true;
+                    }                     
+                    console.log(this.errorCode);
+                }        
                 ).then(data => {
                     if(data){
                         this.courtRoomsAndLocationsJson = data
