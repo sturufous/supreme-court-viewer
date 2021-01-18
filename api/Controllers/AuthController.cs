@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Scv.Api.Helpers;
 using Scv.Api.Helpers.Extensions;
+using Scv.Api.Infrastructure.Authorization;
 using Scv.Api.Models.auth;
 using Scv.Db.Models;
 using Scv.Db.Models.Auth;
@@ -93,7 +94,7 @@ namespace Scv.Api.Controllers
             });
         }
 
-        [Authorize(AuthenticationSchemes = "SiteMinder, OpenIdConnect")]
+        [Authorize(AuthenticationSchemes = "SiteMinder, OpenIdConnect", Policy = nameof(ProviderAuthorizationHandler))]
         [HttpGet("info")]
         public ActionResult UserInfo()
         {
