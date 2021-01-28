@@ -12,6 +12,7 @@ using Scv.Api.Models.Criminal.Detail;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Scv.Api.Services
@@ -33,7 +34,7 @@ namespace Scv.Api.Services
 
         #region Constructor
 
-        public CourtListService(IConfiguration configuration, FileServicesClient filesClient, IMapper mapper, LookupService lookupService, LocationService locationService, IAppCache cache)
+        public CourtListService(IConfiguration configuration, FileServicesClient filesClient, IMapper mapper, LookupService lookupService, LocationService locationService, IAppCache cache, ClaimsPrincipal user)
         {
             _filesClient = filesClient;
             _filesClient.JsonSerializerSettings.ContractResolver = new SafeContractResolver { NamingStrategy = new CamelCaseNamingStrategy() };
@@ -44,8 +45,8 @@ namespace Scv.Api.Services
             _lookupService = lookupService;
             _locationService = locationService;
             _requestApplicationCode = configuration.GetNonEmptyValue("Request:ApplicationCd");
-            _requestAgencyIdentifierId = configuration.GetNonEmptyValue("Request:AgencyIdentifierId");
-            _requestPartId = configuration.GetNonEmptyValue("Request:PartId");
+            _requestAgencyIdentifierId = user.AgencyCode();
+            _requestPartId = user.ParticipantId();
         }
 
         #endregion Constructor
