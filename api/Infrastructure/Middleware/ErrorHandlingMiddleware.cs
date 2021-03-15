@@ -86,8 +86,7 @@ namespace Scv.Api.Helpers.Middleware
                 if (request.ContentType != null && request.ContentType.Contains("json"))
                 {
                     request.Body.Position = 0;
-                    using var reader
-                        = new StreamReader(request.Body, Encoding.UTF8, true, 1024, true);
+                    using var reader = new StreamReader(request.Body);
                     jsonBody = await reader.ReadToEndAsync();
                     request.Body.Position = 0;
                 }
