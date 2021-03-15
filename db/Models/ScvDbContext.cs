@@ -25,6 +25,7 @@ namespace Scv.Db.Models
         // This maps to the table that stores keys.
         public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
         public DbSet<RequestFileAccess> RequestFileAccess { get; set; }
+        public DbSet<Audit> Audit { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

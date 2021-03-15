@@ -15,6 +15,7 @@ module.exports = {
 			https: true,
 			proxy: {
 				//This is for WEB_BASE_HREF = '/' specifically. 
+				//If having problems connecting, try adding: netsh http add iplisten 127.0.0.1
 				'^/api': {
 					target: "https://localhost:44369",
 					headers: {

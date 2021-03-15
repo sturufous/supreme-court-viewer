@@ -31,7 +31,6 @@ namespace Scv.Api.Controllers
         /// This cannot be called from AJAX or SWAGGER. It must be loaded in the browser location, because it brings the user to the SSO page. 
         /// </summary>
         /// <param name="redirectUri">URL to go back to.</param>
-        /// <param name="fromA2A">This determines which login to provide, either VC or IDIR</param>
         [Authorize(AuthenticationSchemes = OpenIdConnectDefaults.AuthenticationScheme)]
         [HttpGet("login")]
         public IActionResult Login(string redirectUri = "/api")
