@@ -6,10 +6,17 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Scv.Api.Helpers.Exceptions;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http.Extensions;
+using Newtonsoft.Json.Linq;
+using Scv.Api.Helpers.Extensions;
+using Scv.Db.Models;
 
 namespace Scv.Api.Helpers.Middleware
 {
@@ -53,7 +60,7 @@ namespace Scv.Api.Helpers.Middleware
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        public async Task Invoke(HttpContext context)
+        public async Task Invoke(HttpContext context, ScvDbContext Db)
         {
             try
             {
@@ -62,6 +69,39 @@ namespace Scv.Api.Helpers.Middleware
             catch (Exception ex)
             {
                 await HandleExceptionAsync(context, ex);
+            }
+            finally
+            {
+                await AuditLog(context, Db);
+            }
+        }
+
+        private async Task AuditLog(HttpContext context, ScvDbContext db)
+        {
+            // May change this later, to include requests that aren't logged into keycloak.
+            if (!string.IsNullOrEmpty(context.User.PreferredUsername()))
+            {
+                var request = context.Request;
+                var jsonBody = "{}";
+                if (request.ContentType != null && request.ContentType.Contains("json"))
+                {
+                    request.Body.Position = 0;
+                    using var reader = new StreamReader(request.Body);
+                    jsonBody = await reader.ReadToEndAsync();
+                    request.Body.Position = 0;
+                }
+                var audit = new Audit
+                {
+                    Created = DateTimeOffset.Now,
+                    Path = $"{request.Method} {request.GetEncodedPathAndQuery()}",
+                    Action = $"{(request.RouteValues.ContainsKey("action") ? request.RouteValues["action"] : "")}",
+                    JsonBody = jsonBody,
+                    IpAddress = request.Headers.ContainsKey("X-Real-IP") ? request.Headers["X-Real-IP"].ToString() : "",
+                    ResponseCode = context.Response?.StatusCode.ToString(),
+                    UserId = context.User.PreferredUsername()
+                };
+                await db.AddAsync(audit);
+                await db.SaveChangesAsync();
             }
         }
 

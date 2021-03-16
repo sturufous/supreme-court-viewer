@@ -23,7 +23,9 @@ using JCCommon.Clients.LookupCodeServices;
 using Microsoft.AspNetCore.WebUtilities;
 using Newtonsoft.Json;
 using Scv.Api.Helpers;
+using Scv.Api.Infrastructure.Authorization;
 using Scv.Api.Models.archive;
+using Scv.Db.Models;
 
 namespace tests.api.Controllers
 {
@@ -62,7 +64,10 @@ namespace tests.api.Controllers
             var principal = new ClaimsPrincipal(identity);
 
             var filesService = new FilesService(fileServices.Configuration, fileServicesClient, new Mapper(), lookupService, locationService, new CachingService(), principal);
-            _controller = new FilesController(fileServices.Configuration, fileServices.LogFactory.CreateLogger<FilesController>(), filesService);
+
+            //TODO fake this.
+            var vcCivilFileAccessHandler = new VcCivilFileAccessHandler(new ScvDbContext());
+            _controller = new FilesController(fileServices.Configuration, fileServices.LogFactory.CreateLogger<FilesController>(), filesService, vcCivilFileAccessHandler);
             _controller.ControllerContext = HttpResponseTest.SetupMockControllerContext(fileServices.Configuration);
         }
 
