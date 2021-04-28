@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Serialization;
 using Scv.Api.Helpers;
 using Scv.Api.Helpers.ContractResolver;
+using Scv.Api.Helpers.Extensions;
 
 namespace Scv.Api.Services.Files
 {
@@ -22,6 +23,9 @@ namespace Scv.Api.Services.Files
         public readonly CriminalFilesService Criminal; 
         private readonly FileServicesClient _filesClient;
         private readonly IAppCache _cache;
+        private readonly string _applicationCode;
+        private readonly string _requestAgencyIdentifierId;
+        private readonly string _requestPartId;
 
         #endregion Variables
 
@@ -41,6 +45,10 @@ namespace Scv.Api.Services.Files
             _cache.DefaultCachePolicy.DefaultCacheDurationSeconds = int.Parse(configuration.GetNonEmptyValue("Caching:FileExpiryMinutes")) * 60;
             Civil = new CivilFilesService(configuration, filesClient, mapper, lookupService, locationService, _cache, claimsPrincipal);
             Criminal = new CriminalFilesService(configuration, filesClient, mapper, lookupService, locationService, _cache, claimsPrincipal);
+
+            _applicationCode = configuration.GetNonEmptyValue("Request:ApplicationCd");
+            _requestAgencyIdentifierId = claimsPrincipal.AgencyCode();
+            _requestPartId = claimsPrincipal.ParticipantId();
         }
 
         #endregion Constructor
@@ -51,9 +59,9 @@ namespace Scv.Api.Services.Files
 
        
 
-        public async Task<DocumentResponse> DocumentAsync(string documentId, bool isCriminal)
+        public async Task<DocumentResponse> DocumentAsync(string documentId, bool isCriminal, string physicalFileId)
         {
-            return await _filesClient.FilesDocumentAsync(documentId, isCriminal ? "R" : "I");
+            return await _filesClient.FilesDocumentAsync(_requestAgencyIdentifierId, _requestPartId, _applicationCode, documentId, isCriminal ? "R" : "I", physicalFileId);
         }
 
         #endregion Courtlist & Document

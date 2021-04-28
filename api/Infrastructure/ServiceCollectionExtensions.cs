@@ -190,7 +190,9 @@ namespace Scv.Api.Infrastructure
                         context.Properties.Items[".TokenNames"] = "refresh_token;token_type;expires_at";
                         return Task.CompletedTask;
                     },
+#pragma warning disable 1998
                     OnTokenValidated = async context =>
+#pragma warning restore 1998
                     {
                         if (!(context.Principal.Identity is ClaimsIdentity identity)) return;
 

@@ -59,8 +59,9 @@ namespace Scv.Api.Helpers.Middleware
         /// Handle the exception if one occurs. Note this wont catch exceptions created from async void functions.
         /// </summary>
         /// <param name="context"></param>
+        /// <param name="db"></param>
         /// <returns></returns>
-        public async Task Invoke(HttpContext context, ScvDbContext Db)
+        public async Task Invoke(HttpContext context, ScvDbContext db)
         {
             try
             {
@@ -72,7 +73,7 @@ namespace Scv.Api.Helpers.Middleware
             }
             finally
             {
-                await AuditLog(context, Db);
+                await AuditLog(context, db);
             }
         }
 
