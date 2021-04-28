@@ -223,6 +223,7 @@ export default class CriminalCaseDetails extends Vue {
                         documentRequest.isCriminal = true;
                         documentRequest.pdfFileName = 'doc' + id + '.pdf';
                         documentRequest.base64UrlEncodedDocumentId = base64url(id);
+                        documentRequest.fileId = this.criminalFileInformation.fileNumber;
                         documentsToDownload.documentRequests.push(documentRequest);                
                     } 
                 }

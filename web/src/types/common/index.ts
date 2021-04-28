@@ -38,7 +38,8 @@ export interface adjudicatorRestrictionsInfoType {
 export interface documentRequestsInfoType {
     isCriminal: boolean,
     pdfFileName: string,
-    base64UrlEncodedDocumentId: string
+    base64UrlEncodedDocumentId: string,
+    fileId: string
 }
 
 export interface archiveInfoType {

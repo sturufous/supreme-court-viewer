@@ -266,6 +266,7 @@ export default class CivilDocumentsView extends Vue {
                 const documentRequest = {} as documentRequestsInfoType;
                 documentRequest.isCriminal = false;
                 documentRequest.pdfFileName = 'doc' + id + '.pdf';
+                documentRequest.fileId = this.civilFileInformation.fileNumber;
                 documentRequest.base64UrlEncodedDocumentId = base64url(id);
                 this.selectedDocuments.documentRequests.push(documentRequest);                
             }        
@@ -448,7 +449,7 @@ export default class CivilDocumentsView extends Vue {
         this.loadingPdf = true;
         const filename = 'doc' + documentId + '.pdf';
         documentId = base64url(documentId);
-        window.open(`${process.env.BASE_URL}api/files/document/${documentId}/${filename}?isCriminal=false&vcCivilFileId=${this.civilFileInformation.fileNumber}`)
+        window.open(`${process.env.BASE_URL}api/files/document/${documentId}/${filename}?isCriminal=false&fileId=${this.civilFileInformation.fileNumber}`)
         this.loadingPdf = false;
     }
     

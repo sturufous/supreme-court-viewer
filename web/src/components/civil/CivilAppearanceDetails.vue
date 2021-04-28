@@ -525,7 +525,7 @@ export default class CivilAppearanceDetails extends Vue {
         this.loadingPdf = true;
         const filename = 'doc' + documentId + '.pdf';
         documentId = base64url(documentId);
-        window.open(`${process.env.BASE_URL}api/files/document/${documentId}/${filename}?isCriminal=false&vcCivilFileId=${this.appearanceInfo.fileNo}`)
+        window.open(`${process.env.BASE_URL}api/files/document/${documentId}/${filename}?isCriminal=false&fileId=${this.appearanceInfo.fileNo}`)
         this.loadingPdf = false;
     }
 
