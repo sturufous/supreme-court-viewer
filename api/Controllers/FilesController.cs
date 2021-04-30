@@ -386,7 +386,7 @@ namespace Scv.Api.Controllers
             var rops = (await ropRequestTasks.WhenAll()).ToList();
 
             if (courtSummaryReports.Any(d => d.ResponseCd != "0")) return BadRequest("One of the CSRs didn't return correctly.");
-            if (documents.Any(d => d.ResultCd == "0")) return BadRequest("One of the documents didn't return correctly.");
+            if (documents.Any(d => d.ResultCd != "1")) return BadRequest("One of the documents didn't return correctly.");
             if (rops.Any(d => d.ResultCd == "0")) return BadRequest("One of the ROPs didn't return correctly.");
 
             var pdfDocuments = courtSummaryReports.SelectToList(d => new PdfDocument
