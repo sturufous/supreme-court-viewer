@@ -137,7 +137,7 @@ namespace tests.api.Controllers
             Assert.Equal(4,referenceDocuments.Count);
             var firstReferenceDocument = referenceDocuments.First();
 
-            Assert.Equal("13915", firstReferenceDocument.AppearanceId);
+            Assert.Equal("14178", firstReferenceDocument.AppearanceId);
             Assert.Equal("Affidavit of Joan Smith sworn Feb 3 2020", firstReferenceDocument.DescriptionText);
             Assert.Equal("4462", firstReferenceDocument.PartyId);
             Assert.Equal("TEST, One", firstReferenceDocument.PartyName);

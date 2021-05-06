@@ -62,7 +62,10 @@
     "parserOptions": {
       "ecmaVersion": 2020
     },
-    "rules": {}
+    "rules": {
+      "no-debugger": "off",
+      "@typescript-eslint/no-explicit-any": "off"
+    }
   },
   "postcss": {
     "plugins": {

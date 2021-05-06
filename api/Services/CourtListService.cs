@@ -213,6 +213,10 @@ namespace Scv.Api.Services
                 var fileDetail = fileDetails.FirstOrDefault(x => x.PhysicalFileId == fileId);
                 courtListFile.ActivityClassCd = await _lookupService.GetActivityClassCdLong(fileDetail?.CourtClassCd.ToString());
                 courtListFile.ActivityClassDesc = await _lookupService.GetActivityClassCdShort(fileDetail?.CourtClassCd.ToString());
+                //Some lookups have LongDesc and ShortDesc the same. 
+                if (courtListFile.ActivityClassCd == courtListFile.ActivityClassDesc)
+                    courtListFile.ActivityClassCd = fileDetail?.CourtClassCd.ToString();
+
                 courtListFile.CommentToJudgeText = fileDetail?.CommentToJudgeTxt;
                 courtListFile.TrialRemarkTxt = fileDetail?.TrialRemarkTxt;
 
@@ -306,6 +310,9 @@ namespace Scv.Api.Services
                 var fileDetail = fileDetails.FirstOrDefault(x => x.JustinNo == courtListFile.FileInformation.MdocJustinNo);
                 courtListFile.ActivityClassCd = await _lookupService.GetActivityClassCdLong(fileDetail?.CourtClassCd.ToString());
                 courtListFile.ActivityClassDesc = await _lookupService.GetActivityClassCdShort(fileDetail?.CourtClassCd.ToString());
+                //Some lookups have LongDesc and ShortDesc the same. 
+                if (courtListFile.ActivityClassCd == courtListFile.ActivityClassDesc)
+                    courtListFile.ActivityClassCd = fileDetail?.CourtClassCd.ToString();
                 courtListFile.Crown = PopulateCrown(fileDetail);
                 courtListFile.TrialRemark = fileDetail?.TrialRemark;
                 courtListFile.TrialRemarkTxt = fileDetail?.TrialRemarkTxt;

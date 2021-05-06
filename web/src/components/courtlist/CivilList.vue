@@ -314,14 +314,14 @@ export default class CivilList extends Vue {
 
   
     public ExtractCivilListInfo(): void {
-        const listClass = this.civilClass=='family'? 'F': 'I';
+        const listClass = this.civilClass=='family'? ['F']: ['I','S']; //S = Supreme Civil.
         for (const civilListIndex in this.civilCourtListJson) 
         {
             const civilListInfo = {} as civilListInfoType;
             const jcivilList = this.civilCourtListJson[civilListIndex];
 
             civilListInfo["Index"] = civilListIndex;
-            if(jcivilList.activityClassCd != listClass) continue;
+            if(listClass.indexOf(jcivilList.activityClassCd) == -1) continue;
 
             civilListInfo['Seq.']=jcivilList.courtListPrintSortNumber? parseInt(jcivilList.courtListPrintSortNumber):0
 

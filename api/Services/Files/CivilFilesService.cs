@@ -273,6 +273,9 @@ namespace Scv.Api.Services.Files
             detail.CourtLevelDescription = await _lookupService.GetCourtLevelDescription(detail.CourtLevelCd.ToString());
             detail.ActivityClassCd = await _lookupService.GetActivityClassCdLong(detail.CourtClassCd.ToString());
             detail.ActivityClassDesc = await _lookupService.GetActivityClassCdShort(detail.CourtClassCd.ToString());
+            //Some lookups have LongDesc and ShortDesc the same. 
+            if (detail.ActivityClassCd == detail.ActivityClassDesc)
+                detail.ActivityClassCd = detail?.CourtClassCd.ToString();
             return detail;
         }
 
