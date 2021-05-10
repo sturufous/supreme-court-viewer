@@ -26,7 +26,7 @@ namespace Scv.Api.Services
         private readonly LocationService _locationService;
         private readonly IAppCache _cache;
         private readonly IMapper _mapper;
-        private readonly string _requestApplicationCode;
+        private readonly string _applicationCode;
         private readonly string _requestAgencyIdentifierId;
         private readonly string _requestPartId;
 
@@ -44,7 +44,7 @@ namespace Scv.Api.Services
 
             _lookupService = lookupService;
             _locationService = locationService;
-            _requestApplicationCode = configuration.GetNonEmptyValue("Request:ApplicationCd");
+            _applicationCode = configuration.GetNonEmptyValue("Request:ApplicationCd");
             _requestAgencyIdentifierId = user.AgencyCode();
             _requestPartId = user.ParticipantId();
         }
@@ -56,9 +56,9 @@ namespace Scv.Api.Services
             var proceedingDateString = proceeding.ToString("yyyy-MM-dd");
             var agencyCode = await _locationService.GetLocationCodeFromId(agencyId);
 
-            async Task<CourtList> CourtList() => await _filesClient.FilesCourtlistAsync(agencyId, roomCode, proceedingDateString, divisionCode, fileNumber);
+            async Task<CourtList> CourtList() => await _filesClient.FilesCourtlistAsync(_requestAgencyIdentifierId, _requestPartId, _applicationCode, agencyId, roomCode, proceedingDateString, divisionCode, fileNumber);
             async Task<CourtCalendarDetailByDay> CourtCalendarDetailByDay() =>
-                await _filesClient.FilesCourtcalendardetailsbydayAsync(_requestAgencyIdentifierId, _requestPartId, agencyCode,
+                await _filesClient.FilesCourtcalendardetailsbydayAsync(_requestAgencyIdentifierId, _requestPartId, _applicationCode, agencyCode,
                     proceeding.ToString("yyyy-MM-dd HH:mm:ss.S"), roomCode);
 
             var courtCalendarDetailsTask = _cache.GetOrAdd($"CourtCalendarDetails-{agencyId}-{roomCode}-{proceedingDateString}-{fileNumber}-{_requestPartId}",
@@ -128,7 +128,7 @@ namespace Scv.Api.Services
             var fileDetailTasks = new List<Task<CivilFileDetailResponse>>();
             foreach (var fileId in fileIds)
             {
-                async Task<CivilFileDetailResponse> FileDetails() => await _filesClient.FilesCivilGetAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode, fileId);
+                async Task<CivilFileDetailResponse> FileDetails() => await _filesClient.FilesCivilGetAsync(_requestAgencyIdentifierId, _requestPartId, _applicationCode, fileId);
                 fileDetailTasks.Add(_cache.GetOrAddAsync($"CivilFileDetail-{fileId}-{_requestPartId}", FileDetails));
             }
 
@@ -144,7 +144,7 @@ namespace Scv.Api.Services
             var appearanceTasks = new List<Task<CivilFileAppearancesResponse>>();
             foreach (var fileId in fileIds)
             {
-                async Task<CivilFileAppearancesResponse> Appearances() => await _filesClient.FilesCivilAppearancesAsync(_requestAgencyIdentifierId, _requestPartId, lookForFutureAppearances,
+                async Task<CivilFileAppearancesResponse> Appearances() => await _filesClient.FilesCivilAppearancesAsync(_requestAgencyIdentifierId, _requestPartId, _applicationCode, lookForFutureAppearances,
                     lookForPastAppearances, fileId);
                 appearanceTasks.Add(_cache.GetOrAddAsync($"CivilAppearances-{fileId}-InPast-{targetDateInPast}-{_requestPartId}", Appearances));
             }
@@ -158,7 +158,7 @@ namespace Scv.Api.Services
             foreach (var fileId in fileIds)
             {
                 async Task<CivilFileContent> FileContent() =>
-                    await _filesClient.FilesCivilFilecontentAsync(null, null, null, null, fileId, _requestApplicationCode);
+                    await _filesClient.FilesCivilFilecontentAsync(_requestAgencyIdentifierId, _requestPartId, _applicationCode, null, null, null, null, fileId);
                 fileContentTasks.Add(_cache.GetOrAddAsync($"CivilFileContent-{fileId}-{_requestPartId}", FileContent));
             }
 
@@ -173,7 +173,7 @@ namespace Scv.Api.Services
             foreach (var fileId in fileIds)
             {
                 async Task<CriminalFileDetailResponse> FileDetails() =>
-                    await _filesClient.FilesCriminalGetAsync(_requestAgencyIdentifierId, _requestPartId, _requestApplicationCode,
+                    await _filesClient.FilesCriminalGetAsync(_requestAgencyIdentifierId, _requestPartId, _applicationCode,
                         fileId);
                 fileDetailTasks.Add(_cache.GetOrAddAsync($"CriminalFileDetail-{fileId}-{_requestPartId}", FileDetails));
             }
@@ -191,7 +191,7 @@ namespace Scv.Api.Services
             foreach (var fileId in fileIds)
             {
                 async Task<CriminalFileAppearancesResponse> Appearances() => await _filesClient.FilesCriminalAppearancesAsync(
-                    _requestAgencyIdentifierId, _requestPartId, lookForFutureAppearances,
+                    _requestAgencyIdentifierId, _requestPartId, _applicationCode, lookForFutureAppearances,
                     lookForPastAppearances, fileId);
                 appearanceTasks.Add(_cache.GetOrAddAsync($"CriminalAppearances-{fileId}-InPast-{targetDateInPast}-{_requestPartId}", Appearances));
             }
@@ -213,6 +213,10 @@ namespace Scv.Api.Services
                 var fileDetail = fileDetails.FirstOrDefault(x => x.PhysicalFileId == fileId);
                 courtListFile.ActivityClassCd = await _lookupService.GetActivityClassCdLong(fileDetail?.CourtClassCd.ToString());
                 courtListFile.ActivityClassDesc = await _lookupService.GetActivityClassCdShort(fileDetail?.CourtClassCd.ToString());
+                //Some lookups have LongDesc and ShortDesc the same. 
+                if (courtListFile.ActivityClassCd == courtListFile.ActivityClassDesc)
+                    courtListFile.ActivityClassCd = fileDetail?.CourtClassCd.ToString();
+
                 courtListFile.CommentToJudgeText = fileDetail?.CommentToJudgeTxt;
                 courtListFile.TrialRemarkTxt = fileDetail?.TrialRemarkTxt;
 
@@ -306,6 +310,9 @@ namespace Scv.Api.Services
                 var fileDetail = fileDetails.FirstOrDefault(x => x.JustinNo == courtListFile.FileInformation.MdocJustinNo);
                 courtListFile.ActivityClassCd = await _lookupService.GetActivityClassCdLong(fileDetail?.CourtClassCd.ToString());
                 courtListFile.ActivityClassDesc = await _lookupService.GetActivityClassCdShort(fileDetail?.CourtClassCd.ToString());
+                //Some lookups have LongDesc and ShortDesc the same. 
+                if (courtListFile.ActivityClassCd == courtListFile.ActivityClassDesc)
+                    courtListFile.ActivityClassCd = fileDetail?.CourtClassCd.ToString();
                 courtListFile.Crown = PopulateCrown(fileDetail);
                 courtListFile.TrialRemark = fileDetail?.TrialRemark;
                 courtListFile.TrialRemarkTxt = fileDetail?.TrialRemarkTxt;

@@ -212,6 +212,7 @@ export default class CivilCaseDetails extends Vue {
                 documentRequest.isCriminal = false;
                 documentRequest.pdfFileName = 'doc_' + doc.partyName + '_' + doc.referenceDocumentTypeDsc + '.pdf';
                 documentRequest.base64UrlEncodedDocumentId = base64url(id);
+                documentRequest.fileId = this.civilFileInformation.fileNumber;
                 documentsToDownload.documentRequests.push(documentRequest);                
             }        
         }
@@ -223,6 +224,7 @@ export default class CivilCaseDetails extends Vue {
                 documentRequest.isCriminal = false;
                 documentRequest.pdfFileName = 'doc' + id + '.pdf';
                 documentRequest.base64UrlEncodedDocumentId = base64url(id);
+                documentRequest.fileId = this.civilFileInformation.fileNumber;
                 documentsToDownload.documentRequests.push(documentRequest);                
             }        
         }

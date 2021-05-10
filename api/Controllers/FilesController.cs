@@ -305,22 +305,22 @@ namespace Scv.Api.Controllers
         /// <param name="documentId"></param>
         /// <param name="fileNameAndExtension">Name of the file and extension.</param>
         /// <param name="isCriminal">True if Criminal, False if Civil</param>
-        /// <param name="vcCivilFileId"></param>
+        /// <param name="fileId"></param>
         /// <returns>DocumentResponse</returns>
         [HttpGet]
         [Route("document/{documentId}/{fileNameAndExtension}")]
-        public async Task<IActionResult> GetDocument(string documentId, string fileNameAndExtension, bool isCriminal = false, string vcCivilFileId = "")
+        public async Task<IActionResult> GetDocument(string documentId, string fileNameAndExtension, bool isCriminal, string fileId)
         {
             documentId = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(documentId));
             if (User.IsVcUser())
             {
-                if (!await _vcCivilFileAccessHandler.HasCivilFileAccess(User, vcCivilFileId))
+                if (!await _vcCivilFileAccessHandler.HasCivilFileAccess(User, fileId))
                     return Forbid();
 
                 if (isCriminal)
                     return Forbid();
 
-                var civilFileDetailResponse = await _civilFilesService.FileIdAsync(vcCivilFileId);
+                var civilFileDetailResponse = await _civilFilesService.FileIdAsync(fileId);
                 if (civilFileDetailResponse?.PhysicalFileId == null)
                     throw new NotFoundException("Couldn't find civil file with this id.");
 
@@ -328,7 +328,7 @@ namespace Scv.Api.Controllers
                     return Forbid();
             }
 
-            var documentResponse = await _filesService.DocumentAsync(documentId, isCriminal);
+            var documentResponse = await _filesService.DocumentAsync(documentId, isCriminal, fileId);
 
             if (documentResponse.B64Content == null || documentResponse.B64Content.Length <= 0)
                 throw new NotFoundException("Couldn't find document with this id.");
@@ -374,7 +374,7 @@ namespace Scv.Api.Controllers
                 JustinReportName.CEISR035));
             var documentTasks = documentRequest.Select(d => _filesService.DocumentAsync(
                 Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(d.Base64UrlEncodedDocumentId)),
-                d.IsCriminal));
+                d.IsCriminal, d.FileId));
             var ropRequestTasks = ropRequests.SelectToList(dr =>
                 _criminalFilesService.RecordOfProceedingsAsync(dr.PartId,
                     dr.ProfSequenceNumber,
@@ -386,7 +386,7 @@ namespace Scv.Api.Controllers
             var rops = (await ropRequestTasks.WhenAll()).ToList();
 
             if (courtSummaryReports.Any(d => d.ResponseCd != "0")) return BadRequest("One of the CSRs didn't return correctly.");
-            if (documents.Any(d => d.ResultCd == "0")) return BadRequest("One of the documents didn't return correctly.");
+            if (documents.Any(d => d.ResultCd != "1")) return BadRequest("One of the documents didn't return correctly.");
             if (rops.Any(d => d.ResultCd == "0")) return BadRequest("One of the ROPs didn't return correctly.");
 
             var pdfDocuments = courtSummaryReports.SelectToList(d => new PdfDocument

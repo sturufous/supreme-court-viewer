@@ -250,6 +250,7 @@ export default class CriminalDocumentsView extends Vue {
                 documentRequest.isCriminal = true;
                 documentRequest.pdfFileName = 'doc' + id + '.pdf';
                 documentRequest.base64UrlEncodedDocumentId = base64url(id);
+                documentRequest.fileId = this.criminalFileInformation.fileNumber;
                 this.selectedDocuments.documentRequests.push(documentRequest);                
             }        
         }
@@ -474,7 +475,7 @@ export default class CriminalDocumentsView extends Vue {
         this.loadingPdf = true;
         const filename = 'doc' + imageId + '.pdf';
         imageId = base64url(imageId);
-        window.open(`${process.env.BASE_URL}api/files/document/${imageId}/${filename}?isCriminal=true`)
+        window.open(`${process.env.BASE_URL}api/files/document/${imageId}/${filename}?isCriminal=true&fileId=${this.criminalFileInformation.fileNumber}`)
         this.loadingPdf = false;
     }
     

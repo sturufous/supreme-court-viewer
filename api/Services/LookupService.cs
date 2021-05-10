@@ -160,8 +160,9 @@ namespace Scv.Api.Services
 
         private async Task<CodeLookup> GetCourtClass()
         {
-            return await GetDataFromCache("CourtClasses", 
+            var courtClasses = await GetDataFromCache("CourtClasses", 
                 async () => await _lookupClient.CodesCourtClassesGetAsync());
+            return courtClasses;
         }
 
         private async Task<CodeLookup> GetCourtLevel()

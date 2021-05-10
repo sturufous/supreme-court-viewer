@@ -406,7 +406,7 @@ export default class CriminalAppearanceDetails extends Vue {
         let imageId = this.initiatingDocuments[0]
         const filename = 'doc' + imageId + '.pdf';
         imageId = base64url(imageId);
-        window.open(`${process.env.BASE_URL}api/files/document/${imageId}/${filename}?isCriminal=true`)
+        window.open(`${process.env.BASE_URL}api/files/document/${imageId}/${filename}?isCriminal=true&fileId=${this.appearanceInfo.fileNo}`)
         this.loadingPdf = false;
     }
 
