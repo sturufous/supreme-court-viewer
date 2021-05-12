@@ -295,7 +295,7 @@ export default class CourtList extends Vue {
                     this.criminalCases = data.criminalCourtList.length;                    
                     for(const civil of data.civilCourtList)
                     {
-                        if(civil.activityClassCd == 'F') this.familyCases++;else this.civilCases ++;
+                        if(civil.activityClassCd == 'F' || civil.activityClassCd == 'E' ) this.familyCases++;else this.civilCases ++;
                         this.setTotalTimeForRoom(civil.estimatedTimeHour,civil.estimatedTimeMin)
                     }
 

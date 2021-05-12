@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Scv.Api.Helpers.Exceptions;
 
 namespace Scv.Api.Services
 {
@@ -68,6 +69,8 @@ namespace Scv.Api.Services
             //Query by courtCalendarDetails, because it returns quite a bit faster than the courtList.
             var courtCalendarDetails = await courtCalendarDetailsTask;
 
+            CheckIfValidUser(courtCalendarDetails.ResponseMessageTxt);
+
             var civilCourtCalendarAppearances = courtCalendarDetails?.Appearance
                 .WhereToList(app => app.CourtDivisionCd == CourtCalendarDetailAppearanceCourtDivisionCd.I);
             var criminalCourtCalendarAppearances = courtCalendarDetails?.Appearance
@@ -119,6 +122,15 @@ namespace Scv.Api.Services
         }
 
         #region Helpers
+
+        private void CheckIfValidUser(string responseMessage)
+        {
+            if (responseMessage == null) return;
+            if (responseMessage.Contains("Not a valid user"))
+                throw new NotAuthorizedException("No active assignment found for PartId in AgencyId");
+            if (responseMessage.Contains("Agency supplied does not match Appliation Code"))
+                throw new NotAuthorizedException("Agency supplied does not match Application Code");
+        }
 
         #region Fetching Methods
 

@@ -125,7 +125,7 @@ namespace tests.api.Controllers
         }
 
         [Fact]
-        public async void Civil_File_With_Reference_Documents()
+        public async Task Civil_File_With_Reference_Documents()
         {
             var actionResult = await _controller.GetCivilFileDetailByFileId("3822");
 
@@ -135,12 +135,11 @@ namespace tests.api.Controllers
 
             Assert.NotNull(referenceDocuments);
             Assert.Equal(4,referenceDocuments.Count);
-            var firstReferenceDocument = referenceDocuments.First();
 
-            Assert.Equal("14178", firstReferenceDocument.AppearanceId);
-            Assert.Equal("Affidavit of Joan Smith sworn Feb 3 2020", firstReferenceDocument.DescriptionText);
-            Assert.Equal("4462", firstReferenceDocument.PartyId);
-            Assert.Equal("TEST, One", firstReferenceDocument.PartyName);
+            Assert.Contains(referenceDocuments, rd => rd.AppearanceId == "14178");
+            Assert.Contains(referenceDocuments, rd => rd.DescriptionText == "Affidavit of Joan Smith sworn Feb 3 2020");
+            Assert.Contains(referenceDocuments, rd => rd.PartyId == "4462");
+            Assert.Contains(referenceDocuments, rd => rd.PartyName == "TEST, One");
         }
 
         [Fact]
