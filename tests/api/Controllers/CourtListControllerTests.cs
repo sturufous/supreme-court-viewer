@@ -4,6 +4,7 @@ using System.Security.Claims;
 using JCCommon.Clients.FileServices;
 using JCCommon.Clients.LocationServices;
 using JCCommon.Clients.LookupCodeServices;
+using Microsoft.Extensions.Logging;
 using LazyCache;
 using MapsterMapper;
 using Scv.Api.Controllers;
@@ -42,7 +43,7 @@ namespace tests.api.Controllers
             var identity = new ClaimsIdentity(claims, "Cookies");
             var principal = new ClaimsPrincipal(identity);
 
-            var courtListService = new CourtListService(fileServices.Configuration, fileServicesClient, new Mapper(), lookupService, locationService, new CachingService(), principal);
+            var courtListService = new CourtListService(fileServices.Configuration, fileServices.LogFactory.CreateLogger<CourtListService>(), fileServicesClient, new Mapper(), lookupService, locationService, new CachingService(), principal);
             _controller = new CourtListController(courtListService)
             {
                 ControllerContext = HttpResponseTest.SetupMockControllerContext(fileServices.Configuration)
