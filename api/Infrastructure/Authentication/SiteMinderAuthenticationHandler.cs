@@ -63,7 +63,7 @@ namespace Scv.Api.Infrastructure.Authentication
                     return AuthenticateResult.Fail("Couldn't authenticate through JC-Interface.");
 
                 participantId = jcUserInfo.UserPartId;
-                agencyCode = jcUserInfo.UserDefaultAgencyCd ?? "";
+                agencyCode = jcUserInfo.UserDefaultAgencyCd;
             }
 
             var claims = new[] {

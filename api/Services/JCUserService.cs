@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
 using JCCommon.Clients.UserService;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Serialization;
+using Scv.Api.Helpers;
 using Scv.Api.Helpers.ContractResolver;
 using Scv.Api.Models.JCUserService;
 
@@ -13,14 +15,16 @@ namespace Scv.Api.Services
         #region Variables
         private UserServiceClient UserServiceClient { get; }
         private ILogger<JCUserService> Logger { get; }
+        private string DefaultAgencyCd { get; }
         #endregion Variables
 
         #region Constructor
-        public JCUserService(UserServiceClient userServiceClient, ILogger<JCUserService> logger)
+        public JCUserService(UserServiceClient userServiceClient, ILogger<JCUserService> logger, IConfiguration configuration)
         {
             UserServiceClient = userServiceClient;
             UserServiceClient.JsonSerializerSettings.ContractResolver = new SafeContractResolver { NamingStrategy = new CamelCaseNamingStrategy() };
             Logger = logger;
+            DefaultAgencyCd = configuration.GetNonEmptyValue("Request:GetUserLoginDefaultAgencyId");
         }
         #endregion
 
@@ -37,10 +41,11 @@ namespace Scv.Api.Services
 
                 if (response.ResponseCd != "1")
                 {
+                    response.UserDefaultAgencyCd = string.IsNullOrEmpty(response.UserDefaultAgencyCd) ? DefaultAgencyCd: response.UserDefaultAgencyCd;
                     Logger.LogDebug($"SMGOV_USERGUID: {userInfoRequest.DomainUserGuid}, UserAgencyCd: {response.UserDefaultAgencyCd}, UserPartId: {response.UserPartId}");
                     return response;
                 }
-                Logger.LogDebug("Returned response 1 (failed) from getUserLogin");
+                Logger.LogInformation("Returned responseCd = 1 (failed) from getUserLogin");
                 return null;
             }
             catch (Exception e)

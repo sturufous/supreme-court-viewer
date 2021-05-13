@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Scv.Api.Helpers.Exceptions;
 
 namespace Scv.Api.Services
@@ -22,6 +23,7 @@ namespace Scv.Api.Services
     {
         #region Variables
 
+        private readonly ILogger<CourtListService> _logger;
         private readonly FileServicesClient _filesClient;
         private readonly LookupService _lookupService;
         private readonly LocationService _locationService;
@@ -35,8 +37,9 @@ namespace Scv.Api.Services
 
         #region Constructor
 
-        public CourtListService(IConfiguration configuration, FileServicesClient filesClient, IMapper mapper, LookupService lookupService, LocationService locationService, IAppCache cache, ClaimsPrincipal user)
+        public CourtListService(IConfiguration configuration, ILogger<CourtListService> logger, FileServicesClient filesClient, IMapper mapper, LookupService lookupService, LocationService locationService, IAppCache cache, ClaimsPrincipal user)
         {
+            _logger = logger;
             _filesClient = filesClient;
             _filesClient.JsonSerializerSettings.ContractResolver = new SafeContractResolver { NamingStrategy = new CamelCaseNamingStrategy() };
             _cache = cache;
@@ -68,6 +71,8 @@ namespace Scv.Api.Services
 
             //Query by courtCalendarDetails, because it returns quite a bit faster than the courtList.
             var courtCalendarDetails = await courtCalendarDetailsTask;
+            if (courtCalendarDetails.ResponseCd != "0")
+                _logger.LogInformation("Court calendar details returned responseCd != 0");
 
             CheckIfValidUser(courtCalendarDetails.ResponseMessageTxt);
 
