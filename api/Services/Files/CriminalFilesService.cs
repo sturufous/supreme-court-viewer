@@ -34,6 +34,7 @@ namespace Scv.Api.Services.Files
         private readonly string _applicationCode;
         private readonly string _requestAgencyIdentifierId;
         private readonly string _requestPartId;
+        private readonly string _fileSearchClass;
 
         #endregion
 
@@ -96,7 +97,7 @@ namespace Scv.Api.Services.Files
                 return new List<RedactedCriminalFileDetailResponse> {new RedactedCriminalFileDetailResponse {JustinNo = fileIdAndAppearanceDate.First().MdocJustinNo}};
 
             //It seems the fileSearch and the FileDetails/FileContent bring up two different participant lists
-            //The fileSearch seems to include extra ones the FileDetails/FileContent don't.
+            //The fileSearch seems to include have extra participants.
             var fileDetailTasks = new List<Task<CriminalFileDetailResponse>>();
             foreach (var fileIdAndAppearance in fileIdAndAppearanceDate)
             {

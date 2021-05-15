@@ -157,7 +157,7 @@ export default class CriminalFileSearchResultsView extends Vue {
     }
 
     get SortedList() {                
-        return  _.sortBy(this.criminalList, 'File Id')
+        return  _.sortBy(this.criminalList, 'Next Appearance').reverse()
     }
 
     public navigateToLandingPage() {

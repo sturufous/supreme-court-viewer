@@ -75,7 +75,7 @@ namespace Scv.Api.Services.Files
         }
 
         public async Task<List<RedactedCivilFileDetailResponse>> GetFilesByAgencyIdCodeAndFileNumberText(string location,
-            string fileNumber)
+            string fileNumber, CourtLevelCd3 courtLevelCd)
         {
             var fileDetails = new List<RedactedCivilFileDetailResponse>();
             FileDetailCourtClassCd courtClass = FileDetailCourtClassCd.A;
@@ -86,7 +86,8 @@ namespace Scv.Api.Services.Files
             {
                 FileHomeAgencyId = location,
                 FileNumber = fileNumber,
-                SearchMode = SearchMode2.FILENO
+                SearchMode = SearchMode2.FILENO,
+                CourtLevel = courtLevelCd
             });
 
             var targetIds = fileSearchResponse?.FileDetail?.Where(fd => !courtClassSet || fd.CourtClassCd == courtClass)

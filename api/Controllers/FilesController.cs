@@ -85,7 +85,8 @@ namespace Scv.Api.Controllers
         [Route("civil")]
         public async Task<ActionResult<List<RedactedCivilFileDetailResponse>>> GetCivilFileIdsByAgencyIdCodeAndFileNumberText(string location, string fileNumber)
         {
-            var civilFiles = await _civilFilesService.GetFilesByAgencyIdCodeAndFileNumberText(location, fileNumber);
+            var courtLevel = User.IsSupremeUser() ? CourtLevelCd3.S : CourtLevelCd3.P;
+            var civilFiles = await _civilFilesService.GetFilesByAgencyIdCodeAndFileNumberText(location, fileNumber, courtLevel);
             if (civilFiles == null || civilFiles.Count == 0)
                 throw new NotFoundException("Couldn't find civil file with this location and file number.");
 
@@ -217,7 +218,8 @@ namespace Scv.Api.Controllers
         [Route("criminal")]
         public async Task<ActionResult<List<RedactedCriminalFileDetailResponse>>> GetCriminalFileIdsByAgencyIdCodeAndFileNumberText(string location, string fileNumber)
         {
-            var criminalFiles = await _criminalFilesService.GetFilesByAgencyIdCodeAndFileNumberText(location, fileNumber);
+            var courtLevel = User.IsSupremeUser() ? CourtLevelCd2.S : CourtLevelCd2.P;
+            var criminalFiles = await _criminalFilesService.GetFilesByAgencyIdCodeAndFileNumberText(location, fileNumber, courtLevel);
             if (criminalFiles == null || criminalFiles.Count == 0)
                 throw new NotFoundException("Couldn't find criminal file with this location and file number.");
 
