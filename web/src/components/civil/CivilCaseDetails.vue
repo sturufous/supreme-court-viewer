@@ -48,7 +48,9 @@
                 </h2>
 
                 <civil-parties v-if="showCaseDetails"/>
+                <!-- Disable for now, as per request by Lorne, although they may be used for Provincial files.
                 <civil-adjudicator-restrictions v-if="showCaseDetails"/>
+                -->
                 <civil-comment-notes v-if="showCaseDetails"/>
                 <civil-documents-view v-if="showDocuments || showAllDocuments"/>
                 <civil-provided-documents-view v-if="showProvidedDocuments || showAllDocuments"/>            
