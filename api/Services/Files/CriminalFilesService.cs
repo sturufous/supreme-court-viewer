@@ -85,27 +85,33 @@ namespace Scv.Api.Services.Files
                 CourtLevel = courtLevel
             });
 
-            var targetIds = fileSearchResponse?.FileDetail?.Where(fd => mdocSequenceNumber == null || fd.MdocSeqNo == mdocSequenceNumber)
-                .SelectToList(fd => fd.MdocJustinNo);
+            var fileIdAndAppearanceDate = fileSearchResponse?.FileDetail?.Where(fd => mdocSequenceNumber == null || fd.MdocSeqNo == mdocSequenceNumber)
+                .SelectToList(fd => new { fd.MdocJustinNo , fd.NextApprDt });
 
-            if (targetIds == null || targetIds.Count == 0)
+            if (fileIdAndAppearanceDate == null || fileIdAndAppearanceDate.Count == 0)
                 return fileDetails;
 
             //Return the basic entry without doing a lookup.
-            if (targetIds.Count == 1)
-                return new List<RedactedCriminalFileDetailResponse> {new RedactedCriminalFileDetailResponse {JustinNo = targetIds.First()}};
+            if (fileIdAndAppearanceDate.Count == 1)
+                return new List<RedactedCriminalFileDetailResponse> {new RedactedCriminalFileDetailResponse {JustinNo = fileIdAndAppearanceDate.First().MdocJustinNo}};
 
+            //It seems the fileSearch and the FileDetails/FileContent bring up two different participant lists
+            //The fileSearch seems to include extra ones the FileDetails/FileContent don't.
             var fileDetailTasks = new List<Task<CriminalFileDetailResponse>>();
-            foreach (var fileId in targetIds)
+            foreach (var fileIdAndAppearance in fileIdAndAppearanceDate)
             {
                 async Task<CriminalFileDetailResponse> FileDetails() =>
                     await _filesClient.FilesCriminalGetAsync(_requestAgencyIdentifierId, _requestPartId, _applicationCode,
-                        fileId);
-                fileDetailTasks.Add(_cache.GetOrAddAsync($"CriminalFileDetail-{fileId}-{_requestAgencyIdentifierId}", FileDetails));
+                        fileIdAndAppearance.MdocJustinNo);
+                fileDetailTasks.Add(_cache.GetOrAddAsync($"CriminalFileDetail-{fileIdAndAppearance.MdocJustinNo}-{_requestAgencyIdentifierId}", FileDetails));
             }
 
             var fileDetailResponses = await fileDetailTasks.WhenAll();
             fileDetails = fileDetailResponses.SelectToList(fdr => _mapper.Map<RedactedCriminalFileDetailResponse>(fdr));
+
+            foreach (var fileDetail in fileDetails)
+                fileDetail.NextApprDt = fileIdAndAppearanceDate.First(fa => fa.MdocJustinNo == fileDetail.JustinNo)
+                    .NextApprDt;
 
             return fileDetails;
         }

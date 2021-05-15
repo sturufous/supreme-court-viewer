@@ -44,7 +44,7 @@
                     <b-button
                         style="font-size:16px; font-weight: bold; border: none;" 
                         size="sm" 
-                        @click="OpenCriminalFilePage(data.value)"                        
+                        @click="OpenCriminalFilePage(data.item['File Id'])"                        
                         variant="outline-primary text-criminal" 
                         class="mr-2">                            
                             {{data.value}}
@@ -97,9 +97,10 @@ export default class CriminalFileSearchResultsView extends Vue {
     
     fields =  
     [        
-        {key:'File Id',             tdClass: 'border-top'},        
+        {key:'File Number',             tdClass: 'border-top'},
         {key:'Participants',        tdClass: 'border-top'},
-        {key:'Level',               tdClass: 'border-top'}        
+        {key:'Next Appearance',        tdClass: 'border-top'},
+        {key:'File Id',             tdClass: 'border-top'}
     ];
 
      mounted() {
@@ -128,7 +129,9 @@ export default class CriminalFileSearchResultsView extends Vue {
                                 participantInfo.push(this.displayName);
                             }
                             criminalListInfo.Participants = participantInfo;
+                            criminalListInfo["File Number"] = jcriminalList.fileNumberTxt
                             criminalListInfo["File Id"] = jcriminalList.justinNo;
+                            criminalListInfo["Next Appearance"] = Vue.filter('beautify-date')(jcriminalList.nextApprDt);
                             criminalListInfo["Level"] = CourtLevel[jcriminalList.courtLevelCd];                            
                             this.criminalList.push(criminalListInfo);
                         }                               
@@ -138,7 +141,7 @@ export default class CriminalFileSearchResultsView extends Vue {
                         }    
                         this.isMounted = true;
                     } else if (data.length == 1) {
-                        this.criminalFileInformation.fileNumber = data[0].physicalFileId;
+                        this.criminalFileInformation.fileNumber = data[0].justinNo;
                         this.UpdateCriminalFile(this.criminalFileInformation)                     
                         this.$router.push({name:'CriminalCaseDetails', params: {fileNumber: this.criminalFileInformation.fileNumber}})
                     }               
