@@ -19,8 +19,8 @@ namespace Scv.Api.Helpers.Extensions
             return identity.Claims.FirstOrDefault(c => c.Type == CustomClaimTypes.JcAgencyCode)?.Value;
         }
 
-        public static string PreferredUsername(this ClaimsPrincipal user) =>
-            user.FindFirstValue(CustomClaimTypes.PreferredUsername);
+        public static string PreferredUsername(this ClaimsPrincipal claimsPrincipal) =>
+            claimsPrincipal.FindFirstValue(CustomClaimTypes.PreferredUsername);
 
         public static List<string> Groups(this ClaimsPrincipal claimsPrincipal)
         {
@@ -28,16 +28,20 @@ namespace Scv.Api.Helpers.Extensions
             return identity.Claims.Where(c => c.Type == CustomClaimTypes.Groups).Select(s => s.Value).ToList();
         }
 
-        public static bool IsServiceAccountUser(this ClaimsPrincipal user)
-            => user.HasClaim(c => c.Type == CustomClaimTypes.PreferredUsername) && 
-               user.FindFirstValue(CustomClaimTypes.PreferredUsername).Equals("service-account-scv");
+        public static bool IsServiceAccountUser(this ClaimsPrincipal claimsPrincipal)
+            => claimsPrincipal.HasClaim(c => c.Type == CustomClaimTypes.PreferredUsername) && 
+               claimsPrincipal.FindFirstValue(CustomClaimTypes.PreferredUsername).Equals("service-account-scv");
 
-        public static bool IsIdirUser(this ClaimsPrincipal user)
-        => user.HasClaim(c => c.Type == CustomClaimTypes.PreferredUsername) && 
-           user.FindFirstValue(CustomClaimTypes.PreferredUsername).Contains("@idir");
+        public static bool IsIdirUser(this ClaimsPrincipal claimsPrincipal)
+        => claimsPrincipal.HasClaim(c => c.Type == CustomClaimTypes.PreferredUsername) && 
+           claimsPrincipal.FindFirstValue(CustomClaimTypes.PreferredUsername).Contains("@idir");
 
-        public static bool IsVcUser(this ClaimsPrincipal user)
-            => user.HasClaim(c => c.Type == CustomClaimTypes.PreferredUsername) && 
-               user.FindFirstValue(CustomClaimTypes.PreferredUsername).Contains("@vc");
+        public static bool IsSupremeUser(this ClaimsPrincipal claimsPrincipal)
+        => claimsPrincipal.HasClaim(c => c.Type == CustomClaimTypes.IsSupremeUser) && 
+           claimsPrincipal.FindFirstValue(CustomClaimTypes.IsSupremeUser).Contains("true");
+
+        public static bool IsVcUser(this ClaimsPrincipal claimsPrincipal)
+            => claimsPrincipal.HasClaim(c => c.Type == CustomClaimTypes.PreferredUsername) && 
+               claimsPrincipal.FindFirstValue(CustomClaimTypes.PreferredUsername).Contains("@vc");
     }
 }

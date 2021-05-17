@@ -15,7 +15,7 @@ namespace Scv.Api.Services
         #region Variables
         private UserServiceClient UserServiceClient { get; }
         private ILogger<JCUserService> Logger { get; }
-        private string DefaultAgencyCd { get; }
+        private string SupremeAgencyId { get; }
         #endregion Variables
 
         #region Constructor
@@ -24,7 +24,7 @@ namespace Scv.Api.Services
             UserServiceClient = userServiceClient;
             UserServiceClient.JsonSerializerSettings.ContractResolver = new SafeContractResolver { NamingStrategy = new CamelCaseNamingStrategy() };
             Logger = logger;
-            DefaultAgencyCd = configuration.GetNonEmptyValue("Request:GetUserLoginDefaultAgencyId");
+            SupremeAgencyId = configuration.GetNonEmptyValue("Request:GetUserLoginDefaultAgencyId");
         }
         #endregion
 
@@ -41,7 +41,7 @@ namespace Scv.Api.Services
 
                 if (response.ResponseCd != "1")
                 {
-                    response.UserDefaultAgencyCd = string.IsNullOrEmpty(response.UserDefaultAgencyCd) ? DefaultAgencyCd: response.UserDefaultAgencyCd;
+                    response.UserDefaultAgencyCd = string.IsNullOrEmpty(response.UserDefaultAgencyCd) ? SupremeAgencyId: response.UserDefaultAgencyCd;
                     Logger.LogDebug($"SMGOV_USERGUID: {userInfoRequest.DomainUserGuid}, UserAgencyCd: {response.UserDefaultAgencyCd}, UserPartId: {response.UserPartId}");
                     return response;
                 }

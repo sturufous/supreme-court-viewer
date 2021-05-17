@@ -75,7 +75,7 @@ namespace Scv.Api.Services.Files
         }
 
         public async Task<List<RedactedCivilFileDetailResponse>> GetFilesByAgencyIdCodeAndFileNumberText(string location,
-            string fileNumber)
+            string fileNumber, CourtLevelCd3 courtLevelCd)
         {
             var fileDetails = new List<RedactedCivilFileDetailResponse>();
             FileDetailCourtClassCd courtClass = FileDetailCourtClassCd.A;
@@ -86,7 +86,8 @@ namespace Scv.Api.Services.Files
             {
                 FileHomeAgencyId = location,
                 FileNumber = fileNumber,
-                SearchMode = SearchMode2.FILENO
+                SearchMode = SearchMode2.FILENO,
+                CourtLevel = courtLevelCd
             });
 
             var targetIds = fileSearchResponse?.FileDetail?.Where(fd => !courtClassSet || fd.CourtClassCd == courtClass)
@@ -104,7 +105,7 @@ namespace Scv.Api.Services.Files
             {
                 async Task<CivilFileDetailResponse> FileDetails() =>
                     await _filesClient.FilesCivilGetAsync(_requestAgencyIdentifierId, _requestPartId, _applicationCode, fileId);
-                fileDetailTasks.Add(_cache.GetOrAddAsync($"CivilFileDetail-{fileId}-{_requestPartId}", FileDetails));
+                fileDetailTasks.Add(_cache.GetOrAddAsync($"CivilFileDetail-{fileId}-{_requestAgencyIdentifierId}", FileDetails));
             }
 
             var fileDetailResponses = await fileDetailTasks.WhenAll();
@@ -119,9 +120,9 @@ namespace Scv.Api.Services.Files
             async Task<CivilFileContent> FileContent() => await _filesClient.FilesCivilFilecontentAsync(_requestAgencyIdentifierId, _requestPartId, _applicationCode,null, null, null, null, fileId);
             async Task<CivilFileAppearancesResponse> Appearances() => await PopulateDetailAppearancesAsync(FutureYN2.Y, HistoryYN2.Y, fileId);
 
-            var fileDetailTask = _cache.GetOrAddAsync($"CivilFileDetail-{fileId}-{_requestPartId}", FileDetails);
-            var fileContentTask = _cache.GetOrAddAsync($"CivilFileContent-{fileId}-{_requestPartId}", FileContent);
-            var appearancesTask = _cache.GetOrAddAsync($"CivilAppearancesFull-{fileId}-{_requestPartId}", Appearances);
+            var fileDetailTask = _cache.GetOrAddAsync($"CivilFileDetail-{fileId}-{_requestAgencyIdentifierId}", FileDetails);
+            var fileContentTask = _cache.GetOrAddAsync($"CivilFileContent-{fileId}-{_requestAgencyIdentifierId}", FileContent);
+            var appearancesTask = _cache.GetOrAddAsync($"CivilAppearancesFull-{fileId}-{_requestAgencyIdentifierId}", Appearances);
 
             var fileDetail = await fileDetailTask;
             var appearances = await appearancesTask;
@@ -153,11 +154,11 @@ namespace Scv.Api.Services.Files
             async Task<CivilFileAppearanceApprMethodResponse> AppearanceMethods() => await _filesClient.FilesCivilAppearanceAppearancemethodsAsync(_requestAgencyIdentifierId, _requestPartId, _applicationCode, appearanceId);
             async Task<CivilFileAppearancesResponse> Appearances() => await PopulateDetailAppearancesAsync(FutureYN2.Y, HistoryYN2.Y, fileId);
 
-            var fileDetailTask = _cache.GetOrAddAsync($"CivilFileDetail-{fileId}-{_requestPartId}", FileDetails);
-            var appearancePartyTask = _cache.GetOrAddAsync($"CivilAppearanceParty-{fileId}-{appearanceId}-{_requestPartId}", AppearanceParty);
-            var fileContentTask = _cache.GetOrAddAsync($"CivilFileContent-{fileId}-{_requestPartId}", FileContent);
-            var appearanceMethodsTask = _cache.GetOrAddAsync($"CivilAppearanceMethods-{fileId}-{appearanceId}-{_requestPartId}", AppearanceMethods);
-            var appearancesTask = _cache.GetOrAddAsync($"CivilAppearancesFull-{fileId}-{_requestPartId}", Appearances);
+            var fileDetailTask = _cache.GetOrAddAsync($"CivilFileDetail-{fileId}-{_requestAgencyIdentifierId}", FileDetails);
+            var appearancePartyTask = _cache.GetOrAddAsync($"CivilAppearanceParty-{fileId}-{appearanceId}-{_requestAgencyIdentifierId}", AppearanceParty);
+            var fileContentTask = _cache.GetOrAddAsync($"CivilFileContent-{fileId}-{_requestAgencyIdentifierId}", FileContent);
+            var appearanceMethodsTask = _cache.GetOrAddAsync($"CivilAppearanceMethods-{fileId}-{appearanceId}-{_requestAgencyIdentifierId}", AppearanceMethods);
+            var appearancesTask = _cache.GetOrAddAsync($"CivilAppearancesFull-{fileId}-{_requestAgencyIdentifierId}", Appearances);
 
             var detail = await fileDetailTask;
             var appearances = await appearancesTask;
@@ -173,7 +174,7 @@ namespace Scv.Api.Services.Files
             if (agencyId != null)
             {
                 async Task<CourtList> CourtList() => await _filesClient.FilesCourtlistAsync(_requestAgencyIdentifierId, _requestPartId, _applicationCode, agencyId, targetAppearance.CourtRoomCd, targetAppearance.AppearanceDt, "CV", detail.FileNumberTxt);
-                var courtListTask = _cache.GetOrAddAsync($"CivilCourtList-{agencyId}-{targetAppearance.CourtRoomCd}-{targetAppearance.AppearanceDt}-{detail.FileNumberTxt}-{_requestPartId}", CourtList);
+                var courtListTask = _cache.GetOrAddAsync($"CivilCourtList-{agencyId}-{targetAppearance.CourtRoomCd}-{targetAppearance.AppearanceDt}-{detail.FileNumberTxt}-{_requestAgencyIdentifierId}", CourtList);
                 var courtList = await courtListTask;
                 civilCourtList = courtList.CivilCourtList.FirstOrDefault(cl => cl.AppearanceId == appearanceId);
             }

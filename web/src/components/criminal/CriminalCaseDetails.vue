@@ -182,21 +182,17 @@ export default class CriminalCaseDetails extends Vue {
                     const courtLevel = DecodeCourtLevel[data.courtLevelCd];
                     const courtClass = DecodeCourtClass[data.courtClassCd];
                     this.ExtractFileInfo()
-                    if(this.participantList.length)
-                    {
-                        this.criminalFileInformation.participantList = this.participantList;
-                        this.criminalFileInformation.adjudicatorRestrictionsInfo = this.adjudicatorRestrictionsInfo;
-                        if (this.bans.length > 0) {
-                            this.banExists = true;
-                        }
-                        this.criminalFileInformation.bans = this.bans;
-                        this.criminalFileInformation.courtLevel = courtLevel;
-                        this.criminalFileInformation.courtClass = courtClass;
-                        this.UpdateCriminalFile(this.criminalFileInformation);
-                        this.isDataReady = true;
+                    //Allow blank participants, it's a real case file 1019 for example on dev.
+                    this.criminalFileInformation.participantList = this.participantList;
+                    this.criminalFileInformation.adjudicatorRestrictionsInfo = this.adjudicatorRestrictionsInfo;
+                    if (this.bans.length > 0) {
+                        this.banExists = true;
                     }
-                    else
-                        this.errorCode=200;                    
+                    this.criminalFileInformation.bans = this.bans;
+                    this.criminalFileInformation.courtLevel = courtLevel;
+                    this.criminalFileInformation.courtClass = courtClass;
+                    this.UpdateCriminalFile(this.criminalFileInformation);
+                    this.isDataReady = true;
                 }
                 else
                     if(this.errorCode==0) this.errorCode=200;                    
