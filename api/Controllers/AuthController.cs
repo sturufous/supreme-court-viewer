@@ -78,6 +78,8 @@ namespace Scv.Api.Controllers
             {
                 FileId = request.FileId,
                 UserId = request.UserId,
+                AgencyId = request.AgencyId,
+                PartId = request.PartId,
                 Requested = DateTimeOffset.Now,
                 Expires = DateTimeOffset.Now.AddMinutes(expiryMinutes)
             });
