@@ -34,7 +34,7 @@ namespace Scv.Api.Helpers.Extensions
 
         public static bool IsIdirUser(this ClaimsPrincipal claimsPrincipal)
         => claimsPrincipal.HasClaim(c => c.Type == CustomClaimTypes.PreferredUsername) && 
-           claimsPrincipal.FindFirstValue(CustomClaimTypes.PreferredUsername).Contains("@idir");
+           claimsPrincipal.FindFirstValue(CustomClaimTypes.PreferredUsername).EndsWith("@idir");
 
         public static bool IsSupremeUser(this ClaimsPrincipal claimsPrincipal)
         => claimsPrincipal.HasClaim(c => c.Type == CustomClaimTypes.IsSupremeUser) && 
@@ -42,6 +42,6 @@ namespace Scv.Api.Helpers.Extensions
 
         public static bool IsVcUser(this ClaimsPrincipal claimsPrincipal)
             => claimsPrincipal.HasClaim(c => c.Type == CustomClaimTypes.PreferredUsername) && 
-               claimsPrincipal.FindFirstValue(CustomClaimTypes.PreferredUsername).Contains("@vc");
+               claimsPrincipal.FindFirstValue(CustomClaimTypes.PreferredUsername).EndsWith("@vc");
     }
 }
