@@ -41,7 +41,7 @@ namespace Scv.Api.Helpers.Extensions
 
         public static bool IsSupremeUser(this ClaimsPrincipal claimsPrincipal)
         => claimsPrincipal.HasClaim(c => c.Type == CustomClaimTypes.IsSupremeUser) && 
-           claimsPrincipal.FindFirstValue(CustomClaimTypes.IsSupremeUser).Contains("true");
+           claimsPrincipal.FindFirstValue(CustomClaimTypes.IsSupremeUser).Equals("True");
 
         public static bool IsVcUser(this ClaimsPrincipal claimsPrincipal)
             => claimsPrincipal.HasClaim(c => c.Type == CustomClaimTypes.PreferredUsername) && 
