@@ -74,7 +74,7 @@ namespace Scv.Api.Services
             if (courtCalendarDetails.ResponseCd != "0")
                 _logger.LogInformation("Court calendar details returned responseCd != 0");
 
-            CheckIfValidUser(courtCalendarDetails.ResponseMessageTxt);
+            ValidUserHelper.CheckIfValidUser(courtCalendarDetails.ResponseMessageTxt);
 
             var civilCourtCalendarAppearances = courtCalendarDetails?.Appearance
                 .WhereToList(app => app.CourtDivisionCd == CourtCalendarDetailAppearanceCourtDivisionCd.I);

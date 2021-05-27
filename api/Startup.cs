@@ -20,6 +20,8 @@ using Scv.Api.Helpers;
 using SS.Api.infrastructure.encryption;
 using Microsoft.EntityFrameworkCore;
 using Scv.Api.Infrastructure;
+using Scv.Api.Infrastructure.Authentication;
+using Scv.Api.Infrastructure.Authorization;
 using Scv.Api.Services.EF;
 using Scv.Db.Models;
 
@@ -83,7 +85,9 @@ namespace Scv.Api
 
             #endregion Data Protection
 
-            services.AddAuthorizationAndAuthentication(CurrentEnvironment, Configuration);
+            services.AddScvAuthentication(CurrentEnvironment, Configuration);
+
+            services.AddScvAuthorization();
 
             #region Newtonsoft
 

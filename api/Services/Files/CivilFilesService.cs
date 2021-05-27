@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Serialization;
 using Scv.Api.Helpers;
 using Scv.Api.Helpers.ContractResolver;
+using Scv.Api.Helpers.Exceptions;
 using Scv.Api.Helpers.Extensions;
 using Scv.Api.Models.Civil.AppearanceDetail;
 using Scv.Api.Models.Civil.Appearances;
@@ -125,6 +126,8 @@ namespace Scv.Api.Services.Files
             var appearancesTask = _cache.GetOrAddAsync($"CivilAppearancesFull-{fileId}-{_requestAgencyIdentifierId}", Appearances);
 
             var fileDetail = await fileDetailTask;
+            ValidUserHelper.CheckIfValidUser(fileDetail.ResponseMessageTxt);
+
             var appearances = await appearancesTask;
             var fileContent = await fileContentTask;
 

@@ -13,9 +13,9 @@ namespace Scv.Api.Infrastructure.Authorization
     public class ProviderAuthorizationHandler : AuthorizationHandler<ProviderAuthorizationHandler>, IAuthorizationRequirement
     {
         /// <summary>
-        /// SiteMinder - specific Participant Id and AgencyId from JUSTIN <see cref="SiteMinderAuthenticationHandler"/>
+        /// SiteMinder - specific Participant Id and AgencyId from CCD <see cref="SiteMinderAuthenticationHandler"/>
         /// IDIR - generic Participant Id and AgencyId. - Uses <see cref="OpenIdConnectHandler"/>
-        /// VC - generic Participant Id and AgencyId, limited routes - Uses <see cref="OpenIdConnectHandler"/>
+        /// VC - specific Participant Id and AgencyId from A2A, limited routes - Uses <see cref="OpenIdConnectHandler"/>
         /// </summary>
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ProviderAuthorizationHandler requirement)
         {
