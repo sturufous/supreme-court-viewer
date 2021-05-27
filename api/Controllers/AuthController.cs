@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Scv.Api.Helpers;
@@ -21,11 +22,13 @@ namespace Scv.Api.Controllers
     {
         public ScvDbContext Db { get; }
         public IConfiguration Configuration { get; }
+        private readonly IDataProtector _protector; 
 
-        public AuthController(ScvDbContext db, IConfiguration configuration)
+        public AuthController(ScvDbContext db, IConfiguration configuration, IDataProtectionProvider provider)
         {
             Db = db;
             Configuration = configuration;
+            _protector = provider.CreateProtector("TemporaryCredentials");  
         }
         /// <summary>
         /// This cannot be called from AJAX or SWAGGER. It must be loaded in the browser location, because it brings the user to the SSO page. 
@@ -73,13 +76,17 @@ namespace Scv.Api.Controllers
             if (!User.IsServiceAccountUser())
                 return Forbid();
 
+            var agencyId = _protector.Protect(request.AgencyId);
+            var partId = _protector.Protect(request.PartId);
+
             var expiryMinutes = float.Parse(Configuration.GetNonEmptyValue("RequestCivilFileAccessMinutes"));
             await Db.RequestFileAccess.AddAsync(new RequestFileAccess
             {
                 FileId = request.FileId,
                 UserId = request.UserId,
-                AgencyId = request.AgencyId,
-                PartId = request.PartId,
+                UserName = request.UserName,
+                AgencyId = agencyId,
+                PartId = partId,
                 Requested = DateTimeOffset.Now,
                 Expires = DateTimeOffset.Now.AddMinutes(expiryMinutes)
             });

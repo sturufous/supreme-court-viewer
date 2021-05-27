@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +22,7 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using Scv.Api.Helpers;
 using Scv.Api.Helpers.Extensions;
+using Scv.Api.Infrastructure.Encryption;
 using Scv.Db.Models;
 
 namespace Scv.Api.Infrastructure.Authentication
@@ -135,16 +137,18 @@ namespace Scv.Api.Infrastructure.Authentication
                         if (context.Principal.IsVcUser())
                         {
                             var db = context.HttpContext.RequestServices.GetRequiredService<ScvDbContext>();
-                            var preferredUserName = context.Principal.PreferredUsername();
+                            var userId = context.Principal.UserId();
                             var now = DateTimeOffset.Now;
                             var fileAccess = await db.RequestFileAccess
-                                .Where(r => r.UserId == preferredUserName && r.Expires > now)
+                                .Where(r => r.UserId == userId && r.Expires > now)
                                 .OrderByDescending(x => x.Id)
                                 .FirstOrDefaultAsync();
                             if (fileAccess is {PartId: { }, AgencyId: { }})
                             {
-                                partId = fileAccess.PartId;
-                                agencyId = fileAccess.AgencyId;
+                                var dataProtector = context.HttpContext.RequestServices.GetRequiredService<IDataProtectionProvider>();
+                                var protector = dataProtector.CreateProtector("TemporaryCredentials");
+                                partId = protector.Unprotect(fileAccess.PartId);
+                                agencyId = protector.Unprotect(fileAccess.AgencyId);
                             }
                         }
 

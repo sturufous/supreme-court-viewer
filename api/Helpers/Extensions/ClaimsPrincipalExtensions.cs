@@ -19,6 +19,9 @@ namespace Scv.Api.Helpers.Extensions
             return identity.Claims.FirstOrDefault(c => c.Type == CustomClaimTypes.JcAgencyCode)?.Value;
         }
 
+        public static string UserId(this ClaimsPrincipal claimsPrincipal) =>
+            claimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier);
+
         public static string PreferredUsername(this ClaimsPrincipal claimsPrincipal) =>
             claimsPrincipal.FindFirstValue(CustomClaimTypes.PreferredUsername);
 
