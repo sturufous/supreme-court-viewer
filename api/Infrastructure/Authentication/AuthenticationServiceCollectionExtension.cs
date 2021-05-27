@@ -151,9 +151,8 @@ namespace Scv.Api.Infrastructure.Authentication
                                 partId = protector.Unprotect(fileAccess.PartId);
                                 agencyId = protector.Unprotect(fileAccess.AgencyId);
                             }
-                        }
-                        
-                        if (context.Principal.IsIdirUser() && context.Principal.Groups().Contains("court-viewer-supreme"))
+                        } 
+                        else if (context.Principal.IsIdirUser() && context.Principal.Groups().Contains("court-viewer-supreme"))
                         {
                             isSupreme = true;
                         }
