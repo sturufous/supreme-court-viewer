@@ -27,7 +27,7 @@ namespace Scv.Api.Infrastructure.Authorization
                 return Task.CompletedTask;
             }
 
-            if (user.IsIdirUser() && user.Groups().Contains("scv"))
+            if (user.IsIdirUser() && (user.Groups().Contains("court-viewer-supreme") || user.Groups().Contains("court-viewer-provincial")))
             {
                 context.Succeed(requirement);
                 return Task.CompletedTask;

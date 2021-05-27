@@ -134,6 +134,7 @@ namespace Scv.Api.Infrastructure.Authentication
 
                         var partId = configuration.GetNonEmptyValue("Request:PartId");
                         var agencyId = configuration.GetNonEmptyValue("Request:AgencyIdentifierId");
+                        var isSupreme = false;
                         if (context.Principal.IsVcUser())
                         {
                             var db = context.HttpContext.RequestServices.GetRequiredService<ScvDbContext>();
@@ -151,12 +152,17 @@ namespace Scv.Api.Infrastructure.Authentication
                                 agencyId = protector.Unprotect(fileAccess.AgencyId);
                             }
                         }
+                        
+                        if (context.Principal.IsIdirUser() && context.Principal.Groups().Contains("court-viewer-supreme"))
+                        {
+                            isSupreme = true;
+                        }
 
                         var claims = new List<Claim>();
                         claims.AddRange(new[] {
                             new Claim(CustomClaimTypes.JcParticipantId, partId),
                             new Claim(CustomClaimTypes.JcAgencyCode, agencyId),
-                            new Claim(CustomClaimTypes.IsSupremeUser, "false")
+                            new Claim(CustomClaimTypes.IsSupremeUser, isSupreme.ToString())
                         });
 
                         identity.AddClaims(claims);
