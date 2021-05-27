@@ -15,7 +15,7 @@ namespace Scv.Api.Infrastructure.Authorization
         /// <summary>
         /// SiteMinder - specific Participant Id and AgencyId from CCD <see cref="SiteMinderAuthenticationHandler"/>
         /// IDIR - generic Participant Id and AgencyId. - Uses <see cref="OpenIdConnectHandler"/>
-        /// VC - specific Participant Id and AgencyId from A2A, limited routes - Uses <see cref="OpenIdConnectHandler"/>
+        /// VC - specific Participant Id and AgencyId from A2A, with a fall back to a generic - limited routes - Uses <see cref="OpenIdConnectHandler"/>
         /// </summary>
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ProviderAuthorizationHandler requirement)
         {
