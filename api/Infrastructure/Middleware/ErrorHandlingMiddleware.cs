@@ -1,24 +1,21 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Net;
+using System.Text.Json;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Scv.Api.Helpers.Exceptions;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Net;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http.Extensions;
-using Newtonsoft.Json.Linq;
 using Scv.Api.Helpers.Extensions;
 using Scv.Db.Models;
 
-namespace Scv.Api.Helpers.Middleware
+namespace Scv.Api.Infrastructure.Middleware
 {
     /// <summary>
     /// ErrorHandlingMiddleware class, provides a way to catch and handle unhandled errors in a generic way.

@@ -8,7 +8,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using Scv.Api.Helpers.ContractResolver;
-using Scv.Api.Helpers.Middleware;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,11 +16,12 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.OpenApi.Models;
 using Scv.Api.Helpers;
-using SS.Api.infrastructure.encryption;
 using Microsoft.EntityFrameworkCore;
 using Scv.Api.Infrastructure;
 using Scv.Api.Infrastructure.Authentication;
 using Scv.Api.Infrastructure.Authorization;
+using Scv.Api.Infrastructure.Encryption;
+using Scv.Api.Infrastructure.Middleware;
 using Scv.Api.Services.EF;
 using Scv.Db.Models;
 
@@ -85,9 +85,11 @@ namespace Scv.Api
 
             #endregion Data Protection
 
+            #region Authentication & Authorization
             services.AddScvAuthentication(CurrentEnvironment, Configuration);
 
             services.AddScvAuthorization();
+            #endregion
 
             #region Newtonsoft
 
