@@ -43,7 +43,7 @@ namespace Scv.Api.Infrastructure.Authentication
                 return AuthenticateResult.NoResult();
             
             if (siteMinderUserTypeHeader != ValidSiteMinderUserType)
-                return AuthenticateResult.Fail("Invalid SiteMinder credentials.");
+                return AuthenticateResult.Fail("Invalid SiteMinder UserType Header.");
 
             var authenticatedBySiteMinderPreviously = Context.User.Identity.AuthenticationType == SiteMinder;
             var participantId = Context.User.ParticipantId(); 

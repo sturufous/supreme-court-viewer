@@ -34,7 +34,6 @@ namespace Scv.Api.Services.Files
         private readonly string _applicationCode;
         private readonly string _requestAgencyIdentifierId;
         private readonly string _requestPartId;
-        private readonly string _fileSearchClass;
 
         #endregion
 

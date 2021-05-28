@@ -14,12 +14,12 @@ namespace Scv.Api.Infrastructure.Authorization
         {
             Db = db;
         }
-        public async Task<Boolean> HasCivilFileAccess(ClaimsPrincipal user, string civilFileId)
+        public async Task<bool> HasCivilFileAccess(ClaimsPrincipal user, string civilFileId)
         {
-            var preferredUserName = user.PreferredUsername();
+            var userId = user.UserId();
             var now = DateTimeOffset.Now;
             var fileAccess = await Db.RequestFileAccess
-                .AnyAsync(r => r.UserId == preferredUserName && r.Expires > now && r.FileId == civilFileId);
+                .AnyAsync(r => r.UserId == userId && r.Expires > now && r.FileId == civilFileId);
             return fileAccess;
         }
     }
