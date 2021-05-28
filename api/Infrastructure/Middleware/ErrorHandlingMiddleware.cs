@@ -151,19 +151,19 @@ namespace Scv.Api.Infrastructure.Middleware
                     break;
 
                 case JCCommon.Clients.FileServices.ApiException exception:
-                    code = (HttpStatusCode)exception.StatusCode;
+                    code = HttpStatusCode.InternalServerError;
                     message = exception.Message;
                     _logger.LogError(ex, ex.Message);
                     break;
 
                 case JCCommon.Clients.LocationServices.ApiException exception:
-                    code = (HttpStatusCode)exception.StatusCode;
+                    code = HttpStatusCode.InternalServerError;
                     message = exception.Message;
                     _logger.LogError(ex, ex.Message);
                     break;
 
                 case JCCommon.Clients.LookupCodeServices.ApiException exception:
-                    code = (HttpStatusCode)exception.StatusCode;
+                    code = HttpStatusCode.InternalServerError;
                     message = exception.Message;
                     _logger.LogError(ex, ex.Message);
                     break;
