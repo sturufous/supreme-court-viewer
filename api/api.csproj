@@ -40,7 +40,6 @@
     <ProjectReference Include="..\jc-interface-client\jc-interface-client.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Infrastructure\Encryption\" />
     <Folder Include="Services\EF\" />
   </ItemGroup>
 </Project>

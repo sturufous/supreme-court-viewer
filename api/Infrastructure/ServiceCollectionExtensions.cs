@@ -12,6 +12,7 @@ using JCCommon.Clients.FileServices;
 using JCCommon.Clients.LocationServices;
 using JCCommon.Clients.LookupCodeServices;
 using JCCommon.Clients.UserService;
+using Scv.Api.Infrastructure.Encryption;
 using Scv.Api.Services;
 using Scv.Api.Services.Files;
 using BasicAuthenticationHeaderValue = JCCommon.Framework.BasicAuthenticationHeaderValue;
@@ -75,6 +76,7 @@ namespace Scv.Api.Infrastructure
             services.AddScoped<CourtListService>();
             services.AddScoped<VcCivilFileAccessHandler>();
             services.AddSingleton<JCUserService>();
+            services.AddSingleton<AesGcmEncryption>();
 
             return services;
         }

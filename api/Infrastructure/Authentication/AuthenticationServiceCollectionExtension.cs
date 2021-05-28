@@ -146,10 +146,9 @@ namespace Scv.Api.Infrastructure.Authentication
                                 .FirstOrDefaultAsync();
                             if (fileAccess is {PartId: { }, AgencyId: { }})
                             {
-                                var dataProtector = context.HttpContext.RequestServices.GetRequiredService<IDataProtectionProvider>();
-                                var protector = dataProtector.CreateProtector("TemporaryCredentials");
-                                partId = protector.Unprotect(fileAccess.PartId);
-                                agencyId = protector.Unprotect(fileAccess.AgencyId);
+                                var aesGcmEncryption = context.HttpContext.RequestServices.GetRequiredService<AesGcmEncryption>();
+                                partId = aesGcmEncryption.Decrypt(fileAccess.PartId);
+                                agencyId = aesGcmEncryption.Decrypt(fileAccess.AgencyId);
                             }
                         } 
                         else if (context.Principal.IsIdirUser() && context.Principal.Groups().Contains("court-viewer-supreme"))

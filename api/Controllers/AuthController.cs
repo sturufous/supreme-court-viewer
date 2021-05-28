@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Scv.Api.Helpers;
 using Scv.Api.Helpers.Extensions;
 using Scv.Api.Infrastructure.Authorization;
+using Scv.Api.Infrastructure.Encryption;
 using Scv.Api.Models.auth;
 using Scv.Db.Models;
 using Scv.Db.Models.Auth;
@@ -22,13 +23,13 @@ namespace Scv.Api.Controllers
     {
         public ScvDbContext Db { get; }
         public IConfiguration Configuration { get; }
-        private readonly IDataProtector _protector; 
+        private AesGcmEncryption AesGcmEncryption { get; }
 
-        public AuthController(ScvDbContext db, IConfiguration configuration, IDataProtectionProvider provider)
+        public AuthController(ScvDbContext db, IConfiguration configuration, AesGcmEncryption aesGcmEncryption)
         {
             Db = db;
             Configuration = configuration;
-            _protector = provider.CreateProtector("TemporaryCredentials");  
+            AesGcmEncryption = aesGcmEncryption;
         }
         /// <summary>
         /// This cannot be called from AJAX or SWAGGER. It must be loaded in the browser location, because it brings the user to the SSO page. 
@@ -76,8 +77,8 @@ namespace Scv.Api.Controllers
             if (!User.IsServiceAccountUser())
                 return Forbid();
 
-            var agencyId = _protector.Protect(request.AgencyId);
-            var partId = _protector.Protect(request.PartId);
+            var agencyId = string.IsNullOrEmpty(request.AgencyId) ? "" : AesGcmEncryption.Encrypt(request.AgencyId);
+            var partId = string.IsNullOrEmpty(request.PartId) ? "" : AesGcmEncryption.Encrypt(request.PartId);
 
             var expiryMinutes = float.Parse(Configuration.GetNonEmptyValue("RequestCivilFileAccessMinutes"));
             await Db.RequestFileAccess.AddAsync(new RequestFileAccess
