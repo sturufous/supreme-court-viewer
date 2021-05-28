@@ -144,7 +144,7 @@ namespace Scv.Api.Infrastructure.Authentication
                                 .Where(r => r.UserId == userId && r.Expires > now)
                                 .OrderByDescending(x => x.Id)
                                 .FirstOrDefaultAsync();
-                            if (fileAccess is {PartId: { }, AgencyId: { }})
+                            if (fileAccess != null && !string.IsNullOrEmpty(fileAccess.PartId) && !string.IsNullOrEmpty(fileAccess.AgencyId))
                             {
                                 var aesGcmEncryption = context.HttpContext.RequestServices.GetRequiredService<AesGcmEncryption>();
                                 partId = aesGcmEncryption.Decrypt(fileAccess.PartId);
