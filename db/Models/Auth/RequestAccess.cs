@@ -11,6 +11,9 @@ namespace Scv.Db.Models.Auth
         public string UserId { get; set; }
         [Required]
         public string FileId { get; set; }
+        public string UserName { get; set; }
+        public string AgencyId { get; set; }
+        public string PartId { get; set; }
         public DateTimeOffset Requested { get; set; }
         public DateTimeOffset Expires { get; set; }
     }

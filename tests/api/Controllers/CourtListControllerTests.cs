@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Linq;
+using System.Security.Claims;
 using JCCommon.Clients.FileServices;
 using JCCommon.Clients.LocationServices;
 using JCCommon.Clients.LookupCodeServices;
+using Microsoft.Extensions.Logging;
 using LazyCache;
 using MapsterMapper;
 using Scv.Api.Controllers;
+using Scv.Api.Helpers;
 using Scv.Api.Services;
 using tests.api.Helpers;
 using Xunit;
@@ -32,7 +35,15 @@ namespace tests.api.Controllers
             var fileServicesClient = new FileServicesClient(fileServices.HttpClient);
             var lookupService = new LookupService(lookupServices.Configuration, lookupServiceClient, new CachingService());
             var locationService = new LocationService(locationServices.Configuration, locationServiceClient, new CachingService());
-            var courtListService = new CourtListService(fileServices.Configuration, fileServicesClient, new Mapper(), lookupService, locationService, new CachingService());
+
+            var claims = new[] {
+                new Claim(CustomClaimTypes.JcParticipantId,  fileServices.Configuration.GetNonEmptyValue("Request:PartId")),
+                new Claim(CustomClaimTypes.JcAgencyCode, fileServices.Configuration.GetNonEmptyValue("Request:AgencyIdentifierId")),
+            };
+            var identity = new ClaimsIdentity(claims, "Cookies");
+            var principal = new ClaimsPrincipal(identity);
+
+            var courtListService = new CourtListService(fileServices.Configuration, fileServices.LogFactory.CreateLogger<CourtListService>(), fileServicesClient, new Mapper(), lookupService, locationService, new CachingService(), principal);
             _controller = new CourtListController(courtListService)
             {
                 ControllerContext = HttpResponseTest.SetupMockControllerContext(fileServices.Configuration)

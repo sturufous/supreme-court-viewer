@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Scv.Db.Models;
@@ -9,9 +10,10 @@ using Scv.Db.Models;
 namespace Scv.Db.Migrations
 {
     [DbContext(typeof(ScvDbContext))]
-    partial class ScvDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210521194126_PartIdAgencyId")]
+    partial class PartIdAgencyId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -116,10 +118,6 @@ namespace Scv.Db.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("user_id");
-
-                    b.Property<string>("UserName")
-                        .HasColumnType("text")
-                        .HasColumnName("user_name");
 
                     b.HasKey("Id")
                         .HasName("pk_request_file_access");

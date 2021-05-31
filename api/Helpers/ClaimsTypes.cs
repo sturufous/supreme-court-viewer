@@ -7,6 +7,7 @@ namespace Scv.Api.Helpers
     {
         public const string JcParticipantId = nameof(CustomClaimTypes) + nameof(JcParticipantId);
         public const string JcAgencyCode = nameof(CustomClaimTypes) + nameof(JcAgencyCode);
+        public const string IsSupremeUser = nameof(CustomClaimTypes) + nameof(IsSupremeUser);
         public const string CivilFileAccess = nameof(CustomClaimTypes) + nameof(CivilFileAccess);
         public const string Groups = "groups";
         public const string PreferredUsername = "preferred_username";

@@ -43,11 +43,12 @@ namespace Scv.Api.Infrastructure.Authentication
                 return AuthenticateResult.NoResult();
             
             if (siteMinderUserTypeHeader != ValidSiteMinderUserType)
-                return AuthenticateResult.Fail("Invalid SiteMinder credentials.");
+                return AuthenticateResult.Fail("Invalid SiteMinder UserType Header.");
 
             var authenticatedBySiteMinderPreviously = Context.User.Identity.AuthenticationType == SiteMinder;
             var participantId = Context.User.ParticipantId(); 
             var agencyCode = Context.User.AgencyCode();
+            var isSupremeUser = Context.User.IsSupremeUser();
             if (!authenticatedBySiteMinderPreviously)
             {
                 var request = new UserInfoRequest
@@ -63,12 +64,14 @@ namespace Scv.Api.Infrastructure.Authentication
                     return AuthenticateResult.Fail("Couldn't authenticate through JC-Interface.");
 
                 participantId = jcUserInfo.UserPartId;
-                agencyCode = jcUserInfo.UserDefaultAgencyCd ?? "";
+                agencyCode = jcUserInfo.UserDefaultAgencyCd;
+                isSupremeUser = true;
             }
 
             var claims = new[] {
                 new Claim(CustomClaimTypes.JcParticipantId, participantId),
                 new Claim(CustomClaimTypes.JcAgencyCode, agencyCode),
+                new Claim(CustomClaimTypes.IsSupremeUser, isSupremeUser.ToString())
             };
             var identity = new ClaimsIdentity(claims, Scheme.Name);
             var principal = new ClaimsPrincipal(identity);

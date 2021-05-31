@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Scv.Db.Models;
@@ -9,9 +10,10 @@ using Scv.Db.Models;
 namespace Scv.Db.Migrations
 {
     [DbContext(typeof(ScvDbContext))]
-    partial class ScvDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210315181924_Audit")]
+    partial class Audit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -91,10 +93,6 @@ namespace Scv.Db.Migrations
                         .HasColumnName("id")
                         .UseIdentityByDefaultColumn();
 
-                    b.Property<string>("AgencyId")
-                        .HasColumnType("text")
-                        .HasColumnName("agency_id");
-
                     b.Property<DateTimeOffset>("Expires")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("expires");
@@ -104,10 +102,6 @@ namespace Scv.Db.Migrations
                         .HasColumnType("text")
                         .HasColumnName("file_id");
 
-                    b.Property<string>("PartId")
-                        .HasColumnType("text")
-                        .HasColumnName("part_id");
-
                     b.Property<DateTimeOffset>("Requested")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("requested");
@@ -116,10 +110,6 @@ namespace Scv.Db.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("user_id");
-
-                    b.Property<string>("UserName")
-                        .HasColumnType("text")
-                        .HasColumnName("user_name");
 
                     b.HasKey("Id")
                         .HasName("pk_request_file_access");

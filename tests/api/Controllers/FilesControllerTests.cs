@@ -23,7 +23,9 @@ using JCCommon.Clients.LookupCodeServices;
 using Microsoft.AspNetCore.WebUtilities;
 using Newtonsoft.Json;
 using Scv.Api.Helpers;
+using Scv.Api.Infrastructure.Authorization;
 using Scv.Api.Models.archive;
+using Scv.Db.Models;
 
 namespace tests.api.Controllers
 {
@@ -38,12 +40,15 @@ namespace tests.api.Controllers
 
         private readonly FilesController _controller;
         private readonly FileServicesClient _fileServicesClient;
+        private readonly string _agencyIdentifierId;
+        private readonly string _partId;
         #endregion Variables
 
         #region Constructor
 
         public FilesControllerTests()
         {
+            //TODO NInject or some other resolvers.
             var fileServices = new EnvironmentBuilder("FileServicesClient:Username", "FileServicesClient:Password", "FileServicesClient:Url");
             var lookupServices = new EnvironmentBuilder("LookupServicesClient:Username", "LookupServicesClient:Password", "LookupServicesClient:Url");
             var locationServices = new EnvironmentBuilder("LocationServicesClient:Username", "LocationServicesClient:Password", "LocationServicesClient:Url");
@@ -54,21 +59,55 @@ namespace tests.api.Controllers
             var lookupService = new LookupService(lookupServices.Configuration, lookupServiceClient, new CachingService());
             var locationService = new LocationService(locationServices.Configuration, locationServiceClient, new CachingService());
 
+            _agencyIdentifierId = fileServices.Configuration.GetNonEmptyValue("Request:AgencyIdentifierId");
+            _partId = fileServices.Configuration.GetNonEmptyValue("Request:PartId");
             var claims = new[] {
-                new Claim(CustomClaimTypes.JcParticipantId,  fileServices.Configuration.GetNonEmptyValue("Request:PartId")),
-                new Claim(CustomClaimTypes.JcAgencyCode, fileServices.Configuration.GetNonEmptyValue("Request:AgencyIdentifierId")),
+                new Claim(CustomClaimTypes.JcParticipantId, _partId),
+                new Claim(CustomClaimTypes.JcAgencyCode, _agencyIdentifierId),
             };
             var identity = new ClaimsIdentity(claims, "Cookies");
             var principal = new ClaimsPrincipal(identity);
 
             var filesService = new FilesService(fileServices.Configuration, fileServicesClient, new Mapper(), lookupService, locationService, new CachingService(), principal);
-            _controller = new FilesController(fileServices.Configuration, fileServices.LogFactory.CreateLogger<FilesController>(), filesService);
+
+            //TODO fake this.
+            var vcCivilFileAccessHandler = new VcCivilFileAccessHandler(new ScvDbContext());
+            _controller = new FilesController(fileServices.Configuration, fileServices.LogFactory.CreateLogger<FilesController>(), filesService, vcCivilFileAccessHandler);
             _controller.ControllerContext = HttpResponseTest.SetupMockControllerContext(fileServices.Configuration);
         }
 
         #endregion Constructor
 
         #region Tests
+
+        [Fact]//(Skip = "ADHOC get documentId")]
+        public async Task Civil_Document_Reference_Document_and_Binder_Document()
+        {
+            //NEEDS PCSS APPLICATION CODE CODE
+            //var civilFileContent = await _controller.GetCivilFileDetailByFileId("3811");
+
+            var civilFileContent = await _controller.GetCivilFileDetailByFileId("3822");
+            var documentId = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes("GeWzGIDmGMUu.#CGMKv9.i`E|ahP'P^^z>qK*[sfUw=M\":Zxf)f#'AI(92O2adE'VGA9_7.368246000.074711.2459184..#C4"));
+            var document = await _controller.GetDocument(documentId, "hello.txt", false, "3822");
+        }
+        [Fact(Skip="TEST")]
+        public async Task Civil_Document_Reference_Document_In_TEST()
+        {
+            //Set application Code to PCSS, SCV doesn't seem to include these. 
+
+            var actionResult = await _controller.GetCivilFileDetailByFileId("4987");
+
+            var fileDetailResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+
+            var referenceDocuments = fileDetailResponse.ReferenceDocument;
+
+
+            Assert.NotNull(referenceDocuments);
+            Assert.Equal(2, referenceDocuments.Count);
+            var firstReferenceDocument = referenceDocuments.First();
+
+            var document = await _controller.GetDocument(WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(firstReferenceDocument.ObjectGuid)), "hello.txt", false, "4987");
+        }
 
         [Fact]
         public async void Civil_Document_With_Reference_Document()
@@ -83,11 +122,11 @@ namespace tests.api.Controllers
             Assert.Equal(4, referenceDocuments.Count);
             var firstReferenceDocument = referenceDocuments.First();
 
-            var document = await _controller.GetDocument(WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(firstReferenceDocument.ObjectGuid)), "hello.txt", false);
+            var document = await _controller.GetDocument(WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(firstReferenceDocument.ObjectGuid)), "hello.txt", false, "3822");
         }
 
         [Fact]
-        public async void Civil_File_With_Reference_Documents()
+        public async Task Civil_File_With_Reference_Documents()
         {
             var actionResult = await _controller.GetCivilFileDetailByFileId("3822");
 
@@ -97,13 +136,11 @@ namespace tests.api.Controllers
 
             Assert.NotNull(referenceDocuments);
             Assert.Equal(4,referenceDocuments.Count);
-            var firstReferenceDocument = referenceDocuments.First();
 
-            Assert.Equal("2020-12-03 00:00:00.0", firstReferenceDocument.AppearanceDate);
-            Assert.Equal("13915", firstReferenceDocument.AppearanceId);
-            Assert.Equal("Notice of Application filed January 2 2020", firstReferenceDocument.DescriptionText);
-            Assert.Equal("4462", firstReferenceDocument.PartyId);
-            Assert.Equal("TEST, One", firstReferenceDocument.PartyName);
+            Assert.Contains(referenceDocuments, rd => rd.AppearanceId == "14178");
+            Assert.Contains(referenceDocuments, rd => rd.DescriptionText == "Affidavit of Joan Smith sworn Feb 3 2020");
+            Assert.Contains(referenceDocuments, rd => rd.PartyId == "4462");
+            Assert.Contains(referenceDocuments, rd => rd.PartyName == "TEST, One");
         }
 
         [Fact]
@@ -127,17 +164,17 @@ namespace tests.api.Controllers
             /* This is the largest civil file on dev. Unfortunately if the WSDL changes for this route, 
              * it will always return back 200, but a null file. It would have been nice if the server 
              * would return 500 etc on errors. */
-            var result = await _fileServicesClient.FilesCivilFilecontentAsync(null, null, null, null, "2222", "SCV");
+            var result = await _fileServicesClient.FilesCivilFilecontentAsync(_agencyIdentifierId, _partId, "SCV",null, null, null, null, "2222");
             Assert.NotNull(result);
         }
 
         [Fact]
-        public async void Criminal_File_Details_ByFileNumberText_Three()
+        public async void Criminal_File_Details_ByFileNumberText_One()
         {
             var actionResult = await _controller.GetCriminalFileIdsByAgencyIdCodeAndFileNumberText("83.0001", "98050101");
 
             var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
-            Assert.Equal(3, fileSearchResponse.Count);
+            Assert.Single(fileSearchResponse);
         }
 
         [Fact]
@@ -157,7 +194,7 @@ namespace tests.api.Controllers
                 await _controller.GetCriminalFileIdsByAgencyIdCodeAndFileNumberText("83.0001", "58819");
 
             var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
-            Assert.Equal(3, fileSearchResponse.Count);
+            Assert.Equal(2, fileSearchResponse.Count); // 1 is Provincial
         }
 
         [Fact]
@@ -199,7 +236,7 @@ namespace tests.api.Controllers
             var actionResult = await _controller.GetCriminalFileIdsByAgencyIdCodeAndFileNumberText("83.0001", "58819-1");
 
             var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
-            Assert.Contains("3777", fileSearchResponse.First().JustinNo);
+            Assert.Contains("3779", fileSearchResponse.First().JustinNo);
         }
 
 
@@ -287,6 +324,16 @@ namespace tests.api.Controllers
             Assert.Equal(1, fileSearchResponse.FileDetail.Count);
             Assert.Equal("C-11011", fileSearchResponse.FileDetail.First().FileNumberTxt);
             Assert.Contains("BYSTANDER, Innocent", fileSearchResponse.FileDetail.First().Participant.Select(u => u.FullNm));
+        }
+
+        [Fact]
+        public async void Criminal_File_Details_by_JustinNo_Test()
+        {
+            var actionResult = await _controller.GetCriminalFileDetailByFileId("4074");
+
+            var redactedCriminalFileDetailResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+            Assert.Equal("4074", redactedCriminalFileDetailResponse.JustinNo);
+            Assert.True(redactedCriminalFileDetailResponse.Participant.Count > 0);
         }
 
         [Fact]
@@ -395,11 +442,36 @@ namespace tests.api.Controllers
                 SearchMode = SearchMode.FILENO,
                 FileHomeAgencyId = "83.0001",
                 FileNumberTxt = "98050101",
+                CourtLevel = CourtLevelCd2.S
             };
             var actionResult = await _controller.FilesCriminalSearchAsync(fcq);
 
             var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
-            Assert.Equal("3", fileSearchResponse.RecCount);
+            Assert.Equal("1", fileSearchResponse.RecCount);
+
+            fcq = new FilesCriminalQuery
+            {
+                SearchMode = SearchMode.FILENO,
+                FileHomeAgencyId = "83.0001",
+                FileNumberTxt = "98050101",
+                CourtLevel = CourtLevelCd2.P
+            };
+            actionResult = await _controller.FilesCriminalSearchAsync(fcq);
+
+            fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+            Assert.Equal("2", fileSearchResponse.RecCount);
+
+            fcq = new FilesCriminalQuery
+            {
+                SearchMode = SearchMode.FILENO,
+                FileHomeAgencyId = "83.0001",
+                FileNumberTxt = "98050101",
+                CourtLevel = CourtLevelCd2.A
+            };
+            actionResult = await _controller.FilesCriminalSearchAsync(fcq);
+
+            fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+            Assert.Equal("0", fileSearchResponse.RecCount);
         }
 
         [Fact]
@@ -457,21 +529,23 @@ namespace tests.api.Controllers
         [Fact]
         public async void Document_Civil()
         {
-            var actionResult = await _controller.GetDocument(WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes("10010")), "test.pdf");
+            //var civilFile = await _controller.GetCivilFileDetailByFileId("3197");
+
+            var actionResult = await _controller.GetDocument(WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes("6874")), "test.pdf", false, "3197");
 
             var fileContentResult = actionResult as FileContentResult;
             Assert.NotNull(fileContentResult);
-            Assert.Equal(14625, fileContentResult.FileContents.Length);
+            Assert.Equal(352827, fileContentResult.FileContents.Length);
         }
 
         [Fact]
         public async void Document_Criminal()
         {
-            var actionResult = await _controller.GetDocument(WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes("40")), "test.pdf", true);
+            var actionResult = await _controller.GetDocument(WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes("6196.0734")), "test.pdf", true, "3192");
 
             var fileContentResult = actionResult as FileContentResult;
             Assert.NotNull(fileContentResult);
-            Assert.True(fileContentResult.FileContents.Length > 100000);
+            Assert.True(fileContentResult.FileContents.Length >= 217);
         }
 
         [Fact]
@@ -708,15 +782,17 @@ namespace tests.api.Controllers
                 {
                     new DocumentRequest
                     {
-                        Base64UrlEncodedDocumentId = "MzUyMi4wNzM0",
-                        IsCriminal = true,
-                        PdfFileName = "55"
+                        Base64UrlEncodedDocumentId = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes("6874")),
+                        IsCriminal = false,
+                        PdfFileName = "55",
+                        FileId = "3197"
                     },
                     new DocumentRequest
                     {
-                        Base64UrlEncodedDocumentId = "R2VXekdJRG1HTVV1LiNDR01LdjkuaWBFfGFoUCdQXl56PnFLKltzZlV3PU0iOlp4ZilmIydBSSg5Mk8yYWRFJ1ZHQTlfNy4zNjgyNDYwMDAuMDc0NzExLjI0NTkxODQuLiNDNA",
-                        IsCriminal = false,
-                        PdfFileName = "4646363"
+                        Base64UrlEncodedDocumentId = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes("6196.0734")),
+                        IsCriminal = true,
+                        PdfFileName = "4646363",
+                        FileId = "3192"
                     }
                 },
                 RopRequests = new List<RopRequest>

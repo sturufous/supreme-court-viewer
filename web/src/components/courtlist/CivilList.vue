@@ -314,14 +314,28 @@ export default class CivilList extends Vue {
 
   
     public ExtractCivilListInfo(): void {
-        const listClass = this.civilClass=='family'? 'F': 'I';
+        const listClass = this.civilClass=='family'? ['F','E']: ['I', 'B', 'V', 'D', 'H', 'P', 'S']; 
+        /* 
+            Unfortunately these don't follow the usual pattern of the other lookups.
+            B = "Bankruptcy"
+            V = "Caveat"
+            D = "Divorce"
+            E = "Family Law Proceeding"
+            H = "Forclosure"
+            P = "Probate"
+            S = "Supreme Civil (General)"
+            Future:
+            SCH – Supreme Court Chambers
+            SCV – Supreme Court Trial List
+        */
+
         for (const civilListIndex in this.civilCourtListJson) 
         {
             const civilListInfo = {} as civilListInfoType;
             const jcivilList = this.civilCourtListJson[civilListIndex];
 
             civilListInfo["Index"] = civilListIndex;
-            if(jcivilList.activityClassCd != listClass) continue;
+            if(listClass.indexOf(jcivilList.activityClassCd) == -1) continue;
 
             civilListInfo['Seq.']=jcivilList.courtListPrintSortNumber? parseInt(jcivilList.courtListPrintSortNumber):0
 

@@ -16,6 +16,7 @@
         <b-card  style="min-height: 100px;">
             <span v-if="errorCode==404">This <b>File-Number '{{this.civilFileInformation.fileNumber}}'</b> doesn't exist in the <b>civil</b> records.</span>            
             <span v-else-if="errorCode==200 || errorCode==204"> Bad Data in <b>File-Number '{{this.civilFileInformation.fileNumber}}'</b>.</span>
+            <span v-else-if="errorCode==403"> You are not authorized to access this file. </span>
             <span v-else> Server is not responding. <b>({{errorText}})</b> </span>
         </b-card>
         <b-card>         
@@ -47,7 +48,9 @@
                 </h2>
 
                 <civil-parties v-if="showCaseDetails"/>
+                <!-- Disable for now, as per request by Lorne, although they may be used for Provincial files.
                 <civil-adjudicator-restrictions v-if="showCaseDetails"/>
+                -->
                 <civil-comment-notes v-if="showCaseDetails"/>
                 <civil-documents-view v-if="showDocuments || showAllDocuments"/>
                 <civil-provided-documents-view v-if="showProvidedDocuments || showAllDocuments"/>            
@@ -211,6 +214,7 @@ export default class CivilCaseDetails extends Vue {
                 documentRequest.isCriminal = false;
                 documentRequest.pdfFileName = 'doc_' + doc.partyName + '_' + doc.referenceDocumentTypeDsc + '.pdf';
                 documentRequest.base64UrlEncodedDocumentId = base64url(id);
+                documentRequest.fileId = this.civilFileInformation.fileNumber;
                 documentsToDownload.documentRequests.push(documentRequest);                
             }        
         }
@@ -222,6 +226,7 @@ export default class CivilCaseDetails extends Vue {
                 documentRequest.isCriminal = false;
                 documentRequest.pdfFileName = 'doc' + id + '.pdf';
                 documentRequest.base64UrlEncodedDocumentId = base64url(id);
+                documentRequest.fileId = this.civilFileInformation.fileNumber;
                 documentsToDownload.documentRequests.push(documentRequest);                
             }        
         }

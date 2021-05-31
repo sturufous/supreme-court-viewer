@@ -5,10 +5,13 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Scv.Api.Helpers;
 using Scv.Api.Helpers.Extensions;
+using Scv.Api.Infrastructure.Authorization;
+using Scv.Api.Infrastructure.Encryption;
 using Scv.Api.Models.auth;
 using Scv.Db.Models;
 using Scv.Db.Models.Auth;
@@ -20,17 +23,18 @@ namespace Scv.Api.Controllers
     {
         public ScvDbContext Db { get; }
         public IConfiguration Configuration { get; }
+        private AesGcmEncryption AesGcmEncryption { get; }
 
-        public AuthController(ScvDbContext db, IConfiguration configuration)
+        public AuthController(ScvDbContext db, IConfiguration configuration, AesGcmEncryption aesGcmEncryption)
         {
             Db = db;
             Configuration = configuration;
+            AesGcmEncryption = aesGcmEncryption;
         }
         /// <summary>
         /// This cannot be called from AJAX or SWAGGER. It must be loaded in the browser location, because it brings the user to the SSO page. 
         /// </summary>
         /// <param name="redirectUri">URL to go back to.</param>
-        /// <param name="fromA2A">This determines which login to provide, either VC or IDIR</param>
         [Authorize(AuthenticationSchemes = OpenIdConnectDefaults.AuthenticationScheme)]
         [HttpGet("login")]
         public IActionResult Login(string redirectUri = "/api")
@@ -73,11 +77,17 @@ namespace Scv.Api.Controllers
             if (!User.IsServiceAccountUser())
                 return Forbid();
 
+            var agencyId = string.IsNullOrEmpty(request.AgencyId) ? "" : AesGcmEncryption.Encrypt(request.AgencyId);
+            var partId = string.IsNullOrEmpty(request.PartId) ? "" : AesGcmEncryption.Encrypt(request.PartId);
+
             var expiryMinutes = float.Parse(Configuration.GetNonEmptyValue("RequestCivilFileAccessMinutes"));
             await Db.RequestFileAccess.AddAsync(new RequestFileAccess
             {
                 FileId = request.FileId,
                 UserId = request.UserId,
+                UserName = request.UserName,
+                AgencyId = agencyId,
+                PartId = partId,
                 Requested = DateTimeOffset.Now,
                 Expires = DateTimeOffset.Now.AddMinutes(expiryMinutes)
             });
@@ -93,7 +103,7 @@ namespace Scv.Api.Controllers
             });
         }
 
-        [Authorize(AuthenticationSchemes = "SiteMinder, OpenIdConnect")]
+        [Authorize(AuthenticationSchemes = "SiteMinder, OpenIdConnect", Policy = nameof(ProviderAuthorizationHandler))]
         [HttpGet("info")]
         public ActionResult UserInfo()
         {

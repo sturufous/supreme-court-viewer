@@ -14,7 +14,10 @@
 
     <b-card bg-variant="light" v-else-if= "isLocationDataMounted && !isLocationDataReady">
         <b-card style="min-height: 40px;">
-            <span v-if="errorCode>0"> Server is not responding. <b>({{errorText}} "{{errorCode}}")</b> </span>
+            <span v-if="errorCode>0">
+                <span v-if="errorCode==403"> You are not authorized to access this page. </span>
+                <span v-else> Server is not responding. <b>({{errorText}} "{{errorCode}}")</b></span>
+            </span>
             <span v-else > No Court Location Found. </span>                    
         </b-card>
         <b-card>         
@@ -292,7 +295,7 @@ export default class CourtList extends Vue {
                     this.criminalCases = data.criminalCourtList.length;                    
                     for(const civil of data.civilCourtList)
                     {
-                        if(civil.activityClassCd == 'F') this.familyCases++;else this.civilCases ++;
+                        if(civil.activityClassCd == 'F' || civil.activityClassCd == 'E' ) this.familyCases++;else this.civilCases ++;
                         this.setTotalTimeForRoom(civil.estimatedTimeHour,civil.estimatedTimeMin)
                     }
 

@@ -42,32 +42,28 @@ namespace JCCommon.Clients.FileServices
         partial void PrepareRequest(System.Net.Http.HttpClient client, System.Net.Http.HttpRequestMessage request, System.Text.StringBuilder urlBuilder);
         partial void ProcessResponse(System.Net.Http.HttpClient client, System.Net.Http.HttpResponseMessage response);
     
-        /// <param name="requestAgencyId">Requesting Agency Identifier</param>
+        /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
+        /// <param name="applicationCd">The code for the calling application</param>
         /// <param name="agencyCode">Agency Code; for example 83.0001 (Kelowna).</param>
         /// <param name="appearanceDt">The appearance date in the format YYYY-MM-dd</param>
         /// <param name="roomCd">Court room code</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<CourtCalendarDetailByDay> FilesCourtcalendardetailsbydayAsync(string requestAgencyId, string requestPartId, string agencyCode, string appearanceDt, string roomCd)
+        public System.Threading.Tasks.Task<CourtCalendarDetailByDay> FilesCourtcalendardetailsbydayAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, string agencyCode, string appearanceDt, string roomCd)
         {
-            return FilesCourtcalendardetailsbydayAsync(requestAgencyId, requestPartId, agencyCode, appearanceDt, roomCd, System.Threading.CancellationToken.None);
+            return FilesCourtcalendardetailsbydayAsync(requestAgencyIdentifierId, requestPartId, applicationCd, agencyCode, appearanceDt, roomCd, System.Threading.CancellationToken.None);
         }
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <param name="requestAgencyId">Requesting Agency Identifier</param>
+        /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
+        /// <param name="applicationCd">The code for the calling application</param>
         /// <param name="agencyCode">Agency Code; for example 83.0001 (Kelowna).</param>
         /// <param name="appearanceDt">The appearance date in the format YYYY-MM-dd</param>
         /// <param name="roomCd">Court room code</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<CourtCalendarDetailByDay> FilesCourtcalendardetailsbydayAsync(string requestAgencyId, string requestPartId, string agencyCode, string appearanceDt, string roomCd, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<CourtCalendarDetailByDay> FilesCourtcalendardetailsbydayAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, string agencyCode, string appearanceDt, string roomCd, System.Threading.CancellationToken cancellationToken)
         {
-            if (requestAgencyId == null)
-                throw new System.ArgumentNullException("requestAgencyId");
-    
-            if (requestPartId == null)
-                throw new System.ArgumentNullException("requestPartId");
-    
             if (agencyCode == null)
                 throw new System.ArgumentNullException("agencyCode");
     
@@ -79,8 +75,6 @@ namespace JCCommon.Clients.FileServices
     
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("files/courtCalendarDetailsByDay?");
-            urlBuilder_.Append(System.Uri.EscapeDataString("requestAgencyId") + "=").Append(System.Uri.EscapeDataString(ConvertToString(requestAgencyId, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
-            urlBuilder_.Append(System.Uri.EscapeDataString("requestPartId") + "=").Append(System.Uri.EscapeDataString(ConvertToString(requestPartId, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             urlBuilder_.Append(System.Uri.EscapeDataString("agencyCode") + "=").Append(System.Uri.EscapeDataString(ConvertToString(agencyCode, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             urlBuilder_.Append(System.Uri.EscapeDataString("appearanceDt") + "=").Append(System.Uri.EscapeDataString(ConvertToString(appearanceDt, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             urlBuilder_.Append(System.Uri.EscapeDataString("roomCd") + "=").Append(System.Uri.EscapeDataString(ConvertToString(roomCd, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
@@ -92,6 +86,15 @@ namespace JCCommon.Clients.FileServices
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+                    if (requestAgencyIdentifierId == null)
+                        throw new System.ArgumentNullException("requestAgencyIdentifierId");
+                    request_.Headers.TryAddWithoutValidation("requestAgencyIdentifierId", ConvertToString(requestAgencyIdentifierId, System.Globalization.CultureInfo.InvariantCulture));
+                    if (requestPartId == null)
+                        throw new System.ArgumentNullException("requestPartId");
+                    request_.Headers.TryAddWithoutValidation("requestPartId", ConvertToString(requestPartId, System.Globalization.CultureInfo.InvariantCulture));
+                    if (applicationCd == null)
+                        throw new System.ArgumentNullException("applicationCd");
+                    request_.Headers.TryAddWithoutValidation("applicationCd", ConvertToString(applicationCd, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
     
@@ -153,23 +156,29 @@ namespace JCCommon.Clients.FileServices
             }
         }
     
+        /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
+        /// <param name="requestPartId">Requesting Participant Id</param>
+        /// <param name="applicationCd">The code for the calling application</param>
         /// <param name="agencyId">Agency Identifier Code (Location Code); for example 4801 (Kelowna).</param>
         /// <param name="proceedingDt">The proceeding date in the format YYYY-MM-dd</param>
         /// <param name="divisionCd">The division code; CR, or CV.</param>
         /// <param name="fileNumber">The full file number; for example 1500-3</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<CourtList> FilesCourtlistAsync(string agencyId, string roomCd, string proceedingDt, string divisionCd, string fileNumber)
+        public System.Threading.Tasks.Task<CourtList> FilesCourtlistAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, string agencyId, string roomCd, string proceedingDt, string divisionCd, string fileNumber)
         {
-            return FilesCourtlistAsync(agencyId, roomCd, proceedingDt, divisionCd, fileNumber, System.Threading.CancellationToken.None);
+            return FilesCourtlistAsync(requestAgencyIdentifierId, requestPartId, applicationCd, agencyId, roomCd, proceedingDt, divisionCd, fileNumber, System.Threading.CancellationToken.None);
         }
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
+        /// <param name="requestPartId">Requesting Participant Id</param>
+        /// <param name="applicationCd">The code for the calling application</param>
         /// <param name="agencyId">Agency Identifier Code (Location Code); for example 4801 (Kelowna).</param>
         /// <param name="proceedingDt">The proceeding date in the format YYYY-MM-dd</param>
         /// <param name="divisionCd">The division code; CR, or CV.</param>
         /// <param name="fileNumber">The full file number; for example 1500-3</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<CourtList> FilesCourtlistAsync(string agencyId, string roomCd, string proceedingDt, string divisionCd, string fileNumber, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<CourtList> FilesCourtlistAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, string agencyId, string roomCd, string proceedingDt, string divisionCd, string fileNumber, System.Threading.CancellationToken cancellationToken)
         {
             if (agencyId == null)
                 throw new System.ArgumentNullException("agencyId");
@@ -201,6 +210,15 @@ namespace JCCommon.Clients.FileServices
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+                    if (requestAgencyIdentifierId == null)
+                        throw new System.ArgumentNullException("requestAgencyIdentifierId");
+                    request_.Headers.TryAddWithoutValidation("requestAgencyIdentifierId", ConvertToString(requestAgencyIdentifierId, System.Globalization.CultureInfo.InvariantCulture));
+                    if (requestPartId == null)
+                        throw new System.ArgumentNullException("requestPartId");
+                    request_.Headers.TryAddWithoutValidation("requestPartId", ConvertToString(requestPartId, System.Globalization.CultureInfo.InvariantCulture));
+                    if (applicationCd == null)
+                        throw new System.ArgumentNullException("applicationCd");
+                    request_.Headers.TryAddWithoutValidation("applicationCd", ConvertToString(applicationCd, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
     
@@ -262,19 +280,25 @@ namespace JCCommon.Clients.FileServices
             }
         }
     
+        /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
+        /// <param name="requestPartId">Requesting Participant Id</param>
+        /// <param name="applicationCd">The code for the calling application</param>
         /// <param name="partId">The participant id associated to the Record Of Proceedings.</param>
         /// <param name="courtLevelCd">The associated court level code.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<RopResponse> FilesRecordofproceedingsAsync(string partId, string profSeqNo, CourtLevelCd courtLevelCd, CourtClassCd courtClassCd)
+        public System.Threading.Tasks.Task<RopResponse> FilesRecordofproceedingsAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, string partId, string profSeqNo, CourtLevelCd courtLevelCd, CourtClassCd courtClassCd)
         {
-            return FilesRecordofproceedingsAsync(partId, profSeqNo, courtLevelCd, courtClassCd, System.Threading.CancellationToken.None);
+            return FilesRecordofproceedingsAsync(requestAgencyIdentifierId, requestPartId, applicationCd, partId, profSeqNo, courtLevelCd, courtClassCd, System.Threading.CancellationToken.None);
         }
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
+        /// <param name="requestPartId">Requesting Participant Id</param>
+        /// <param name="applicationCd">The code for the calling application</param>
         /// <param name="partId">The participant id associated to the Record Of Proceedings.</param>
         /// <param name="courtLevelCd">The associated court level code.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<RopResponse> FilesRecordofproceedingsAsync(string partId, string profSeqNo, CourtLevelCd courtLevelCd, CourtClassCd courtClassCd, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<RopResponse> FilesRecordofproceedingsAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, string partId, string profSeqNo, CourtLevelCd courtLevelCd, CourtClassCd courtClassCd, System.Threading.CancellationToken cancellationToken)
         {
             if (partId == null)
                 throw new System.ArgumentNullException("partId");
@@ -302,6 +326,15 @@ namespace JCCommon.Clients.FileServices
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+                    if (requestAgencyIdentifierId == null)
+                        throw new System.ArgumentNullException("requestAgencyIdentifierId");
+                    request_.Headers.TryAddWithoutValidation("requestAgencyIdentifierId", ConvertToString(requestAgencyIdentifierId, System.Globalization.CultureInfo.InvariantCulture));
+                    if (requestPartId == null)
+                        throw new System.ArgumentNullException("requestPartId");
+                    request_.Headers.TryAddWithoutValidation("requestPartId", ConvertToString(requestPartId, System.Globalization.CultureInfo.InvariantCulture));
+                    if (applicationCd == null)
+                        throw new System.ArgumentNullException("applicationCd");
+                    request_.Headers.TryAddWithoutValidation("applicationCd", ConvertToString(applicationCd, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
     
@@ -363,19 +396,27 @@ namespace JCCommon.Clients.FileServices
             }
         }
     
+        /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
+        /// <param name="requestPartId">Requesting Participant Id</param>
+        /// <param name="applicationCd">The code for the calling application</param>
         /// <param name="documentId">cfcAccusedFile.document array element's imageId, or cvfcCivilFile document array element's imageId</param>
         /// <param name="courtDivisionCd">R for criminal, I for non-criminal</param>
+        /// <param name="fileId">Physical File Id (CEIS) or Justin No (JUSTIN)</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<DocumentResponse> FilesDocumentAsync(string documentId, string courtDivisionCd)
+        public System.Threading.Tasks.Task<DocumentResponse> FilesDocumentAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, string documentId, string courtDivisionCd, string fileId)
         {
-            return FilesDocumentAsync(documentId, courtDivisionCd, System.Threading.CancellationToken.None);
+            return FilesDocumentAsync(requestAgencyIdentifierId, requestPartId, applicationCd, documentId, courtDivisionCd, fileId, System.Threading.CancellationToken.None);
         }
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
+        /// <param name="requestPartId">Requesting Participant Id</param>
+        /// <param name="applicationCd">The code for the calling application</param>
         /// <param name="documentId">cfcAccusedFile.document array element's imageId, or cvfcCivilFile document array element's imageId</param>
         /// <param name="courtDivisionCd">R for criminal, I for non-criminal</param>
+        /// <param name="fileId">Physical File Id (CEIS) or Justin No (JUSTIN)</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<DocumentResponse> FilesDocumentAsync(string documentId, string courtDivisionCd, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<DocumentResponse> FilesDocumentAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, string documentId, string courtDivisionCd, string fileId, System.Threading.CancellationToken cancellationToken)
         {
             if (documentId == null)
                 throw new System.ArgumentNullException("documentId");
@@ -383,10 +424,14 @@ namespace JCCommon.Clients.FileServices
             if (courtDivisionCd == null)
                 throw new System.ArgumentNullException("courtDivisionCd");
     
+            if (fileId == null)
+                throw new System.ArgumentNullException("fileId");
+    
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("files/document?");
             urlBuilder_.Append(System.Uri.EscapeDataString("documentId") + "=").Append(System.Uri.EscapeDataString(ConvertToString(documentId, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             urlBuilder_.Append(System.Uri.EscapeDataString("courtDivisionCd") + "=").Append(System.Uri.EscapeDataString(ConvertToString(courtDivisionCd, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            urlBuilder_.Append(System.Uri.EscapeDataString("fileId") + "=").Append(System.Uri.EscapeDataString(ConvertToString(fileId, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             urlBuilder_.Length--;
     
             var client_ = _httpClient;
@@ -395,6 +440,15 @@ namespace JCCommon.Clients.FileServices
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+                    if (requestAgencyIdentifierId == null)
+                        throw new System.ArgumentNullException("requestAgencyIdentifierId");
+                    request_.Headers.TryAddWithoutValidation("requestAgencyIdentifierId", ConvertToString(requestAgencyIdentifierId, System.Globalization.CultureInfo.InvariantCulture));
+                    if (requestPartId == null)
+                        throw new System.ArgumentNullException("requestPartId");
+                    request_.Headers.TryAddWithoutValidation("requestPartId", ConvertToString(requestPartId, System.Globalization.CultureInfo.InvariantCulture));
+                    if (applicationCd == null)
+                        throw new System.ArgumentNullException("applicationCd");
+                    request_.Headers.TryAddWithoutValidation("applicationCd", ConvertToString(applicationCd, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
     
@@ -458,7 +512,7 @@ namespace JCCommon.Clients.FileServices
     
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
-        /// <param name="applicationCd">The code for the calling applicaiton.</param>
+        /// <param name="applicationCd">The code for the calling application</param>
         /// <param name="fileHomeAgencyId">File home Agency Identifier; the Justin Agency ID.  Equates to a location code.</param>
         /// <param name="filePermissions">A list of one or more of the courtClassCd codes indicating the files to which the requesting user has permissions.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
@@ -470,7 +524,7 @@ namespace JCCommon.Clients.FileServices
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
-        /// <param name="applicationCd">The code for the calling applicaiton.</param>
+        /// <param name="applicationCd">The code for the calling application</param>
         /// <param name="fileHomeAgencyId">File home Agency Identifier; the Justin Agency ID.  Equates to a location code.</param>
         /// <param name="filePermissions">A list of one or more of the courtClassCd codes indicating the files to which the requesting user has permissions.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
@@ -568,8 +622,9 @@ namespace JCCommon.Clients.FileServices
                     if (requestPartId == null)
                         throw new System.ArgumentNullException("requestPartId");
                     request_.Headers.TryAddWithoutValidation("requestPartId", ConvertToString(requestPartId, System.Globalization.CultureInfo.InvariantCulture));
-                    if (applicationCd != null)
-                        request_.Headers.TryAddWithoutValidation("applicationCd", ConvertToString(applicationCd, System.Globalization.CultureInfo.InvariantCulture));
+                    if (applicationCd == null)
+                        throw new System.ArgumentNullException("applicationCd");
+                    request_.Headers.TryAddWithoutValidation("applicationCd", ConvertToString(applicationCd, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
     
@@ -633,17 +688,19 @@ namespace JCCommon.Clients.FileServices
     
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
+        /// <param name="applicationCd">The code for the calling application</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<CriminalFileAppearanceCountResponse> FilesCriminalAppearanceCountsAsync(string requestAgencyIdentifierId, string requestPartId, string appearanceId)
+        public System.Threading.Tasks.Task<CriminalFileAppearanceCountResponse> FilesCriminalAppearanceCountsAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, string appearanceId)
         {
-            return FilesCriminalAppearanceCountsAsync(requestAgencyIdentifierId, requestPartId, appearanceId, System.Threading.CancellationToken.None);
+            return FilesCriminalAppearanceCountsAsync(requestAgencyIdentifierId, requestPartId, applicationCd, appearanceId, System.Threading.CancellationToken.None);
         }
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
+        /// <param name="applicationCd">The code for the calling application</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<CriminalFileAppearanceCountResponse> FilesCriminalAppearanceCountsAsync(string requestAgencyIdentifierId, string requestPartId, string appearanceId, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<CriminalFileAppearanceCountResponse> FilesCriminalAppearanceCountsAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, string appearanceId, System.Threading.CancellationToken cancellationToken)
         {
             if (appearanceId == null)
                 throw new System.ArgumentNullException("appearanceId");
@@ -664,6 +721,9 @@ namespace JCCommon.Clients.FileServices
                     if (requestPartId == null)
                         throw new System.ArgumentNullException("requestPartId");
                     request_.Headers.TryAddWithoutValidation("requestPartId", ConvertToString(requestPartId, System.Globalization.CultureInfo.InvariantCulture));
+                    if (applicationCd == null)
+                        throw new System.ArgumentNullException("applicationCd");
+                    request_.Headers.TryAddWithoutValidation("applicationCd", ConvertToString(applicationCd, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
     
@@ -727,17 +787,19 @@ namespace JCCommon.Clients.FileServices
     
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
+        /// <param name="applicationCd">The code for the calling application</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<CriminalFileAppearanceApprMethodResponse> FilesCriminalAppearanceAppearancemethodsAsync(string requestAgencyIdentifierId, string requestPartId, string appearanceId)
+        public System.Threading.Tasks.Task<CriminalFileAppearanceApprMethodResponse> FilesCriminalAppearanceAppearancemethodsAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, string appearanceId)
         {
-            return FilesCriminalAppearanceAppearancemethodsAsync(requestAgencyIdentifierId, requestPartId, appearanceId, System.Threading.CancellationToken.None);
+            return FilesCriminalAppearanceAppearancemethodsAsync(requestAgencyIdentifierId, requestPartId, applicationCd, appearanceId, System.Threading.CancellationToken.None);
         }
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
+        /// <param name="applicationCd">The code for the calling application</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<CriminalFileAppearanceApprMethodResponse> FilesCriminalAppearanceAppearancemethodsAsync(string requestAgencyIdentifierId, string requestPartId, string appearanceId, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<CriminalFileAppearanceApprMethodResponse> FilesCriminalAppearanceAppearancemethodsAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, string appearanceId, System.Threading.CancellationToken cancellationToken)
         {
             if (appearanceId == null)
                 throw new System.ArgumentNullException("appearanceId");
@@ -758,6 +820,9 @@ namespace JCCommon.Clients.FileServices
                     if (requestPartId == null)
                         throw new System.ArgumentNullException("requestPartId");
                     request_.Headers.TryAddWithoutValidation("requestPartId", ConvertToString(requestPartId, System.Globalization.CultureInfo.InvariantCulture));
+                    if (applicationCd == null)
+                        throw new System.ArgumentNullException("applicationCd");
+                    request_.Headers.TryAddWithoutValidation("applicationCd", ConvertToString(applicationCd, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
     
@@ -819,21 +884,27 @@ namespace JCCommon.Clients.FileServices
             }
         }
     
-        /// <param name="agencyId">Agency Identifier Code (Location Code); for example 4801 (Kelona).</param>
+        /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
+        /// <param name="requestPartId">Requesting Participant Id</param>
+        /// <param name="applicationCd">The code for the calling application</param>
+        /// <param name="agencyId">Agency Identifier Code (Location Code); for example 4801 (Kelowna).</param>
         /// <param name="proceedingDt">The proceeding date in the format YYYY-MM-dd</param>
         /// <param name="appearanceId">The full appeance Id in the for 00000.0000</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<CriminalFileContent> FilesCriminalFilecontentAsync(string agencyId, string roomCd, string proceedingDt, string appearanceId, string mdocJustinNo)
+        public System.Threading.Tasks.Task<CriminalFileContent> FilesCriminalFilecontentAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, string agencyId, string roomCd, string proceedingDt, string appearanceId, string mdocJustinNo)
         {
-            return FilesCriminalFilecontentAsync(agencyId, roomCd, proceedingDt, appearanceId, mdocJustinNo, System.Threading.CancellationToken.None);
+            return FilesCriminalFilecontentAsync(requestAgencyIdentifierId, requestPartId, applicationCd, agencyId, roomCd, proceedingDt, appearanceId, mdocJustinNo, System.Threading.CancellationToken.None);
         }
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <param name="agencyId">Agency Identifier Code (Location Code); for example 4801 (Kelona).</param>
+        /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
+        /// <param name="requestPartId">Requesting Participant Id</param>
+        /// <param name="applicationCd">The code for the calling application</param>
+        /// <param name="agencyId">Agency Identifier Code (Location Code); for example 4801 (Kelowna).</param>
         /// <param name="proceedingDt">The proceeding date in the format YYYY-MM-dd</param>
         /// <param name="appearanceId">The full appeance Id in the for 00000.0000</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<CriminalFileContent> FilesCriminalFilecontentAsync(string agencyId, string roomCd, string proceedingDt, string appearanceId, string mdocJustinNo, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<CriminalFileContent> FilesCriminalFilecontentAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, string agencyId, string roomCd, string proceedingDt, string appearanceId, string mdocJustinNo, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("files/criminal/filecontent?");
@@ -865,6 +936,15 @@ namespace JCCommon.Clients.FileServices
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+                    if (requestAgencyIdentifierId == null)
+                        throw new System.ArgumentNullException("requestAgencyIdentifierId");
+                    request_.Headers.TryAddWithoutValidation("requestAgencyIdentifierId", ConvertToString(requestAgencyIdentifierId, System.Globalization.CultureInfo.InvariantCulture));
+                    if (requestPartId == null)
+                        throw new System.ArgumentNullException("requestPartId");
+                    request_.Headers.TryAddWithoutValidation("requestPartId", ConvertToString(requestPartId, System.Globalization.CultureInfo.InvariantCulture));
+                    if (applicationCd == null)
+                        throw new System.ArgumentNullException("applicationCd");
+                    request_.Headers.TryAddWithoutValidation("applicationCd", ConvertToString(applicationCd, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
     
@@ -928,7 +1008,7 @@ namespace JCCommon.Clients.FileServices
     
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
-        /// <param name="applicationCd">The code for the calling applicaiton.</param>
+        /// <param name="applicationCd">The code for the calling application</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public System.Threading.Tasks.Task<CriminalFileDetailResponse> FilesCriminalGetAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, string fileId)
         {
@@ -938,7 +1018,7 @@ namespace JCCommon.Clients.FileServices
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
-        /// <param name="applicationCd">The code for the calling applicaiton.</param>
+        /// <param name="applicationCd">The code for the calling application</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public async System.Threading.Tasks.Task<CriminalFileDetailResponse> FilesCriminalGetAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, string fileId, System.Threading.CancellationToken cancellationToken)
         {
@@ -961,8 +1041,9 @@ namespace JCCommon.Clients.FileServices
                     if (requestPartId == null)
                         throw new System.ArgumentNullException("requestPartId");
                     request_.Headers.TryAddWithoutValidation("requestPartId", ConvertToString(requestPartId, System.Globalization.CultureInfo.InvariantCulture));
-                    if (applicationCd != null)
-                        request_.Headers.TryAddWithoutValidation("applicationCd", ConvertToString(applicationCd, System.Globalization.CultureInfo.InvariantCulture));
+                    if (applicationCd == null)
+                        throw new System.ArgumentNullException("applicationCd");
+                    request_.Headers.TryAddWithoutValidation("applicationCd", ConvertToString(applicationCd, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
     
@@ -1026,17 +1107,19 @@ namespace JCCommon.Clients.FileServices
     
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
+        /// <param name="applicationCd">The code for the calling application</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<CriminalFileAppearancesResponse> FilesCriminalAppearancesAsync(string requestAgencyIdentifierId, string requestPartId, FutureYN? futureYN, HistoryYN? historyYN, string fileId)
+        public System.Threading.Tasks.Task<CriminalFileAppearancesResponse> FilesCriminalAppearancesAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, FutureYN? futureYN, HistoryYN? historyYN, string fileId)
         {
-            return FilesCriminalAppearancesAsync(requestAgencyIdentifierId, requestPartId, futureYN, historyYN, fileId, System.Threading.CancellationToken.None);
+            return FilesCriminalAppearancesAsync(requestAgencyIdentifierId, requestPartId, applicationCd, futureYN, historyYN, fileId, System.Threading.CancellationToken.None);
         }
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
+        /// <param name="applicationCd">The code for the calling application</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<CriminalFileAppearancesResponse> FilesCriminalAppearancesAsync(string requestAgencyIdentifierId, string requestPartId, FutureYN? futureYN, HistoryYN? historyYN, string fileId, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<CriminalFileAppearancesResponse> FilesCriminalAppearancesAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, FutureYN? futureYN, HistoryYN? historyYN, string fileId, System.Threading.CancellationToken cancellationToken)
         {
             if (fileId == null)
                 throw new System.ArgumentNullException("fileId");
@@ -1066,6 +1149,9 @@ namespace JCCommon.Clients.FileServices
                     if (requestPartId == null)
                         throw new System.ArgumentNullException("requestPartId");
                     request_.Headers.TryAddWithoutValidation("requestPartId", ConvertToString(requestPartId, System.Globalization.CultureInfo.InvariantCulture));
+                    if (applicationCd == null)
+                        throw new System.ArgumentNullException("applicationCd");
+                    request_.Headers.TryAddWithoutValidation("applicationCd", ConvertToString(applicationCd, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
     
@@ -1129,7 +1215,7 @@ namespace JCCommon.Clients.FileServices
     
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
-        /// <param name="applicationCd">The code for the calling application.</param>
+        /// <param name="applicationCd">The code for the calling application</param>
         /// <param name="fileHomeAgencyId">File home Agency Identifier; the Justin Agency ID.  Equates to a location code.</param>
         /// <param name="filePermissions">A list of one or more of the courtClassCd codes indicating the files to which the requesting user has permissions.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
@@ -1141,7 +1227,7 @@ namespace JCCommon.Clients.FileServices
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
-        /// <param name="applicationCd">The code for the calling application.</param>
+        /// <param name="applicationCd">The code for the calling application</param>
         /// <param name="fileHomeAgencyId">File home Agency Identifier; the Justin Agency ID.  Equates to a location code.</param>
         /// <param name="filePermissions">A list of one or more of the courtClassCd codes indicating the files to which the requesting user has permissions.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
@@ -1239,8 +1325,9 @@ namespace JCCommon.Clients.FileServices
                     if (requestPartId == null)
                         throw new System.ArgumentNullException("requestPartId");
                     request_.Headers.TryAddWithoutValidation("requestPartId", ConvertToString(requestPartId, System.Globalization.CultureInfo.InvariantCulture));
-                    if (applicationCd != null)
-                        request_.Headers.TryAddWithoutValidation("applicationCd", ConvertToString(applicationCd, System.Globalization.CultureInfo.InvariantCulture));
+                    if (applicationCd == null)
+                        throw new System.ArgumentNullException("applicationCd");
+                    request_.Headers.TryAddWithoutValidation("applicationCd", ConvertToString(applicationCd, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
     
@@ -1304,17 +1391,19 @@ namespace JCCommon.Clients.FileServices
     
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
+        /// <param name="applicationCd">The code for the calling application</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<CivilFileAppearancePartyResponse> FilesCivilAppearancePartiesAsync(string requestAgencyIdentifierId, string requestPartId, string appearanceId)
+        public System.Threading.Tasks.Task<CivilFileAppearancePartyResponse> FilesCivilAppearancePartiesAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, string appearanceId)
         {
-            return FilesCivilAppearancePartiesAsync(requestAgencyIdentifierId, requestPartId, appearanceId, System.Threading.CancellationToken.None);
+            return FilesCivilAppearancePartiesAsync(requestAgencyIdentifierId, requestPartId, applicationCd, appearanceId, System.Threading.CancellationToken.None);
         }
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
+        /// <param name="applicationCd">The code for the calling application</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<CivilFileAppearancePartyResponse> FilesCivilAppearancePartiesAsync(string requestAgencyIdentifierId, string requestPartId, string appearanceId, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<CivilFileAppearancePartyResponse> FilesCivilAppearancePartiesAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, string appearanceId, System.Threading.CancellationToken cancellationToken)
         {
             if (appearanceId == null)
                 throw new System.ArgumentNullException("appearanceId");
@@ -1335,6 +1424,9 @@ namespace JCCommon.Clients.FileServices
                     if (requestPartId == null)
                         throw new System.ArgumentNullException("requestPartId");
                     request_.Headers.TryAddWithoutValidation("requestPartId", ConvertToString(requestPartId, System.Globalization.CultureInfo.InvariantCulture));
+                    if (applicationCd == null)
+                        throw new System.ArgumentNullException("applicationCd");
+                    request_.Headers.TryAddWithoutValidation("applicationCd", ConvertToString(applicationCd, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
     
@@ -1398,17 +1490,19 @@ namespace JCCommon.Clients.FileServices
     
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
+        /// <param name="applicationCd">The code for the calling application</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<CivilFileAppearanceApprMethodResponse> FilesCivilAppearanceAppearancemethodsAsync(string requestAgencyIdentifierId, string requestPartId, string appearanceId)
+        public System.Threading.Tasks.Task<CivilFileAppearanceApprMethodResponse> FilesCivilAppearanceAppearancemethodsAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, string appearanceId)
         {
-            return FilesCivilAppearanceAppearancemethodsAsync(requestAgencyIdentifierId, requestPartId, appearanceId, System.Threading.CancellationToken.None);
+            return FilesCivilAppearanceAppearancemethodsAsync(requestAgencyIdentifierId, requestPartId, applicationCd, appearanceId, System.Threading.CancellationToken.None);
         }
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
+        /// <param name="applicationCd">The code for the calling application</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<CivilFileAppearanceApprMethodResponse> FilesCivilAppearanceAppearancemethodsAsync(string requestAgencyIdentifierId, string requestPartId, string appearanceId, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<CivilFileAppearanceApprMethodResponse> FilesCivilAppearanceAppearancemethodsAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, string appearanceId, System.Threading.CancellationToken cancellationToken)
         {
             if (appearanceId == null)
                 throw new System.ArgumentNullException("appearanceId");
@@ -1429,6 +1523,9 @@ namespace JCCommon.Clients.FileServices
                     if (requestPartId == null)
                         throw new System.ArgumentNullException("requestPartId");
                     request_.Headers.TryAddWithoutValidation("requestPartId", ConvertToString(requestPartId, System.Globalization.CultureInfo.InvariantCulture));
+                    if (applicationCd == null)
+                        throw new System.ArgumentNullException("applicationCd");
+                    request_.Headers.TryAddWithoutValidation("applicationCd", ConvertToString(applicationCd, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
     
@@ -1492,19 +1589,21 @@ namespace JCCommon.Clients.FileServices
     
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
+        /// <param name="applicationCd">The code for the calling application</param>
         /// <param name="appearanceId">The full appearance Id in the for 00000.0000</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<JustinReportResponse> FilesCivilCourtsummaryreportAsync(string requestAgencyIdentifierId, string requestPartId, string appearanceId, string reportName)
+        public System.Threading.Tasks.Task<JustinReportResponse> FilesCivilCourtsummaryreportAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, string appearanceId, string reportName)
         {
-            return FilesCivilCourtsummaryreportAsync(requestAgencyIdentifierId, requestPartId, appearanceId, reportName, System.Threading.CancellationToken.None);
+            return FilesCivilCourtsummaryreportAsync(requestAgencyIdentifierId, requestPartId, applicationCd, appearanceId, reportName, System.Threading.CancellationToken.None);
         }
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
+        /// <param name="applicationCd">The code for the calling application</param>
         /// <param name="appearanceId">The full appearance Id in the for 00000.0000</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<JustinReportResponse> FilesCivilCourtsummaryreportAsync(string requestAgencyIdentifierId, string requestPartId, string appearanceId, string reportName, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<JustinReportResponse> FilesCivilCourtsummaryreportAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, string appearanceId, string reportName, System.Threading.CancellationToken cancellationToken)
         {
             if (appearanceId == null)
                 throw new System.ArgumentNullException("appearanceId");
@@ -1530,6 +1629,9 @@ namespace JCCommon.Clients.FileServices
                     if (requestPartId == null)
                         throw new System.ArgumentNullException("requestPartId");
                     request_.Headers.TryAddWithoutValidation("requestPartId", ConvertToString(requestPartId, System.Globalization.CultureInfo.InvariantCulture));
+                    if (applicationCd == null)
+                        throw new System.ArgumentNullException("applicationCd");
+                    request_.Headers.TryAddWithoutValidation("applicationCd", ConvertToString(applicationCd, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
     
@@ -1591,23 +1693,27 @@ namespace JCCommon.Clients.FileServices
             }
         }
     
+        /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
+        /// <param name="requestPartId">Requesting Participant Id</param>
+        /// <param name="applicationCd">The code for the calling application</param>
         /// <param name="agencyId">Agency Identifier Code (Location Code); for example 4801 (Kelowna).</param>
         /// <param name="proceedingDt">The proceeding date in the format YYYY-MM-dd</param>
         /// <param name="appearanceId">The full appearance Id in the for 00000.0000</param>
-        /// <param name="applicationCd">The code for the calling application</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<CivilFileContent> FilesCivilFilecontentAsync(string agencyId, string roomCd, string proceedingDt, string appearanceId, string physicalFileId, string applicationCd)
+        public System.Threading.Tasks.Task<CivilFileContent> FilesCivilFilecontentAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, string agencyId, string roomCd, string proceedingDt, string appearanceId, string physicalFileId)
         {
-            return FilesCivilFilecontentAsync(agencyId, roomCd, proceedingDt, appearanceId, physicalFileId, applicationCd, System.Threading.CancellationToken.None);
+            return FilesCivilFilecontentAsync(requestAgencyIdentifierId, requestPartId, applicationCd, agencyId, roomCd, proceedingDt, appearanceId, physicalFileId, System.Threading.CancellationToken.None);
         }
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
+        /// <param name="requestPartId">Requesting Participant Id</param>
+        /// <param name="applicationCd">The code for the calling application</param>
         /// <param name="agencyId">Agency Identifier Code (Location Code); for example 4801 (Kelowna).</param>
         /// <param name="proceedingDt">The proceeding date in the format YYYY-MM-dd</param>
         /// <param name="appearanceId">The full appearance Id in the for 00000.0000</param>
-        /// <param name="applicationCd">The code for the calling application</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<CivilFileContent> FilesCivilFilecontentAsync(string agencyId, string roomCd, string proceedingDt, string appearanceId, string physicalFileId, string applicationCd, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<CivilFileContent> FilesCivilFilecontentAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, string agencyId, string roomCd, string proceedingDt, string appearanceId, string physicalFileId, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("files/civil/filecontent?");
@@ -1631,10 +1737,6 @@ namespace JCCommon.Clients.FileServices
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("physicalFileId") + "=").Append(System.Uri.EscapeDataString(ConvertToString(physicalFileId, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (applicationCd != null) 
-            {
-                urlBuilder_.Append(System.Uri.EscapeDataString("applicationCd") + "=").Append(System.Uri.EscapeDataString(ConvertToString(applicationCd, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
-            }
             urlBuilder_.Length--;
     
             var client_ = _httpClient;
@@ -1643,6 +1745,15 @@ namespace JCCommon.Clients.FileServices
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+                    if (requestAgencyIdentifierId == null)
+                        throw new System.ArgumentNullException("requestAgencyIdentifierId");
+                    request_.Headers.TryAddWithoutValidation("requestAgencyIdentifierId", ConvertToString(requestAgencyIdentifierId, System.Globalization.CultureInfo.InvariantCulture));
+                    if (requestPartId == null)
+                        throw new System.ArgumentNullException("requestPartId");
+                    request_.Headers.TryAddWithoutValidation("requestPartId", ConvertToString(requestPartId, System.Globalization.CultureInfo.InvariantCulture));
+                    if (applicationCd == null)
+                        throw new System.ArgumentNullException("applicationCd");
+                    request_.Headers.TryAddWithoutValidation("applicationCd", ConvertToString(applicationCd, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
     
@@ -1804,17 +1915,19 @@ namespace JCCommon.Clients.FileServices
     
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
+        /// <param name="applicationCd">The code for the calling application</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<CivilFileAppearancesResponse> FilesCivilAppearancesAsync(string requestAgencyIdentifierId, string requestPartId, FutureYN2? futureYN, HistoryYN2? historyYN, string fileId)
+        public System.Threading.Tasks.Task<CivilFileAppearancesResponse> FilesCivilAppearancesAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, FutureYN2? futureYN, HistoryYN2? historyYN, string fileId)
         {
-            return FilesCivilAppearancesAsync(requestAgencyIdentifierId, requestPartId, futureYN, historyYN, fileId, System.Threading.CancellationToken.None);
+            return FilesCivilAppearancesAsync(requestAgencyIdentifierId, requestPartId, applicationCd, futureYN, historyYN, fileId, System.Threading.CancellationToken.None);
         }
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="requestAgencyIdentifierId">Requesting Agency Identifier</param>
         /// <param name="requestPartId">Requesting Participant Id</param>
+        /// <param name="applicationCd">The code for the calling application</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<CivilFileAppearancesResponse> FilesCivilAppearancesAsync(string requestAgencyIdentifierId, string requestPartId, FutureYN2? futureYN, HistoryYN2? historyYN, string fileId, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<CivilFileAppearancesResponse> FilesCivilAppearancesAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, FutureYN2? futureYN, HistoryYN2? historyYN, string fileId, System.Threading.CancellationToken cancellationToken)
         {
             if (fileId == null)
                 throw new System.ArgumentNullException("fileId");
@@ -1844,6 +1957,9 @@ namespace JCCommon.Clients.FileServices
                     if (requestPartId == null)
                         throw new System.ArgumentNullException("requestPartId");
                     request_.Headers.TryAddWithoutValidation("requestPartId", ConvertToString(requestPartId, System.Globalization.CultureInfo.InvariantCulture));
+                    if (applicationCd == null)
+                        throw new System.ArgumentNullException("applicationCd");
+                    request_.Headers.TryAddWithoutValidation("applicationCd", ConvertToString(applicationCd, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
     

@@ -31,6 +31,7 @@ services:
       - Request__ApplicationCd=${RequestApplicationCd}
       - Request__AgencyIdentifierId=${RequestAgencyIdentifierId}
       - Request__PartId=${RequestPartId}
+      - Request__GetUserLoginDefaultAgencyId=${RequestGetUserLoginDefaultAgencyId}
       - WebBaseHref=${WEB_BASE_HREF}
       - Auth__UserId=${USER_ID}
       - Auth__UserPassword=${USER_PASSWORD}

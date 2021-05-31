@@ -3264,8 +3264,8 @@ schemas:
     get:
       description: |
         Gets the court list details from JUSTIN web services.
-      queryParameters:
-        requestAgencyId:
+      headers:
+        requestAgencyIdentifierId:
           description: Requesting Agency Identifier
           type: string
           required: true
@@ -3273,6 +3273,11 @@ schemas:
           description: Requesting Participant Id
           type: string
           required: true
+        applicationCd:
+          description: The code for the calling application
+          type: string
+          required: true
+      queryParameters:
         agencyCode:
           description: Agency Code; for example 83.0001 (Kelowna).
           type: string
@@ -3300,6 +3305,19 @@ schemas:
     get:
       description: |
         Gets the court list from the CCD web services.
+      headers:
+        requestAgencyIdentifierId:
+          description: Requesting Agency Identifier
+          type: string
+          required: true
+        requestPartId:
+          description: Requesting Participant Id
+          type: string
+          required: true
+        applicationCd:
+          description: The code for the calling application
+          type: string
+          required: true
       queryParameters:
         agencyId:
           displayName: agencyId
@@ -3340,6 +3358,19 @@ schemas:
     get:
       description: |
         Gets the Record Of Proceedings for a given file.
+      headers:
+        requestAgencyIdentifierId:
+          description: Requesting Agency Identifier
+          type: string
+          required: true
+        requestPartId:
+          description: Requesting Participant Id
+          type: string
+          required: true
+        applicationCd:
+          description: The code for the calling application
+          type: string
+          required: true
       queryParameters:
         partId:
           displayName: partId
@@ -3376,6 +3407,19 @@ schemas:
     get:
       description: |
         Gets the document identified by a document id.
+      headers:
+        requestAgencyIdentifierId:
+          description: Requesting Agency Identifier
+          type: string
+          required: true
+        requestPartId:
+          description: Requesting Participant Id
+          type: string
+          required: true
+        applicationCd:
+          description: The code for the calling application
+          type: string
+          required: true
       queryParameters:
         documentId:
           displayName: documentId
@@ -3385,6 +3429,10 @@ schemas:
         courtDivisionCd:
           displayName: courtDivisionCd
           description: R for criminal, I for non-criminal
+          type: string
+          required: true
+        fileId:
+          description: Physical File Id (CEIS) or Justin No (JUSTIN)
           type: string
           required: true
       responses:
@@ -3402,6 +3450,19 @@ schemas:
     get:
       description: |
         Provides facilities for performing a criminal file search.
+      headers:
+        requestAgencyIdentifierId:
+          description: Requesting Agency Identifier
+          type: string
+          required: true
+        requestPartId:
+          description: Requesting Participant Id
+          type: string
+          required: true
+        applicationCd:
+          description: The code for the calling application
+          type: string
+          required: true
       queryParameters:
         searchMode:
           displayName: searchMode
@@ -3487,20 +3548,6 @@ schemas:
           displayName: physicalFileIdSet
           type: string
           required: false
-      headers:
-        requestAgencyIdentifierId:
-          description: Requesting Agency Identifier
-          type: string
-          required: true
-        requestPartId:
-          description: Requesting Participant Id
-          type: string
-          required: true
-        applicationCd:
-          displayName: applicationCd
-          description: The code for the calling applicaiton.
-          type: string
-          required: false
       responses:
         200:
           body:
@@ -3527,6 +3574,10 @@ schemas:
                   description: Requesting Participant Id
                   type: string
                   required: true
+                applicationCd:
+                  description: The code for the calling application
+                  type: string
+                  required: true
               responses:
                 200:
                   body:
@@ -3551,6 +3602,10 @@ schemas:
                   description: Requesting Participant Id
                   type: string
                   required: true
+                applicationCd:
+                  description: The code for the calling application
+                  type: string
+                  required: true
               responses:
                 200:
                   body:
@@ -3566,10 +3621,23 @@ schemas:
       get:
         description: |
           Gets the criminal file content from the CCD web services.
+        headers:
+          requestAgencyIdentifierId:
+            description: Requesting Agency Identifier
+            type: string
+            required: true
+          requestPartId:
+            description: Requesting Participant Id
+            type: string
+            required: true
+          applicationCd:
+            description: The code for the calling application
+            type: string
+            required: true
         queryParameters:
           agencyId:
             displayName: agencyId
-            description: Agency Identifier Code (Location Code); for example 4801 (Kelona).
+            description: Agency Identifier Code (Location Code); for example 4801 (Kelowna).
             type: string
             required: false
           roomCd:
@@ -3615,10 +3683,9 @@ schemas:
             type: string
             required: true
           applicationCd:
-            displayName: applicationCd
-            description: The code for the calling applicaiton.
+            description: The code for the calling application
             type: string
-            required: false
+            required: true
         responses:
           200:
             body:
@@ -3634,6 +3701,19 @@ schemas:
         get:
           description: |
             Get the appearance information for a given criminal file.
+          headers:
+            requestAgencyIdentifierId:
+              description: Requesting Agency Identifier
+              type: string
+              required: true
+            requestPartId:
+              description: Requesting Participant Id
+              type: string
+              required: true
+            applicationCd:
+              description: The code for the calling application
+              type: string
+              required: true
           queryParameters:
             futureYN:
               displayName: futureYN
@@ -3647,15 +3727,6 @@ schemas:
               enum: [ "Y", "N" ]
               default: "Y"
               required: false
-          headers:
-            requestAgencyIdentifierId:
-              description: Requesting Agency Identifier
-              type: string
-              required: true
-            requestPartId:
-              description: Requesting Participant Id
-              type: string
-              required: true
           responses:
             200:
               body:
@@ -3671,6 +3742,19 @@ schemas:
     get:
       description: |
         Provides facilities for performing a civil file search.
+      headers:
+        requestAgencyIdentifierId:
+          description: Requesting Agency Identifier
+          type: string
+          required: true
+        requestPartId:
+          description: Requesting Participant Id
+          type: string
+          required: true
+        applicationCd:
+          description: The code for the calling application
+          type: string
+          required: true
       queryParameters:
         searchMode:
           displayName: searchMode
@@ -3756,20 +3840,6 @@ schemas:
           displayName: physicalFileIdSet
           type: string
           required: false
-      headers:
-        requestAgencyIdentifierId:
-          description: Requesting Agency Identifier
-          type: string
-          required: true
-        requestPartId:
-          description: Requesting Participant Id
-          type: string
-          required: true
-        applicationCd:
-          displayName: applicationCd
-          description: The code for the calling application.
-          type: string
-          required: false
       responses:
         200:
           body:
@@ -3796,6 +3866,10 @@ schemas:
                   description: Requesting Participant Id
                   type: string
                   required: true
+                applicationCd:
+                  description: The code for the calling application
+                  type: string
+                  required: true
               responses:
                 200:
                   body:
@@ -3820,6 +3894,10 @@ schemas:
                   description: Requesting Participant Id
                   type: string
                   required: true
+                applicationCd:
+                  description: The code for the calling application
+                  type: string
+                  required: true
               responses:
                 200:
                   body:
@@ -3835,6 +3913,19 @@ schemas:
       get:
         description: |
           Gets the court summary report for a given appearanceId.
+        headers:
+          requestAgencyIdentifierId:
+            description: Requesting Agency Identifier
+            type: string
+            required: true
+          requestPartId:
+            description: Requesting Participant Id
+            type: string
+            required: true
+          applicationCd:
+            description: The code for the calling application
+            type: string
+            required: true
         queryParameters:
           appearanceId:
             displayName: appearanceId
@@ -3843,15 +3934,6 @@ schemas:
             required: true
           reportName:
             displayName: reportName
-            type: string
-            required: true
-        headers:
-          requestAgencyIdentifierId:
-            description: Requesting Agency Identifier
-            type: string
-            required: true
-          requestPartId:
-            description: Requesting Participant Id
             type: string
             required: true
         responses:
@@ -3869,6 +3951,19 @@ schemas:
       get:
         description: |
           Gets the civil file content from the CCD web services.
+        headers:
+          requestAgencyIdentifierId:
+            description: Requesting Agency Identifier
+            type: string
+            required: true
+          requestPartId:
+            description: Requesting Participant Id
+            type: string
+            required: true
+          applicationCd:
+            description: The code for the calling application
+            type: string
+            required: true
         queryParameters: # same as /criminal/filecontent
           agencyId:
             displayName: agencyId
@@ -3891,10 +3986,6 @@ schemas:
             required: false
           physicalFileId:
             displayName: physicalFileId
-            type: string
-            required: false
-          applicationCd:
-            description: The code for the calling application
             type: string
             required: false
         responses:
@@ -3940,6 +4031,19 @@ schemas:
         get:
           description: |
             Get the appearance information for a given civil file.
+          headers:
+            requestAgencyIdentifierId:
+              description: Requesting Agency Identifier
+              type: string
+              required: true
+            requestPartId:
+              description: Requesting Participant Id
+              type: string
+              required: true
+            applicationCd:
+              description: The code for the calling application
+              type: string
+              required: true
           queryParameters:
             futureYN:
               displayName: futureYN
@@ -3953,15 +4057,6 @@ schemas:
               enum: [ "Y", "N" ]
               default: "Y"
               required: false
-          headers:
-            requestAgencyIdentifierId:
-              description: Requesting Agency Identifier
-              type: string
-              required: true
-            requestPartId:
-              description: Requesting Participant Id
-              type: string
-              required: true
           responses:
             200:
               body:

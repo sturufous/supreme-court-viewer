@@ -17,6 +17,7 @@
         <b-card  style="min-height: 100px;">
             <span v-if="errorCode==404">This <b>File-Number '{{this.criminalFileInformation.fileNumber}}'</b> doesn't exist in the <b>criminal</b> records. </span>
             <span v-else-if="errorCode==200 || errorCode==204"> Bad Data in <b>File-Number '{{this.criminalFileInformation.fileNumber}}'</b> ! </span>
+            <span v-else-if="errorCode==403"> You are not authorized to access this file. </span>
             <span v-else> Server is not responding. <b>({{errorText}})</b> </span>
         </b-card>
         <b-card>         
@@ -181,21 +182,17 @@ export default class CriminalCaseDetails extends Vue {
                     const courtLevel = DecodeCourtLevel[data.courtLevelCd];
                     const courtClass = DecodeCourtClass[data.courtClassCd];
                     this.ExtractFileInfo()
-                    if(this.participantList.length)
-                    {
-                        this.criminalFileInformation.participantList = this.participantList;
-                        this.criminalFileInformation.adjudicatorRestrictionsInfo = this.adjudicatorRestrictionsInfo;
-                        if (this.bans.length > 0) {
-                            this.banExists = true;
-                        }
-                        this.criminalFileInformation.bans = this.bans;
-                        this.criminalFileInformation.courtLevel = courtLevel;
-                        this.criminalFileInformation.courtClass = courtClass;
-                        this.UpdateCriminalFile(this.criminalFileInformation);
-                        this.isDataReady = true;
+                    //Allow blank participants, it's a real case file 1019 for example on dev.
+                    this.criminalFileInformation.participantList = this.participantList;
+                    this.criminalFileInformation.adjudicatorRestrictionsInfo = this.adjudicatorRestrictionsInfo;
+                    if (this.bans.length > 0) {
+                        this.banExists = true;
                     }
-                    else
-                        this.errorCode=200;                    
+                    this.criminalFileInformation.bans = this.bans;
+                    this.criminalFileInformation.courtLevel = courtLevel;
+                    this.criminalFileInformation.courtClass = courtClass;
+                    this.UpdateCriminalFile(this.criminalFileInformation);
+                    this.isDataReady = true;
                 }
                 else
                     if(this.errorCode==0) this.errorCode=200;                    
@@ -222,6 +219,7 @@ export default class CriminalCaseDetails extends Vue {
                         documentRequest.isCriminal = true;
                         documentRequest.pdfFileName = 'doc' + id + '.pdf';
                         documentRequest.base64UrlEncodedDocumentId = base64url(id);
+                        documentRequest.fileId = this.criminalFileInformation.fileNumber;
                         documentsToDownload.documentRequests.push(documentRequest);                
                     } 
                 }

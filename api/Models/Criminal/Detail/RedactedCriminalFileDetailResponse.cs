@@ -67,5 +67,7 @@ namespace Scv.Api.Models.Criminal.Detail
         public ICollection<CriminalHearingRestriction> HearingRestriction { get; set; }
 
         public CriminalFileAppearancesResponse Appearances { get; set; }
+        //Used just for searching.
+        public string NextApprDt { get; set; }
     }
 }

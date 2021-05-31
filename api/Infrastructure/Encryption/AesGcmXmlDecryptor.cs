@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.DataProtection.XmlEncryption;
-using Microsoft.Extensions.DependencyInjection;
-using System;
+﻿using System;
 using System.Text;
 using System.Xml.Linq;
+using Microsoft.AspNetCore.DataProtection.XmlEncryption;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace SS.Api.infrastructure.encryption
+namespace Scv.Api.Infrastructure.Encryption
 {
     public class AesGcmXmlDecryptor : IXmlDecryptor
     {

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.DataProtection.XmlEncryption;
 using Microsoft.Extensions.DependencyInjection;
 using Exception = System.Exception;
 
-namespace SS.Api.infrastructure.encryption
+namespace Scv.Api.Infrastructure.Encryption
 {
     public class AesGcmXmlEncryptor : IXmlEncryptor
     {
