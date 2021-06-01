@@ -24,7 +24,7 @@
                             class="mt-1"
                             v-b-tooltip.hover.right
                             title="Download Record Of Proceeding"
-                            @click="openRopPdf()"
+                            @click="openDocumentsPdf(documentTypeRop)"
                             size="sm">
                             <b-icon icon="file-earmark-arrow-down" font-scale="2"></b-icon>
                         </b-button>
@@ -160,7 +160,7 @@
                     class="mt-1"
                     v-b-tooltip.hover.right
                     title="Download Information File"
-                    @click="openDocumentsPdf()"
+                    @click="openDocumentsPdf(documentTypeCriminal)"
                     size="sm">
                     <b-icon icon="file-earmark-arrow-down" font-scale="2"></b-icon>
                 </b-button>
@@ -216,9 +216,10 @@
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { namespace } from "vuex-class";
-import base64url from "base64url";
-import {criminalFileInformationType, appearanceAdditionalInfoType, appearanceMethodDetailsInfoType, appearanceChargesInfoType, criminalAppearanceInfoType, criminalAppearanceMethodsInfoType} from '../../types/criminal';
+import shared from "../shared";
+import {criminalFileInformationType, appearanceAdditionalInfoType, appearanceMethodDetailsInfoType, appearanceChargesInfoType, criminalAppearanceInfoType, criminalAppearanceMethodsInfoType, initiatingDocument} from '../../types/criminal';
 import "@store/modules/CriminalFileInformation";
+import { CourtDocumentType, DocumentData } from "@/types/shared";
 const criminalState = namespace("CriminalFileInformation");
 
 
@@ -236,6 +237,8 @@ export default class CriminalAppearanceDetails extends Vue {
     appearanceMethods: criminalAppearanceMethodsInfoType[] = [];
     appearanceMethodDetails: appearanceMethodDetailsInfoType[] = [];    
   
+    documentTypeRop = CourtDocumentType.ROP;
+    documentTypeCriminal = CourtDocumentType.Criminal;
     loadingPdf = false;
     loadingROP = false;
     isMounted = false;
@@ -247,7 +250,7 @@ export default class CriminalAppearanceDetails extends Vue {
     informationsFileExists = false;
     notes = {};       
     appearanceDetailsInfo = {};
-    initiatingDocuments: string[] = [];    
+    initiatingDocuments: initiatingDocument[] = [];    
 
     addInfoFields =  
     [
@@ -401,36 +404,22 @@ export default class CriminalAppearanceDetails extends Vue {
         this.showNotes=true;           
     }
 
-    public openDocumentsPdf(): void {
-        this.loadingPdf = true;
-        let imageId = this.initiatingDocuments[0]
-        const filename = 'doc' + imageId + '.pdf';
-        imageId = base64url(imageId);
-        window.open(`${process.env.BASE_URL}api/files/document/${imageId}/${filename}?isCriminal=true&fileId=${this.appearanceInfo.fileNo}`)
+    public openDocumentsPdf(courtDocumentType) {
+        this.loadingPdf = true; 
+        const documentData: DocumentData  = {
+            courtLevel: this.criminalFileInformation.detailsData.courtLevelCd, 
+            courtClass: this.criminalFileInformation.detailsData.courtClassCd, 
+            dateFiled: Vue.filter('beautify-date')(this.initiatingDocuments[0].issueDate),
+            documentDescription: courtDocumentType == CourtDocumentType.ROP ? "ROP" : "Information",
+            documentId: this.initiatingDocuments[0].imageId, 
+            fileId: this.appearanceInfo.fileNo,
+            fileNumberText: this.criminalFileInformation.detailsData.fileNumberTxt,
+            partId: this.appearanceInfo.partId,
+            profSeqNo: this.appearanceInfo.profSeqNo, 
+            location: this.criminalFileInformation.detailsData.homeLocationAgencyName
+        }; 
+        shared.openDocumentsPdf(courtDocumentType, documentData); 
         this.loadingPdf = false;
     }
-
-    public openRopPdf(): void {
-        this.loadingROP = true;         
-        const partID = this.appearanceInfo.partId;
-        const profSeqNo = this.appearanceInfo.profSeqNo;      
-        const filename = 'ROP_'+partID+'.pdf';
-        const courtLevel = this.appearanceInfo.courtLevel;
-        const courtClass = this.appearanceInfo.courtClass;
-      
-        const url =`api/files/criminal/record-of-proceedings/${partID}/${filename}?profSequenceNumber=${profSeqNo}&courtLevelCode=${courtLevel}&courtClassCode=${courtClass}`;
-
-        this.$http.get(url)
-            .then(() => {
-                window.open(`${process.env.BASE_URL}${url}`);
-                this.loadingROP = false;},
-              err => {
-                console.log(err); 
-                window.alert("Broken PDF File");
-                this.loadingROP = false;}
-            );        
-    }
-
-
 }
 </script>

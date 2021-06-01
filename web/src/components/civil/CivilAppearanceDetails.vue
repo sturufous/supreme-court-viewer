@@ -26,7 +26,7 @@
                                 class="mt-0"
                                 v-b-tooltip.hover.right                                
                                 title="Download Court Summary"
-                                @click="openCourtSummaryPdf(appearanceInfo.appearanceId)"
+                                @click="documentClick({ appearanceId: appearanceInfo.appearanceId, appearanceDate: appearanceInfo.date, documentDescription: 'CourtSummary' })"
                                 size="sm">                                        
                                 <b-icon icon="file-earmark-arrow-down" font-scale="2"></b-icon>
                             </b-button>
@@ -276,10 +276,11 @@
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { namespace } from "vuex-class";
-import base64url from "base64url";
+import shared from "../shared";
+import { CourtDocumentType, DocumentData } from '../../types/shared';
 import "@store/modules/CommonInformation";
 import "@store/modules/CivilFileInformation";
-import {appearanceAdditionalInfoType, civilAppearanceInfoType, appearancePartiesType, appearanceMethodsType, appearanceDocumentsType} from '../../types/civil';
+import {appearanceAdditionalInfoType, civilAppearanceInfoType, appearancePartiesType, appearanceMethodsType, appearanceDocumentsType, civilFileInformationType} from '../../types/civil';
 import {inputNamesType } from '../../types/common'
 const civilState = namespace("CivilFileInformation");
 const commonState = namespace("CommonInformation");
@@ -293,6 +294,9 @@ export default class CivilAppearanceDetails extends Vue {
     @civilState.State
     public appearanceInfo!: civilAppearanceInfoType;        
 
+    @civilState.State
+    public civilFileInformation!: civilFileInformationType
+    
     @commonState.Action
     public UpdateDisplayName!: (newInputNames: inputNamesType) => void
 
@@ -514,26 +518,20 @@ export default class CivilAppearanceDetails extends Vue {
 
     public documentClick(document) 
     {
-        if(document.item.DocTypeCd != "CSR") {
-            this.openDocumentsPdf(document.item['ID']);
-        } else if (document.item.DocTypeCd == "CSR") {
-            this.openCourtSummaryPdf(this.appearanceInfo.appearanceId);
-        }
-    }
-
-    public openDocumentsPdf(documentId): void {
         this.loadingPdf = true;
-        const filename = 'doc' + documentId + '.pdf';
-        documentId = base64url(documentId);
-        window.open(`${process.env.BASE_URL}api/files/document/${documentId}/${filename}?isCriminal=false&fileId=${this.appearanceInfo.fileNo}`)
-        this.loadingPdf = false;
-    }
-
-    public openCourtSummaryPdf(appearanceId): void {
-
-        this.loadingPdf = true;        
-        const filename = 'court summary_'+appearanceId+'.pdf';
-        window.open(`${process.env.BASE_URL}api/files/civil/court-summary-report/${appearanceId}/${filename}?vcCivilFileId=${this.appearanceInfo.fileNo}`)
+        const documentType = document.item == null ? CourtDocumentType.CSR : CourtDocumentType.Civil;
+        const documentData: DocumentData = {
+            appearanceId: document.appearanceId, 
+            appearanceDate: document.appearanceDate,
+            courtLevel: this.civilFileInformation.detailsData.courtLevelCd,
+            dateFiled: document.item ? Vue.filter('beautify-date')(document.item['Date Filed']) : '',
+            documentId: document.item ? document.item['ID'] : '', 
+            documentDescription: document.item ? document.item['Document Type'] : document.documentDescription,
+            fileId: this.civilFileInformation.fileNumber,
+            fileNumberText:  this.civilFileInformation.detailsData.fileNumberTxt,
+            location: this.civilFileInformation.detailsData.homeLocationAgencyName
+        };
+        shared.openDocumentsPdf(documentType, documentData);
         this.loadingPdf = false;
     }
 
