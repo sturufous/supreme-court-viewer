@@ -28,7 +28,6 @@ export default {
   },
 
   generateFileName(documentType: CourtDocumentType, documentData: DocumentData): string {
-    debugger;
     const locationAbbreviation = (documentData.location.match(/[A-Z]/g) || []).join("");
     switch (documentType) {
       case CourtDocumentType.Civil:

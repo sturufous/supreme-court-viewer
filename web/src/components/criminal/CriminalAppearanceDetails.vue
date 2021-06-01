@@ -323,7 +323,6 @@ export default class CriminalAppearanceDetails extends Vue {
         const appNote = this.appearanceDetailsJson.appearanceNote? this.appearanceDetailsJson.appearanceNote: '';
         this.notes =  {'judgeRec': judgeRec, 'appNote': appNote}        
         if (this.appearanceDetailsJson.initiatingDocuments && this.appearanceDetailsJson.initiatingDocuments.length>0) {
-            debugger;
             this.initiatingDocuments.push(this.appearanceDetailsJson.initiatingDocuments[0])
             this.informationsFileExists = true;
         }
