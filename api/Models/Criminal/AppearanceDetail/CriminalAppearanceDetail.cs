@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using JCCommon.Clients.FileServices;
+using Scv.Api.Models.Criminal.Detail;
 
 namespace Scv.Api.Models.Criminal.AppearanceDetail
 {
@@ -30,6 +31,6 @@ namespace Scv.Api.Models.Criminal.AppearanceDetail
         public ICollection<CriminalAppearanceMethod> AppearanceMethods { get; set; }
         public string EstimatedTimeHour { get; set; }
         public string EstimatedTimeMin { get; set; }
-        public List<string> InitiatingDocuments { get; set; }
+        public List<CriminalDocument> InitiatingDocuments { get; set; }
     }
 }

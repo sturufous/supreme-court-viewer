@@ -84,7 +84,8 @@ export interface civilAppearanceInfoType {
     "appearanceId": string
     "supplementalEquipmentTxt": string,
     "securityRestrictionTxt": string,
-    "outOfTownJudgeTxt": string
+    "outOfTownJudgeTxt": string,
+    "date": string
 }
 
 export interface civilIssueType {

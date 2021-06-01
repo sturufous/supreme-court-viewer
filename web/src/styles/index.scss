@@ -9,6 +9,9 @@ $bcgov-font-path: "../../node_modules/@bcgov/bootstrap-theme/dist/fonts/";
 
 @import "~bootstrap-vue/src/index.scss";
 
+.max-width-300 {
+  max-width: 300px;
+}
 .breadcrumb {
   margin-bottom: 0;
 }

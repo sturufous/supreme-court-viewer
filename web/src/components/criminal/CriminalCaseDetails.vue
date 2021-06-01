@@ -91,6 +91,8 @@ import {inputNamesType, adjudicatorRestrictionsInfoType, documentRequestsInfoTyp
 import '@store/modules/CriminalFileInformation';
 import "@store/modules/CommonInformation";
 import base64url from 'base64url';
+import shared from '../shared';
+import { CourtDocumentType, DocumentData } from '../../types/shared';
 const criminalState = namespace('CriminalFileInformation');
 const commonState = namespace("CommonInformation");
 
@@ -203,7 +205,12 @@ export default class CriminalCaseDetails extends Vue {
 
     public downloadDocuments(){
 
-        const fileName = 'file'+this.criminalFileInformation.fileNumber+'documents.zip'
+        const fileName = shared.generateFileName(CourtDocumentType.CriminalZip, {
+            location: this.criminalFileInformation.detailsData.homeLocationAgencyName,
+            courtClass: this.criminalFileInformation.detailsData.courtClassCd,
+            courtLevel: this.criminalFileInformation.detailsData.courtLevelCd,
+            fileNumberText:  this.criminalFileInformation.detailsData.fileNumberTxt
+        });
         const documentsToDownload = {zipName: fileName, csrRequests: [], documentRequests: [], ropRequests: []} as archiveInfoType;
 
         for(const partIndex in this.participantList)
@@ -217,7 +224,17 @@ export default class CriminalCaseDetails extends Vue {
                         const id = doc.imageId;                
                         const documentRequest = {} as documentRequestsInfoType;
                         documentRequest.isCriminal = true;
-                        documentRequest.pdfFileName = 'doc' + id + '.pdf';
+                        const documentData: DocumentData = { 
+                            dateFiled: Vue.filter('beautify-date')(doc.issueDate),
+                            documentDescription: doc.documentTypeDescription,
+                            documentId: id,
+                            courtLevel: this.criminalFileInformation.detailsData.courtLevelCd, 
+                            courtClass: this.criminalFileInformation.detailsData.courtClassCd, 
+                            fileId: this.criminalFileInformation.fileNumber,
+                            fileNumberText: this.criminalFileInformation.detailsData.fileNumberTxt,
+                            location: this.criminalFileInformation.detailsData.homeLocationAgencyName
+                        };
+                        documentRequest.pdfFileName = shared.generateFileName(CourtDocumentType.Criminal, documentData);
                         documentRequest.base64UrlEncodedDocumentId = base64url(id);
                         documentRequest.fileId = this.criminalFileInformation.fileNumber;
                         documentsToDownload.documentRequests.push(documentRequest);                
@@ -226,7 +243,16 @@ export default class CriminalCaseDetails extends Vue {
                 else {
                     const ropRequest = {} as ropRequestsInfoType;
                     const partId = doc.partId;
-                    ropRequest.pdfFileName = 'ROP_'+partId+'.pdf';
+                    const documentData: DocumentData = { 
+                        courtClass: this.criminalFileInformation.detailsData.courtClassCd, 
+                        courtLevel: this.criminalFileInformation.detailsData.courtLevelCd, 
+                        documentDescription: 'ROP',
+                        fileNumberText: this.criminalFileInformation.detailsData.fileNumberTxt,
+                        partId: partId,
+                        profSeqNo: partInfo['Prof Seq No'],
+                        location: this.criminalFileInformation.detailsData.homeLocationAgencyName
+                    };
+                    ropRequest.pdfFileName = shared.generateFileName(CourtDocumentType.ROP, documentData);
                     ropRequest.partId = partId;
                     ropRequest.profSequenceNumber = partInfo['Prof Seq No'];
                     ropRequest.courtLevelCode = this.criminalFileInformation.courtLevel;
