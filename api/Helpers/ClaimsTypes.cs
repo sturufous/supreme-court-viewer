@@ -5,6 +5,7 @@ namespace Scv.Api.Helpers
 {
     public class CustomClaimTypes
     {
+        public const string ApplicationCode = nameof(CustomClaimTypes) + nameof(ApplicationCode);
         public const string JcParticipantId = nameof(CustomClaimTypes) + nameof(JcParticipantId);
         public const string JcAgencyCode = nameof(CustomClaimTypes) + nameof(JcAgencyCode);
         public const string IsSupremeUser = nameof(CustomClaimTypes) + nameof(IsSupremeUser);

@@ -18,6 +18,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using Scv.Api.Helpers;
@@ -127,11 +128,16 @@ namespace Scv.Api.Infrastructure.Authentication
                     {
                         if (!(context.Principal.Identity is ClaimsIdentity identity)) return;
 
+                        var loggerFactory = context.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>();
+                        var logger = loggerFactory.CreateLogger("OnTokenValidated");
+                        logger.LogInformation($"OpenIdConnect UserId - { context.Principal.UserId() } - logged in.");
+
                         //Cleanup keycloak claims, that are unused.
                         foreach (var claim in identity.Claims.WhereToList(c =>
                             !CustomClaimTypes.UsedKeycloakClaimTypes.Contains(c.Type)))
                             identity.RemoveClaim(claim);
 
+                        var applicationCode = "SCV";
                         var partId = configuration.GetNonEmptyValue("Request:PartId");
                         var agencyId = configuration.GetNonEmptyValue("Request:AgencyIdentifierId");
                         var isSupremeUser = false;
@@ -144,11 +150,14 @@ namespace Scv.Api.Infrastructure.Authentication
                                 .Where(r => r.UserId == userId && r.Expires > now)
                                 .OrderByDescending(x => x.Id)
                                 .FirstOrDefaultAsync();
+
                             if (fileAccess != null && !string.IsNullOrEmpty(fileAccess.PartId) && !string.IsNullOrEmpty(fileAccess.AgencyId))
                             {
+                                logger.LogInformation($"UserId - { context.Principal.UserId() } - Using credentials passed in from A2A.");
                                 var aesGcmEncryption = context.HttpContext.RequestServices.GetRequiredService<AesGcmEncryption>();
                                 partId = aesGcmEncryption.Decrypt(fileAccess.PartId);
                                 agencyId = aesGcmEncryption.Decrypt(fileAccess.AgencyId);
+                                applicationCode = "A2A";
                             }
                         } 
                         else if (context.Principal.IsIdirUser() && context.Principal.Groups().Contains("court-viewer-supreme"))
@@ -158,6 +167,7 @@ namespace Scv.Api.Infrastructure.Authentication
 
                         var claims = new List<Claim>();
                         claims.AddRange(new[] {
+                            new Claim(CustomClaimTypes.ApplicationCode, applicationCode),
                             new Claim(CustomClaimTypes.JcParticipantId, partId),
                             new Claim(CustomClaimTypes.JcAgencyCode, agencyId),
                             new Claim(CustomClaimTypes.IsSupremeUser, isSupremeUser.ToString())
