@@ -46,7 +46,7 @@ namespace Scv.Api.Services.Files
             Civil = new CivilFilesService(configuration, filesClient, mapper, lookupService, locationService, _cache, claimsPrincipal);
             Criminal = new CriminalFilesService(configuration, filesClient, mapper, lookupService, locationService, _cache, claimsPrincipal);
 
-            _applicationCode = configuration.GetNonEmptyValue("Request:ApplicationCd");
+            _applicationCode = claimsPrincipal.ApplicationCode();
             _requestAgencyIdentifierId = claimsPrincipal.AgencyCode();
             _requestPartId = claimsPrincipal.ParticipantId();
         }

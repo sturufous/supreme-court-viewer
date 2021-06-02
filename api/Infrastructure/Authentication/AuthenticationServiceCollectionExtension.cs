@@ -34,7 +34,6 @@ namespace Scv.Api.Infrastructure.Authentication
             IWebHostEnvironment env, IConfiguration configuration)
         {
             var baseUrl = configuration.GetNonEmptyValue("WebBaseHref");
-            var useCredentialsFromA2A = configuration.GetNonEmptyValue("UseCredentialsFromA2A").Equals("true", StringComparison.OrdinalIgnoreCase);
             services.AddAuthentication(options =>
             {
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -138,11 +137,11 @@ namespace Scv.Api.Infrastructure.Authentication
                             !CustomClaimTypes.UsedKeycloakClaimTypes.Contains(c.Type)))
                             identity.RemoveClaim(claim);
 
+                        var applicationCode = "SCV";
                         var partId = configuration.GetNonEmptyValue("Request:PartId");
                         var agencyId = configuration.GetNonEmptyValue("Request:AgencyIdentifierId");
                         var isSupremeUser = false;
-                        //TODO check to see if we should be passing A2A credentials on, if we do.. we need applicationCode as a claim set to "A2A"
-                        if (useCredentialsFromA2A && context.Principal.IsVcUser())
+                        if (context.Principal.IsVcUser())
                         {
                             var db = context.HttpContext.RequestServices.GetRequiredService<ScvDbContext>();
                             var userId = context.Principal.UserId();
@@ -158,6 +157,7 @@ namespace Scv.Api.Infrastructure.Authentication
                                 var aesGcmEncryption = context.HttpContext.RequestServices.GetRequiredService<AesGcmEncryption>();
                                 partId = aesGcmEncryption.Decrypt(fileAccess.PartId);
                                 agencyId = aesGcmEncryption.Decrypt(fileAccess.AgencyId);
+                                applicationCode = "A2A";
                             }
                         } 
                         else if (context.Principal.IsIdirUser() && context.Principal.Groups().Contains("court-viewer-supreme"))
@@ -167,6 +167,7 @@ namespace Scv.Api.Infrastructure.Authentication
 
                         var claims = new List<Claim>();
                         claims.AddRange(new[] {
+                            new Claim(CustomClaimTypes.ApplicationCode, applicationCode),
                             new Claim(CustomClaimTypes.JcParticipantId, partId),
                             new Claim(CustomClaimTypes.JcAgencyCode, agencyId),
                             new Claim(CustomClaimTypes.IsSupremeUser, isSupremeUser.ToString())

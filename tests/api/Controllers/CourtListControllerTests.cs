@@ -37,8 +37,10 @@ namespace tests.api.Controllers
             var locationService = new LocationService(locationServices.Configuration, locationServiceClient, new CachingService());
 
             var claims = new[] {
+                new Claim(CustomClaimTypes.ApplicationCode, "SCV"),
                 new Claim(CustomClaimTypes.JcParticipantId,  fileServices.Configuration.GetNonEmptyValue("Request:PartId")),
                 new Claim(CustomClaimTypes.JcAgencyCode, fileServices.Configuration.GetNonEmptyValue("Request:AgencyIdentifierId")),
+                new Claim(CustomClaimTypes.IsSupremeUser, "True"),
             };
             var identity = new ClaimsIdentity(claims, "Cookies");
             var principal = new ClaimsPrincipal(identity);

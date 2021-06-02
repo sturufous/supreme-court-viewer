@@ -48,7 +48,7 @@ namespace Scv.Api.Services
 
             _lookupService = lookupService;
             _locationService = locationService;
-            _applicationCode = configuration.GetNonEmptyValue("Request:ApplicationCd");
+            _applicationCode = user.ApplicationCode();
             _requestAgencyIdentifierId = user.AgencyCode();
             _requestPartId = user.ParticipantId();
         }

@@ -46,6 +46,7 @@ namespace Scv.Api.Infrastructure.Authentication
                 return AuthenticateResult.Fail("Invalid SiteMinder UserType Header.");
 
             var authenticatedBySiteMinderPreviously = Context.User.Identity.AuthenticationType == SiteMinder;
+            var applicationCode = Context.User.ApplicationCode();
             var participantId = Context.User.ParticipantId(); 
             var agencyCode = Context.User.AgencyCode();
             var isSupremeUser = Context.User.IsSupremeUser();
@@ -63,12 +64,14 @@ namespace Scv.Api.Infrastructure.Authentication
                 if (jcUserInfo == null)
                     return AuthenticateResult.Fail("Couldn't authenticate through JC-Interface.");
 
+                applicationCode = "SCV";
                 participantId = jcUserInfo.UserPartId;
                 agencyCode = jcUserInfo.UserDefaultAgencyCd;
                 isSupremeUser = true;
             }
 
             var claims = new[] {
+                new Claim(CustomClaimTypes.ApplicationCode, applicationCode),
                 new Claim(CustomClaimTypes.JcParticipantId, participantId),
                 new Claim(CustomClaimTypes.JcAgencyCode, agencyCode),
                 new Claim(CustomClaimTypes.IsSupremeUser, isSupremeUser.ToString())

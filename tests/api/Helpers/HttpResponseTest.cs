@@ -35,8 +35,10 @@ namespace tests.api.Helpers
             httpContext.SetupGet(a => a.Response).Returns(response.Object);
 
             var claims = new[] {
+                new Claim(CustomClaimTypes.ApplicationCode, "SCV"),
                 new Claim(CustomClaimTypes.JcParticipantId,  configuration.GetNonEmptyValue("Request:PartId")),
                 new Claim(CustomClaimTypes.JcAgencyCode, configuration.GetNonEmptyValue("Request:AgencyIdentifierId")),
+                new Claim(CustomClaimTypes.IsSupremeUser, "True"),
             };
             var identity = new ClaimsIdentity(claims, "Cookies");
             var principal = new ClaimsPrincipal(identity);
