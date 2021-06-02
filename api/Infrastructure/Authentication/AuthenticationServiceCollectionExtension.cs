@@ -18,6 +18,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using Scv.Api.Helpers;
@@ -33,6 +34,7 @@ namespace Scv.Api.Infrastructure.Authentication
             IWebHostEnvironment env, IConfiguration configuration)
         {
             var baseUrl = configuration.GetNonEmptyValue("WebBaseHref");
+            var useCredentialsFromA2A = configuration.GetNonEmptyValue("UseCredentialsFromA2A").Equals("true", StringComparison.OrdinalIgnoreCase);
             services.AddAuthentication(options =>
             {
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -127,6 +129,10 @@ namespace Scv.Api.Infrastructure.Authentication
                     {
                         if (!(context.Principal.Identity is ClaimsIdentity identity)) return;
 
+                        var loggerFactory = context.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>();
+                        var logger = loggerFactory.CreateLogger("OnTokenValidated");
+                        logger.LogInformation($"OpenIdConnect UserId - { context.Principal.UserId() } - logged in.");
+
                         //Cleanup keycloak claims, that are unused.
                         foreach (var claim in identity.Claims.WhereToList(c =>
                             !CustomClaimTypes.UsedKeycloakClaimTypes.Contains(c.Type)))
@@ -135,7 +141,8 @@ namespace Scv.Api.Infrastructure.Authentication
                         var partId = configuration.GetNonEmptyValue("Request:PartId");
                         var agencyId = configuration.GetNonEmptyValue("Request:AgencyIdentifierId");
                         var isSupremeUser = false;
-                        if (context.Principal.IsVcUser())
+                        //TODO check to see if we should be passing A2A credentials on, if we do.. we need applicationCode as a claim set to "A2A"
+                        if (useCredentialsFromA2A && context.Principal.IsVcUser())
                         {
                             var db = context.HttpContext.RequestServices.GetRequiredService<ScvDbContext>();
                             var userId = context.Principal.UserId();
@@ -144,8 +151,10 @@ namespace Scv.Api.Infrastructure.Authentication
                                 .Where(r => r.UserId == userId && r.Expires > now)
                                 .OrderByDescending(x => x.Id)
                                 .FirstOrDefaultAsync();
+
                             if (fileAccess != null && !string.IsNullOrEmpty(fileAccess.PartId) && !string.IsNullOrEmpty(fileAccess.AgencyId))
                             {
+                                logger.LogInformation($"UserId - { context.Principal.UserId() } - Using credentials passed in from A2A.");
                                 var aesGcmEncryption = context.HttpContext.RequestServices.GetRequiredService<AesGcmEncryption>();
                                 partId = aesGcmEncryption.Decrypt(fileAccess.PartId);
                                 agencyId = aesGcmEncryption.Decrypt(fileAccess.AgencyId);
