@@ -175,6 +175,7 @@
                 border-variant="white">
                     {{notes.text}}
             </b-card>
+            <!-- As per Kevin's request SCV-140, hide JCM Notes. 
             <b-card 
                 v-if="notes.remarks.length>0" 
                 title="Crown Notes to JCM" 
@@ -189,6 +190,7 @@
                     </b-table>
                
             </b-card>             
+            -->
             <b-button class="mt-3 bg-info" @click="$bvModal.hide('bv-modal-notes')">Close</b-button>
         </b-modal> 
       
