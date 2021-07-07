@@ -2,7 +2,7 @@
 
    <b-card  v-if= "isMounted" no-body>
         <div>
-            <b-row>         
+            <b-row class="ml-0">         
                 <h3 class="mx-4 font-weight-normal"> Documents ({{NumberOfDocuments}}) </h3>
                 <custom-overlay :show="!downloadCompleted" style="padding: 0 1rem; margin-left:auto; margin-right:2rem;">
                     <b-button @click="downloadDocuments()" size="sm" variant="success" style="padding: 0 1rem; margin-left:auto; margin-right:2rem;"> Download Selected </b-button>

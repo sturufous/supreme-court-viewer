@@ -34,7 +34,7 @@
             <criminal-header-top v-if="isDataReady"/> 
             <criminal-header v-if="isDataReady"/>
 
-            <b-row v-if="showDocuments">
+            <b-row class="ml-0" v-if="showDocuments">
                     <h2 style= "white-space: pre" v-if="isDataReady">
                         {{selectedSideBar}}
                     </h2>         

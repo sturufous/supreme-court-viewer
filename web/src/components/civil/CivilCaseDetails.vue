@@ -34,7 +34,7 @@
                 <civil-header-top v-if="isDataReady"/> 
                 <civil-header v-if="isDataReady"/>
 
-                <b-row v-if="showAllDocuments">
+                <b-row class="ml-0" v-if="showAllDocuments">
                     <h2 style= "white-space: pre" v-if="isDataReady">
                         {{selectedSideBar}}
                     </h2>         
