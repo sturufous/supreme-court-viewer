@@ -249,7 +249,7 @@ export default class CivilProvidedDocumentsView extends Vue {
                 link.click();
                 setTimeout(() => URL.revokeObjectURL(link.href), 1000);
                 this.downloadCompleted = true;
-            }, err =>{this.downloadCompleted = true;})
+            }, err =>{ console.log(err); this.downloadCompleted = true;})
         }
     }
 
@@ -275,7 +275,7 @@ export default class CivilProvidedDocumentsView extends Vue {
         this.activetab = tabMapping;
     }
 
-    public toggleSelectedDocuments(checked) {  
+    public toggleSelectedDocuments() {  
         Vue.nextTick(()=>{
             const checkedDocs = this.documents.filter(doc=>{return doc.isChecked})
             const enabledDocs = this.documents.filter(doc=>{return doc.isEnabled})
