@@ -10,6 +10,7 @@
     "lint": "vue-cli-service lint"
   },
   "resolutions": {
+    "glob-parent": "^5.1.2",
     "normalize-url": "^4.5.1",
     "css-what": "^5.0.1",
     "trim-newlines": "^3.0.1"
@@ -24,6 +25,7 @@
     "cross-env": "^7.0.3",
     "intersection-observer": "^0.10.0",
     "jquery": "^3.5.1",
+    "lodash": "^4.17.21",
     "regenerator-runtime": "^0.13.5",
     "underscore": "^1.13.1",
     "vue": "2.6.11",

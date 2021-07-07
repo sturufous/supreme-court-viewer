@@ -150,7 +150,6 @@
                                 </span>
                             </b-row> 
                             <b-row class="text-criminal"> Criminal (<b>{{criminalCases}}</b>) </b-row>
-                            <b-row class="text-family"> Family (<b>{{familyCases}}</b>) </b-row>
                             <b-row class="text-civil"> Civil (<b>{{civilCases}}</b>) </b-row>
                         </b-nav-text>
                     </b-navbar-nav>
@@ -179,7 +178,6 @@
             <b-card no-body v-if="isDataReady">
                 <b-row cols="1" class = "mx-2 mt-2 mb-5">
                     <criminal-list v-if="criminalCases>0"/>
-                    <civil-list v-if="familyCases>0" civilClass='family'/>
                     <civil-list v-if="civilCases>0" civilClass='civil'/>
                     <b-card class="mb-5"/>
                     
@@ -227,7 +225,6 @@ export default class CourtList extends Vue {
     syncFlag = true
     totalCases = 0;
     criminalCases = 0;
-    familyCases = 0;
     civilCases = 0;
     totalHours =0;
     totalMins =0;
@@ -278,7 +275,6 @@ export default class CourtList extends Vue {
         this.searchingRequest = true;
         this.totalCases = 0;
         this.criminalCases = 0;
-        this.familyCases = 0;
         this.civilCases = 0;
         this.totalHours = 0;
         this.totalMins = 0;
@@ -295,7 +291,7 @@ export default class CourtList extends Vue {
                     this.criminalCases = data.criminalCourtList.length;                    
                     for(const civil of data.civilCourtList)
                     {
-                        if(civil.activityClassCd == 'F' || civil.activityClassCd == 'E' ) this.familyCases++;else this.civilCases ++;
+                        this.civilCases ++;
                         this.setTotalTimeForRoom(civil.estimatedTimeHour,civil.estimatedTimeMin)
                     }
 
@@ -366,20 +362,14 @@ export default class CourtList extends Vue {
     public getCourtNameById(locationId) 
     {        
         return this.courtRoomsAndLocations.filter(location => {                
-            if (location.value['LocationID'] == locationId) 
-                return true;
-            else 
-                return false;            
+            return location.value['LocationID'] == locationId;
         });
     }
 
     public getRoomInLocationByRoomNo(location, roomNo)
     {
         return location.value['Rooms'].filter(room=>{
-            if(room.value==roomNo)
-                return true;
-            else 
-                return false;
+            return room.value==roomNo;
         })
     }
 
