@@ -34,7 +34,7 @@
                 <civil-header-top v-if="isDataReady"/> 
                 <civil-header v-if="isDataReady"/>
 
-                <b-row v-if="showAllDocuments">
+                <b-row class="ml-0" v-if="showAllDocuments">
                     <h2 style= "white-space: pre" v-if="isDataReady">
                         {{selectedSideBar}}
                     </h2>         
@@ -294,7 +294,7 @@ export default class CivilCaseDetails extends Vue {
                 link.click();
                 setTimeout(() => URL.revokeObjectURL(link.href), 1000);
                 this.downloadCompleted = true;
-            }, err =>{this.downloadCompleted = true;})
+            }, err =>{ console.log(err); this.downloadCompleted = true;})
         }
     }
     

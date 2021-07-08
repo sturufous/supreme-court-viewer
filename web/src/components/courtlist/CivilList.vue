@@ -213,7 +213,7 @@
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import CivilAppearanceDetails from '@components/civil/CivilAppearanceDetails.vue';
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 import {courtListInformationInfoType, civilListInfoType} from '../../types/courtlist';
 import {civilFileInformationType, civilAppearanceInfoType} from '../../types/civil';
 import {inputNamesType, durationType, iconInfoType, iconStyleType} from '../../types/common'
@@ -314,7 +314,7 @@ export default class CivilList extends Vue {
 
   
     public ExtractCivilListInfo(): void {
-        const listClass = this.civilClass=='family'? ['F','E']: ['I', 'B', 'V', 'D', 'H', 'P', 'S']; 
+        const listClass = ['F','E','I', 'B', 'V', 'D', 'H', 'P', 'S']; 
         /* 
             Unfortunately these don't follow the usual pattern of the other lookups.
             B = "Bankruptcy"
@@ -328,7 +328,6 @@ export default class CivilList extends Vue {
             SCH – Supreme Court Chambers
             SCV – Supreme Court Trial List
         */
-
         for (const civilListIndex in this.civilCourtListJson) 
         {
             const civilListInfo = {} as civilListInfoType;
@@ -357,6 +356,9 @@ export default class CivilList extends Vue {
                 civilListInfo["Icons"] = this.iconStyles
             }
 
+
+
+            civilListInfo["AppearanceDateTime"] = `${jcivilList.appearanceDate.substr(0,10)} ${jcivilList.appearanceTime.substr(0,5)}`;
             civilListInfo["Time"] = this.getTime(jcivilList.appearanceTime.substr(0,5));
             civilListInfo["Room"] = this.courtRoom
             const partyNames = this.getNameOfPartyTrunc(jcivilList.sealFileSOCText)
@@ -502,15 +504,12 @@ export default class CivilList extends Vue {
 
     get getClassName()
     {
-        if (this.civilClass=='family') 
-            return 'Family';
-        else
-            return 'Civil';
+        return 'Civil';
     }
 
     get SortedCivilList()
-    {           
-        return  _.sortBy(this.civilList, 'Seq.')      
+    {        
+        return _.orderBy(this.civilList, ['AppearanceDateTime', 'Parties']);
     }
 }
 </script>

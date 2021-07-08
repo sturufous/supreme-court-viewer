@@ -335,7 +335,7 @@ export default class CivilDocumentsView extends Vue {
                 link.click();
                 setTimeout(() => URL.revokeObjectURL(link.href), 1000);
                 this.downloadCompleted = true;
-            }, err =>{this.downloadCompleted = true;})
+            }, err =>{ console.log(err); this.downloadCompleted = true;})
         }
     }
 
@@ -384,7 +384,7 @@ export default class CivilDocumentsView extends Vue {
         }
     }
 
-    public toggleSelectedDocuments(checked) {  
+    public toggleSelectedDocuments() {  
         Vue.nextTick(()=>{
             if(this.activetab == 'COURT SUMMARY') {
                 const checkedDocs = this.summaryDocuments.filter(doc=>{return doc.isChecked})
