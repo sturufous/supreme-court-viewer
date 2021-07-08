@@ -4293,6 +4293,12 @@ namespace JCCommon.Clients.FileServices
         [Newtonsoft.Json.JsonProperty("documentPageCount", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocumentPageCount { get; set; }
     
+        [Newtonsoft.Json.JsonProperty("swornByNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string SwornByNm { get; set; }
+    
+        [Newtonsoft.Json.JsonProperty("affidavitNo", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string AffidavitNo { get; set; }
+    
         [Newtonsoft.Json.JsonProperty("issue", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CvfcIssue> Issue { get; set; }
     
@@ -5115,14 +5121,14 @@ namespace JCCommon.Clients.FileServices
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public partial class CvfcRefDocument3 
     {
-        [Newtonsoft.Json.JsonProperty("PartyId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string PartyId { get; set; }
+        [Newtonsoft.Json.JsonProperty("ReferenceDocumentId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string ReferenceDocumentId { get; set; }
+    
+        [Newtonsoft.Json.JsonProperty("ReferenceDocumentNo", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string ReferenceDocumentNo { get; set; }
     
         [Newtonsoft.Json.JsonProperty("AppearanceId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceId { get; set; }
-    
-        [Newtonsoft.Json.JsonProperty("PartyName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string PartyName { get; set; }
     
         [Newtonsoft.Json.JsonProperty("AppearanceDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string AppearanceDate { get; set; }
@@ -5136,8 +5142,38 @@ namespace JCCommon.Clients.FileServices
         [Newtonsoft.Json.JsonProperty("EnterDtm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string EnterDtm { get; set; }
     
+        [Newtonsoft.Json.JsonProperty("ReferenceDocumentTypeCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string ReferenceDocumentTypeCd { get; set; }
+    
         [Newtonsoft.Json.JsonProperty("ReferenceDocumentTypeDsc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ReferenceDocumentTypeDsc { get; set; }
+    
+        [Newtonsoft.Json.JsonProperty("ReferenceDocumentInterest", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<ReferenceDocumentInterest> ReferenceDocumentInterest { get; set; }
+    
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
+    
+        [Newtonsoft.Json.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties; }
+            set { _additionalProperties = value; }
+        }
+    
+    
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
+    public partial class ReferenceDocumentInterest 
+    {
+        [Newtonsoft.Json.JsonProperty("PartyId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string PartyId { get; set; }
+    
+        [Newtonsoft.Json.JsonProperty("PartyName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string PartyName { get; set; }
+    
+        [Newtonsoft.Json.JsonProperty("NonPartyName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string NonPartyName { get; set; }
     
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
     
