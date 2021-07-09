@@ -3511,12 +3511,6 @@
           "documentPageCount": {
             "type": "string"
           },
-          "swornByNm": {
-            "type": "string"
-          },
-          "affidavitNo": {
-            "type": "string"
-          },
           "issue": {
             "type": "array",
             "items": {
@@ -4366,13 +4360,13 @@
       "cvfcRefDocument3": {
         "type": "object",
         "properties": {
-          "ReferenceDocumentId": {
-            "type": "string"
-          },
-          "ReferenceDocumentNo": {
+          "PartyId": {
             "type": "string"
           },
           "AppearanceId": {
+            "type": "string"
+          },
+          "PartyName": {
             "type": "string"
           },
           "AppearanceDate": {
@@ -4387,30 +4381,7 @@
           "EnterDtm": {
             "type": "string"
           },
-          "ReferenceDocumentTypeCd": {
-            "type": "string"
-          },
           "ReferenceDocumentTypeDsc": {
-            "type": "string"
-          },
-          "ReferenceDocumentInterest": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/referenceDocumentInterest"
-            }
-          }
-        }
-      },
-      "referenceDocumentInterest": {
-        "type": "object",
-        "properties": {
-          "PartyId": {
-            "type": "string"
-          },
-          "PartyName": {
-            "type": "string"
-          },
-          "NonPartyName": {
             "type": "string"
           }
         }

@@ -45,12 +45,7 @@ namespace Scv.Api
 
             services.AddDbContext<ScvDbContext>(options =>
                 {
-                    options.UseNpgsql(Configuration.GetNonEmptyValue("DatabaseConnectionString"), npg => 
-                    {
-                        npg.MigrationsAssembly("db");
-                        npg.EnableRetryOnFailure(5, TimeSpan.FromSeconds(1), null);
-                   }).UseSnakeCaseNamingConvention();
-
+                    options.UseNpgsql(Configuration.GetNonEmptyValue("DatabaseConnectionString"), npg => npg.MigrationsAssembly("db")).UseSnakeCaseNamingConvention();
                     if (CurrentEnvironment.IsDevelopment())
                         options.EnableSensitiveDataLogging();
                 }
