@@ -5238,6 +5238,12 @@ namespace JCCommon.Clients.FileServices
         [Newtonsoft.Json.JsonProperty("sheriffCommentText", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SheriffCommentText { get; set; }
     
+        [Newtonsoft.Json.JsonProperty("fileCommentText", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string FileCommentText { get; set; }
+    
+        [Newtonsoft.Json.JsonProperty("cfcsaFileYN", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string CfcsaFileYN { get; set; }
+    
         [Newtonsoft.Json.JsonProperty("sealedYN", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SealedYN { get; set; }
     

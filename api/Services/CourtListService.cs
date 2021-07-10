@@ -95,15 +95,11 @@ namespace Scv.Api.Services
             var civilAppearanceTasks = CivilAppearancesTasks(proceeding, civilFileIds);
             var criminalAppearanceTasks = CriminalAppearancesTasks(proceeding, criminalFileIds);
 
-            //Start file content tasks. 
-            var civilFileContentTasks = CivilFileContentTasks(civilFileIds);
-
             //Await our asynchronous requests.
             var civilFileDetails = (await civilFileDetailTasks.WhenAll()).ToList();
             var criminalFileDetails = (await criminalFileDetailTasks.WhenAll()).ToList();
             var civilAppearances = (await civilAppearanceTasks.WhenAll()).ToList();
             var criminalAppearances = (await criminalAppearanceTasks.WhenAll()).ToList();
-            var civilFileContents = (await civilFileContentTasks.WhenAll()).ToList();
             var originalCourtList = await originalCourtListTask;
 
             //Note, there is test data that doesn't have a CourtList, but may have CourtCalendarDetails. 
@@ -122,7 +118,6 @@ namespace Scv.Api.Services
             courtList.CivilCourtList = PopulateCivilCourtListFromCourtCalendarDetails(courtList.CivilCourtList, civilCourtCalendarAppearances);
             courtList.CriminalCourtList = PopulateCriminalCourtListFromCourtCalendarDetails(courtList.CriminalCourtList, criminalCourtCalendarAppearances);
 
-            courtList.CivilCourtList = PopulateCivilCourtListFromFileContent(courtList.CivilCourtList, civilFileContents);
             return courtList;
         }
 
@@ -169,18 +164,6 @@ namespace Scv.Api.Services
             return appearanceTasks;
         }
 
-        private List<Task<CivilFileContent>> CivilFileContentTasks(List<string> fileIds)
-        {
-            var fileContentTasks = new List<Task<CivilFileContent>>();
-            foreach (var fileId in fileIds)
-            {
-                async Task<CivilFileContent> FileContent() =>
-                    await _filesClient.FilesCivilFilecontentAsync(_requestAgencyIdentifierId, _requestPartId, _applicationCode, null, null, null, null, fileId);
-                fileContentTasks.Add(_cache.GetOrAddAsync($"CivilFileContent-{fileId}-{_requestAgencyIdentifierId}", FileContent));
-            }
-
-            return fileContentTasks;
-        }
         #endregion Civil
 
         #region Criminal 
@@ -236,6 +219,8 @@ namespace Scv.Api.Services
 
                 courtListFile.CommentToJudgeText = fileDetail?.CommentToJudgeTxt;
                 courtListFile.TrialRemarkTxt = fileDetail?.TrialRemarkTxt;
+                courtListFile.FileCommentText = fileDetail?.FileCommentText;
+                courtListFile.CfcsaFile = fileDetail?.CfcsaFileYN == "Y";
 
                 foreach (var hearingRestriction in courtListFile.HearingRestriction)
                 {
@@ -281,27 +266,7 @@ namespace Scv.Api.Services
             return documents;
         }
 
-        private ICollection<CivilCourtList> PopulateCivilCourtListFromFileContent(ICollection<CivilCourtList> courtList,
-            ICollection<CivilFileContent> fileContents)
-        {
-            foreach (var courtListFile in courtList)
-            {
-                var fileId = courtListFile.PhysicalFile.PhysicalFileID;
-                var civilFile = fileContents.Where(fc => fc != null).FirstOrDefault(fc => fc.PhysicalFileId == fileId)?.CivilFile
-                    .FirstOrDefault(cf => cf.PhysicalFileID == fileId);
-
-                //This doesn't map correctly. the WSDL states CFCSAFileYN, but the server returns cfcsafileYN.
-                if (civilFile != null && civilFile.AdditionalProperties.ContainsKey("cfcsafileYN") && civilFile.AdditionalProperties["cfcsafileYN"] != null)
-                {
-                    courtListFile.CfcsaFile = civilFile.AdditionalProperties["cfcsafileYN"].Equals("Y");
-                }
-
-                courtListFile.FileCommentText = civilFile?.FileCommentText;
-            }
-
-            return courtList;
-        }
-
+   
         private ICollection<CivilCourtList> PopulateCivilCourtListFromCourtCalendarDetails(ICollection<CivilCourtList> courtList,
             ICollection<CourtCalendarDetailAppearance> courtCalendarDetailAppearances)
         {
