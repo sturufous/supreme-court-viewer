@@ -1,7 +1,7 @@
 ﻿using JCCommon.Clients.FileServices;
 using System;
 
-namespace JCCommon.Models
+namespace Scv.Api.Models.Search
 {
     public class FilesCivilQuery
     {

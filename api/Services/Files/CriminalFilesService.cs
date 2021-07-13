@@ -1,5 +1,4 @@
 ﻿using JCCommon.Clients.FileServices;
-using JCCommon.Models;
 using LazyCache;
 using MapsterMapper;
 using Microsoft.Extensions.Configuration;
@@ -10,6 +9,7 @@ using Scv.Api.Helpers.Extensions;
 using Scv.Api.Models.Criminal.AppearanceDetail;
 using Scv.Api.Models.Criminal.Appearances;
 using Scv.Api.Models.Criminal.Detail;
+using Scv.Api.Models.Search;
 using System;
 using System.Collections.Generic;
 using System.Linq;

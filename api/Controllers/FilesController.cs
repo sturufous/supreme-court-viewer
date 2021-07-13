@@ -1,5 +1,4 @@
 ﻿using JCCommon.Clients.FileServices;
-using JCCommon.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -23,6 +22,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Scv.Api.Helpers;
 using Scv.Api.Infrastructure.Authorization;
 using Scv.Api.Models.archive;
+using Scv.Api.Models.Search;
 
 namespace Scv.Api.Controllers
 {
@@ -109,8 +109,24 @@ namespace Scv.Api.Controllers
             if (civilFileDetailResponse?.PhysicalFileId == null)
                 throw new NotFoundException("Couldn't find civil file with this id.");
 
-            if (User.IsVcUser() && civilFileDetailResponse.SealedYN == "Y")
-                return Forbid();
+            if (User.IsVcUser()) 
+            { 
+                if (civilFileDetailResponse.SealedYN == "Y")
+                    return Forbid();
+                civilFileDetailResponse.SheriffCommentText = null;
+                civilFileDetailResponse.FileCommentText = null;
+                civilFileDetailResponse.TrialRemarkTxt = null;
+                civilFileDetailResponse.CommentToJudgeTxt = null;
+                
+                foreach (var appearanceDetail in civilFileDetailResponse.Appearances?.ApprDetail)
+                {
+                    if (appearanceDetail == null)
+                        continue;
+                    appearanceDetail.SupplementalEquipmentTxt = null;
+                    appearanceDetail.SecurityRestrictionTxt = null;
+                    appearanceDetail.OutOfTownJudgeTxt = null;
+                }
+            }
 
             return Ok(civilFileDetailResponse);
         }
