@@ -24,6 +24,7 @@ using Scv.Api.Infrastructure.Encryption;
 using Scv.Api.Infrastructure.Middleware;
 using Scv.Api.Services.EF;
 using Scv.Db.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Scv.Api
 {
@@ -41,6 +42,15 @@ namespace Scv.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddLogging(options =>
+            {
+                options.AddConsole(c =>
+                {
+                    c.DisableColors = true;
+                    c.TimestampFormat = "[yyyy-MM-dd HH:mm:ss] ";
+                });
+            });
+
             services.AddSingleton<MigrationAndSeedService>();
 
             services.AddDbContext<ScvDbContext>(options =>
