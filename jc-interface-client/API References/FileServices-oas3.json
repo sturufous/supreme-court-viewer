@@ -3327,6 +3327,12 @@
           },
           "phoneNumberTxt": {
             "type": "string"
+          },
+          "counselAppearanceMethod": {
+            "type": "string"
+          },
+          "counselName": {
+            "type": "string"
           }
         }
       },
