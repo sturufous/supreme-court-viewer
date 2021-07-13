@@ -1,5 +1,7 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
+[![Lifecycle:Stable](https://img.shields.io/badge/Lifecycle-Stable-97ca00)]
+
 # Supreme Court Viewer
 
 This repository contains the stand alone **Supreme Court Viewer** application.  This application allows authorized individuals to review file details and access the electronic versions of the related documentation.
