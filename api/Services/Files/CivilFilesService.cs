@@ -418,11 +418,11 @@ namespace Scv.Api.Services.Files
                         if (!counsel.AdditionalProperties.ContainsKey("counselName"))
                             continue;
                   
-                        var targetCounsel = party.Counsel?.FirstOrDefault(c => c.CounselFullName == counsel.AdditionalProperties["counselName"]?.ToString());
+                        var targetCounsel = party.Counsel?.FirstOrDefault(c => c.CounselFullName == counsel.CounselName);
                         if (targetCounsel == null)
                             continue;
 
-                        targetCounsel.CounselAppearanceMethod = counsel.AdditionalProperties.ContainsKey("counselAppearanceMethod") ? counsel.AdditionalProperties["counselAppearanceMethod"]?.ToString() : null;
+                        targetCounsel.CounselAppearanceMethod = counsel.CounselAppearanceMethod;
                         targetCounsel.CounselAppearanceMethodDesc = await _lookupService.GetCivilCounselAttendanceType(targetCounsel.CounselAppearanceMethod);
                     }
                 }

@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Serialization;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace Scv.Api.Helpers.ContractResolver
@@ -15,14 +16,7 @@ namespace Scv.Api.Helpers.ContractResolver
         protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
         {
             var jsonProp = base.CreateProperty(member, memberSerialization);
-            jsonProp.Required = Required.Default;
-
-            //This is to exclude additionalProperties if it's empty. Inside of the generated content, it's always being set as a new dictionary
-            if (jsonProp.UnderlyingName == "AdditionalProperties" && jsonProp.PropertyType == typeof(IDictionary<string, object>))
-            {
-                jsonProp.Ignored = false;
-                jsonProp.ShouldSerialize = instance => jsonProp.ValueProvider?.GetValue(instance) is IDictionary value && value.Count > 0;
-            }
+            jsonProp.Required = Required.Default;          
             return jsonProp;
         }
     }

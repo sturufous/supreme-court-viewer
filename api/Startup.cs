@@ -112,7 +112,7 @@ namespace Scv.Api
 
             services.AddSwaggerGen(options =>
             {
-                options.EnableAnnotations(true);
+                options.EnableAnnotations(true, true);
                 options.CustomSchemaIds(o => o.FullName);
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
