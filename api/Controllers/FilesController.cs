@@ -1,5 +1,4 @@
 ﻿using JCCommon.Clients.FileServices;
-using JCCommon.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -23,6 +22,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Scv.Api.Helpers;
 using Scv.Api.Infrastructure.Authorization;
 using Scv.Api.Models.archive;
+using Scv.Api.Models.Search;
 
 namespace Scv.Api.Controllers
 {

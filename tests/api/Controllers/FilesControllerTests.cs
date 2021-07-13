@@ -1,6 +1,5 @@
 ﻿using JCCommon.Clients.FileServices;
 using JCCommon.Clients.LocationServices;
-using JCCommon.Models;
 using LazyCache;
 using MapsterMapper;
 using Microsoft.AspNetCore.Http;
@@ -26,6 +25,7 @@ using Scv.Api.Helpers;
 using Scv.Api.Infrastructure.Authorization;
 using Scv.Api.Models.archive;
 using Scv.Db.Models;
+using Scv.Api.Models.Search;
 
 namespace tests.api.Controllers
 {
