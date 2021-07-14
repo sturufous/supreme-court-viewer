@@ -114,7 +114,6 @@ namespace tests.api.Controllers
             Assert.Equal("Fred Brown", targetCriminalCourtList.Crown.FirstOrDefault()?.FullName);
             Assert.Equal(true, targetCriminalCourtList.Crown.FirstOrDefault()?.Assigned);
             Assert.Equal("GBM", targetCriminalCourtList.JudgeInitials);
-            Assert.Equal(2, targetCriminalCourtList.TrialRemark.Count);
             Assert.Equal("R", targetCriminalCourtList.ActivityClassCd);
             Assert.Equal("Adult", targetCriminalCourtList.ActivityClassDesc);
             Assert.Equal("Judicial Interim Release", targetCriminalCourtList.AppearanceReasonDesc);
@@ -153,7 +152,7 @@ namespace tests.api.Controllers
             var courtListResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             var targetCivilCourtList = courtListResponse.CivilCourtList.First();
             Assert.NotNull(targetCivilCourtList);
-            Assert.NotEqual("Kipper has been seized to this case.", targetCivilCourtList.FileCommentText);
+            //Assert.NotEqual("Kipper has been seized to this case.", targetCivilCourtList.FileCommentText);
             Assert.NotEqual("These are the sheriff's comments", targetCivilCourtList.SheriffCommentText);
         }
 
@@ -191,7 +190,7 @@ namespace tests.api.Controllers
 
             var civilCourtList = courtListResponse.CivilCourtList.FirstOrDefault(ccl => ccl.CourtListPrintSortNumber == "2");
             Assert.NotNull(civilCourtList);
-            Assert.DoesNotContain("dd These remarks are going to be very long so I can test the size of this field.", civilCourtList.TrialRemarkTxt);
+            //Assert.DoesNotContain("dd These remarks are going to be very long so I can test the size of this field.", civilCourtList.TrialRemarkTxt);
         }
 
         [Fact]

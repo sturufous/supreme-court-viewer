@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using JCCommon.Clients.FileServices;
+using Mapster;
+using Newtonsoft.Json;
 using Scv.Api.Models.CourtList;
 
 namespace Scv.Api.Models.Civil.CourtList
@@ -24,5 +26,8 @@ namespace Scv.Api.Models.Civil.CourtList
         public new ICollection<ScheduledAppearance> ScheduledAppearance { get; set; }
         public new ICollection<HearingRestriction> HearingRestriction { get; set; }
         public new ICollection<CivilClDocument> Document { get; set; }
+        [AdaptIgnore]
+        [JsonIgnore]
+        public new string SheriffCommentText { get;set;}
     }
 }

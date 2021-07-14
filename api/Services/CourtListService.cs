@@ -217,10 +217,6 @@ namespace Scv.Api.Services
                 if (courtListFile.ActivityClassCd == courtListFile.ActivityClassDesc)
                     courtListFile.ActivityClassCd = fileDetail?.CourtClassCd.ToString();
 
-                //courtListFile.CommentToJudgeText = fileDetail?.CommentToJudgeTxt;
-                //courtListFile.TrialRemarkTxt = fileDetail?.TrialRemarkTxt;
-                //courtListFile.FileCommentText = fileDetail?.FileCommentText;
-                courtListFile.SheriffCommentText = null;
                 courtListFile.CfcsaFile = fileDetail?.CfcsaFileYN == "Y";
 
                 foreach (var hearingRestriction in courtListFile.HearingRestriction)
@@ -274,7 +270,6 @@ namespace Scv.Api.Services
                 courtListFile.Video = courtCalendarDetailAppearance?.VideoYn == CourtCalendarDetailAppearanceVideoYn.Y;
                 courtListFile.RemoteVideo = courtCalendarDetailAppearance?.RemoteVideoYn == CourtCalendarDetailAppearanceRemoteVideoYn.Y;
                 courtListFile.StyleOfCause = courtCalendarDetailAppearance?.StyleOfCause;
-                courtListFile.SheriffCommentText = null;
             }
 
             return courtList;

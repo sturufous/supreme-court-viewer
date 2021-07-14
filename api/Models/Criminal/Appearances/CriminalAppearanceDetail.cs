@@ -1,4 +1,7 @@
-﻿namespace Scv.Api.Models.Criminal.Appearances
+﻿using Mapster;
+using Newtonsoft.Json;
+
+namespace Scv.Api.Models.Criminal.Appearances
 {
     /// <summary>
     /// Extends the original object.
@@ -14,5 +17,14 @@
         public string AppearanceStatusDsc { get; set; }
         public string CourtLocationId { get; set; }
         public string CourtLocation { get; set; }
+        [AdaptIgnore]
+        [JsonIgnore]
+        public new string OutOfTownJudgeTxt { get;set; }
+        [AdaptIgnore]
+        [JsonIgnore]
+        public new string SupplementalEquipmentTxt { get; set; }
+        [AdaptIgnore]
+        [JsonIgnore]
+        public new string SecurityRestrictionTxt { get; set; }
     }
 }
