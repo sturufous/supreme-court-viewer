@@ -55,7 +55,7 @@ namespace Scv.Api.Services
 
         #endregion Constructor
 
-        public async Task<Models.CourtList.CourtList> CourtListAsync(string agencyId, string roomCode, DateTime proceeding, string divisionCode, string fileNumber)
+        public async Task<Models.CourtList.CourtList> CourtListAsync(string agencyId, string roomCode, DateTime proceeding, string divisionCode, string fileNumber, string courtLevelCode)
         {
             var proceedingDateString = proceeding.ToString("yyyy-MM-dd");
             var agencyCode = await _locationService.GetLocationCodeFromId(agencyId);
@@ -111,6 +111,10 @@ namespace Scv.Api.Services
 
             courtList.CivilCourtList = await PopulateCivilCourtListFromFileDetails(courtList.CivilCourtList, civilFileDetails);
             courtList.CriminalCourtList = await PopulateCriminalCourtListFromFileDetails(courtList.CriminalCourtList, criminalFileDetails);
+
+            //Filter by court level.
+            courtList.CivilCourtList = courtList.CivilCourtList.WhereToList(cl => cl.CourtLevelCd == courtLevelCode);
+            courtList.CriminalCourtList = courtList.CriminalCourtList.WhereToList(cl => cl.CourtLevelCd == courtLevelCode);
 
             courtList.CivilCourtList = await PopulateCivilCourtListFromAppearances(courtList.CivilCourtList, civilAppearances);
             courtList.CriminalCourtList = await PopulateCriminalCourtListFromAppearances(courtList.CriminalCourtList, criminalAppearances);
@@ -303,6 +307,7 @@ namespace Scv.Api.Services
                 {
                     hearingRestriction.HearingRestrictionTypeDesc = await _lookupService.GetHearingRestrictionDescription(hearingRestriction.HearingRestrictiontype);
                 }
+                courtListFile.CourtLevelCd = fileDetail.CourtLevelCd.ToString();
             }
 
             return courtList;

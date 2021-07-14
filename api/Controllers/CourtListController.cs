@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Scv.Api.Helpers.Extensions;
 using Scv.Api.Infrastructure.Authorization;
 using Scv.Api.Models.CourtList;
 using Scv.Api.Services;
@@ -43,8 +45,9 @@ namespace Scv.Api.Controllers
         [Route("court-list")]
         public async Task<ActionResult<CourtList>> GetCourtList(string agencyId, string roomCode, DateTime proceeding, string divisionCode, string fileNumber)
         {
+            var courtLevel = User.IsSupremeUser() ? "S" : "P";
             var courtList = await _courtListService.CourtListAsync(agencyId, roomCode, proceeding, divisionCode,
-                fileNumber);
+                fileNumber, courtLevel);
             return Ok(courtList);
         }
     }
