@@ -143,16 +143,9 @@ namespace Scv.Api.Services.Files
             detail.Appearances = appearances;
 
             var fileContentCivilFile = fileContent?.CivilFile?.First(cf => cf.PhysicalFileID == fileId);
-            detail.FileCommentText = fileContentCivilFile.FileCommentText;
             detail.Party = await PopulateDetailParties(detail.Party);
             detail.Document = await PopulateDetailDocuments(detail.Document, fileContentCivilFile);
             detail.HearingRestriction = await PopulateDetailHearingRestrictions(fileDetail.HearingRestriction);
-
-            //Hide this information from both Judges and VC Lawyers.
-            detail.SheriffCommentText = null;
-            detail.FileCommentText = null;
-            detail.TrialRemarkTxt = null;
-            detail.CommentToJudgeTxt = null;
 
             foreach (var appearanceDetail in detail.Appearances?.ApprDetail)
             {
