@@ -156,7 +156,7 @@ import { archiveInfoType, documentRequestsInfoType } from '../../types/common';
 import shared from "../shared";
 import { CourtDocumentType, DocumentData } from '../../types/shared';
 
-enum fieldTab {Categories=0, Summary, Orders, Scheduled}
+enum fieldTab {Categories=0, Summary, Orders, Scheduled,  Affidavits }
 
 @Component({
     components: {
@@ -183,8 +183,8 @@ export default class CivilDocumentsView extends Vue {
     sortDesc = false;
     categories: string[] = []; 
     fieldsTab = fieldTab.Categories;
-    documentPlace = [2,1,2,2]
-    datePlace = [4,2,3,5]
+    documentPlace = [2,1,2,2, 2]
+    datePlace = [4,2,3,5, 4]
     selectedDocuments = {} as archiveInfoType; 
     downloadCompleted = true;
     allDocumentsChecked = false; 
@@ -193,13 +193,15 @@ export default class CivilDocumentsView extends Vue {
         [
             {key:'Select',label:'',sortable:false,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},
             {key:'Seq',label:'Seq.',  sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
-            {key:'Document Type',  sortable:true,  headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 16px; text-align:left;'},
+            {key:'Document Type',  sortable:true,  headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 16px; text-align:left;'}, 
+            {key:'Aff No.',        sortable:false, headerStyle:'text',          cellStyle:'font-size: 16px;'},           
             {key:'Act',            sortable:false, headerStyle:'text',          cellStyle:'display: block; margin-top: 1px; font-size: 14px; max-width : 50px;'},
             {key:'Date Filed',     sortable:true,  headerStyle:'text-danger',   cellStyle:'font-size: 16px;'},
+            {key:'Sworn By',       sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px'},                
             {key:'Issues',         sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px;'},
             {key:'Filed By Name',  sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px'},
             {key:'Comment',        sortable:false, headerStyle:'text',          cellStyle:'font-size: 12px; max-width:300px;', tdClass: 'max-width-300'}
-        ],
+        ],        
         [
             {key:'Select',label:'',  sortable:false,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},            
             {key:'Document Type',    sortable:false, headerStyle:'text-primary',    cellStyle:'border:0px; font-size: 16px;'},
@@ -224,8 +226,19 @@ export default class CivilDocumentsView extends Vue {
             {key:'Issues',               sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px;'},
             {key:'Filed By Name',        sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px;'},
             {key:'Comment',              sortable:false, headerStyle:'text',          cellStyle:'font-size: 12px; max-width:300px;', tdClass: 'max-width-300'}
-        ]  
-        
+        ],
+        [
+            {key:'Select',label:'',sortable:false,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},
+            {key:'Seq',label:'Seq.',  sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
+            {key:'Document Type',  sortable:true,  headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 16px; text-align:left;'},
+            {key:'Aff No.',        sortable:false, headerStyle:'text',          cellStyle:'font-size: 16px;'},           
+            {key:'Date Filed',     sortable:true,  headerStyle:'text-danger',   cellStyle:'font-size: 16px;'},
+            {key:'Sworn By',       sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px'},           
+            {key:'Filed By Name',  sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px'},
+            {key:'Issues',         sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px;'},
+            {key:'Act',            sortable:false, headerStyle:'text',          cellStyle:'display: block; margin-top: 1px; font-size: 14px; max-width : 50px;'},
+            {key:'Comment',        sortable:false, headerStyle:'text',          cellStyle:'font-size: 12px; max-width:300px;', tdClass: 'max-width-300'}
+        ]
     ];
 
     public getDocuments(): void {
@@ -450,6 +463,16 @@ export default class CivilDocumentsView extends Vue {
                                   
                     return false; 
                 } 
+                else if(this.activetab == 'AFFIDAVITS')
+                {
+                    console.log('HI')
+                    this.fieldsTab = fieldTab.Affidavits;
+                    if (doc["Category"].toUpperCase() == this.activetab.toUpperCase()) {                        
+                        return true;
+                    }                                                                       
+                                  
+                    return false; 
+                }
                 else if ( this.activetab != 'ALL' )
                 {
                     if (doc["Category"].toUpperCase() == this.activetab.toUpperCase()) {                        

@@ -25,6 +25,8 @@ export interface documentsInfoType {
     "Concluded": string,
     "Next Appearance Date": string, 
     "Category": string,
+    "Sworn By": string,
+    "Aff No.": string,
     "Act": actType[],           
     "Sealed": boolean,
     "Document ID": string,            

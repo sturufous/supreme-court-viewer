@@ -395,6 +395,10 @@ export default class CivilCaseDetails extends Vue {
 
                 docInfo["Category"] = jDoc.category? jDoc.category : '';
                 if((this.categories.indexOf(docInfo["Category"]) < 0) && docInfo["Category"].length > 0) this.categories.push(docInfo["Category"])
+               
+                docInfo["Sworn By"] = jDoc.swornByNm?jDoc.swornByNm: '';
+                docInfo["Aff No."] = jDoc.affidavitNo?jDoc.affidavitNo: '';
+               
                 docInfo["Act"] = [];            
                 if (jDoc.documentSupport && jDoc.documentSupport.length > 0) {
                     for (const act of jDoc.documentSupport) {
