@@ -124,8 +124,7 @@ namespace tests.api.Controllers
             var referenceDocuments = fileDetailResponse.ReferenceDocument;
 
             Assert.NotNull(referenceDocuments);
-            //Was 4, might need PCSS CRED to get 4 docs back.
-            Assert.Equal(1, referenceDocuments.Count);
+            Assert.Equal(4, referenceDocuments.Count);
             var firstReferenceDocument = referenceDocuments.First();
 
             var document = await _controller.GetDocument(WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(firstReferenceDocument.ObjectGuid)), "hello.txt", false, "3822");
@@ -141,16 +140,12 @@ namespace tests.api.Controllers
             var referenceDocuments = fileDetailResponse.ReferenceDocument;
 
             Assert.NotNull(referenceDocuments);
-            //Was 4, might need pcss cred to get 4 docs back.
-            Assert.Equal(1,referenceDocuments.Count);
+            Assert.Equal(4,referenceDocuments.Count);
 
-            Assert.Contains(referenceDocuments, rd => rd.AppearanceId == "13915");
-            Assert.Contains(referenceDocuments, rd => rd.DescriptionText == "Affidavit #2 of Joan Smith sworn Jul 4 2020");
-
-            var interests = referenceDocuments.First().ReferenceDocumentInterest;
-            Assert.Contains(interests, rd => rd.NonPartyName == "JOE TEST");
-            Assert.Contains(interests, rd => rd.PartyName == "TEST, Two");
-            Assert.Contains(interests, rd => rd.PartyId == "4463");
+            Assert.Contains(referenceDocuments, rd => rd.AppearanceId == "14178");
+            Assert.Contains(referenceDocuments, rd => rd.DescriptionText == "Affidavit of Joan Smith sworn Feb 3 2020");
+            Assert.Contains(referenceDocuments, rd => rd.PartyId == "4462");
+            Assert.Contains(referenceDocuments, rd => rd.PartyName == "TEST, One");
         }
 
         [Fact]
