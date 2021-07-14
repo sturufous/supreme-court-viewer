@@ -31,5 +31,6 @@ namespace Scv.Api.Models.Criminal.CourtList
         public ICollection<CrownWitness> Crown { get; set; }
         public new ICollection<ScheduledAppearance> ScheduledAppearance { get; set; }
         public new ICollection<HearingRestriction> HearingRestriction { get; set; }
+        public string CourtLevelCd { get;set;}
     }
 }
