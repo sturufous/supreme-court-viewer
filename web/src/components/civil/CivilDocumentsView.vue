@@ -184,7 +184,7 @@ export default class CivilDocumentsView extends Vue {
     categories: string[] = []; 
     fieldsTab = fieldTab.Categories;
     documentPlace = [2,1,2,2, 2]
-    datePlace = [4,2,3,5, 4]
+    datePlace = [5,2,3,5, 4]
     selectedDocuments = {} as archiveInfoType; 
     downloadCompleted = true;
     allDocumentsChecked = false; 
