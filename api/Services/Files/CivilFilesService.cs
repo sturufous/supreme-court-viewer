@@ -115,7 +115,7 @@ namespace Scv.Api.Services.Files
             return fileDetails;
         }
 
-        public async Task<RedactedCivilFileDetailResponse> FileIdAsync(string fileId)
+        public async Task<RedactedCivilFileDetailResponse> FileIdAsync(string fileId, bool disableCsr = false)
         {
             async Task<CivilFileDetailResponse> FileDetails() => await _filesClient.FilesCivilGetAsync(_requestAgencyIdentifierId, _requestPartId, _applicationCode, fileId);
             async Task<CivilFileContent> FileContent() => await _filesClient.FilesCivilFilecontentAsync(_requestAgencyIdentifierId, _requestPartId, _applicationCode,null, null, null, null, fileId);
@@ -136,7 +136,8 @@ namespace Scv.Api.Services.Files
 
             var detail = _mapper.Map<RedactedCivilFileDetailResponse>(fileDetail);
             foreach (var document in PopulateDetailCsrsDocuments(fileDetail.Appearance))
-                detail.Document.Add(document);
+                if (!disableCsr)
+                    detail.Document.Add(document);
 
             detail = await PopulateBaseDetail(detail);
             detail.Appearances = appearances;
@@ -146,6 +147,22 @@ namespace Scv.Api.Services.Files
             detail.Party = await PopulateDetailParties(detail.Party);
             detail.Document = await PopulateDetailDocuments(detail.Document, fileContentCivilFile);
             detail.HearingRestriction = await PopulateDetailHearingRestrictions(fileDetail.HearingRestriction);
+
+            //Hide this information from both Judges and VC Lawyers.
+            detail.SheriffCommentText = null;
+            detail.FileCommentText = null;
+            detail.TrialRemarkTxt = null;
+            detail.CommentToJudgeTxt = null;
+
+            foreach (var appearanceDetail in detail.Appearances?.ApprDetail)
+            {
+                if (appearanceDetail == null)
+                    continue;
+                appearanceDetail.SupplementalEquipmentTxt = null;
+                appearanceDetail.SecurityRestrictionTxt = null;
+                appearanceDetail.OutOfTownJudgeTxt = null;
+            }
+
             return detail;
         }
 
@@ -207,7 +224,8 @@ namespace Scv.Api.Services.Files
                 Party = await PopulateDetailedAppearancePartiesAsync(appearanceParty.Party, civilCourtList?.Parties, previousAppearance, appearanceMethods),
                 Document = await PopulateDetailedAppearanceDocuments(fileDetailDocuments),
                 Adjudicator = await PopulateDetailedAppearanceAdjudicator(previousAppearance, appearanceMethods),
-                AdjudicatorComment = previousAppearance?.AdjudicatorComment
+                AdjudicatorComment = previousAppearance?.AdjudicatorComment,
+                CourtLevelCd = detail.CourtLevelCd
             };
             return detailedAppearance;
         }

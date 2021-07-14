@@ -205,7 +205,8 @@ namespace Scv.Api.Services.Files
                 Adjudicator = await PopulateAppearanceDetailAdjudicator(appearanceFromAccused, attendanceMethods, appearanceMethods.AppearanceMethod),
                 JustinCounsel = await PopulateAppearanceDetailJustinCounsel(criminalParticipant, appearanceFromAccused, attendanceMethods, appearanceMethods.AppearanceMethod),
                 Charges = await PopulateCharges(appearanceCount.ApprCount),
-                InitiatingDocuments = GetInitiatingDocuments(accusedFile.Document)
+                InitiatingDocuments = GetInitiatingDocuments(accusedFile.Document),
+                CourtLevelCd = detail.CourtLevelCd
             };
             return appearanceDetail;
         }
