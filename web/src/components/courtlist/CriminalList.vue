@@ -201,7 +201,7 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
-import * as _ from 'lodash';
+import * as _ from 'underscore';
 import CriminalAppearanceDetails from '@components/criminal/CriminalAppearanceDetails.vue';
 import {courtListInformationInfoType, criminalListInfoType} from '../../types/courtlist';
 import {criminalFileInformationType, criminalAppearanceInfoType} from '../../types/criminal';
@@ -335,7 +335,6 @@ export default class CriminalList extends Vue {
                 criminalListInfo["Icons"] = this.iconStyles
             }
             criminalListInfo['Case Age']= jcriminalList.caseAgeDaysNumber? jcriminalList.caseAgeDaysNumber: ''
-            criminalListInfo["AppearanceDateTime"] = `${jcriminalList.appearanceTime}`;
             criminalListInfo["Time"] = this.getTime(jcriminalList.appearanceTime.split(' ')[1].substr(0,5));
 
             criminalListInfo["Room"] = this.courtRoom
@@ -399,9 +398,11 @@ export default class CriminalList extends Vue {
             criminalListInfo['TrialNotes'] = jcriminalList.trialRemarkTxt;
 
             criminalListInfo['TrialRemarks'] = [];
-            for (const trialRemark of jcriminalList.trialRemark)
-            {
-                criminalListInfo['TrialRemarks'].push({txt:trialRemark.commentTxt})
+            if (jcriminalList.trialRemark) {
+                for (const trialRemark of jcriminalList.trialRemark)
+                {
+                    criminalListInfo['TrialRemarks'].push({txt:trialRemark.commentTxt})
+                }
             }
             criminalListInfo["Notes"]={remarks:criminalListInfo['TrialRemarks'], text:criminalListInfo['TrialNotes']}            
             criminalListInfo["Supplemental Equipment"] = jcriminalList.supplementalEquipment
@@ -482,7 +483,7 @@ export default class CriminalList extends Vue {
 
     get SortedCriminalList()
     {                
-        return _.orderBy(this.criminalList, ['AppearanceDateTime', 'Accused']);
+        return  _.sortBy(this.criminalList, 'Seq.')
     }
 }
 </script>
