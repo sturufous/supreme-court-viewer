@@ -298,6 +298,8 @@ namespace Scv.Api.Services.Files
                 document.ImageId = document.SealedYN != "N" ? null : document.ImageId;
                 document.NextAppearanceDt = document.Appearance?.Where(app => DateTime.TryParse(app?.AppearanceDate, out DateTime appearanceDate) && appearanceDate >= DateTime.Today).FirstOrDefault()?.AppearanceDate;
                 document.Appearance = null;
+                document.SwornByNm = documentFromFileContent.SwornByNm;
+                document.AffidavitNo = documentFromFileContent.AffidavitNo;
                 foreach (var issue in document.Issue)
                 {
                     issue.IssueTypeDesc = await _lookupService.GetCivilDocumentIssueType(issue.IssueTypeCd);
