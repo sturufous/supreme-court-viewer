@@ -42,11 +42,6 @@ namespace Scv.Api.Models.Criminal.Detail
         public string AssignmentTypeDsc { get; set; }
 
         /// <summary>
-        /// Used for Crown Notes to JCM.
-        /// </summary>
-        public ICollection<TrialRemark> TrialRemark { get; set; }
-
-        /// <summary>
         /// Custom class to extend.
         /// </summary>
         public ICollection<CriminalParticipant> Participant { get; set; }

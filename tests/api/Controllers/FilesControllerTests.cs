@@ -39,9 +39,11 @@ namespace tests.api.Controllers
         #region Variables
 
         private readonly FilesController _controller;
+        private readonly FilesService _service; 
         private readonly FileServicesClient _fileServicesClient;
         private readonly string _agencyIdentifierId;
         private readonly string _partId;
+        ClaimsPrincipal principal;
         #endregion Variables
 
         #region Constructor
@@ -68,13 +70,13 @@ namespace tests.api.Controllers
                 new Claim(CustomClaimTypes.IsSupremeUser, "True"),
             };
             var identity = new ClaimsIdentity(claims, "Cookies");
-            var principal = new ClaimsPrincipal(identity);
+            principal = new ClaimsPrincipal(identity);
 
-            var filesService = new FilesService(fileServices.Configuration, fileServicesClient, new Mapper(), lookupService, locationService, new CachingService(), principal);
+            _service = new FilesService(fileServices.Configuration, fileServicesClient, new Mapper(), lookupService, locationService, new CachingService(), principal);
 
             //TODO fake this.
             var vcCivilFileAccessHandler = new VcCivilFileAccessHandler(new ScvDbContext());
-            _controller = new FilesController(fileServices.Configuration, fileServices.LogFactory.CreateLogger<FilesController>(), filesService, vcCivilFileAccessHandler);
+            _controller = new FilesController(fileServices.Configuration, fileServices.LogFactory.CreateLogger<FilesController>(), _service, vcCivilFileAccessHandler);
             _controller.ControllerContext = HttpResponseTest.SetupMockControllerContext(fileServices.Configuration);
         }
 
@@ -92,6 +94,7 @@ namespace tests.api.Controllers
             var documentId = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes("GeWzGIDmGMUu.#CGMKv9.i`E|ahP'P^^z>qK*[sfUw=M\":Zxf)f#'AI(92O2adE'VGA9_7.368246000.074711.2459184..#C4"));
             var document = await _controller.GetDocument(documentId, "hello.txt", false, "3822");
         }
+
         [Fact(Skip="TEST")]
         public async Task Civil_Document_Reference_Document_In_TEST()
         {
@@ -270,10 +273,9 @@ namespace tests.api.Controllers
                 FileHomeAgencyId = "83.0001",
                 LastName = "Sm"
             };
-            var actionResult = await _controller.FilesCriminalSearchAsync(fcq);
+            var actionResult = await _service.Criminal.SearchAsync(fcq);
 
-            var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
-            Assert.Contains(fileSearchResponse.FileDetail, fd => fd.Participant.Any(p => p.FullNm.Contains("Smith")));
+            Assert.Contains(actionResult.FileDetail, fd => fd.Participant.Any(p => p.FullNm.Contains("Smith")));
         }
 
         [Fact]
@@ -286,13 +288,12 @@ namespace tests.api.Controllers
                 LastName = "bad",
                 CourtLevel = CourtLevelCd3.P
             };
-            var actionResult = await _controller.FilesCivilSearchAsync(fcq);
+            var actionResult = await _service.Civil.SearchAsync(fcq);
 
-            var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
-            Assert.Equal("1", fileSearchResponse.RecCount);
-            Assert.Equal(1, fileSearchResponse.FileDetail.Count);
-            Assert.Contains("2437", fileSearchResponse.FileDetail.First().PhysicalFileId);
-            Assert.Contains("BADGUY, Borris", fileSearchResponse.FileDetail.First().Participant.Select(u => u.FullNm));
+            Assert.Equal("1", actionResult.RecCount);
+            Assert.Equal(1, actionResult.FileDetail.Count);
+            Assert.Contains("2437", actionResult.FileDetail.First().PhysicalFileId);
+            Assert.Contains("BADGUY, Borris", actionResult.FileDetail.First().Participant.Select(u => u.FullNm));
         }
 
         [Fact]
@@ -304,10 +305,9 @@ namespace tests.api.Controllers
                 FileHomeAgencyId = "83.00001",
                 MdocJustinNoSet = "35674"
             };
-            var actionResult = await _controller.FilesCriminalSearchAsync(fcq);
+            var actionResult = await _service.Criminal.SearchAsync(fcq);
 
-            var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
-            Assert.Contains(fileSearchResponse.FileDetail, fd => fd.MdocJustinNo == "35674");
+            Assert.Contains(actionResult.FileDetail, fd => fd.MdocJustinNo == "35674");
         }
 
         [Fact]
@@ -319,21 +319,19 @@ namespace tests.api.Controllers
                 FileHomeAgencyId = "83.0001",
                 PhysicalFileIdSet = "2506"
             };
-            var actionResult = await _controller.FilesCivilSearchAsync(fcq);
+            var actionResult = await _service.Civil.SearchAsync(fcq);
 
-            var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
-            Assert.Equal("1", fileSearchResponse.RecCount);
-            Assert.Equal(1, fileSearchResponse.FileDetail.Count);
-            Assert.Equal("C-11011", fileSearchResponse.FileDetail.First().FileNumberTxt);
-            Assert.Contains("BYSTANDER, Innocent", fileSearchResponse.FileDetail.First().Participant.Select(u => u.FullNm));
+            Assert.Equal("1", actionResult.RecCount);
+            Assert.Equal(1, actionResult.FileDetail.Count);
+            Assert.Equal("C-11011", actionResult.FileDetail.First().FileNumberTxt);
+            Assert.Contains("BYSTANDER, Innocent", actionResult.FileDetail.First().Participant.Select(u => u.FullNm));
         }
 
         [Fact]
         public async void Criminal_File_Details_by_JustinNo_Test()
         {
-            var actionResult = await _controller.GetCriminalFileDetailByFileId("4074");
+            var redactedCriminalFileDetailResponse = await _service.Criminal.FileIdAsync("4074");
 
-            var redactedCriminalFileDetailResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Equal("4074", redactedCriminalFileDetailResponse.JustinNo);
             Assert.True(redactedCriminalFileDetailResponse.Participant.Count > 0);
         }
@@ -341,9 +339,8 @@ namespace tests.api.Controllers
         [Fact]
         public async void Criminal_File_Details_by_JustinNo()
         {
-            var actionResult = await _controller.GetCriminalFileDetailByFileId("35674");
+            var redactedCriminalFileDetailResponse = await _service.Criminal.FileIdAsync("35674");
 
-            var redactedCriminalFileDetailResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Equal("35674", redactedCriminalFileDetailResponse.JustinNo);
             Assert.True(redactedCriminalFileDetailResponse.Participant.Count > 0);
         }
@@ -363,9 +360,8 @@ namespace tests.api.Controllers
         [Fact]
         public async void Criminal_Appearances_by_JustinNo()
         {
-            var actionResult = await _controller.GetCriminalFileDetailByFileId("35674");
+            var criminalFileAppearancesResponse = await _service.Criminal.FileIdAsync("35674");
 
-            var criminalFileAppearancesResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Contains(criminalFileAppearancesResponse.Appearances.ApprDetail,
                 f => f.LastNm == "Young" && f.GivenNm == "Johnny");
         }
@@ -373,9 +369,8 @@ namespace tests.api.Controllers
         [Fact]
         public async void Civil_Appearances_by_PhysicalFileId()
         {
-            var actionResult = await _controller.GetCivilFileDetailByFileId("2506");
+            var civilFile = await _service.Civil.FileIdAsync("2506");
 
-            var civilFile = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Equal("0", civilFile.Appearances.FutureRecCount);
             Assert.Equal("20", civilFile.Appearances.HistoryRecCount);
         }
@@ -383,9 +378,8 @@ namespace tests.api.Controllers
         [Fact]
         public async void Criminal_File_Content()
         {
-            var actionResult = await _controller.GetCriminalFileContent("4801", "101", DateTime.Parse("2016-04-04"), "44150.0734");
+            var criminalFileContent = await _service.Criminal.FileContentAsync("4801", "101", DateTime.Parse("2016-04-04"), "44150.0734", null);
 
-            var criminalFileContent = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Equal("4801", criminalFileContent.CourtLocaCd);
             Assert.Equal("101", criminalFileContent.CourtRoomCd);
             Assert.Equal("2016-04-04", criminalFileContent.CourtProceedingDate);
@@ -394,9 +388,8 @@ namespace tests.api.Controllers
         [Fact]
         public async void Civil_File_Content_By_AgencyId_Room_Proceeding_Appearance()
         {
-            var actionResult = await _controller.GetCivilFileContent("4801", "101", DateTime.Parse("2016-04-04"), "984");
+            var civilFileContent = await _service.Civil.FileContentAsync("4801", "101", DateTime.Parse("2016-04-04"), "984", null);
 
-            var civilFileContent = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Equal("4801", civilFileContent.CourtLocaCd);
             Assert.Equal("101", civilFileContent.CourtRoomCd);
             Assert.Equal("2016-04-04", civilFileContent.CourtProceedingDate);
@@ -414,9 +407,8 @@ namespace tests.api.Controllers
                 FileNumberTxt = "98050101",
                 CourtLevel = CourtLevelCd2.P
             };
-            var actionResult = await _controller.FilesCriminalSearchAsync(fcq);
+            var fileSearchResponse = await _service.Criminal.SearchAsync(fcq);
 
-            var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Equal("2", fileSearchResponse.RecCount);
         }
 
@@ -430,9 +422,8 @@ namespace tests.api.Controllers
                 FileNumberTxt = "98050101",
                 CourtLevel = CourtLevelCd2.S
             };
-            var actionResult = await _controller.FilesCriminalSearchAsync(fcq);
+            var fileSearchResponse = await _service.Criminal.SearchAsync(fcq);
 
-            var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Equal("1", fileSearchResponse.RecCount);
         }
 
@@ -446,9 +437,8 @@ namespace tests.api.Controllers
                 FileNumberTxt = "98050101",
                 CourtLevel = CourtLevelCd2.S
             };
-            var actionResult = await _controller.FilesCriminalSearchAsync(fcq);
+            var fileSearchResponse = await _service.Criminal.SearchAsync(fcq);
 
-            var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Equal("1", fileSearchResponse.RecCount);
 
             fcq = new FilesCriminalQuery
@@ -458,10 +448,9 @@ namespace tests.api.Controllers
                 FileNumberTxt = "98050101",
                 CourtLevel = CourtLevelCd2.P
             };
-            actionResult = await _controller.FilesCriminalSearchAsync(fcq);
+            var fileSearchResponse2 = await _service.Criminal.SearchAsync(fcq);
 
-            fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
-            Assert.Equal("2", fileSearchResponse.RecCount);
+            Assert.Equal("2", fileSearchResponse2.RecCount);
 
             fcq = new FilesCriminalQuery
             {
@@ -470,10 +459,9 @@ namespace tests.api.Controllers
                 FileNumberTxt = "98050101",
                 CourtLevel = CourtLevelCd2.A
             };
-            actionResult = await _controller.FilesCriminalSearchAsync(fcq);
+            var fileSearchResponse3 = await _service.Criminal.SearchAsync(fcq);
 
-            fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
-            Assert.Equal("0", fileSearchResponse.RecCount);
+            Assert.Equal("0", fileSearchResponse3.RecCount);
         }
 
         [Fact]
@@ -486,9 +474,8 @@ namespace tests.api.Controllers
                 FileNumber = "11011",
                 CourtLevel = CourtLevelCd3.P
             };
-            var actionResult = await _controller.FilesCivilSearchAsync(fcq);
+            var fileSearchResponse = await _service.Civil.SearchAsync(fcq);
 
-            var fileSearchResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Equal("1", fileSearchResponse.RecCount);
             Assert.Equal(1, fileSearchResponse.FileDetail.Count);
             Assert.Equal("2506", fileSearchResponse.FileDetail.First().PhysicalFileId);
@@ -512,15 +499,14 @@ namespace tests.api.Controllers
 
             var fileContentResult = actionResult as FileContentResult;
             Assert.NotNull(fileContentResult);
-            Assert.True(fileContentResult.FileContents.Length > 79000);
+            Assert.True(fileContentResult.FileContents.Length > 68600);
         }
 
         [Fact]
         public async void Civil_File_Content_By_FileId()
         {
-            var actionResult = await _controller.GetCivilFileContent(physicalFileId: "2506");
+            var civilFileContent = await _service.Civil.FileContentAsync(null,null,null,null,physicalFileId: "2506");
 
-            var civilFileContent = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Null(civilFileContent.CourtLocaCd);
             Assert.Null(civilFileContent.CourtRoomCd);
             Assert.Equal("", civilFileContent.CourtProceedingDate);
@@ -553,9 +539,8 @@ namespace tests.api.Controllers
         [Fact]
         public async void Criminal_File_Content_By_JustinNumber()
         {
-            var actionResult = await _controller.GetCriminalFileContent(justinNumber: "3179.0000");
+            var criminalFileContent = await _service.Criminal.FileContentAsync(null,null,null,null,justinNumber: "3179.0000");
 
-            var criminalFileContent = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Equal("", criminalFileContent.CourtLocaCd);
             Assert.Equal("", criminalFileContent.CourtRoomCd);
             Assert.Equal("", criminalFileContent.CourtProceedingDate);
@@ -568,9 +553,8 @@ namespace tests.api.Controllers
         [Fact]
         public async void Criminal_File_Detail_Document_By_JustinNumber()
         {
-            var actionResult = await _controller.GetCriminalFileDetailByFileId(fileId: "35840");
+            var criminalFileDocuments = await _service.Criminal.FileIdAsync(fileId: "35840");
 
-            var criminalFileDocuments = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Equal(4, criminalFileDocuments.Participant.First().Document.Count);
             Assert.Contains(criminalFileDocuments.Participant.First().Document,
                 doc => doc.DocmFormDsc == "Summons Criminal Code (With a very long name so I can test Cannabis names)");
@@ -581,16 +565,14 @@ namespace tests.api.Controllers
         public async void Civil_Appearance_Details()
         {
             //Has party data.
-            var actionResult = await _controller.GetCivilAppearanceDetails("2506", "11034");
+            var civilAppearanceDetail = await _service.Civil.DetailedAppearanceAsync("2506", "11034");
 
-            var civilAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Equal(3, civilAppearanceDetail.Party.Count);
             Assert.Contains(civilAppearanceDetail.Party, p => p.LastNm == "BYSTANDER");
 
             //Has appearanceMethod data.
-            actionResult = await _controller.GetCivilAppearanceDetails("3499", "13410");
+            civilAppearanceDetail = await _service.Civil.DetailedAppearanceAsync("3499", "13410");
 
-            civilAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Equal(1, civilAppearanceDetail.AppearanceMethod.Count);
             Assert.Equal("IP", civilAppearanceDetail.AppearanceMethod.First().AppearanceMethodCd);
         }
@@ -598,9 +580,8 @@ namespace tests.api.Controllers
         [Fact]
         public async void Criminal_Appearance_Details()
         {
-            var actionResult = await _controller.GetCriminalAppearanceDetails("2934", "36548.0734", "19498.0042");
+            var criminalAppearanceDetail = await _service.Criminal.AppearanceDetailAsync("2934", "36548.0734", "19498.0042");
 
-            var criminalAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Equal(1, criminalAppearanceDetail.Charges.Count);
             Assert.Equal("2934", criminalAppearanceDetail.JustinNo);
             Assert.Contains(criminalAppearanceDetail.Charges, p => p.AppearanceReasonDsc == "First Appearance");
@@ -613,9 +594,7 @@ namespace tests.api.Controllers
         [Fact]
         public async void Criminal_Appearance_Details_Accused_Prosecutor_Adjudicator()
         {
-            var actionResult = await _controller.GetCriminalAppearanceDetails("2800", "34595.0734", "13816.0026");
-
-            var criminalAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+            var criminalAppearanceDetail = await _service.Criminal.AppearanceDetailAsync("2800", "34595.0734", "13816.0026");
 
             Assert.Equal("2800", criminalAppearanceDetail.JustinNo);
             Assert.Contains(criminalAppearanceDetail.Charges, p => p.AppearanceReasonDsc == "First Appearance");
@@ -630,9 +609,7 @@ namespace tests.api.Controllers
         [Fact]
         public async void Criminal_Appearance_Details_No_Prosecutor_Adjudicator()
         {
-            var actionResult = await _controller.GetCriminalAppearanceDetails("2934", "36548.0734", "19498.0042");
-
-            var criminalAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+            var criminalAppearanceDetail = await _service.Criminal.AppearanceDetailAsync("2934", "36548.0734", "19498.0042");
 
             Assert.Equal("2934", criminalAppearanceDetail.JustinNo);
             Assert.Equal("Telephone Conference", criminalAppearanceDetail.Accused.AttendanceMethodDesc);
@@ -647,9 +624,7 @@ namespace tests.api.Controllers
         [Fact]
         public async void Criminal_Appearance_Details_Prosecutor_Adjudicator_Accused()
         {
-            var actionResult = await _controller.GetCriminalAppearanceDetails("1009", "1169.0026", "14188.0026");
-
-            var criminalAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+            var criminalAppearanceDetail = await _service.Criminal.AppearanceDetailAsync("1009", "1169.0026", "14188.0026");
 
             Assert.Equal("1009", criminalAppearanceDetail.JustinNo);
             Assert.Equal("Stephen Frank Lewis", criminalAppearanceDetail.Accused.FullName);
@@ -664,9 +639,8 @@ namespace tests.api.Controllers
         [Fact]
         public async void Criminal_Appearance_Details_AttendanceMethod_PartyAppearanceMethod_AppearanceMethod()
         {
-            var actionResult = await _controller.GetCriminalAppearanceDetails("3058", "30503.0734", "19621.0042");
+            var criminalAppearanceDetail = await _service.Criminal.AppearanceDetailAsync("3058", "30503.0734", "19621.0042");
 
-            var criminalAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Equal("VC", criminalAppearanceDetail.JustinCounsel.AppearanceMethodCd);
             Assert.Equal("VC", criminalAppearanceDetail.JustinCounsel.AttendanceMethodCd);
             Assert.Equal("CV", criminalAppearanceDetail.JustinCounsel.PartyAppearanceMethod);
@@ -681,9 +655,8 @@ namespace tests.api.Controllers
         [Fact]
         public async void Civil_Appearance_Details_Adjudicator()
         {
-            var actionResult = await _controller.GetCivilAppearanceDetails("2255", "13403");
+            var civilAppearanceDetail = await _service.Civil.DetailedAppearanceAsync("2255", "13403");
 
-            var civilAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Equal("This is the comment i made to Guy Landry ", civilAppearanceDetail.AdjudicatorComment);
             Assert.Equal("Butler Mon Ami, R", civilAppearanceDetail.Adjudicator.FullName);
             Assert.Equal("In Person", civilAppearanceDetail.Adjudicator.AdjudicatorAppearanceMethodDesc);
@@ -694,9 +667,7 @@ namespace tests.api.Controllers
         public async void Civil_Appearance_Details_Party_AppearanceMethods()
         {
             //This test sees if our AppearanceMethod data is tied into the party objects.
-            var actionResult = await _controller.GetCivilAppearanceDetails("2222", "12047");
-
-            var civilAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
+            var civilAppearanceDetail = await _service.Civil.DetailedAppearanceAsync("2222", "12047");
 
             //Here we have AppearanceMethods, for adjudicator.  Note no data for name.
             Assert.Equal("VC", civilAppearanceDetail.Adjudicator?.AppearanceMethodCd);
@@ -709,18 +680,16 @@ namespace tests.api.Controllers
         [Fact]
         public async void Civil_Appearance_Details_Party_CourtList_AttendanceMethod()
         {
-            var actionResult = await _controller.GetCivilAppearanceDetails("100", "19");
+            var civilAppearanceDetail = await _service.Civil.DetailedAppearanceAsync("100", "19");
 
-            var civilAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             Assert.Contains(civilAppearanceDetail.Party, p => p.PartyId == "11" && p.AttendanceMethodCd == "TC");
         }
 
         [Fact]
         public async void Civil_Appearance_Details_Party_CourtList_LegalRepresentative()
         {
-            var actionResult = await _controller.GetCivilAppearanceDetails("1984", "8344");
+            var civilAppearanceDetail = await _service.Civil.DetailedAppearanceAsync("1984", "8344");
 
-            var civilAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             var legalRepresentativeParty = civilAppearanceDetail.Party.FirstOrDefault(p => p.PartyId == "896");
             Assert.NotNull(legalRepresentativeParty);
             Assert.NotEmpty(legalRepresentativeParty.LegalRepresentative);
@@ -731,9 +700,8 @@ namespace tests.api.Controllers
         [Fact]
         public async void Civil_Appearance_Details_Party_CourtList_Counsel()
         {
-            var actionResult = await _controller.GetCivilAppearanceDetails("2436", "8430");
+            var civilAppearanceDetail = await _service.Civil.DetailedAppearanceAsync("2436", "8430");
 
-            var civilAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             var counselParty = civilAppearanceDetail.Party.FirstOrDefault(p => p.PartyId == "1928");
             Assert.NotNull(counselParty);
             Assert.NotEmpty(counselParty.Counsel);
@@ -745,9 +713,8 @@ namespace tests.api.Controllers
         [Fact]
         public async void Civil_Appearance_Details_Party_CourtList_Representative()
         {
-            var actionResult = await _controller.GetCivilAppearanceDetails("2307", "9403");
+            var civilAppearanceDetail = await _service.Civil.DetailedAppearanceAsync("2307", "9403");
 
-            var civilAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             var representativeParty = civilAppearanceDetail.Party.FirstOrDefault(p => p.PartyId == "1112");
             Assert.NotNull(representativeParty);
             Assert.NotEmpty(representativeParty.Representative);
@@ -757,9 +724,8 @@ namespace tests.api.Controllers
         [Fact]
         public async void Civil_Appearance_Details_Party_PreviousAppearance_PartyAppearanceMethod()
         {
-            var actionResult = await _controller.GetCivilAppearanceDetails("100", "19");
+            var civilAppearanceDetail = await _service.Civil.DetailedAppearanceAsync("100", "19");
 
-            var civilAppearanceDetail = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             var party = civilAppearanceDetail.Party.FirstOrDefault(p => p.PartyId == "21");
             Assert.NotNull(party);
             Assert.Equal("P", party.PartyAppearanceMethod);

@@ -50,7 +50,7 @@
             <criminal-participants v-if="showCaseDetails"/>            
             <criminal-adjudicator-restrictions v-if="showCaseDetails"/>
             <criminal-crown-information v-if="showCaseDetails"/>
-            <criminal-crown-notes v-if="showCaseDetails"/>
+            <!--<criminal-crown-notes v-if="showCaseDetails"/> Asked to be hidden by Kevin SCV-140.-->
             <criminal-past-appearances v-if="showPastAppearances" />
             <criminal-future-appearances v-if="showFutureAppearances" />
             <criminal-documents-view v-if="showDocuments"/>

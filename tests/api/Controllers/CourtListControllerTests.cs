@@ -153,8 +153,8 @@ namespace tests.api.Controllers
             var courtListResponse = HttpResponseTest.CheckForValidHttpResponseAndReturnValue(actionResult);
             var targetCivilCourtList = courtListResponse.CivilCourtList.First();
             Assert.NotNull(targetCivilCourtList);
-            Assert.Equal("Kipper has been seized to this case.", targetCivilCourtList.FileCommentText);
-            Assert.Equal("These are the sheriff's comments", targetCivilCourtList.SheriffCommentText);
+            Assert.NotEqual("Kipper has been seized to this case.", targetCivilCourtList.FileCommentText);
+            Assert.NotEqual("These are the sheriff's comments", targetCivilCourtList.SheriffCommentText);
         }
 
         [Fact]
@@ -191,7 +191,7 @@ namespace tests.api.Controllers
 
             var civilCourtList = courtListResponse.CivilCourtList.FirstOrDefault(ccl => ccl.CourtListPrintSortNumber == "2");
             Assert.NotNull(civilCourtList);
-            Assert.Contains("dd These remarks are going to be very long so I can test the size of this field.", civilCourtList.TrialRemarkTxt);
+            Assert.DoesNotContain("dd These remarks are going to be very long so I can test the size of this field.", civilCourtList.TrialRemarkTxt);
         }
 
         [Fact]

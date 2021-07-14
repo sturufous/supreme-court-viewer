@@ -32,5 +32,6 @@ namespace Scv.Api.Models.Criminal.AppearanceDetail
         public string EstimatedTimeHour { get; set; }
         public string EstimatedTimeMin { get; set; }
         public List<CriminalDocument> InitiatingDocuments { get; set; }
+        public CriminalFileDetailResponseCourtLevelCd CourtLevelCd { get;set;}
     }
 }

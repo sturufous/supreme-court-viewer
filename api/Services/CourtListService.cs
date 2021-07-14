@@ -217,9 +217,10 @@ namespace Scv.Api.Services
                 if (courtListFile.ActivityClassCd == courtListFile.ActivityClassDesc)
                     courtListFile.ActivityClassCd = fileDetail?.CourtClassCd.ToString();
 
-                courtListFile.CommentToJudgeText = fileDetail?.CommentToJudgeTxt;
-                courtListFile.TrialRemarkTxt = fileDetail?.TrialRemarkTxt;
-                courtListFile.FileCommentText = fileDetail?.FileCommentText;
+                //courtListFile.CommentToJudgeText = fileDetail?.CommentToJudgeTxt;
+                //courtListFile.TrialRemarkTxt = fileDetail?.TrialRemarkTxt;
+                //courtListFile.FileCommentText = fileDetail?.FileCommentText;
+                courtListFile.SheriffCommentText = null;
                 courtListFile.CfcsaFile = fileDetail?.CfcsaFileYN == "Y";
 
                 foreach (var hearingRestriction in courtListFile.HearingRestriction)
@@ -244,9 +245,6 @@ namespace Scv.Api.Services
                         await _lookupService.GetCivilAppearanceReasonsDescription(targetAppearance?.AppearanceReasonCd);
 
                     courtListFile.AppearanceStatusCd = targetAppearance?.AppearanceStatusCd.ToString();
-                    courtListFile.OutOfTownJudge = targetAppearance.OutOfTownJudgeTxt;
-                    courtListFile.SecurityRestriction = targetAppearance.SecurityRestrictionTxt;
-                    courtListFile.SupplementalEquipment = targetAppearance.SupplementalEquipmentTxt;
                     courtListFile.JudgeInitials = targetAppearance.JudgeInitials;
                     courtListFile.EstimatedTimeHour = targetAppearance.EstimatedTimeHour?.ReturnNullIfEmpty();
                     courtListFile.EstimatedTimeMin = targetAppearance.EstimatedTimeMin?.ReturnNullIfEmpty();
@@ -276,6 +274,7 @@ namespace Scv.Api.Services
                 courtListFile.Video = courtCalendarDetailAppearance?.VideoYn == CourtCalendarDetailAppearanceVideoYn.Y;
                 courtListFile.RemoteVideo = courtCalendarDetailAppearance?.RemoteVideoYn == CourtCalendarDetailAppearanceRemoteVideoYn.Y;
                 courtListFile.StyleOfCause = courtCalendarDetailAppearance?.StyleOfCause;
+                courtListFile.SheriffCommentText = null;
             }
 
             return courtList;
@@ -296,8 +295,8 @@ namespace Scv.Api.Services
                 if (courtListFile.ActivityClassCd == courtListFile.ActivityClassDesc)
                     courtListFile.ActivityClassCd = fileDetail?.CourtClassCd.ToString();
                 courtListFile.Crown = PopulateCrown(fileDetail);
-                courtListFile.TrialRemark = fileDetail?.TrialRemark;
-                courtListFile.TrialRemarkTxt = fileDetail?.TrialRemarkTxt;
+                //courtListFile.TrialRemark = fileDetail?.TrialRemark; This hide Crown Notes to JCM.
+                //courtListFile.TrialRemarkTxt = fileDetail?.TrialRemarkTxt;
                 var participant = fileDetail?.Participant.FirstOrDefault(p => p.PartId == courtListFile.FileInformation.PartId);
                 if (participant != null)
                 {
@@ -327,9 +326,9 @@ namespace Scv.Api.Services
                     courtListFile.AppearanceReasonCd = targetAppearance?.AppearanceReasonCd;
                     courtListFile.AppearanceReasonDesc = await _lookupService.GetCriminalAppearanceReasonsDescription(targetAppearance?.AppearanceReasonCd);
                     courtListFile.AppearanceStatusCd = targetAppearance?.AppearanceStatusCd.ToString();
-                    courtListFile.OutOfTownJudge = targetAppearance.OutOfTownJudgeTxt;
-                    courtListFile.SecurityRestriction = targetAppearance.SecurityRestrictionTxt;
-                    courtListFile.SupplementalEquipment = targetAppearance.SupplementalEquipmentTxt;
+                    //courtListFile.OutOfTownJudge = targetAppearance.OutOfTownJudgeTxt;
+                    //courtListFile.SecurityRestriction = targetAppearance.SecurityRestrictionTxt;
+                    //courtListFile.SupplementalEquipment = targetAppearance.SupplementalEquipmentTxt;
                     courtListFile.JudgeInitials = targetAppearance.JudgeInitials;
                     courtListFile.EstimatedTimeHour = targetAppearance.EstimatedTimeHour?.ReturnNullIfEmpty();
                     courtListFile.EstimatedTimeMin = targetAppearance.EstimatedTimeMin?.ReturnNullIfEmpty();
