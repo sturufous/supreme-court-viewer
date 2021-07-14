@@ -1810,6 +1810,12 @@ schemas:
           "documentPageCount" : {
             "type" : "string"
           },
+          "swornByNm" : {
+            "type" : "string"
+          },
+          "affidavitNo" : {
+            "type" : "string"
+          },
           "issue" : {
             "type" : "array",
             "items" : { "$ref" : "cvfcIssue" }
@@ -2405,6 +2411,12 @@ schemas:
           },
           "phoneNumberTxt" : {
             "type" : "string"
+          },
+          "counselAppearanceMethod" : {
+            "type" : "string"
+          },
+          "counselName" : {
+            "type" : "string"
           }
         }
       }
@@ -2554,13 +2566,13 @@ schemas:
         "$schema": "http://json-schema.org/draft-04/schema#",
         "type" : "object",
         "properties" : {
-          "PartyId" : {
+          "ReferenceDocumentId" : {
+            "type" : "string"
+          },
+          "ReferenceDocumentNo" : {
             "type" : "string"
           },
           "AppearanceId" : {
-            "type" : "string"
-          },
-          "PartyName" : {
             "type" : "string"
           },
           "AppearanceDate" : {
@@ -2575,11 +2587,35 @@ schemas:
           "EnterDtm" : {
             "type" : "string"
           },
+          "ReferenceDocumentTypeCd" : {
+            "type" : "string"
+          },
           "ReferenceDocumentTypeDsc" : {
             "type" : "string"
+          },
+          "ReferenceDocumentInterest" : {
+            "type" : "array",
+            "items" : { "$ref": "referenceDocumentInterest" }
           }
         }
       }     
+
+  - referenceDocumentInterest: |
+      {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties" : {
+          "PartyId": {
+            "type" : "string"
+          },
+          "PartyName" : {
+            "type" : "string"
+          },
+          "NonPartyName" : {
+            "type" : "string"
+          }
+        }
+      }
 
   - cvfcHearingRestriction2: |
       {
@@ -2662,6 +2698,12 @@ schemas:
           },
           "sheriffCommentText" : {
             "type" : "string"
+          },
+          "fileCommentText" : {
+            "type": "string"
+          },
+          "cfcsaFileYN" : {
+            "type": "string"
           },
           "sealedYN" : {
             "type" : "string"

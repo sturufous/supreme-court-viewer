@@ -2,7 +2,7 @@
 
    <b-card  v-if= "isMounted" no-body>
         <div>
-            <b-row>         
+            <b-row class="ml-0">         
                 <h3 class="mx-4 font-weight-normal"> Documents ({{NumberOfDocuments}}) </h3>
                 <custom-overlay :show="!downloadCompleted" style="padding: 0 1rem; margin-left:auto; margin-right:2rem;">
                     <b-button @click="downloadDocuments()" size="sm" variant="success" style="padding: 0 1rem; margin-left:auto; margin-right:2rem;"> Download Selected </b-button>
@@ -95,7 +95,7 @@
                     </template>
 
                 </b-table>
-                <span v-else class="text-muted ml-4 mb-5"> No document with label <b> {{activetab}} </b> . </span>
+                <span v-else class="text-muted ml-4 mb-5"> No document with label <b>{{activetab}}</b>.</span>
             </b-card>
             <template v-slot:overlay>               
                <div style="text-align: center"> 
@@ -118,11 +118,14 @@ import "@store/modules/CommonInformation";
 import {participantFilesInfoType, participantROPInfoType, participantListInfoType, participantDocumentsInfoType, criminalFileInformationType, ropRequestsInfoType} from '../../types/criminal';
 import {inputNamesType} from '../../types/common'
 import base64url from 'base64url';
+
+import shared from '../shared';
 const criminalState = namespace("CriminalFileInformation");
 const commonState = namespace("CommonInformation");
 
 import CustomOverlay from "../CustomOverlay.vue"
 import { archiveInfoType, documentRequestsInfoType } from '../../types/common';
+import { CourtDocumentType, DocumentData } from '../../types/shared';
 
 
 enum fieldTab {Categories=0, Summary, Bail}
@@ -180,20 +183,20 @@ export default class CriminalDocumentsView extends Vue {
         [
             {key:'Select',label:'',sortable:false,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},
             {key:'Date',               sortable:true,   tdClass: 'border-top',  headerStyle:'text-danger'},
-            {key:'Document Type',      sortable:true,   tdClass: 'border-top',  headerStyle:'text-primary'},
+            {key:'Document Type',      sortable:true,   tdClass: 'border-top',  cellStyle:'text-align:left;', headerStyle:'text-primary'},
             {key:'Category',           sortable:false,  tdClass: 'border-top',  headerStyle:'text'},
             {key:'Pages',              sortable:false,  tdClass: 'border-top',  headerStyle:'text'},
         ],
         [
             {key:'Select',label:'',sortable:false,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},
-            {key:'Document Type',    sortable:false,  tdClass: 'border-top', headerStyle:'text-primary'},
+            {key:'Document Type',    sortable:false,  tdClass: 'border-top', cellStyle:'text-align:left;', headerStyle:'text-primary'},
             {key:'Category',         sortable:true,   tdClass: 'border-top', headerStyle:'text'},
             {key:'Pages',            sortable:false,  tdClass: 'border-top', headerStyle:'text'},
         ],
         [
             {key:'Select',label:'',sortable:false,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},
             {key:'Date',               sortable:true,   tdClass: 'border-top',  headerStyle:'text-danger'},
-            {key:'Document Type',      sortable:true,   tdClass: 'border-top',  headerStyle:'text-primary'},
+            {key:'Document Type',      sortable:true,   tdClass: 'border-top',  cellStyle:'text-align:left;', headerStyle:'text-primary'},
             {key:'Status',             sortable:true,   tdClass: 'border-top',  headerStyle:'text-primary'},
             {key:'Status Date',        sortable:true,   tdClass: 'border-top',  headerStyle:'text-primary'},
             {key:'Category',           sortable:false,  tdClass: 'border-top',  headerStyle:'text'},
@@ -241,14 +244,30 @@ export default class CriminalDocumentsView extends Vue {
     public downloadDocuments() {
         // console.log(this.participantFiles["Documents"])
 
-        const fileName = 'file'+this.criminalFileInformation.fileNumber+'documents.zip';
+        const fileName = shared.generateFileName(CourtDocumentType.CriminalZip, {
+            location: this.criminalFileInformation.detailsData.homeLocationAgencyName,
+            courtClass: this.criminalFileInformation.detailsData.courtClassCd,
+            courtLevel: this.criminalFileInformation.detailsData.courtLevelCd,
+            fileNumberText:  this.criminalFileInformation.detailsData.fileNumberTxt
+        });
+        
         this.selectedDocuments = {zipName: fileName, csrRequests: [], documentRequests: [], ropRequests: []};
         for(const doc of this.participantFiles[this.activeCriminalParticipantIndex]["Documents"]){
             if (doc.isChecked && doc.isEnabled) {
                 const id = doc["Image ID"];                
                 const documentRequest = {} as documentRequestsInfoType;
                 documentRequest.isCriminal = true;
-                documentRequest.pdfFileName = 'doc' + id + '.pdf';
+                const documentData: DocumentData = { 
+                    courtClass: this.criminalFileInformation.detailsData.courtClassCd, 
+                    courtLevel: this.criminalFileInformation.detailsData.courtLevelCd, 
+                    dateFiled: Vue.filter('beautify-date')(doc["Date"]),
+                    documentDescription: doc["Document Type"],
+                    documentId: id,
+                    fileId: this.criminalFileInformation.fileNumber,
+                    fileNumberText: this.criminalFileInformation.detailsData.fileNumberTxt,
+                    location: this.criminalFileInformation.detailsData.homeLocationAgencyName,
+                };
+                documentRequest.pdfFileName = shared.generateFileName(CourtDocumentType.Criminal, documentData);
                 documentRequest.base64UrlEncodedDocumentId = base64url(id);
                 documentRequest.fileId = this.criminalFileInformation.fileNumber;
                 this.selectedDocuments.documentRequests.push(documentRequest);                
@@ -259,7 +278,17 @@ export default class CriminalDocumentsView extends Vue {
             if (doc.isChecked && doc.isEnabled) {                
                 const ropRequest = {} as ropRequestsInfoType;
                 const partId = doc['Part ID'];
-                ropRequest.pdfFileName = 'ROP_'+partId+'.pdf';
+                const documentData: DocumentData = { 
+                    courtClass: this.criminalFileInformation.detailsData.courtClassCd, 
+                    courtLevel: this.criminalFileInformation.detailsData.courtLevelCd, 
+                    documentDescription: doc["Document Type"],
+                    fileId: this.criminalFileInformation.fileNumber,
+                    fileNumberText: this.criminalFileInformation.detailsData.fileNumberTxt,
+                    location: this.criminalFileInformation.detailsData.homeLocationAgencyName,
+                    partId: partId,
+                    profSeqNo: doc['Prof Seq No']
+                };
+                ropRequest.pdfFileName = shared.generateFileName(CourtDocumentType.ROP, documentData);
                 ropRequest.partId = partId;
                 ropRequest.profSequenceNumber = doc['Prof Seq No'];
                 ropRequest.courtLevelCode = this.criminalFileInformation.courtLevel;
@@ -286,7 +315,7 @@ export default class CriminalDocumentsView extends Vue {
                 link.click();
                 setTimeout(() => URL.revokeObjectURL(link.href), 1000);
                 this.downloadCompleted = true;
-            }, err =>{this.downloadCompleted = true;})
+            }, err =>{ console.log(err); this.downloadCompleted = true;})
         }
     }
 
@@ -319,7 +348,7 @@ export default class CriminalDocumentsView extends Vue {
         }    
     }
 
-    public toggleSelectedDocuments(checked) {  
+    public toggleSelectedDocuments() {  
         Vue.nextTick(()=>{
             if(this.activetab == 'ROP') {
                 const checkedDocs = this.participantFiles[this.activeCriminalParticipantIndex]["Record of Proceedings"].filter(doc=>{return doc.isChecked})
@@ -463,41 +492,26 @@ export default class CriminalDocumentsView extends Vue {
         }    
     }
 
-    public cellClick(data)
-    {         
-        if(data.item.Category !='ROP')        
-            this.openDocumentsPdf(data.item["Image ID"]);        
-        else        
-            this.openRopPdf(data.item["Index"])              
-    }
-
-    public openDocumentsPdf(imageId): void {
+    public cellClick(eventData)
+    {   
         this.loadingPdf = true;
-        const filename = 'doc' + imageId + '.pdf';
-        imageId = base64url(imageId);
-        window.open(`${process.env.BASE_URL}api/files/document/${imageId}/${filename}?isCriminal=true&fileId=${this.criminalFileInformation.fileNumber}`)
+        const documentType = eventData.item.Category == "ROP" ? CourtDocumentType.ROP : CourtDocumentType.Criminal;
+        const index = eventData.item["Index"];
+        const documentData: DocumentData = { 
+            courtClass: this.criminalFileInformation.detailsData.courtClassCd, 
+            courtLevel: this.criminalFileInformation.detailsData.courtLevelCd, 
+            dateFiled: Vue.filter('beautify-date')(eventData.item["Date"]),
+            documentId: eventData.item["Image ID"], 
+            documentDescription: eventData.item["Document Type"],
+            fileId: this.criminalFileInformation.fileNumber, 
+            fileNumberText: this.criminalFileInformation.detailsData.fileNumberTxt,
+            partId: index ? this.participantFiles[index]["Part ID"] : '', 
+            profSeqNo: index ? this.participantFiles[index]["Prof Seq No"]: '', 
+            location: this.criminalFileInformation.detailsData.homeLocationAgencyName
+        };
+        shared.openDocumentsPdf(documentType, documentData);
         this.loadingPdf = false;
     }
-    
-    public openRopPdf(index): void {
-        this.loadingPdf = true;         
-        const partID = this.participantFiles[index]["Part ID"];
-        const profSeqNo = this.participantFiles[index]["Prof Seq No"];      
-        const filename = 'ROP_'+partID+'.pdf';
-      
-        const url =`api/files/criminal/record-of-proceedings/${partID}/${filename}?profSequenceNumber=${profSeqNo}&courtLevelCode=${this.courtLevel}&courtClassCode=${this.courtClass}`;
-
-        this.$http.get(url)
-            .then(() => {
-                window.open(`${process.env.BASE_URL}${url}`);
-                this.loadingPdf = false;},
-              err => {
-                console.log(err); 
-                window.alert("Broken PDF File");
-                this.loadingPdf = false;}
-            );        
-    }
-    
 }
 </script>
 

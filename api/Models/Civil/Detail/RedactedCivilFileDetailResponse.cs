@@ -1,4 +1,5 @@
 ﻿using JCCommon.Clients.FileServices;
+using Scv.Api.Models.Civil.Appearances;
 using System.Collections.Generic;
 
 namespace Scv.Api.Models.Civil.Detail
@@ -26,10 +27,6 @@ namespace Scv.Api.Models.Civil.Detail
         public string HomeLocationAgencyName { get; set; }
         public string HomeLocationAgencyCode { get; set; }
         public string HomeLocationRegionName { get; set; }
-        public string TrialRemarkTxt { get; set; }
-        public string CommentToJudgeTxt { get; set; }
-        public string SheriffCommentText { get; set; }
-        public string FileCommentText { get; set; }
 
         /// <summary>
         /// Extended party object. Hides fields.
@@ -46,6 +43,6 @@ namespace Scv.Api.Models.Civil.Detail
         /// Extended hearing restriction object. 
         /// </summary>
         public ICollection<CivilHearingRestriction> HearingRestriction { get; set; }
-        public CivilFileAppearancesResponse Appearances { get; set; }
+        public CivilAppearanceResponse Appearances { get; set; }
     }
 }

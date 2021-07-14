@@ -264,6 +264,7 @@ export default class CriminalPastAppearances extends Vue {
             this.appearanceInfo.fileNo = this.criminalFileInformation.fileNumber;
             this.appearanceInfo.courtLevel = this.criminalFileInformation.courtLevel;
             this.appearanceInfo.courtClass = this.criminalFileInformation.courtClass;
+            this.appearanceInfo.date = data.item["FormattedDate"];
             this.appearanceInfo.appearanceId = data.item["Appearance ID"];
             this.appearanceInfo.partId = data.item["Part ID"];
             this.appearanceInfo.supplementalEquipmentTxt = data.item["Supplemental Equipment"];

@@ -34,12 +34,12 @@
                 <civil-header-top v-if="isDataReady"/> 
                 <civil-header v-if="isDataReady"/>
 
-                <b-row v-if="showAllDocuments">
+                <b-row class="ml-0" v-if="showAllDocuments">
                     <h2 style= "white-space: pre" v-if="isDataReady">
                         {{selectedSideBar}}
                     </h2>         
                     <custom-overlay v-if="isDataReady" :show="!downloadCompleted" style="padding: 0 1rem; margin-left:auto; margin-right:2rem;">
-                        <b-button @click="downloadDocuments()" size="md" variant="info" style="padding: 0 1rem; margin-left:auto; margin-right:2rem;"> Download All Documents </b-button>
+                        <b-button @click="downloadAllDocuments()" size="md" variant="info" style="padding: 0 1rem; margin-left:auto; margin-right:2rem;"> Download All Documents </b-button>
                     </custom-overlay>
                 </b-row> 
 
@@ -93,6 +93,8 @@ import "@store/modules/CivilFileInformation";
 import CustomOverlay from "../CustomOverlay.vue"
 import { civilReferenceDocumentJsonType } from '../../types/civil/jsonTypes';
 import base64url from 'base64url';
+import shared from '../shared';
+import { CourtDocumentType, DocumentData } from '../../types/shared';
 const civilState = namespace("CivilFileInformation");
 const commonState = namespace("CommonInformation");
 
@@ -203,16 +205,31 @@ export default class CivilCaseDetails extends Vue {
             });
     }
     
-    public downloadDocuments(){
+    public downloadAllDocuments(){
 
-        const fileName = 'file'+this.civilFileInformation.fileNumber+'documents.zip'
+        const fileName = shared.generateFileName(CourtDocumentType.CivilZip, {
+            location: this.civilFileInformation.detailsData.homeLocationAgencyName,
+            courtLevel: this.civilFileInformation.detailsData.courtLevelCd,
+            fileNumberText:  this.civilFileInformation.detailsData.fileNumberTxt
+        });
+        
         const documentsToDownload = { zipName: fileName, csrRequests: [], documentRequests: [], ropRequests: [], vcCivilFileId: this.civilFileInformation.fileNumber } as archiveInfoType;
         for(const doc of this.providedDocumentsInfo){
             if (doc.isEnabled) {
                 const id = doc.objectGuid;                
                 const documentRequest = {} as documentRequestsInfoType;
                 documentRequest.isCriminal = false;
-                documentRequest.pdfFileName = 'doc_' + doc.partyName + '_' + doc.referenceDocumentTypeDsc + '.pdf';
+                const documentData: DocumentData  = {
+                    appearanceDate: Vue.filter('beautify-date')(doc.appearanceDate), 
+                    courtLevel: this.civilFileInformation.detailsData.courtLevelCd,
+                    documentDescription: doc.descriptionText,
+                    documentId: id,
+                    fileId: this.civilFileInformation.fileNumber,
+                    fileNumberText:  this.civilFileInformation.detailsData.fileNumberTxt,
+                    location: this.civilFileInformation.detailsData.homeLocationAgencyName,
+                    partyName: doc.partyName
+                };
+                documentRequest.pdfFileName = shared.generateFileName(CourtDocumentType.ProvidedCivil, documentData);
                 documentRequest.base64UrlEncodedDocumentId = base64url(id);
                 documentRequest.fileId = this.civilFileInformation.fileNumber;
                 documentsToDownload.documentRequests.push(documentRequest);                
@@ -224,7 +241,16 @@ export default class CivilCaseDetails extends Vue {
                 const id = doc["Document ID"]                
                 const documentRequest = {} as documentRequestsInfoType;
                 documentRequest.isCriminal = false;
-                documentRequest.pdfFileName = 'doc' + id + '.pdf';
+                const documentData: DocumentData  = { 
+                    courtLevel: this.civilFileInformation.detailsData.courtLevelCd,
+                    dateFiled: Vue.filter('beautify-date')(doc["Date Filed"]),
+                    documentDescription: doc["Document Type"],
+                    documentId: id,
+                    fileId:this.civilFileInformation.fileNumber,
+                    fileNumberText:  this.civilFileInformation.detailsData.fileNumberTxt,
+                    location: this.civilFileInformation.detailsData.homeLocationAgencyName
+                };
+                documentRequest.pdfFileName = shared.generateFileName(CourtDocumentType.Civil, documentData);
                 documentRequest.base64UrlEncodedDocumentId = base64url(id);
                 documentRequest.fileId = this.civilFileInformation.fileNumber;
                 documentsToDownload.documentRequests.push(documentRequest);                
@@ -236,7 +262,16 @@ export default class CivilCaseDetails extends Vue {
                 const id = doc["Appearance ID"];                      
                 const csrRequest = {} as csrRequestsInfoType;
                 csrRequest.appearanceId = id;
-                csrRequest.pdfFileName = 'court summary_'+id+'.pdf';
+                const documentData: DocumentData  = { 
+                    appearanceDate: Vue.filter('beautify-date')(doc["Appearance Date"]),
+                    appearanceId: id,
+                    courtLevel: this.civilFileInformation.detailsData.courtLevelCd,
+                    documentDescription: doc["Document Type"],
+                    fileNumberText:  this.civilFileInformation.detailsData.fileNumberTxt,
+                    fileId: this.civilFileInformation.fileNumber,
+                    location: this.civilFileInformation.detailsData.homeLocationAgencyName
+                };
+                csrRequest.pdfFileName = shared.generateFileName(CourtDocumentType.CSR, documentData);
                 documentsToDownload.csrRequests.push(csrRequest);
             }        
         }
@@ -259,7 +294,7 @@ export default class CivilCaseDetails extends Vue {
                 link.click();
                 setTimeout(() => URL.revokeObjectURL(link.href), 1000);
                 this.downloadCompleted = true;
-            }, err =>{this.downloadCompleted = true;})
+            }, err =>{ console.log(err); this.downloadCompleted = true;})
         }
     }
     

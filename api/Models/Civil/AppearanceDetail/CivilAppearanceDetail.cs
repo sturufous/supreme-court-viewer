@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using JCCommon.Clients.FileServices;
+using System.Collections.Generic;
 
 namespace Scv.Api.Models.Civil.AppearanceDetail
 {
@@ -14,7 +15,6 @@ namespace Scv.Api.Models.Civil.AppearanceDetail
         public string AppearanceResultDesc { get; set; }
         public string AppearanceReasonCd { get; set; }
         public string AppearanceReasonDesc { get; set; }
-        public string AdjudicatorComment { get; set; }
         public CivilAdjudicator Adjudicator { get; set; }
         
         /// <summary>
@@ -31,5 +31,6 @@ namespace Scv.Api.Models.Civil.AppearanceDetail
         /// Extended object.
         /// </summary>
         public ICollection<CivilAppearanceMethod> AppearanceMethod { get; set; }
+        public CivilFileDetailResponseCourtLevelCd CourtLevelCd { get;set; }
     }
 }

@@ -366,20 +366,14 @@ export default class CourtList extends Vue {
     public getCourtNameById(locationId) 
     {        
         return this.courtRoomsAndLocations.filter(location => {                
-            if (location.value['LocationID'] == locationId) 
-                return true;
-            else 
-                return false;            
+            return location.value['LocationID'] == locationId;
         });
     }
 
     public getRoomInLocationByRoomNo(location, roomNo)
     {
         return location.value['Rooms'].filter(room=>{
-            if(room.value==roomNo)
-                return true;
-            else 
-                return false;
+            return room.value==roomNo;
         })
     }
 

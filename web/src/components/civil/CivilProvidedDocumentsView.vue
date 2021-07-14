@@ -133,9 +133,11 @@ import { namespace } from 'vuex-class';
 import base64url from "base64url";
 import '@store/modules/CivilFileInformation';
 import {civilFileInformationType, referenceDocumentsInfoType} from '../../types/civil';
+import { CourtDocumentType, DocumentData } from '../../types/shared';
 const civilState = namespace('CivilFileInformation');
 
 import CustomOverlay from "../CustomOverlay.vue"
+import shared from "../shared"
 import { archiveInfoType, documentRequestsInfoType } from '../../types/common';
 enum fieldTab {Categories=0}
 
@@ -175,7 +177,7 @@ export default class CivilProvidedDocumentsView extends Vue {
         [
             {key:'Select',label:'',sortable:false,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},
             {key:'partyName',                label:'Party Name',  sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
-            {key:'referenceDocumentTypeDsc', label:'Document Type',  sortable:false,  headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 16px;'},
+            {key:'referenceDocumentTypeDsc', label:'Document Type',  sortable:false,  headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 16px;text-align:left;'},
             {key:'appearanceDate',           label:'Appearance Date', sortable:true,  headerStyle:'text',   cellStyle:'font-size: 16px;'},
             {key:'enterDtm',                 label:'Created Date', sortable:true,  headerStyle:'text',   cellStyle:'font-size: 16px;'},
             {key:'descriptionText',          label:'Description', sortable:false, headerStyle:'text',          cellStyle:'font-size: 12px;'}
@@ -201,14 +203,28 @@ export default class CivilProvidedDocumentsView extends Vue {
 
     public downloadDocuments(){
 
-        const fileName = 'file'+this.civilFileInformation.fileNumber+'provided_documents.zip'
+        const fileName = shared.generateFileName(CourtDocumentType.CivilZip, {
+            location: this.civilFileInformation.detailsData.homeLocationAgencyName,
+            courtLevel: this.civilFileInformation.detailsData.courtLevelCd,
+            fileNumberText:  this.civilFileInformation.detailsData.fileNumberTxt
+        }).replace('documents', 'provided-documents');
+
         this.selectedDocuments = {zipName: fileName, csrRequests: [], documentRequests: [], ropRequests: []};
         for(const doc of this.documents){
             if (doc.isChecked && doc.isEnabled) {
                 const id = doc.objectGuid;                
                 const documentRequest = {} as documentRequestsInfoType;
                 documentRequest.isCriminal = false;
-                documentRequest.pdfFileName = 'doc_' + doc.partyName + '_' + doc.referenceDocumentTypeDsc + '.pdf';
+                const documentData: DocumentData  = {
+                    appearanceDate: Vue.filter('beautify-date')(doc.appearanceDate),
+                    courtLevel: this.civilFileInformation.detailsData.courtLevelCd,
+                    documentDescription: doc.descriptionText,
+                    documentId: id,
+                    fileNumberText:  this.civilFileInformation.detailsData.fileNumberTxt,
+                    location: this.civilFileInformation.detailsData.homeLocationAgencyName,
+                    partyName: doc.partyName
+                };
+                documentRequest.pdfFileName = shared.generateFileName(CourtDocumentType.ProvidedCivil, documentData); 
                 documentRequest.base64UrlEncodedDocumentId = base64url(id);
                 documentRequest.fileId = this.civilFileInformation.fileNumber;
                 this.selectedDocuments.documentRequests.push(documentRequest);                
@@ -233,7 +249,7 @@ export default class CivilProvidedDocumentsView extends Vue {
                 link.click();
                 setTimeout(() => URL.revokeObjectURL(link.href), 1000);
                 this.downloadCompleted = true;
-            }, err =>{this.downloadCompleted = true;})
+            }, err =>{ console.log(err); this.downloadCompleted = true;})
         }
     }
 
@@ -259,7 +275,7 @@ export default class CivilProvidedDocumentsView extends Vue {
         this.activetab = tabMapping;
     }
 
-    public toggleSelectedDocuments(checked) {  
+    public toggleSelectedDocuments() {  
         Vue.nextTick(()=>{
             const checkedDocs = this.documents.filter(doc=>{return doc.isChecked})
             const enabledDocs = this.documents.filter(doc=>{return doc.isEnabled})
@@ -270,9 +286,22 @@ export default class CivilProvidedDocumentsView extends Vue {
         })        
 	}
 
-    public cellClick(data)
+    public cellClick(eventData)
     {  
-        this.openDocumentsPdf(data.item.objectGuid);
+        this.loadingPdf = true;
+        const documentData: DocumentData = {
+            appearanceDate: Vue.filter('beautify-date')(eventData.item.appearanceDate),
+            courtClass: this.civilFileInformation.detailsData.courtClassCd,
+            courtLevel: this.civilFileInformation.detailsData.courtLevelCd, 
+            documentId: eventData.item.objectGuid,
+            documentDescription: eventData.item.referenceDocumentTypeDsc,
+            fileId: this.civilFileInformation.fileNumber,
+            fileNumberText: this.civilFileInformation.detailsData.fileNumberTxt,
+            partyName: eventData.item.partyName,
+            location: this.civilFileInformation.detailsData.homeLocationAgencyName
+        }
+        shared.openDocumentsPdf(CourtDocumentType.ProvidedCivil, documentData);
+        this.loadingPdf = false;
     }
 
     public navigateToLandingPage() {
@@ -296,16 +325,6 @@ export default class CivilProvidedDocumentsView extends Vue {
             }
         });  
     }
-       
-    
-
-    public openDocumentsPdf(documentId): void {
-        this.loadingPdf = true;
-        const filename = 'doc.pdf';
-        documentId = base64url(documentId);
-        window.open(`${process.env.BASE_URL}api/files/document/${documentId}/${filename}?isCriminal=false&fileId=${this.civilFileInformation.fileNumber}`)
-        this.loadingPdf = false;
-    }    
     
     get NumberOfDocuments() {
         return(this.documents.length)

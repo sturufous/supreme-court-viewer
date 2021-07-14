@@ -7,16 +7,22 @@ namespace Scv.Api.Helpers.Extensions
 {
     public static class ClaimsPrincipalExtensions
     {
-        public static string ParticipantId(this ClaimsPrincipal claimsPrincipal)
+        public static string ApplicationCode(this ClaimsPrincipal claimsPrincipal)
         {
             var identity = (ClaimsIdentity)claimsPrincipal.Identity;
-            return identity.Claims.FirstOrDefault(c => c.Type == CustomClaimTypes.JcParticipantId)?.Value;
+            return identity.Claims.FirstOrDefault(c => c.Type == CustomClaimTypes.ApplicationCode)?.Value;
         }
 
         public static string AgencyCode(this ClaimsPrincipal claimsPrincipal)
         {
             var identity = (ClaimsIdentity)claimsPrincipal.Identity;
             return identity.Claims.FirstOrDefault(c => c.Type == CustomClaimTypes.JcAgencyCode)?.Value;
+        }
+
+        public static string ParticipantId(this ClaimsPrincipal claimsPrincipal)
+        {
+            var identity = (ClaimsIdentity)claimsPrincipal.Identity;
+            return identity.Claims.FirstOrDefault(c => c.Type == CustomClaimTypes.JcParticipantId)?.Value;
         }
 
         public static string UserId(this ClaimsPrincipal claimsPrincipal) =>
@@ -39,12 +45,12 @@ namespace Scv.Api.Helpers.Extensions
         => claimsPrincipal.HasClaim(c => c.Type == CustomClaimTypes.PreferredUsername) && 
            claimsPrincipal.FindFirstValue(CustomClaimTypes.PreferredUsername).EndsWith("@idir");
 
-        public static bool IsSupremeUser(this ClaimsPrincipal claimsPrincipal)
-        => claimsPrincipal.HasClaim(c => c.Type == CustomClaimTypes.IsSupremeUser) && 
-           claimsPrincipal.FindFirstValue(CustomClaimTypes.IsSupremeUser).Equals("True");
-
         public static bool IsVcUser(this ClaimsPrincipal claimsPrincipal)
             => claimsPrincipal.HasClaim(c => c.Type == CustomClaimTypes.PreferredUsername) && 
                claimsPrincipal.FindFirstValue(CustomClaimTypes.PreferredUsername).EndsWith("@vc");
+
+        public static bool IsSupremeUser(this ClaimsPrincipal claimsPrincipal)
+        => claimsPrincipal.HasClaim(c => c.Type == CustomClaimTypes.IsSupremeUser) && 
+           claimsPrincipal.FindFirstValue(CustomClaimTypes.IsSupremeUser).Equals("true", StringComparison.OrdinalIgnoreCase);
     }
 }

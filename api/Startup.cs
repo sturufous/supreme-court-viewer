@@ -24,6 +24,7 @@ using Scv.Api.Infrastructure.Encryption;
 using Scv.Api.Infrastructure.Middleware;
 using Scv.Api.Services.EF;
 using Scv.Db.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Scv.Api
 {
@@ -41,11 +42,25 @@ namespace Scv.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddLogging(options =>
+            {
+                options.AddConsole(c =>
+                {
+                    c.DisableColors = true;
+                    c.TimestampFormat = "[yyyy-MM-dd HH:mm:ss] ";
+                });
+            });
+
             services.AddSingleton<MigrationAndSeedService>();
 
             services.AddDbContext<ScvDbContext>(options =>
                 {
-                    options.UseNpgsql(Configuration.GetNonEmptyValue("DatabaseConnectionString"), npg => npg.MigrationsAssembly("db")).UseSnakeCaseNamingConvention();
+                    options.UseNpgsql(Configuration.GetNonEmptyValue("DatabaseConnectionString"), npg => 
+                    {
+                        npg.MigrationsAssembly("db");
+                        npg.EnableRetryOnFailure(5, TimeSpan.FromSeconds(1), null);
+                   }).UseSnakeCaseNamingConvention();
+
                     if (CurrentEnvironment.IsDevelopment())
                         options.EnableSensitiveDataLogging();
                 }
@@ -107,7 +122,7 @@ namespace Scv.Api
 
             services.AddSwaggerGen(options =>
             {
-                options.EnableAnnotations(true);
+                options.EnableAnnotations(true, true);
                 options.CustomSchemaIds(o => o.FullName);
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);

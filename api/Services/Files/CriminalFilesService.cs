@@ -1,5 +1,4 @@
 ﻿using JCCommon.Clients.FileServices;
-using JCCommon.Models;
 using LazyCache;
 using MapsterMapper;
 using Microsoft.Extensions.Configuration;
@@ -10,6 +9,7 @@ using Scv.Api.Helpers.Extensions;
 using Scv.Api.Models.Criminal.AppearanceDetail;
 using Scv.Api.Models.Criminal.Appearances;
 using Scv.Api.Models.Criminal.Detail;
+using Scv.Api.Models.Search;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,7 +47,7 @@ namespace Scv.Api.Services.Files
             _lookupService = lookupService;
             _locationService = locationService;
             _mapper = mapper;
-            _applicationCode = configuration.GetNonEmptyValue("Request:ApplicationCd");
+            _applicationCode = user.ApplicationCode();
             _requestAgencyIdentifierId = user.AgencyCode();
             _requestPartId = user.ParticipantId();
             _cache = cache;
@@ -196,8 +196,8 @@ namespace Scv.Api.Services.Files
                 FileNumberTxt = detail.FileNumberTxt,
                 AppearanceMethods = await PopulateAppearanceMethods(appearanceMethods.AppearanceMethod),
                 AppearanceDt = targetAppearance.AppearanceDt,
-                AppearanceNote = appearanceFromAccused.AppearanceNote?.ReturnNullIfEmpty(),
-                JudgesRecommendation = appearanceFromAccused.JudgesRecommendation,
+                //AppearanceNote = appearanceFromAccused.AppearanceNote?.ReturnNullIfEmpty(),
+                //JudgesRecommendation = appearanceFromAccused.JudgesRecommendation,
                 EstimatedTimeHour = appearanceFromAccused.EstimatedTimeHour?.ReturnNullIfEmpty(),
                 EstimatedTimeMin = appearanceFromAccused.EstimatedTimeMin?.ReturnNullIfEmpty(),
                 Accused = await PopulateAppearanceCriminalAccused(criminalParticipant.FullName, appearanceFromAccused, attendanceMethods, partId, appearanceMethods.AppearanceMethod),
@@ -205,7 +205,8 @@ namespace Scv.Api.Services.Files
                 Adjudicator = await PopulateAppearanceDetailAdjudicator(appearanceFromAccused, attendanceMethods, appearanceMethods.AppearanceMethod),
                 JustinCounsel = await PopulateAppearanceDetailJustinCounsel(criminalParticipant, appearanceFromAccused, attendanceMethods, appearanceMethods.AppearanceMethod),
                 Charges = await PopulateCharges(appearanceCount.ApprCount),
-                InitiatingDocuments = GetInitiatingDocumentsImageIds(accusedFile.Document)
+                InitiatingDocuments = GetInitiatingDocuments(accusedFile.Document),
+                CourtLevelCd = detail.CourtLevelCd
             };
             return appearanceDetail;
         }
@@ -216,11 +217,10 @@ namespace Scv.Api.Services.Files
 
         #region Criminal Details
 
-        //Couldn't find any data for this in DEV, or TEST. 
-        private List<string> GetInitiatingDocumentsImageIds(ICollection<CfcDocument> documents)
+        private List<CriminalDocument> GetInitiatingDocuments(ICollection<CfcDocument> documents)
         {
             return documents?.Where(doc => doc?.DocmClassification == "Initiating" && !string.IsNullOrEmpty(doc.ImageId))
-                .Select(a => a.ImageId).ToList();
+                .Select(a => new CriminalDocument {IssueDate = a.IssueDate, ImageId = a.ImageId}).ToList();
         }
 
         private async Task<CriminalFileAppearances> PopulateDetailsAppearancesAsync(string fileId, FutureYN? future, HistoryYN? history)

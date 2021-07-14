@@ -328,7 +328,6 @@ export default class CivilList extends Vue {
             SCH – Supreme Court Chambers
             SCV – Supreme Court Trial List
         */
-
         for (const civilListIndex in this.civilCourtListJson) 
         {
             const civilListInfo = {} as civilListInfoType;

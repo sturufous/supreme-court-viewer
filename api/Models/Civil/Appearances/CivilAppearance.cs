@@ -1,4 +1,7 @@
-﻿namespace Scv.Api.Models.Civil.Appearances
+﻿using Mapster;
+using Newtonsoft.Json;
+
+namespace Scv.Api.Models.Civil.Appearances
 {
     /// <summary>
     /// Extends the original object.
@@ -11,5 +14,14 @@
         public string CourtLocationId { get; set; }
         public string CourtLocation { get; set; }
         public string DocumentTypeDsc { get; set; }
+        [AdaptIgnore]
+        [JsonIgnore]
+        public new string OutOfTownJudgeTxt { get; set; }
+        [AdaptIgnore]
+        [JsonIgnore]
+        public new string SupplementalEquipmentTxt { get; set; }
+        [AdaptIgnore]
+        [JsonIgnore]
+        public new string SecurityRestrictionTxt { get; set; }
     }
 }

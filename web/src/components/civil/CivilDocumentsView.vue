@@ -153,6 +153,8 @@ const civilState = namespace('CivilFileInformation');
 
 import CustomOverlay from "../CustomOverlay.vue"
 import { archiveInfoType, documentRequestsInfoType } from '../../types/common';
+import shared from "../shared";
+import { CourtDocumentType, DocumentData } from '../../types/shared';
 
 enum fieldTab {Categories=0, Summary, Orders, Scheduled}
 
@@ -191,12 +193,12 @@ export default class CivilDocumentsView extends Vue {
         [
             {key:'Select',label:'',sortable:false,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},
             {key:'Seq',label:'Seq.',  sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
-            {key:'Document Type',  sortable:true,  headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 16px;'},
+            {key:'Document Type',  sortable:true,  headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 16px; text-align:left;'},
             {key:'Act',            sortable:false, headerStyle:'text',          cellStyle:'display: block; margin-top: 1px; font-size: 14px; max-width : 50px;'},
             {key:'Date Filed',     sortable:true,  headerStyle:'text-danger',   cellStyle:'font-size: 16px;'},
             {key:'Issues',         sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px;'},
             {key:'Filed By Name',  sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px'},
-            {key:'Comment',        sortable:false, headerStyle:'text',          cellStyle:'font-size: 16px;'}
+            {key:'Comment',        sortable:false, headerStyle:'text',          cellStyle:'font-size: 12px; max-width:300px;', tdClass: 'max-width-300'}
         ],
         [
             {key:'Select',label:'',  sortable:false,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},            
@@ -206,22 +208,22 @@ export default class CivilDocumentsView extends Vue {
         [
             {key:'Select',label:'',sortable:false,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},            
             {key:'Seq',label:'Seq.',  sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
-            {key:'Document Type',  sortable:true,  headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 16px;'},
+            {key:'Document Type',  sortable:true,  headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 16px; text-align:left;'},
             {key:'Date Filed',     sortable:false, headerStyle:'text-primary',   cellStyle:'font-size: 16px;'},
             {key:'Order Made Date',sortable:true,  headerStyle:'text-primary',   cellStyle:'font-size: 16px;'},
             {key:'Filed By Name',  sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px'},
-            {key:'Comment',        sortable:false, headerStyle:'text',          cellStyle:'font-size: 16px;'}
+            {key:'Comment',        sortable:false, headerStyle:'text',          cellStyle:'font-size: 12px; max-width:300px;', tdClass: 'max-width-300'}
         ],
         [
             {key:'Select',label:'',      sortable:false,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},            
             {key:'Seq',label:'Seq.',        sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
-            {key:'Document Type',        sortable:true,  headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 16px;'},
+            {key:'Document Type',        sortable:true,  headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 16px; text-align:left;'},
             {key:'Act',                  sortable:false, headerStyle:'text',          cellStyle:'display: block; margin-top: 1px; font-size: 14px; max-width : 50px;'},
             {key:'Next Appearance Date', sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
             {key:'Date Filed',           sortable:false, headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
             {key:'Issues',               sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px;'},
             {key:'Filed By Name',        sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px;'},
-            {key:'Comment',              sortable:false, headerStyle:'text',          cellStyle:'font-size: 16px;'}
+            {key:'Comment',              sortable:false, headerStyle:'text',          cellStyle:'font-size: 12px; max-width:300px;', tdClass: 'max-width-300'}
         ]  
         
     ];
@@ -248,24 +250,49 @@ export default class CivilDocumentsView extends Vue {
         this.activetab = tabMapping;
     }
 
-    public cellClick(data)
-    {          
-        if(data.value !='CourtSummary')        
-            this.openDocumentsPdf(data.item['Document ID']);        
-        else        
-            this.openCourtSummaryPdf(data.item['Appearance ID'])              
+    public cellClick(eventData)
+    {   
+        this.loadingPdf = true;
+        const documentType = eventData.value == "CourtSummary" ? CourtDocumentType.CSR : CourtDocumentType.Civil;
+        const documentData: DocumentData = { 
+            appearanceDate: eventData.item['Appearance Date'],
+            appearanceId: eventData.item['Appearance ID'],
+            dateFiled: eventData.item['Date Filed'],
+            documentDescription: eventData.item['Document Type'],
+            documentId: eventData.item['Document ID'], 
+            fileId: this.civilFileInformation.fileNumber,
+            fileNumberText: this.civilFileInformation.detailsData.fileNumberTxt,
+            courtClass: this.civilFileInformation.detailsData.courtClassCd,
+            courtLevel: this.civilFileInformation.detailsData.courtLevelCd, 
+            location: this.civilFileInformation.detailsData.homeLocationAgencyName,
+        };
+        shared.openDocumentsPdf(documentType, documentData); 
+        this.loadingPdf = false;
     }
 
     public downloadDocuments(){
 
-        const fileName = 'file'+this.civilFileInformation.fileNumber+'documents.zip'
+        const fileName = shared.generateFileName(CourtDocumentType.CivilZip, {
+            location: this.civilFileInformation.detailsData.homeLocationAgencyName,
+            courtLevel: this.civilFileInformation.detailsData.courtLevelCd,
+            fileNumberText:  this.civilFileInformation.detailsData.fileNumberTxt
+        });
+
         this.selectedDocuments = {zipName: fileName, csrRequests: [], documentRequests: [], ropRequests: []};
         for(const doc of this.documents){
             if (doc.isChecked && doc.isEnabled) {
                 const id = doc["Document ID"]                
                 const documentRequest = {} as documentRequestsInfoType;
                 documentRequest.isCriminal = false;
-                documentRequest.pdfFileName = 'doc' + id + '.pdf';
+                const documentData: DocumentData = { 
+                    courtLevel: this.civilFileInformation.detailsData.courtLevelCd,
+                    dateFiled: Vue.filter('beautify-date')(doc["Date Filed"]),
+                    documentDescription: doc["Document Type"],
+                    documentId: id,
+                    fileNumberText:  this.civilFileInformation.detailsData.fileNumberTxt,
+                    location: this.civilFileInformation.detailsData.homeLocationAgencyName
+                };
+                documentRequest.pdfFileName = shared.generateFileName(CourtDocumentType.Civil, documentData);
                 documentRequest.fileId = this.civilFileInformation.fileNumber;
                 documentRequest.base64UrlEncodedDocumentId = base64url(id);
                 this.selectedDocuments.documentRequests.push(documentRequest);                
@@ -277,7 +304,15 @@ export default class CivilDocumentsView extends Vue {
                 const id = doc["Appearance ID"]                      
                 const csrRequest = {} as csrRequestsInfoType;
                 csrRequest.appearanceId = id;
-                csrRequest.pdfFileName = 'court summary_'+id+'.pdf';
+                const documentData: DocumentData = { 
+                    appearanceId: csrRequest.appearanceId,
+                    appearanceDate: Vue.filter('beautify-date')(doc["Appearance Date"]),
+                    courtLevel: this.civilFileInformation.detailsData.courtLevelCd,
+                    documentDescription: doc["Document Type"],
+                    fileNumberText:  this.civilFileInformation.detailsData.fileNumberTxt,
+                    location: this.civilFileInformation.detailsData.homeLocationAgencyName
+                }
+                csrRequest.pdfFileName = shared.generateFileName(CourtDocumentType.CSR, documentData);
                 this.selectedDocuments.csrRequests.push(csrRequest);
             }        
         }
@@ -300,7 +335,7 @@ export default class CivilDocumentsView extends Vue {
                 link.click();
                 setTimeout(() => URL.revokeObjectURL(link.href), 1000);
                 this.downloadCompleted = true;
-            }, err =>{this.downloadCompleted = true;})
+            }, err =>{ console.log(err); this.downloadCompleted = true;})
         }
     }
 
@@ -349,7 +384,7 @@ export default class CivilDocumentsView extends Vue {
         }
     }
 
-    public toggleSelectedDocuments(checked) {  
+    public toggleSelectedDocuments() {  
         Vue.nextTick(()=>{
             if(this.activetab == 'COURT SUMMARY') {
                 const checkedDocs = this.summaryDocuments.filter(doc=>{return doc.isChecked})
@@ -445,22 +480,6 @@ export default class CivilDocumentsView extends Vue {
         }
     }
 
-    public openDocumentsPdf(documentId): void {
-        this.loadingPdf = true;
-        const filename = 'doc' + documentId + '.pdf';
-        documentId = base64url(documentId);
-        window.open(`${process.env.BASE_URL}api/files/document/${documentId}/${filename}?isCriminal=false&fileId=${this.civilFileInformation.fileNumber}`)
-        this.loadingPdf = false;
-    }
-    
-    public openCourtSummaryPdf(appearanceId): void {
-
-        this.loadingPdf = true; 
-        const filename = 'court summary_'+appearanceId+'.pdf';
-        window.open(`${process.env.BASE_URL}api/files/civil/court-summary-report/${appearanceId}/${filename}?vcCivilFileId=${this.civilFileInformation.fileNumber}`)
-        this.loadingPdf = false;
-    }
-    
     get NumberOfDocuments() {       
         if(this.activetab == 'COURT SUMMARY')
         {           

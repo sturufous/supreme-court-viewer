@@ -109,6 +109,7 @@ namespace Scv.Api.Controllers
         {
             return Ok(new
             {
+                ApplicationCode = User.ApplicationCode(),
                 AgencyId = User.AgencyCode(),
                 ParticipantId = User.ParticipantId()
             });

@@ -1,4 +1,5 @@
 ﻿using JCCommon.Clients.FileServices;
+using Scv.Api.Models.Criminal.Appearances;
 using System.Collections.Generic;
 
 namespace Scv.Api.Models.Criminal.Detail
@@ -42,11 +43,6 @@ namespace Scv.Api.Models.Criminal.Detail
         public string AssignmentTypeDsc { get; set; }
 
         /// <summary>
-        /// Used for Crown Notes to JCM.
-        /// </summary>
-        public ICollection<TrialRemark> TrialRemark { get; set; }
-
-        /// <summary>
         /// Custom class to extend.
         /// </summary>
         public ICollection<CriminalParticipant> Participant { get; set; }
@@ -66,7 +62,7 @@ namespace Scv.Api.Models.Criminal.Detail
         /// </summary>
         public ICollection<CriminalHearingRestriction> HearingRestriction { get; set; }
 
-        public CriminalFileAppearancesResponse Appearances { get; set; }
+        public CriminalFileAppearances Appearances { get; set; }
         //Used just for searching.
         public string NextApprDt { get; set; }
     }

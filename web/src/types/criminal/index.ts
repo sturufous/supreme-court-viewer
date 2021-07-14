@@ -131,7 +131,8 @@ export interface criminalAppearanceInfoType {
     "supplementalEquipmentTxt": string,
     "securityRestrictionTxt": string,
     "outOfTownJudgeTxt": string,
-    "profSeqNo": string
+    "profSeqNo": string,
+    "date": string
 }
 
 export interface criminalAppearanceMethodsInfoType {
@@ -235,3 +236,7 @@ export interface fileSearchCriminalInfoType {
     "Level": string
 }
 
+export interface initiatingDocument {
+    imageId: string,
+    issueDate: string,
+}

@@ -28,10 +28,9 @@ namespace Scv.Api.Models.Criminal.CourtList
         public string AdjudicatorNm { get; set; }
         public string StyleOfCause { get; set; }
 
-        public ICollection<TrialRemark> TrialRemark { get; set; }
-        public string TrialRemarkTxt { get; set; }
         public ICollection<CrownWitness> Crown { get; set; }
         public new ICollection<ScheduledAppearance> ScheduledAppearance { get; set; }
         public new ICollection<HearingRestriction> HearingRestriction { get; set; }
+        public string CourtLevelCd { get;set;}
     }
 }

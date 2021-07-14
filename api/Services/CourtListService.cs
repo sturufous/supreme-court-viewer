@@ -48,14 +48,14 @@ namespace Scv.Api.Services
 
             _lookupService = lookupService;
             _locationService = locationService;
-            _applicationCode = configuration.GetNonEmptyValue("Request:ApplicationCd");
+            _applicationCode = user.ApplicationCode();
             _requestAgencyIdentifierId = user.AgencyCode();
             _requestPartId = user.ParticipantId();
         }
 
         #endregion Constructor
 
-        public async Task<Models.CourtList.CourtList> CourtListAsync(string agencyId, string roomCode, DateTime proceeding, string divisionCode, string fileNumber)
+        public async Task<Models.CourtList.CourtList> CourtListAsync(string agencyId, string roomCode, DateTime proceeding, string divisionCode, string fileNumber, string courtLevelCode)
         {
             var proceedingDateString = proceeding.ToString("yyyy-MM-dd");
             var agencyCode = await _locationService.GetLocationCodeFromId(agencyId);
@@ -95,15 +95,11 @@ namespace Scv.Api.Services
             var civilAppearanceTasks = CivilAppearancesTasks(proceeding, civilFileIds);
             var criminalAppearanceTasks = CriminalAppearancesTasks(proceeding, criminalFileIds);
 
-            //Start file content tasks. 
-            var civilFileContentTasks = CivilFileContentTasks(civilFileIds);
-
             //Await our asynchronous requests.
             var civilFileDetails = (await civilFileDetailTasks.WhenAll()).ToList();
             var criminalFileDetails = (await criminalFileDetailTasks.WhenAll()).ToList();
             var civilAppearances = (await civilAppearanceTasks.WhenAll()).ToList();
             var criminalAppearances = (await criminalAppearanceTasks.WhenAll()).ToList();
-            var civilFileContents = (await civilFileContentTasks.WhenAll()).ToList();
             var originalCourtList = await originalCourtListTask;
 
             //Note, there is test data that doesn't have a CourtList, but may have CourtCalendarDetails. 
@@ -116,13 +112,16 @@ namespace Scv.Api.Services
             courtList.CivilCourtList = await PopulateCivilCourtListFromFileDetails(courtList.CivilCourtList, civilFileDetails);
             courtList.CriminalCourtList = await PopulateCriminalCourtListFromFileDetails(courtList.CriminalCourtList, criminalFileDetails);
 
+            //Filter by court level.
+            courtList.CivilCourtList = courtList.CivilCourtList.WhereToList(cl => cl.CourtLevelCd == courtLevelCode);
+            courtList.CriminalCourtList = courtList.CriminalCourtList.WhereToList(cl => cl.CourtLevelCd == courtLevelCode);
+
             courtList.CivilCourtList = await PopulateCivilCourtListFromAppearances(courtList.CivilCourtList, civilAppearances);
             courtList.CriminalCourtList = await PopulateCriminalCourtListFromAppearances(courtList.CriminalCourtList, criminalAppearances);
             
             courtList.CivilCourtList = PopulateCivilCourtListFromCourtCalendarDetails(courtList.CivilCourtList, civilCourtCalendarAppearances);
             courtList.CriminalCourtList = PopulateCriminalCourtListFromCourtCalendarDetails(courtList.CriminalCourtList, criminalCourtCalendarAppearances);
 
-            courtList.CivilCourtList = PopulateCivilCourtListFromFileContent(courtList.CivilCourtList, civilFileContents);
             return courtList;
         }
 
@@ -169,18 +168,6 @@ namespace Scv.Api.Services
             return appearanceTasks;
         }
 
-        private List<Task<CivilFileContent>> CivilFileContentTasks(List<string> fileIds)
-        {
-            var fileContentTasks = new List<Task<CivilFileContent>>();
-            foreach (var fileId in fileIds)
-            {
-                async Task<CivilFileContent> FileContent() =>
-                    await _filesClient.FilesCivilFilecontentAsync(_requestAgencyIdentifierId, _requestPartId, _applicationCode, null, null, null, null, fileId);
-                fileContentTasks.Add(_cache.GetOrAddAsync($"CivilFileContent-{fileId}-{_requestAgencyIdentifierId}", FileContent));
-            }
-
-            return fileContentTasks;
-        }
         #endregion Civil
 
         #region Criminal 
@@ -234,8 +221,7 @@ namespace Scv.Api.Services
                 if (courtListFile.ActivityClassCd == courtListFile.ActivityClassDesc)
                     courtListFile.ActivityClassCd = fileDetail?.CourtClassCd.ToString();
 
-                courtListFile.CommentToJudgeText = fileDetail?.CommentToJudgeTxt;
-                courtListFile.TrialRemarkTxt = fileDetail?.TrialRemarkTxt;
+                courtListFile.CfcsaFile = fileDetail?.CfcsaFileYN == "Y";
 
                 foreach (var hearingRestriction in courtListFile.HearingRestriction)
                 {
@@ -259,9 +245,6 @@ namespace Scv.Api.Services
                         await _lookupService.GetCivilAppearanceReasonsDescription(targetAppearance?.AppearanceReasonCd);
 
                     courtListFile.AppearanceStatusCd = targetAppearance?.AppearanceStatusCd.ToString();
-                    courtListFile.OutOfTownJudge = targetAppearance.OutOfTownJudgeTxt;
-                    courtListFile.SecurityRestriction = targetAppearance.SecurityRestrictionTxt;
-                    courtListFile.SupplementalEquipment = targetAppearance.SupplementalEquipmentTxt;
                     courtListFile.JudgeInitials = targetAppearance.JudgeInitials;
                     courtListFile.EstimatedTimeHour = targetAppearance.EstimatedTimeHour?.ReturnNullIfEmpty();
                     courtListFile.EstimatedTimeMin = targetAppearance.EstimatedTimeMin?.ReturnNullIfEmpty();
@@ -281,27 +264,7 @@ namespace Scv.Api.Services
             return documents;
         }
 
-        private ICollection<CivilCourtList> PopulateCivilCourtListFromFileContent(ICollection<CivilCourtList> courtList,
-            ICollection<CivilFileContent> fileContents)
-        {
-            foreach (var courtListFile in courtList)
-            {
-                var fileId = courtListFile.PhysicalFile.PhysicalFileID;
-                var civilFile = fileContents.Where(fc => fc != null).FirstOrDefault(fc => fc.PhysicalFileId == fileId)?.CivilFile
-                    .FirstOrDefault(cf => cf.PhysicalFileID == fileId);
-
-                //This doesn't map correctly. the WSDL states CFCSAFileYN, but the server returns cfcsafileYN.
-                if (civilFile != null && civilFile.AdditionalProperties.ContainsKey("cfcsafileYN") && civilFile.AdditionalProperties["cfcsafileYN"] != null)
-                {
-                    courtListFile.CfcsaFile = civilFile.AdditionalProperties["cfcsafileYN"].Equals("Y");
-                }
-
-                courtListFile.FileCommentText = civilFile?.FileCommentText;
-            }
-
-            return courtList;
-        }
-
+   
         private ICollection<CivilCourtList> PopulateCivilCourtListFromCourtCalendarDetails(ICollection<CivilCourtList> courtList,
             ICollection<CourtCalendarDetailAppearance> courtCalendarDetailAppearances)
         {
@@ -331,8 +294,8 @@ namespace Scv.Api.Services
                 if (courtListFile.ActivityClassCd == courtListFile.ActivityClassDesc)
                     courtListFile.ActivityClassCd = fileDetail?.CourtClassCd.ToString();
                 courtListFile.Crown = PopulateCrown(fileDetail);
-                courtListFile.TrialRemark = fileDetail?.TrialRemark;
-                courtListFile.TrialRemarkTxt = fileDetail?.TrialRemarkTxt;
+                //courtListFile.TrialRemark = fileDetail?.TrialRemark; This hide Crown Notes to JCM.
+                //courtListFile.TrialRemarkTxt = fileDetail?.TrialRemarkTxt;
                 var participant = fileDetail?.Participant.FirstOrDefault(p => p.PartId == courtListFile.FileInformation.PartId);
                 if (participant != null)
                 {
@@ -344,6 +307,7 @@ namespace Scv.Api.Services
                 {
                     hearingRestriction.HearingRestrictionTypeDesc = await _lookupService.GetHearingRestrictionDescription(hearingRestriction.HearingRestrictiontype);
                 }
+                courtListFile.CourtLevelCd = fileDetail.CourtLevelCd.ToString();
             }
 
             return courtList;
@@ -362,9 +326,9 @@ namespace Scv.Api.Services
                     courtListFile.AppearanceReasonCd = targetAppearance?.AppearanceReasonCd;
                     courtListFile.AppearanceReasonDesc = await _lookupService.GetCriminalAppearanceReasonsDescription(targetAppearance?.AppearanceReasonCd);
                     courtListFile.AppearanceStatusCd = targetAppearance?.AppearanceStatusCd.ToString();
-                    courtListFile.OutOfTownJudge = targetAppearance.OutOfTownJudgeTxt;
-                    courtListFile.SecurityRestriction = targetAppearance.SecurityRestrictionTxt;
-                    courtListFile.SupplementalEquipment = targetAppearance.SupplementalEquipmentTxt;
+                    //courtListFile.OutOfTownJudge = targetAppearance.OutOfTownJudgeTxt;
+                    //courtListFile.SecurityRestriction = targetAppearance.SecurityRestrictionTxt;
+                    //courtListFile.SupplementalEquipment = targetAppearance.SupplementalEquipmentTxt;
                     courtListFile.JudgeInitials = targetAppearance.JudgeInitials;
                     courtListFile.EstimatedTimeHour = targetAppearance.EstimatedTimeHour?.ReturnNullIfEmpty();
                     courtListFile.EstimatedTimeMin = targetAppearance.EstimatedTimeMin?.ReturnNullIfEmpty();

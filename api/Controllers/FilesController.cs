@@ -1,5 +1,4 @@
 ﻿using JCCommon.Clients.FileServices;
-using JCCommon.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -62,20 +61,6 @@ namespace Scv.Api.Controllers
         #region Civil Only
 
         /// <summary>
-        /// Provides facilities for performing a civil file search.
-        /// </summary>
-        /// <param name="fcq">FileCivilQuery object with many parameters - Search Modes: FILENO = 0, PARTNAME = 1, CROWN = 2, JUSTINNO = 3, PHYSID = 4</param>
-        /// 
-        /// <returns>FileSearchResponse</returns>
-        [HttpPost]
-        [Route("civil/search")]
-        public async Task<ActionResult<FileSearchResponse>> FilesCivilSearchAsync(FilesCivilQuery fcq)
-        {
-            var fileSearchResponse = await _civilFilesService.SearchAsync(fcq);
-            return Ok(fileSearchResponse);
-        }
-
-        /// <summary>
         /// Gets the details for a given a location and civil file number text.
         /// </summary>
         /// <param name="location">Agency Location Id Code: EX. 104.0001</param>
@@ -105,11 +90,14 @@ namespace Scv.Api.Controllers
             if (User.IsVcUser() && !await _vcCivilFileAccessHandler.HasCivilFileAccess(User, fileId))
                 return Forbid();
 
-            var civilFileDetailResponse = await _civilFilesService.FileIdAsync(fileId);
+            var civilFileDetailResponse = await _civilFilesService.FileIdAsync(fileId, User.IsVcUser());
             if (civilFileDetailResponse?.PhysicalFileId == null)
                 throw new NotFoundException("Couldn't find civil file with this id.");
 
-            if (User.IsVcUser() && civilFileDetailResponse.SealedYN == "Y")
+            if (User.IsVcUser() && civilFileDetailResponse.SealedYN != "N") 
+                return Forbid();
+
+            if (User.IsSupremeUser() && civilFileDetailResponse.CourtLevelCd != CivilFileDetailResponseCourtLevelCd.S)
                 return Forbid();
 
             return Ok(civilFileDetailResponse);
@@ -130,16 +118,20 @@ namespace Scv.Api.Controllers
                 if(!await _vcCivilFileAccessHandler.HasCivilFileAccess(User, fileId))
                     return Forbid();
 
-                var civilFileDetailResponse = await _civilFilesService.FileIdAsync(fileId);
+                var civilFileDetailResponse = await _civilFilesService.FileIdAsync(fileId, User.IsVcUser());
                 if (civilFileDetailResponse?.PhysicalFileId == null)
                     throw new NotFoundException("Couldn't find civil file with this id.");
-                if (civilFileDetailResponse.SealedYN == "Y")
+                if (civilFileDetailResponse.SealedYN != "N")
                     return Forbid();
             } 
 
             var civilAppearanceDetail = await _civilFilesService.DetailedAppearanceAsync(fileId, appearanceId);
             if (civilAppearanceDetail == null)
                 throw new NotFoundException("Couldn't find appearance detail with the provided file id and appearance id.");
+
+            if (User.IsSupremeUser() && civilAppearanceDetail.CourtLevelCd != CivilFileDetailResponseCourtLevelCd.S)
+                return Forbid();
+
             return Ok(civilAppearanceDetail);
         }
 
@@ -156,14 +148,8 @@ namespace Scv.Api.Controllers
         {
             if (User.IsVcUser())
             {
-                if (!await _vcCivilFileAccessHandler.HasCivilFileAccess(User, vcCivilFileId))
-                    return Forbid();
-
-                var civilFileDetailResponse = await _civilFilesService.FileIdAsync(vcCivilFileId);
-                if (civilFileDetailResponse?.PhysicalFileId == null)
-                    throw new NotFoundException("Couldn't find civil file with this id.");
-                if (civilFileDetailResponse.SealedYN == "Y" || civilFileDetailResponse.Appearances.ApprDetail.All(ad => ad.AppearanceId != appearanceId))
-                    return Forbid();
+                //Disable Court Summary Reports.
+                return Forbid();
             }
 
             var justinReportResponse = await _civilFilesService.CourtSummaryReportAsync(appearanceId, JustinReportName.CEISR035);
@@ -174,39 +160,9 @@ namespace Scv.Api.Controllers
             return BuildPdfFileResponse(justinReportResponse.ReportContent);
         }
 
-        /// <summary>
-        /// Gets the civil file content.
-        /// </summary>
-        /// <param name="agencyId"></param>
-        /// <param name="roomCode"></param>
-        /// <param name="proceeding">DateTime? converted to yyyy-MM-dd string</param>
-        /// <param name="appearanceId"></param>
-        /// <param name="physicalFileId"></param>
-        /// <returns>CivilFileContent</returns>
-        [HttpGet]
-        [Route("civil/file-content")]
-        public async Task<ActionResult<CivilFileContent>> GetCivilFileContent(string agencyId = null, string roomCode = null, DateTime? proceeding = null, string appearanceId = null, string physicalFileId = "")
-        {
-            var civilFileContent = await _civilFilesService.FileContentAsync(agencyId, roomCode, proceeding, appearanceId, physicalFileId);
-            return Ok(civilFileContent);
-        }
-
         #endregion Civil Only
 
         #region Criminal Only
-
-        /// <summary>
-        /// Provides facilities for performing a criminal file search.
-        /// </summary>
-        /// <param name="fcq">FileCriminalQuery, composed of parameters for search. </param>
-        /// <returns>FileSearchResponse</returns>
-        [HttpPost]
-        [Route("criminal/search")]
-        public async Task<ActionResult<FileSearchResponse>> FilesCriminalSearchAsync(FilesCriminalQuery fcq)
-        {
-            var fileSearchResponse = await _criminalFilesService.SearchAsync(fcq);
-            return Ok(fileSearchResponse);
-        }
 
         /// <summary>
         /// Gets the details for a given a location and criminal file number text.
@@ -238,6 +194,10 @@ namespace Scv.Api.Controllers
             var redactedCriminalFileDetailResponse = await _criminalFilesService.FileIdAsync(fileId);
             if (redactedCriminalFileDetailResponse?.JustinNo == null)
                 throw new NotFoundException("Couldn't find criminal file with this id.");
+
+            if (User.IsSupremeUser() && redactedCriminalFileDetailResponse.CourtLevelCd != CriminalFileDetailResponseCourtLevelCd.S)
+                return Forbid();
+
             return Ok(redactedCriminalFileDetailResponse);
         }
 
@@ -255,24 +215,12 @@ namespace Scv.Api.Controllers
             var appearanceDetail = await _criminalFilesService.AppearanceDetailAsync(fileId, appearanceId, partId);
             if (appearanceDetail == null)
                 throw new NotFoundException("Couldn't find appearance details with the provided parameters.");
-            return Ok(appearanceDetail);
-        }
 
-        /// <summary>
-        /// Gets the criminal file content.
-        /// </summary>
-        /// <param name="agencyId"></param>
-        /// <param name="roomCode"></param>
-        /// <param name="proceeding">The proceeding date in the format YYYY-MM-dd</param>
-        /// <param name="appearanceId"></param>
-        /// <param name="justinNumber"></param>
-        /// <returns>CriminalFileContent</returns>
-        [HttpGet]
-        [Route("criminal/file-content")]
-        public async Task<ActionResult<CriminalFileContent>> GetCriminalFileContent(string agencyId = null, string roomCode = null, DateTime? proceeding = null, string appearanceId = null, string justinNumber = null)
-        {
-            var criminalFileContent = await _criminalFilesService.FileContentAsync(agencyId, roomCode, proceeding, appearanceId, justinNumber);
-            return Ok(criminalFileContent);
+            if (User.IsSupremeUser() && appearanceDetail.CourtLevelCd != CriminalFileDetailResponseCourtLevelCd.S)
+                return Forbid();
+
+
+            return Ok(appearanceDetail);
         }
 
         /// <summary>
@@ -322,11 +270,12 @@ namespace Scv.Api.Controllers
                 if (isCriminal)
                     return Forbid();
 
-                var civilFileDetailResponse = await _civilFilesService.FileIdAsync(fileId);
+                var civilFileDetailResponse = await _civilFilesService.FileIdAsync(fileId, User.IsVcUser());
                 if (civilFileDetailResponse?.PhysicalFileId == null)
                     throw new NotFoundException("Couldn't find civil file with this id.");
 
-                if (civilFileDetailResponse.SealedYN == "Y" || civilFileDetailResponse.Document.All(s => s.CivilDocumentId != documentId))
+                //This handles the documents being sealed as well. The documentId would be set to null.
+                if (civilFileDetailResponse.SealedYN != "N" || civilFileDetailResponse.Document.All(s => s.CivilDocumentId != documentId))
                     return Forbid();
             }
 
@@ -350,14 +299,18 @@ namespace Scv.Api.Controllers
                 if (archiveRequest.RopRequests.Any() || archiveRequest.DocumentRequests.Any(dr => dr.IsCriminal))
                     return Forbid();
 
-                var civilFileDetailResponse = await _civilFilesService.FileIdAsync(archiveRequest.VcCivilFileId);
+                var civilFileDetailResponse = await _civilFilesService.FileIdAsync(archiveRequest.VcCivilFileId, User.IsVcUser());
                 if (civilFileDetailResponse?.PhysicalFileId == null)
                     throw new NotFoundException("Couldn't find civil file with this id.");
 
                 var documentIds = archiveRequest.DocumentRequests.SelectToList(d => Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(d.Base64UrlEncodedDocumentId)));
                 var appearanceIds = archiveRequest.CsrRequests.SelectToList(csr => csr.AppearanceId);
 
-                if (civilFileDetailResponse.SealedYN == "Y" || !documentIds.All(id => civilFileDetailResponse.Document.Any(d => d.CivilDocumentId == id))
+                //Disable Court Summary Reports.
+                if (appearanceIds.Any())
+                    return Forbid();
+
+                if (civilFileDetailResponse.SealedYN != "N" || !documentIds.All(id => civilFileDetailResponse.Document.Any(d => d.CivilDocumentId == id))
                 || !appearanceIds.All(id => civilFileDetailResponse.Appearances.ApprDetail.Any(d => d.AppearanceId == id))
                 )
                     return Forbid();
