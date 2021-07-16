@@ -115,7 +115,7 @@ namespace Scv.Api.Services.Files
             return fileDetails;
         }
 
-        public async Task<RedactedCivilFileDetailResponse> FileIdAsync(string fileId, bool disableCsr = false)
+        public async Task<RedactedCivilFileDetailResponse> FileIdAsync(string fileId, bool isVcUser)
         {
             async Task<CivilFileDetailResponse> FileDetails() => await _filesClient.FilesCivilGetAsync(_requestAgencyIdentifierId, _requestPartId, _applicationCode, fileId);
             async Task<CivilFileContent> FileContent() => await _filesClient.FilesCivilFilecontentAsync(_requestAgencyIdentifierId, _requestPartId, _applicationCode,null, null, null, null, fileId);
@@ -136,9 +136,9 @@ namespace Scv.Api.Services.Files
 
             var detail = _mapper.Map<RedactedCivilFileDetailResponse>(fileDetail);
             foreach (var document in PopulateDetailCsrsDocuments(fileDetail.Appearance))
-                if (!disableCsr)
+                if (!isVcUser)
                     detail.Document.Add(document);
-
+   
             detail = await PopulateBaseDetail(detail);
             detail.Appearances = appearances;
 
@@ -146,6 +146,8 @@ namespace Scv.Api.Services.Files
             detail.Party = await PopulateDetailParties(detail.Party);
             detail.Document = await PopulateDetailDocuments(detail.Document, fileContentCivilFile);
             detail.HearingRestriction = await PopulateDetailHearingRestrictions(fileDetail.HearingRestriction);
+            if (isVcUser)
+                detail.HearingRestriction = new List<CivilHearingRestriction>();
 
             return detail;
         }
