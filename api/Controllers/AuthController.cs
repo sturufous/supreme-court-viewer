@@ -102,17 +102,5 @@ namespace Scv.Api.Controllers
                 Url = $"{XForwardedForHelper.BuildUrlString(forwardedHost, forwardedPort, baseUrl)}civil-file/{request.FileId}?fromA2A=true"
             });
         }
-
-        [Authorize(AuthenticationSchemes = "SiteMinder, OpenIdConnect", Policy = nameof(ProviderAuthorizationHandler))]
-        [HttpGet("info")]
-        public ActionResult UserInfo()
-        {
-            return Ok(new
-            {
-                ApplicationCode = User.ApplicationCode(),
-                AgencyId = User.AgencyCode(),
-                ParticipantId = User.ParticipantId()
-            });
-        }
     }
 }
