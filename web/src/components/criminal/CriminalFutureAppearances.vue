@@ -47,7 +47,7 @@
                     </b-badge>
                 </template>
 
-                <template v-slot:cell(Date)="data" >
+                <template v-slot:cell(sate)="data" >
                     <span :class="data.field.cellClass" style="display: inline-flex;"> 
                         <b-button :style="data.field.cellStyle" 
                                   size="sm" 
@@ -56,7 +56,7 @@
                                   class="mr-2 mt-1">
                             <b-icon-caret-right-fill v-if="!data.item['_showDetails']"></b-icon-caret-right-fill>
                             <b-icon-caret-down-fill v-if="data.item['_showDetails']"></b-icon-caret-down-fill>
-                            {{data.item.FormattedDate}}
+                            {{data.item.formattedDate}}
                         </b-button>
                     </span> 
                 </template>
@@ -66,17 +66,17 @@
                     </b-card>
                 </template>
 
-                <template  v-slot:cell(Reason)="data">
+                <template  v-slot:cell(reason)="data">
                     <b-badge
                             variant="secondary"
                             v-b-tooltip.hover.right                            
-                            :title="data.item['Reason Description']"
+                            :title="data.item.reasonDescription"
                             :style="data.field.cellStyle"> 
                             {{data.value}}
                     </b-badge>
                 </template>
 
-                <template  v-slot:cell(Accused)="data">
+                <template  v-slot:cell(accused)="data">
                     <b-badge  
                             variant="white" 
                             :style="data.field.cellStyle" 
@@ -84,8 +84,8 @@
                     </b-badge>
                 </template>
 
-                <template  v-slot:cell(Status)="data">
-                    <b :class = "data.item['Status Style']" 
+                <template  v-slot:cell(status)="data">
+                    <b :class = "data.item.statusStyle" 
                        :style="data.field.cellStyle"> {{data.value}}
                     </b>
                 </template>
@@ -105,6 +105,7 @@ import CriminalAppearanceDetails from '@components/criminal/CriminalAppearanceDe
 import "@store/modules/CommonInformation";
 import {criminalAppearancesListType, criminalAppearanceInfoType, criminalFileInformationType} from '../../types/criminal';
 import {inputNamesType, durationType} from '../../types/common'
+import { criminalApprDetailType } from "@/types/criminal/jsonTypes";
 const criminalState = namespace("CriminalFileInformation");
 const commonState = namespace("CommonInformation");
 
@@ -156,20 +157,20 @@ export default class CriminalFutureAppearances extends Vue {
     futureAppearancesList: criminalAppearancesListType[] = [];
     isMounted = false;
     isDataReady = false;
-    futureAppearancesJson;    
-    sortBy = 'Date';
+    futureAppearancesJson: criminalApprDetailType [] = [];    
+    sortBy = 'date';
     sortDesc = true;    
 
     fields =  
     [
-        {key:'Date',       sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'transform: translate(0,-7px); font-size:16px', cellClass:'text-info mt-2 d-inline-flex'},
-        {key:'Reason',     sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'margin-top: 10px; font-size: 14px;'},
-        {key:'Time',       sortable:false, tdClass: 'border-top', headerStyle:'text'},
-        {key:'Duration',   sortable:false, tdClass: 'border-top', headerStyle:'text'},
-        {key:'Location',   sortable:true,  tdClass: 'border-top', headerStyle:'text-primary'},
-        {key:'Room',       sortable:false, tdClass: 'border-top', headerStyle:'text'},
-        {key:'Accused',    sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'font-size: 16px;'},
-        {key:'Status',     sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'font-weight: normal; font-size: 16px; width:110px'},
+        {key:'date',      label:'Date',       sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'transform: translate(0,-7px); font-size:16px', cellClass:'text-info mt-2 d-inline-flex'},
+        {key:'reason',    label:'Reason',    sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'margin-top: 10px; font-size: 14px;'},
+        {key:'time',      label:'Time',    sortable:false, tdClass: 'border-top', headerStyle:'text'},
+        {key:'duration',  label:'Duration', sortable:false, tdClass: 'border-top', headerStyle:'text'},
+        {key:'location',  label:'Location',   sortable:true,  tdClass: 'border-top', headerStyle:'text-primary'},
+        {key:'room',      label:'Room',      sortable:false, tdClass: 'border-top', headerStyle:'text'},
+        {key:'accused',   label:'Accused',   sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'font-size: 16px;'},
+        {key:'status',    label:'Status',   sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'font-weight: normal; font-size: 16px; width:110px'},
     ];
     
     mounted() {
@@ -195,32 +196,32 @@ export default class CriminalFutureAppearances extends Vue {
             const appInfo = {} as criminalAppearancesListType;
             const jApp = this.futureAppearancesJson[appIndex];
 
-            appInfo["Index"] = appIndex;
-            appInfo["Date"] = jApp.appearanceDt.split(' ')[0]
-            if(new Date(appInfo["Date"]) < currentDate) continue;            
-            appInfo["FormattedDate"] = Vue.filter('beautify-date')(appInfo["Date"]);
-            appInfo["Time"] = this.getTime(jApp.appearanceTm.split(' ')[1].substr(0,5));
-            appInfo["Reason"] = jApp.appearanceReasonCd;
-            appInfo["Reason Description"] = jApp.appearanceReasonDsc? jApp.appearanceReasonDsc: '';
+            appInfo.index = appIndex;
+            appInfo.date = jApp.appearanceDt.split(' ')[0]
+            if(new Date(appInfo.date) < currentDate) continue;            
+            appInfo.formattedDate = Vue.filter('beautify-date')(appInfo.date);
+            appInfo.time = this.getTime(jApp.appearanceTm.split(' ')[1].substr(0,5));
+            appInfo.reason = jApp.appearanceReasonCd;
+            appInfo.reasonDescription = jApp.appearanceReasonDsc? jApp.appearanceReasonDsc: '';
           
-            appInfo["Duration"] = this.getDuration(jApp.estimatedTimeHour, jApp.estimatedTimeMin)           
-            appInfo["Location"] = jApp.courtLocation;
-            appInfo["Room"] =jApp.courtRoomCd
+            appInfo.duration = this.getDuration(jApp.estimatedTimeHour, jApp.estimatedTimeMin)           
+            appInfo.location = jApp.courtLocation? jApp.courtLocation: '';
+            appInfo.room =jApp.courtRoomCd
 
-            appInfo["First Name"] = jApp.givenNm ? jApp.givenNm : "";
-            appInfo["Last Name"] = jApp.lastNm ? jApp.lastNm : jApp.orgNm;
-            appInfo["Accused"] = this.getNameOfParticipant(appInfo["Last Name"], appInfo["First Name"]);  
-            appInfo["Status"] = jApp.appearanceStatusCd ? appearanceStatus[jApp.appearanceStatusCd] :''
-            appInfo["Status Style"] = this.getStatusStyle(appInfo["Status"]);
-            appInfo["Presider"] =  jApp.judgeInitials ? jApp.judgeInitials :''
-            appInfo["Judge Full Name"] =  jApp.judgeInitials ? jApp.judgeFullNm : ''
+            appInfo.firstName = jApp.givenNm ? jApp.givenNm : "";
+            appInfo.lastName = jApp.lastNm ? jApp.lastNm : jApp.orgNm;
+            appInfo.accused = this.getNameOfParticipant(appInfo.lastName, appInfo.firstName);  
+            appInfo.status = jApp.appearanceStatusCd ? appearanceStatus[jApp.appearanceStatusCd] :''
+            appInfo.statusStyle = this.getStatusStyle(appInfo.status);
+            appInfo.presider =  jApp.judgeInitials ? jApp.judgeInitials :''
+            appInfo.judgeFullName =  jApp.judgeInitials ? jApp.judgeFullNm : ''
 
-            appInfo["Appearance ID"] = jApp.appearanceId;            
-            appInfo["Part ID"] = jApp.partId;
-            appInfo["Supplemental Equipment"] = jApp.supplementalEquipmentTxt;
-            appInfo["Security Restriction"] = jApp.securityRestrictionTxt;
-            appInfo["OutOfTown Judge"] = jApp.outOfTownJudgeTxt;
-            appInfo["Prof Seq No"] = jApp.profSeqNo;           
+            appInfo.appearanceId = jApp.appearanceId;            
+            appInfo.partId = jApp.partId;
+            appInfo.supplementalEquipment = jApp.supplementalEquipmentTxt;
+            appInfo.securityRestriction = jApp.securityRestrictionTxt;
+            appInfo.outOfTownJudge = jApp.outOfTownJudgeTxt;
+            appInfo.profSeqNo = jApp.profSeqNo;           
             this.futureAppearancesList.push(appInfo); 
         }
     }
@@ -255,13 +256,13 @@ export default class CriminalFutureAppearances extends Vue {
             this.appearanceInfo.fileNo = this.criminalFileInformation.fileNumber;            
             this.appearanceInfo.courtLevel = this.criminalFileInformation.courtLevel;
             this.appearanceInfo.courtClass = this.criminalFileInformation.courtClass;
-            this.appearanceInfo.date = data.item["FormattedDate"];
-            this.appearanceInfo.appearanceId = data.item["Appearance ID"]
-            this.appearanceInfo.partId = data.item["Part ID"]
-            this.appearanceInfo.supplementalEquipmentTxt = data.item["Supplemental Equipment"]
-            this.appearanceInfo.securityRestrictionTxt = data.item["Security Restriction"]
-            this.appearanceInfo.outOfTownJudgeTxt = data.item["OutOfTown Judge"]
-            this.appearanceInfo.profSeqNo = data.item["Prof Seq No"]
+            this.appearanceInfo.date = data.item.formattedDate;
+            this.appearanceInfo.appearanceId = data.item.appearanceId;
+            this.appearanceInfo.partId = data.item.partId;
+            this.appearanceInfo.supplementalEquipmentTxt = data.item.supplementalEquipment;
+            this.appearanceInfo.securityRestrictionTxt = data.item.securityRestriction;
+            this.appearanceInfo.outOfTownJudgeTxt = data.item.outOfTownJudge;
+            this.appearanceInfo.profSeqNo = data.item.profSeqNo;
             this.UpdateAppearanceInfo(this.appearanceInfo);
         }        
     }
@@ -281,7 +282,7 @@ export default class CriminalFutureAppearances extends Vue {
         }
         else
         {
-            return _.sortBy(this.futureAppearancesList,"Date").reverse().slice(0, 3);           
+            return _.sortBy(this.futureAppearancesList,"date").reverse().slice(0, 3);           
         }
     }
 }

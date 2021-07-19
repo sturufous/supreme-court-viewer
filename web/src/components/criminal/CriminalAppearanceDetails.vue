@@ -47,23 +47,23 @@
                         <b> {{ data.label }}</b>
                     </template>                
                 
-                    <template v-slot:cell(Finding)="data" >                        
+                    <template v-slot:cell(finding)="data" >                        
                         <b-badge 
                             variant="secondary" 
-                            v-if="data.item['Finding']"                               
+                            v-if="data.item.finding"                               
                             v-b-tooltip.hover.left 
-                            :title='data.item["Finding Description"]'> 
-                            {{ data.item["Finding"] }} 
+                            :title='data.item.findingDescription'> 
+                            {{ data.item.finding }} 
                         </b-badge>                       
                     </template>
 
-                    <template v-slot:cell(LastResult)="data" >
+                    <template v-slot:cell(lastResult)="data" >
                         <b-badge 
                             variant="secondary"
-                            v-if="data.item['Last Result']"
+                            v-if="data.item.lastResult"
                             v-b-tooltip.hover.left 
-                            :title='data.item["Last Result Description"]' > 
-                            {{ data.item["Last Result"] }} 
+                            :title='data.item.lastResultDescription' > 
+                            {{ data.item.lastResult }} 
                         </b-badge>
                     </template>
                 </b-table>
@@ -183,9 +183,9 @@
                 <b> {{ data.label }}</b>
             </template>             
         
-            <template v-slot:cell(Appearance)="data" :style="data.field.cellStyle">                        
+            <template v-slot:cell(appearance)="data" :style="data.field.cellStyle">                        
                 <span>{{ data.value }}</span>
-                <span><br v-if="data.value.length>0">{{data.item.PartyAppearance}}</span>                      
+                <span><br v-if="data.value.length>0">{{data.item.partyAppearance}}</span>                      
             </template>           
         </b-table>
         <template v-slot:overlay>               
@@ -217,7 +217,7 @@
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import shared from "../shared";
-import {criminalFileInformationType, appearanceAdditionalInfoType, appearanceMethodDetailsInfoType, appearanceChargesInfoType, criminalAppearanceInfoType, criminalAppearanceMethodsInfoType, initiatingDocument} from '../../types/criminal';
+import {criminalFileInformationType, appearanceAdditionalInfoType, appearanceMethodDetailsInfoType, appearanceChargesInfoType, criminalAppearanceInfoType, criminalAppearanceMethodsInfoType, initiatingDocument, criminalAppearanceDetailsInfoType} from '../../types/criminal';
 import "@store/modules/CriminalFileInformation";
 import { CourtDocumentType, DocumentData } from "@/types/shared";
 const criminalState = namespace("CriminalFileInformation");
@@ -244,40 +244,40 @@ export default class CriminalAppearanceDetails extends Vue {
     isMounted = false;
     isDataReady = false;
     appearanceDetailsJson;    
-    sortBy = 'Date';
+    sortBy = 'date';
     sortDesc = true;
     showNotes = false;
     informationsFileExists = false;
     notes = {};       
-    appearanceDetailsInfo = {};
+    appearanceDetailsInfo = {} as criminalAppearanceDetailsInfoType;
     initiatingDocuments: initiatingDocument[] = [];    
 
     addInfoFields =  
     [
-        {key:'key',    sortable:false},
-        {key:'value',  sortable:false},
+        {key:'key',     label:'key',   sortable:false},
+        {key:'value',   label:'value', sortable:false},
     ];   
 
     chargesFields =  
     [
-        {key:'Count',          sortable:false,  tdClass: 'border-top'},
-        {key:'Criminal Code',  sortable:false,  tdClass: 'border-top'},
-        {key:'Description',    sortable:false,  tdClass: 'border-top'},
-        {key:'LastResult',     sortable:false,  tdClass: 'border-top'},
-        {key:'Finding',        sortable:false,  tdClass: 'border-top'},
+        {key:'count',        label:'Count',          sortable:false,  tdClass: 'border-top'},
+        {key:'criminalCode', label:'Criminal Code',  sortable:false,  tdClass: 'border-top'},
+        {key:'description',  label:'Description',    sortable:false,  tdClass: 'border-top'},
+        {key:'lastResult',   label:'LastResult',     sortable:false,  tdClass: 'border-top'},
+        {key:'finding',      label:'Finding',        sortable:false,  tdClass: 'border-top'},
     ];
 
     appearanceMethodsField = 
     [
-        {key:'Key', cellClass:'text-danger', cellStyle:'white-space: pre-line'}
+        {key:'key', label:'Key', cellClass:'text-danger', cellStyle:'white-space: pre-line'}
     ]
 
     appearanceFields =  
     [
-        {key:'Name',             sortable:false, tdClass: 'border-top',  cellStyle: 'font-size: 14px;'},
-        {key:'Role',             sortable:false, tdClass: 'border-top',  cellStyle: 'font-size: 14px; white-space: pre-line;'},
-        {key:'Appearance',       sortable:false, tdClass: 'border-top',  cellStyle: 'display: block; font-size: 14px; white-space: initial;'},
-        {key:'Attendance',       sortable:false, tdClass: 'border-top',  cellStyle: 'display: block; font-size: 14px; white-space: initial;'}
+        {key:'name',        label:'Name',           sortable:false, tdClass: 'border-top',  cellStyle: 'font-size: 14px;'},
+        {key:'role',        label:'Role',           sortable:false, tdClass: 'border-top',  cellStyle: 'font-size: 14px; white-space: pre-line;'},
+        {key:'appearance',  label:'Appearance',     sortable:false, tdClass: 'border-top',  cellStyle: 'display: block; font-size: 14px; white-space: initial;'},
+        {key:'attendance',  label:'Attendance',     sortable:false, tdClass: 'border-top',  cellStyle: 'display: block; font-size: 14px; white-space: initial;'}
         
     ];
     
@@ -307,9 +307,9 @@ export default class CriminalAppearanceDetails extends Vue {
     
     public getAppearanceInfo()
     {                      
-        this.appearanceDetailsInfo["Supplemental Equipment"] = this.appearanceInfo.supplementalEquipmentTxt? this.appearanceInfo.supplementalEquipmentTxt: '';
-        this.appearanceDetailsInfo["Security Restriction"] = this.appearanceInfo.securityRestrictionTxt? this.appearanceInfo.securityRestrictionTxt: '';
-        this.appearanceDetailsInfo["Out-Of-Town Judge"] =  this.appearanceInfo.outOfTownJudgeTxt? this.appearanceInfo.outOfTownJudgeTxt: '';
+        this.appearanceDetailsInfo.supplementalEquipment = this.appearanceInfo.supplementalEquipmentTxt? this.appearanceInfo.supplementalEquipmentTxt: '';
+        this.appearanceDetailsInfo.securityRestriction = this.appearanceInfo.securityRestrictionTxt? this.appearanceInfo.securityRestrictionTxt: '';
+        this.appearanceDetailsInfo.outOfTownJudge =  this.appearanceInfo.outOfTownJudgeTxt? this.appearanceInfo.outOfTownJudgeTxt: '';
 
         for(const info in this.appearanceDetailsInfo) {
             if(this.appearanceDetailsInfo[info].length>0)
@@ -326,20 +326,21 @@ export default class CriminalAppearanceDetails extends Vue {
             this.initiatingDocuments.push(this.appearanceDetailsJson.initiatingDocuments[0])
             this.informationsFileExists = true;
         }
+        console.log(this.initiatingDocuments)
              
         for(const charge of this.appearanceDetailsJson.charges)
         {              
             const chargeInfo = {} as appearanceChargesInfoType;             
-            chargeInfo["Count"] = charge.printSeqNo;
+            chargeInfo.count = charge.printSeqNo;
 
-            chargeInfo["Criminal Code"]= charge.statuteSectionDsc                 
-            chargeInfo["Description"]= charge.statuteDsc
+            chargeInfo.criminalCode= charge.statuteSectionDsc                 
+            chargeInfo.description= charge.statuteDsc
 
-            chargeInfo["Last Result"]= charge.appearanceResultCd
-            chargeInfo["Last Result Description"]= charge.appearanceResultDesc
+            chargeInfo.lastResult = charge.appearanceResultCd
+            chargeInfo.lastResultDescription = charge.appearanceResultDesc
 
-            chargeInfo["Finding"]= charge.findingCd
-            chargeInfo["Finding Description"]= charge.findingDsc
+            chargeInfo.finding = charge.findingCd
+            chargeInfo.findingDescription = charge.findingDsc
 
             this.appearanceCharges.push(chargeInfo);
         }
@@ -347,42 +348,42 @@ export default class CriminalAppearanceDetails extends Vue {
         for(const appearanceMethod of this.appearanceDetailsJson.appearanceMethods)
         {                         
             const methodInfo = {} as criminalAppearanceMethodsInfoType;             
-            methodInfo["role"] = appearanceMethod.roleTypeDsc;
-            methodInfo["method"] = appearanceMethod.appearanceMethodDesc;
-            methodInfo["instruction"] = appearanceMethod.instructionTxt? appearanceMethod.instructionTxt: '';
-            methodInfo["phoneNumber"] = appearanceMethod.phoneNumberTxt? appearanceMethod.phoneNumberTxt: '';
+            methodInfo.role = appearanceMethod.roleTypeDsc;
+            methodInfo.method = appearanceMethod.appearanceMethodDesc;
+            methodInfo.instruction = appearanceMethod.instructionTxt? appearanceMethod.instructionTxt: '';
+            methodInfo.phoneNumber = appearanceMethod.phoneNumberTxt? appearanceMethod.phoneNumberTxt: '';
             this.appearanceMethods.push(methodInfo)
         }        
 
         if (this.appearanceDetailsJson.accused) {
             const accusedJson = this.appearanceDetailsJson.accused;
-            const accused = {'Name': accusedJson.fullName,
-                            'Role': 'Accused',
-                            'Attendance': accusedJson.attendanceMethodDesc? accusedJson.attendanceMethodDesc: '',
-                            'Appearance': accusedJson.appearanceMethodDesc? accusedJson.appearanceMethodDesc: '',
-                            'PartyAppearance': accusedJson.partyAppearanceMethodDesc? accusedJson.partyAppearanceMethodDesc: ''
+            const accused = {'name': accusedJson.fullName,
+                            'role': 'Accused',
+                            'attendance': accusedJson.attendanceMethodDesc? accusedJson.attendanceMethodDesc: '',
+                            'appearance': accusedJson.appearanceMethodDesc? accusedJson.appearanceMethodDesc: '',
+                            'partyAppearance': accusedJson.partyAppearanceMethodDesc? accusedJson.partyAppearanceMethodDesc: ''
                             }
             this.appearanceMethodDetails.push(accused)
         }
 
         if (this.appearanceDetailsJson.prosecutor) {
             const prosecutorJson = this.appearanceDetailsJson.prosecutor;
-            const prosecutor = {'Name': prosecutorJson.fullName,
-                                'Role': 'Prosecutor',
-                                'Attendance': prosecutorJson.attendanceMethodDesc? prosecutorJson.attendanceMethodDesc: '',
-                                'Appearance': prosecutorJson.appearanceMethodDesc? prosecutorJson.appearanceMethodDesc: '',
-                                'PartyAppearance': prosecutorJson.partyAppearanceMethodDesc? prosecutorJson.partyAppearanceMethodDesc: ''
+            const prosecutor = {'name': prosecutorJson.fullName,
+                                'role': 'Prosecutor',
+                                'attendance': prosecutorJson.attendanceMethodDesc? prosecutorJson.attendanceMethodDesc: '',
+                                'appearance': prosecutorJson.appearanceMethodDesc? prosecutorJson.appearanceMethodDesc: '',
+                                'partyAppearance': prosecutorJson.partyAppearanceMethodDesc? prosecutorJson.partyAppearanceMethodDesc: ''
                             }
             this.appearanceMethodDetails.push(prosecutor)
         }
 
         if (this.appearanceDetailsJson.adjudicator) {
             const adjudicatorJson = this.appearanceDetailsJson.adjudicator;
-            const adjudicator = {'Name': adjudicatorJson.fullName,
-                                'Role': 'Adjudicator',
-                                'Attendance': adjudicatorJson.attendanceMethodDesc? adjudicatorJson.attendanceMethodDesc: '',
-                                'Appearance': adjudicatorJson.appearanceMethodDesc? adjudicatorJson.appearanceMethodDesc: '',
-                                'PartyAppearance': adjudicatorJson.partyAppearanceMethodDesc? adjudicatorJson.partyAppearanceMethodDesc: ''
+            const adjudicator = {'name': adjudicatorJson.fullName,
+                                'role': 'Adjudicator',
+                                'attendance': adjudicatorJson.attendanceMethodDesc? adjudicatorJson.attendanceMethodDesc: '',
+                                'appearance': adjudicatorJson.appearanceMethodDesc? adjudicatorJson.appearanceMethodDesc: '',
+                                'partyAppearance': adjudicatorJson.partyAppearanceMethodDesc? adjudicatorJson.partyAppearanceMethodDesc: ''
                             }
             this.appearanceMethodDetails.push(adjudicator)
 
@@ -390,11 +391,11 @@ export default class CriminalAppearanceDetails extends Vue {
 
         if (this.appearanceDetailsJson.justinCounsel) {
             const counselJson = this.appearanceDetailsJson.justinCounsel;
-            const counsel = {'Name': counselJson.fullName,
-                            'Role': 'Counsel',
-                            'Attendance': counselJson.attendanceMethodDesc? counselJson.attendanceMethodDesc: '',
-                            'Appearance': counselJson.appearanceMethodDesc? counselJson.appearanceMethodDesc: '',
-                            'PartyAppearance': counselJson.partyAppearanceMethodDesc? counselJson.partyAppearanceMethodDesc: ''
+            const counsel = {'name': counselJson.fullName,
+                            'role': 'Counsel',
+                            'attendance': counselJson.attendanceMethodDesc? counselJson.attendanceMethodDesc: '',
+                            'appearance': counselJson.appearanceMethodDesc? counselJson.appearanceMethodDesc: '',
+                            'partyAppearance': counselJson.partyAppearanceMethodDesc? counselJson.partyAppearanceMethodDesc: ''
                             }
             this.appearanceMethodDetails.push(counsel)
         }                

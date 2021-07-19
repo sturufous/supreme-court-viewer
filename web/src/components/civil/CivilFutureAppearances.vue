@@ -46,7 +46,7 @@
                 </b-badge>
             </template>
 
-            <template v-slot:cell(Date)="data" >
+            <template v-slot:cell(date)="data" >
                 <span :class="data.field.cellClass" :style="data.field.cellStyle"> 
                     <b-button style="transform: translate(-2px,-7px);font-size:14px;" 
                               size="sm" 
@@ -55,7 +55,7 @@
                               class="mr-2">
                         <b-icon-caret-right-fill v-if="!data.item['_showDetails']"></b-icon-caret-right-fill>
                         <b-icon-caret-down-fill v-if="data.item['_showDetails']"></b-icon-caret-down-fill>
-                        {{data.item.FormattedDate}}
+                        {{data.item.formattedDate}}
                     </b-button>
                 </span> 
             </template>
@@ -63,43 +63,43 @@
                 <civil-appearance-details/>
             </template>
 
-            <template  v-slot:cell(Reason)="data">
+            <template  v-slot:cell(reason)="data">
                 <b-badge
                         :class="data.field.cellClass"
                         variant="secondary"
                         v-b-tooltip.hover.right                            
-                        :title="data.item['Reason Description']"
+                        :title="data.item.reasonDescription"
                         :style="data.field.cellStyle">  
                         {{data.value}}
                 </b-badge>
             </template>
 
-            <template v-slot:cell(Result)="data" >
+            <template v-slot:cell(result)="data" >
                 <span
                         v-if="data.value"
                         :class="data.field.cellClass"
                         variant="outline-primary border-white"
                         v-b-tooltip.hover.right                            
-                        :title="data.item['Result Description']"
+                        :title="data.item.resultDescription"
                         :style="data.field.cellStyle"> 
                         {{data.value}}
                 </span>
             </template>
 
-            <template v-slot:cell(Presider)="data">
+            <template v-slot:cell(presider)="data">
                 <b-badge                              
                         variant="secondary"
                         v-if="data.value"
                         :class="data.field.cellClass"
                         :style="data.field.cellStyle"
                         v-b-tooltip.hover.left                           
-                        :title="data.item['Judge Full Name']"> 
+                        :title="data.item.judgeFullName"> 
                         {{data.value}}
                 </b-badge>
             </template>                
 
-            <template v-slot:cell(Status)="data">
-                <b :class = "data.item['Status Style']" :style="data.field.cellStyle"> {{data.value}} </b>
+            <template v-slot:cell(status)="data">
+                <b :class = "data.item.statusStyle" :style="data.field.cellStyle"> {{data.value}} </b>
             </template>
             
         </b-table>
@@ -174,16 +174,16 @@ export default class CivilFutureAppearances extends Vue {
 
     fields =  
     [
-        {key:'Date',            sortable:true,  tdClass: 'border-top', headerStyle:'text-primary',  cellClass:'text-info mt-2 d-inline-flex', cellStyle: 'display: inline-flex; font-size: 14px;'},
-        {key:'Reason',          sortable:true,  tdClass: 'border-top', headerStyle:'text-primary',  cellClass:'badge badge-secondary mt-2',   cellStyle: 'font-size: 14px; text-align:left;'},
-        {key:'Document Type',   sortable:false, tdClass: 'border-top', headerStyle:'text',          cellClass:'text',                         cellStyle: 'font-weight: normal;font-size: 14px; padding-top:12px'},
-        {key:'Result',          sortable:true,  tdClass: 'border-top', headerStyle:'text-primary',  cellClass:'badge badge-secondary mt-2',   cellStyle: 'font-size: 14px;'},
-        {key:'Time',            sortable:false, tdClass: 'border-top', headerStyle:'text',          cellClass:'text',                         cellStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
-        {key:'Duration',        sortable:false, tdClass: 'border-top', headerStyle:'text',          cellClass:'text',                         cellStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
-        {key:'Location',        sortable:true,  tdClass: 'border-top', headerStyle:'text-primary',  cellClass:'text',                         cellStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
-        {key:'Room',            sortable:false, tdClass: 'border-top', headerStyle:'text',          cellClass:'text',                         cellStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
-        {key:'Presider',        sortable:true,  tdClass: 'border-top', headerStyle:'text-primary',  cellClass:'badge badge-secondary mt-2',   cellStyle: 'font-size: 14px;'},        
-        {key:'Status',          sortable:true,  tdClass: 'border-top', headerStyle:'text-primary',  cellClass:'badge',                        cellStyle: 'font-size: 14px;'}
+        {key:'date',            label:'Date',            sortable:true,  tdClass: 'border-top', headerStyle:'text-primary',  cellClass:'text-info mt-2 d-inline-flex', cellStyle: 'display: inline-flex; font-size: 14px;'},
+        {key:'reason',          label:'Reason',          sortable:true,  tdClass: 'border-top', headerStyle:'text-primary',  cellClass:'badge badge-secondary mt-2',   cellStyle: 'font-size: 14px; text-align:left;'},
+        {key:'documentType',    label:'Document Type',   sortable:false, tdClass: 'border-top', headerStyle:'text',          cellClass:'text',                         cellStyle: 'font-weight: normal;font-size: 14px; padding-top:12px'},
+        {key:'result',          label:'Result',          sortable:true,  tdClass: 'border-top', headerStyle:'text-primary',  cellClass:'badge badge-secondary mt-2',   cellStyle: 'font-size: 14px;'},
+        {key:'time',            label:'Time',            sortable:false, tdClass: 'border-top', headerStyle:'text',          cellClass:'text',                         cellStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
+        {key:'duration',        label:'Duration',        sortable:false, tdClass: 'border-top', headerStyle:'text',          cellClass:'text',                         cellStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
+        {key:'location',        label:'Location',        sortable:true,  tdClass: 'border-top', headerStyle:'text-primary',  cellClass:'text',                         cellStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
+        {key:'room',            label:'Room',            sortable:false, tdClass: 'border-top', headerStyle:'text',          cellClass:'text',                         cellStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
+        {key:'presider',        label:'Presider',        sortable:true,  tdClass: 'border-top', headerStyle:'text-primary',  cellClass:'badge badge-secondary mt-2',   cellStyle: 'font-size: 14px;'},        
+        {key:'status',          label:'Status',          sortable:true,  tdClass: 'border-top', headerStyle:'text-primary',  cellClass:'badge',                        cellStyle: 'font-size: 14px;'}
     ];
     
      mounted() {
@@ -208,27 +208,27 @@ export default class CivilFutureAppearances extends Vue {
             const appInfo = {} as civilAppearancesListType;
             const jApp = this.futureAppearancesJson[appIndex];
 
-            appInfo["Index"] = appIndex;
-            appInfo["Date"] = jApp.appearanceDt.split(' ')[0]
-            if(new Date(appInfo["Date"]) < currentDate) continue;            
-            appInfo["FormattedDate"] = Vue.filter('beautify-date')(appInfo["Date"]);
-            appInfo["Document Type"] = jApp.documentTypeDsc;
-            appInfo["Result"] = jApp.appearanceResultCd;
-            appInfo["Result Description"] = jApp.appearanceResultDsc? jApp.appearanceResultDsc: '';
-            appInfo["Time"] = this.getTime(jApp.appearanceTm.split(' ')[1].substr(0,5));
-            appInfo["Reason"] = jApp.appearanceReasonCd;
-            appInfo["Reason Description"] = jApp.appearanceReasonDsc? jApp.appearanceReasonDsc: '';
-            appInfo["Duration"] = this.getDuration(jApp.estimatedTimeHour, jApp.estimatedTimeMin)           
-            appInfo["Location"] = jApp.courtLocation;
-            appInfo["Room"] =jApp.courtRoomCd              
-            appInfo["Status"] = jApp.appearanceStatusCd ? appearanceStatus[jApp.appearanceStatusCd] :''
-            appInfo["Status Style"] = this.getStatusStyle(appInfo["Status"])
-            appInfo["Presider"] =  jApp.judgeInitials ? jApp.judgeInitials :''
-            appInfo["Judge Full Name"] =  jApp.judgeInitials ? jApp.judgeFullNm : ''
-            appInfo["Appearance ID"] = jApp.appearanceId
-            appInfo["Supplemental Equipment"] = jApp.supplementalEquipmentTxt
-            appInfo["Security Restriction"] = jApp.securityRestrictionTxt
-            appInfo["OutOfTown Judge"] = jApp.outOfTownJudgeTxt
+            appInfo.index = appIndex;
+            appInfo.date = jApp.appearanceDt.split(' ')[0]
+            if(new Date(appInfo.date) < currentDate) continue;            
+            appInfo.formattedDate = Vue.filter('beautify-date')(appInfo.date);
+            appInfo.documentType = jApp.documentTypeDsc;
+            appInfo.result = jApp.appearanceResultCd;
+            appInfo.resultDescription = jApp.appearanceResultDsc? jApp.appearanceResultDsc: '';
+            appInfo.time = this.getTime(jApp.appearanceTm.split(' ')[1].substr(0,5));
+            appInfo.reason = jApp.appearanceReasonCd;
+            appInfo.reasonDescription = jApp.appearanceReasonDsc? jApp.appearanceReasonDsc: '';
+            appInfo.duration = this.getDuration(jApp.estimatedTimeHour, jApp.estimatedTimeMin)           
+            appInfo.location = jApp.courtLocation;
+            appInfo.room =jApp.courtRoomCd;              
+            appInfo.status = jApp.appearanceStatusCd ? appearanceStatus[jApp.appearanceStatusCd] :''
+            appInfo.statusStyle = this.getStatusStyle(appInfo.status);
+            appInfo.presider =  jApp.judgeInitials ? jApp.judgeInitials :''
+            appInfo.judgeFullName =  jApp.judgeInitials ? jApp.judgeFullNm : ''
+            appInfo.appearanceId = jApp.appearanceId;
+            appInfo.supplementalEquipment = jApp.supplementalEquipmentTxt;
+            appInfo.securityRestriction = jApp.securityRestrictionTxt;
+            appInfo.outOfTownJudge = jApp.outOfTownJudgeTxt;
                        
             this.futureAppearancesList.push(appInfo); 
         }
@@ -254,11 +254,11 @@ export default class CivilFutureAppearances extends Vue {
         if(!data.detailsShowing)
         {
             this.appearanceInfo.fileNo = this.civilFileInformation.fileNumber;    
-            this.appearanceInfo.date = data.item["FormattedDate"];        
-            this.appearanceInfo.appearanceId = data.item["Appearance ID"]
-            this.appearanceInfo.supplementalEquipmentTxt = data.item["Supplemental Equipment"]
-            this.appearanceInfo.securityRestrictionTxt = data.item["Security Restriction"]
-            this.appearanceInfo.outOfTownJudgeTxt = data.item["OutOfTown Judge"]
+            this.appearanceInfo.date = data.item.formattedDate;        
+            this.appearanceInfo.appearanceId = data.item.appearanceId;
+            this.appearanceInfo.supplementalEquipmentTxt = data.item.supplementalEquipment;
+            this.appearanceInfo.securityRestrictionTxt = data.item.securityRestriction;
+            this.appearanceInfo.outOfTownJudgeTxt = data.item.outOfTownJudge;
 
             this.UpdateAppearanceInfo(this.appearanceInfo);
         }        
@@ -279,7 +279,7 @@ export default class CivilFutureAppearances extends Vue {
         }
         else
         {
-            return _.sortBy(this.futureAppearancesList,"Date").reverse().slice(0, 3);           
+            return _.sortBy(this.futureAppearancesList,"date").reverse().slice(0, 3);           
         }   
     }
 }

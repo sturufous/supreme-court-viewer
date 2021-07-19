@@ -84,6 +84,7 @@
     import {criminalFileInformationType, fileSearchCriminalInfoType} from '../types/criminal';
     import {civilFileInformationType, fileSearchCivilInfoType} from '../types/civil';
     import {courtRoomsAndLocationsInfoType, locationInfoType} from '../types/courtlist';   
+    import { courtRoomsJsonInfoType } from '@/types/common';
 
     @Component
     export default class Home extends Vue {       
@@ -111,7 +112,7 @@
         searchAllowed = true;
         isLocationDataMounted = false;
         isLocationDataReady = false;
-        courtRoomsAndLocationsJson;
+        courtRoomsAndLocationsJson: courtRoomsJsonInfoType[] = [];
         courtRoomsAndLocations: courtRoomsAndLocationsInfoType[] = []
         fileSearchCivilInfo: fileSearchCivilInfoType[] = []
         fileSearchCriminalInfo: fileSearchCriminalInfoType[] = []
@@ -174,10 +175,10 @@
                 if(jroomAndLocation.courtRooms.length>0)
                 {
                     const roomAndLocationInfo = {} as courtRoomsAndLocationsInfoType;
-                    roomAndLocationInfo["text"]= jroomAndLocation.name + ' (' +jroomAndLocation.code+')';                    
+                    roomAndLocationInfo.text= jroomAndLocation.name + ' (' +jroomAndLocation.code+')';                    
                     roomAndLocationInfo.value = {} as locationInfoType;
-                    roomAndLocationInfo.value["Location"] = jroomAndLocation.name;
-                    roomAndLocationInfo.value["LocationID"] = jroomAndLocation.code;                
+                    roomAndLocationInfo.value.Location = jroomAndLocation.name;
+                    roomAndLocationInfo.value.LocationID = jroomAndLocation.code;                
                     this.courtRoomsAndLocations.push(roomAndLocationInfo);
                 }                
             }

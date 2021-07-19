@@ -97,10 +97,10 @@ export default class CriminalFileSearchResultsView extends Vue {
     
     fields =  
     [        
-        {key:'File Number',             tdClass: 'border-top'},
-        {key:'Participants',        tdClass: 'border-top'},
-        {key:'Next Appearance',        tdClass: 'border-top'},
-        {key:'File Id',             tdClass: 'border-top'}
+        {key:'fileNumber',      label:'File Number',          tdClass: 'border-top'},
+        {key:'participants',    label:'Participants',      tdClass: 'border-top'},
+        {key:'nextAppearance',  label:'Next Appearance',       tdClass: 'border-top'},
+        {key:'fileId',          label:'File Id',          tdClass: 'border-top'}
     ];
 
      mounted() {
@@ -128,9 +128,9 @@ export default class CriminalFileSearchResultsView extends Vue {
                                 this.UpdateDisplayName({'lastName': lastName, 'givenName': firstName});
                                 participantInfo.push(this.displayName);
                             }
-                            criminalListInfo.Participants = participantInfo;
+                            criminalListInfo.participants = participantInfo;
                             criminalListInfo["File Number"] = jcriminalList.fileNumberTxt
-                            criminalListInfo["File Id"] = jcriminalList.justinNo;
+                            criminalListInfo.fileId = jcriminalList.justinNo;
                             criminalListInfo["Next Appearance"] = Vue.filter('beautify-date')(jcriminalList.nextApprDt);
                             criminalListInfo["Level"] = CourtLevel[jcriminalList.courtLevelCd];                            
                             this.criminalList.push(criminalListInfo);

@@ -14,11 +14,11 @@
             small              
             striped
             >
-                <template  v-slot:cell(CrownInfoValue)="data">
-                    <span v-if="data.item['CrownInfoFieldName'] == 'Crown Assigned' ">
-                        <b v-for="(assignee, index) in data.item['CrownInfoValue'].split('+')"  v-bind:key="index" style= "white-space: pre-line">{{ assignee }} <br></b>
+                <template  v-slot:cell(crownInfoValue)="data">
+                    <span v-if="data.item.crownInfoFieldName == 'Crown Assigned' ">
+                        <b v-for="(assignee, index) in data.item.crownInfoValue.split('+')"  v-bind:key="index" style= "white-space: pre-line">{{ assignee }} <br></b>
                     </span>
-                    <span v-if="data.item['CrownInfoFieldName'] != 'Crown Assigned' ">
+                    <span v-if="data.item.CrownInfoFieldName != 'Crown Assigned' ">
                         <b > {{ data.value }}</b>
                     </span>                    
                 </template> 
@@ -53,8 +53,8 @@ export default class CriminalCrownInformation extends Vue {
     
     isMounted = false
     fields =[
-        {key:"CrownInfoFieldName", tdClass: 'border-top',label: "Crown Info Field Name"},
-        {key:"CrownInfoValue", tdClass: 'border-top',label: "Crown Info Value"}
+        {key:"crownInfoFieldName",  tdClass: 'border-top',label: "Crown Info Field Name"},
+        {key:"crownInfoValue",      tdClass: 'border-top',label: "Crown Info Value"}
     ];
 
     public getCrownInfo(): void {
@@ -71,32 +71,32 @@ export default class CriminalCrownInformation extends Vue {
             assignedCrown = assignedCrown.substr(0, assignedCrown.length - 1)            
         }
         let crownInfo = {} as criminalCrownInformationInfoType;
-        crownInfo['CrownInfoFieldName'] = "Crown Assigned";
-        crownInfo['CrownInfoValue'] = assignedCrown;
+        crownInfo.crownInfoFieldName = "Crown Assigned";
+        crownInfo.crownInfoValue = assignedCrown;
         this.crownInformation.push(crownInfo);
         crownInfo = {} as criminalCrownInformationInfoType;
-        crownInfo['CrownInfoFieldName'] = "Crown Time Estimate";
+        crownInfo.crownInfoFieldName = "Crown Time Estimate";
         if (data.crownEstimateLenQty) {
             if (data.crownEstimateLenQty == 1) {
-                crownInfo['CrownInfoValue'] = data.crownEstimateLenQty + " " + data.crownEstimateLenDsc.replace('s', '')
+                crownInfo.crownInfoValue = data.crownEstimateLenQty + " " + data.crownEstimateLenDsc.replace('s', '')
             } else {
-                crownInfo['CrownInfoValue'] = data.crownEstimateLenQty + " " + data.crownEstimateLenDsc
+                crownInfo.crownInfoValue = data.crownEstimateLenQty + " " + data.crownEstimateLenDsc
             }
 
         } else {
-            crownInfo['CrownInfoValue'] = ''
+            crownInfo.crownInfoValue = ''
         }        
         this.crownInformation.push(crownInfo);
         crownInfo = {} as criminalCrownInformationInfoType;
-        crownInfo['CrownInfoFieldName'] = "Case Age";
-        crownInfo['CrownInfoValue'] = data.caseAgeDays?data.caseAgeDays + " Days":'';
+        crownInfo.crownInfoFieldName = "Case Age";
+        crownInfo.crownInfoValue = data.caseAgeDays?data.caseAgeDays + " Days":'';
         this.crownInformation.push(crownInfo);
         crownInfo = {} as criminalCrownInformationInfoType;
-        crownInfo['CrownInfoFieldName'] = "Approved By";
+        crownInfo.crownInfoFieldName = "Approved By";
         if (data.approvedByAgencyCd) {           
-            crownInfo['CrownInfoValue'] = data.approvedByPartNm?data.approvedByAgencyCd + " - " + data.approvedByPartNm: data.approvedByAgencyCd + " -";           
+            crownInfo.crownInfoValue = data.approvedByPartNm?data.approvedByAgencyCd + " - " + data.approvedByPartNm: data.approvedByAgencyCd + " -";           
         } else {
-            crownInfo['CrownInfoValue'] = '';
+            crownInfo.crownInfoValue = '';
         }        
         this.crownInformation.push(crownInfo);
         this.isMounted = true;

@@ -36,13 +36,13 @@ const criminalState = namespace('CriminalFileInformation');
 export default class CriminalCrownNotes extends Vue {
 
     @criminalState.State
-    public criminalFileInformation!: criminalFileInformationType
-    crownNotes: criminalCrownNotesInfoType[] = [];
-        
-    isMounted = false
+    public criminalFileInformation!: criminalFileInformationType;
+
+    crownNotes: criminalCrownNotesInfoType[] = [];        
+    isMounted = false;
 
     fields = [
-        {key:'CrownNotes', label: 'Crown Notes'}
+        {key:'crownNotes', label: 'Crown Notes'}
     ];
 
     public getCrownNotes(): void {
@@ -52,7 +52,7 @@ export default class CriminalCrownNotes extends Vue {
         if (data.trialRemark.length > 0) {
             for (const note of data.trialRemark) {
                 const crownNote = {} as criminalCrownNotesInfoType;
-                crownNote['CrownNotes'] = note.commentTxt
+                crownNote.crownNotes = note.commentTxt
                 this.crownNotes.push(crownNote)
             }
         }        

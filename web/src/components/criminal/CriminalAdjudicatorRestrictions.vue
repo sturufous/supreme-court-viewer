@@ -23,7 +23,7 @@
                 <template v-for="(field,index) in fields" v-slot:[`head(${field.key})`]="data">
                     <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
                 </template>
-                <template v-slot:cell(Status)="data" >                   
+                <template v-slot:cell(status)="data" >                   
                     <b-badge 
                         variant="primary" 
                         style="font-weight: normal; font-size: 16px;"> 
@@ -51,15 +51,15 @@ export default class  CriminalAdjudicatorRestrictions extends Vue {
 
   adjudicatorRestrictions: adjudicatorRestrictionsInfoType[] = [];
     
-  sortBy = 'Adjudicator';
+  sortBy = 'adjudicator';
   sortDesc = false;
   isMounted = false;  
 
   fields =  
   [
-      {key:'Adjudicator', sortable:true, tdClass: 'border-top',  headerStyle:'table-borderless text-primary'},       
-      {key:'Status',      sortable:true, tdClass: 'border-top',  headerStyle:'text-primary'},
-      {key:'Applies to',  sortable:true, tdClass: 'border-top',  headerStyle:'text-primary'},
+      {key:'adjudicator',   label:'Adjudicator', sortable:true, tdClass: 'border-top',  headerStyle:'table-borderless text-primary'},       
+      {key:'status',        label:'Status',      sortable:true, tdClass: 'border-top',  headerStyle:'text-primary'},
+      {key:'appliesTo',     label:'Applies to',  sortable:true, tdClass: 'border-top',  headerStyle:'text-primary'},
            
   ];
 

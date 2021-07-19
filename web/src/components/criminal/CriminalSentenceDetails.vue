@@ -13,31 +13,31 @@
             </b-thead>
 
             <b-tbody v-for="(counts,inx) in SortedParticipantSentencesCounts" v-bind:key="inx">
-                <b-tr v-for="(sentence,index) in counts['Sentence/Disposition Type']" v-bind:key="index" :style ="getRowStyle(index)">                            
+                <b-tr v-for="(sentence,index) in counts.sentenceDispositionType" v-bind:key="index" :style ="getRowStyle(index)">                            
                     
-                    <b-td :rowspan="counts.Len" v-if="index==0">{{counts['Date'] | beautify-date}}</b-td>                            
-                    <b-td :rowspan="counts.Len" v-if="index==0">{{counts['Count']}}</b-td>
+                    <b-td :rowspan="counts.len" v-if="index==0">{{counts.date | beautify-date}}</b-td>                            
+                    <b-td :rowspan="counts.len" v-if="index==0">{{counts.count}}</b-td>
                     
                     <b-td>                                
-                        <b> {{counts.ChargeIssueCd[index]}} </b> 
-                        <span v-if="counts.ChargeIssueCd[index]">
+                        <b> {{counts.chargeIssueCd[index]}} </b> 
+                        <span v-if="counts.chargeIssueCd[index]">
                             &mdash; 
                             <b-badge
                                 variant = "secondary"  
                                 v-b-tooltip.hover.right 
-                                :title="counts.ChargeIssueDscFull[index]"> 
-                                {{counts.ChargeIssueDsc[index]}} 
+                                :title="counts.chargeIssueDscFull[index]"> 
+                                {{counts.chargeIssueDsc[index]}} 
                             </b-badge>
                         </span>
                     </b-td>
                     
-                    <b-td :rowspan="counts.Len" v-if="index==0">
+                    <b-td :rowspan="counts.len" v-if="index==0">
                         <b-badge
-                            v-if="counts['Finding']"
+                            v-if="counts.finding"
                             variant = "secondary"
                             v-b-tooltip.hover.right
-                            :title="counts.FindingDsc"> 
-                            {{counts['Finding']}} 
+                            :title="counts.findingDsc"> 
+                            {{counts.finding}} 
                         </b-badge>
                     </b-td>
 
@@ -46,15 +46,15 @@
                             v-if="sentence"
                             variant = "secondary"  
                             v-b-tooltip.hover.right                             
-                            :title="counts.SentenceDsc[index]"> 
+                            :title="counts.sentenceDsc[index]"> 
                             {{sentence}} 
                         </b-badge>
                     </b-td>
 
-                    <b-td> {{counts['Term'][index]}} </b-td>
-                    <b-td> {{counts['Amount'][index]}} </b-td>
-                    <b-td> {{counts['Due Date/ Until'][index] | beautify-date }} </b-td>
-                    <b-td> {{counts['Effective Date'][index] | beautify-date }} </b-td>
+                    <b-td> {{counts.term[index]}} </b-td>
+                    <b-td> {{counts.amount[index]}} </b-td>
+                    <b-td> {{counts.dueDateUntil[index] | beautify-date }} </b-td>
+                    <b-td> {{counts.effectiveDate[index] | beautify-date }} </b-td>
                     
                 </b-tr>                       
             </b-tbody>
@@ -74,25 +74,24 @@ const criminalState = namespace("CriminalFileInformation");
 export default class CriminalSentenceDetails extends Vue {   
 
     @criminalState.State
-    public criminalParticipantSentenceInformation 
-
-    participantJson;         
-    sortBy = 'Date';
+    public criminalParticipantSentenceInformation
+            
+    sortBy = 'date';
     dateSortDir = 'desc';   
     isMounted = false
     selectedParticipant = 0;
     participantSentences: participantSentencesInfoType[] = [];
 
     fields = [        
-        {key:'Date',                     sortable:true,   tdClass: 'border-top', headerStyle:'text-primary'},
-        {key:'Count',                    sortable:true,   tdClass: 'border-top', headerStyle:'text-primary'},
-        {key:'Charge/Issue',             sortable:false,  tdClass: 'border-top', headerStyle:'text'},
-        {key:'Finding',                  sortable:true,   tdClass: 'border-top', headerStyle:'text-danger'},        
-        {key:'Sentence/ Disposition Type',sortable:false, tdClass: 'border-top', headerStyle:'text'},   
-        {key:'Term',                     sortable:false,  tdClass: 'border-top', headerStyle:'text'},
-        {key:'Amount',                   sortable:false,  tdClass: 'border-top', headerStyle:'text'},
-        {key:'Due Date/ Until',          sortable:false,  tdClass: 'border-top', headerStyle:'text'},
-        {key:'Effective Date',           sortable:false,  tdClass: 'border-top', headerStyle:'text'},
+        {key:'date',                     label:'Date',  sortable:true,   tdClass: 'border-top', headerStyle:'text-primary'},
+        {key:'count',                    label:'Count',  sortable:true,   tdClass: 'border-top', headerStyle:'text-primary'},
+        {key:'chargeIssue',              label:'Charge/Issue', sortable:false,  tdClass: 'border-top', headerStyle:'text'},
+        {key:'finding',                  label:'Finding', sortable:true,   tdClass: 'border-top', headerStyle:'text-danger'},        
+        {key:'sentenceDispositionType',  label:'Sentence/ Disposition Type',   sortable:false, tdClass: 'border-top', headerStyle:'text'},   
+        {key:'term',                     label:'Term', sortable:false,  tdClass: 'border-top', headerStyle:'text'},
+        {key:'amount',                   label:'Amount', sortable:false,  tdClass: 'border-top', headerStyle:'text'},
+        {key:'dueDateUntil',             label:'Due Date/ Until', sortable:false,  tdClass: 'border-top', headerStyle:'text'},
+        {key:'effectiveDate',            label:'Effective Date',sortable:false,  tdClass: 'border-top', headerStyle:'text'},
     ];
     
     public getParticipants(): void {       
@@ -109,13 +108,13 @@ export default class CriminalSentenceDetails extends Vue {
     get SortedParticipantSentencesCounts()
     {
         if(this.dateSortDir =='desc')
-            return _.sortBy(this.participantSentences[this.selectedParticipant]['Counts'],this.sortBy).reverse()
+            return _.sortBy(this.participantSentences[this.selectedParticipant].counts, this.sortBy).reverse()
         else
-            return _.sortBy(this.participantSentences[this.selectedParticipant]['Counts'],this.sortBy)  
+            return _.sortBy(this.participantSentences[this.selectedParticipant].counts, this.sortBy)  
     } 
 
     get NumberOfCounts() { 
-        return(this.participantSentences[this.selectedParticipant]["Counts"].length) 
+        return(this.participantSentences[this.selectedParticipant].counts.length) 
     }
 
     public getRowStyle(index) {

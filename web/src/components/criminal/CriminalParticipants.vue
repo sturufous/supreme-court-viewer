@@ -26,31 +26,31 @@
                     <b-badge class = "mt-1"  :style="data.field.cellStyle" variant="white" v-bind:key="index" >  {{ data.value }} </b-badge>
                 </template>
 
-                <template v-slot:cell(Name)="data" >               
+                <template v-slot:cell(name)="data" >               
                                                
                         <b-dropdown size="sm" style="height:35px;" no-caret variant="text-info"  >
                             <template v-slot:button-content>
                                 <b-button
-                                    :variant="data.item.Charges.length>0? 'outline-primary text-info':'white'" 
-                                    :disabled="data.item.Charges.length==0"
+                                    :variant="data.item.charges.length>0? 'outline-primary text-info':'white'" 
+                                    :disabled="data.item.charges.length==0"
                                     :style="data.field.cellStyle"
                                     size="sm"> 
                                     {{ data.value }}
-                                    <b-icon v-if="data.item.Charges.length>0" class="ml-1" icon="caret-down-fill" font-scale="1"></b-icon>
+                                    <b-icon v-if="data.item.charges.length>0" class="ml-1" icon="caret-down-fill" font-scale="1"></b-icon>
                                 </b-button>
                             </template>
                             <b-dropdown-text variant="white text-danger">Charges</b-dropdown-text>
                             <b-dropdown-divider></b-dropdown-divider>
                             <b-dropdown-item-button 
                                 disabled                                                               
-                                v-for="(file,index) in data.item.Charges" 
+                                v-for="(file,index) in data.item.charges" 
                                 :key="index">                                
-                                    <b>{{file["Code"]}}</b> &mdash; {{file["Description"]}}
+                                    <b>{{file.code}}</b> &mdash; {{file.description}}
                             </b-dropdown-item-button> 
                         </b-dropdown>                   
                 </template>
  
-                <template v-slot:cell(Status)="data" >
+                <template v-slot:cell(status)="data" >
                         <b-badge  
                             v-for="(field,index) in data.value"
                             :key="index" 
@@ -94,18 +94,17 @@ export default class CriminalParticipants extends Vue {
     participantList: participantListInfoType[] = [];
 
     isMounted = false;
-    participantJson;
     numberOfParticipants = 0;
-    sortBy = 'Name';
+    sortBy = 'name';
     sortDesc = false;
 
     fields =  
     [
-        {key:'Name',                    sortable:true,  tdClass: 'border-top',  headerStyle:'text-primary', cellStyle:'transform: translate(-10px,-4px); border:0px; font-size:16px'},
-        {key:'D.O.B.',                  sortable:false, tdClass: 'border-top',  headerStyle:'text',         cellStyle:'font-weight:normal; font-size:16px'},
-        {key:'Status',                  sortable:false, tdClass: 'border-top', headerStyle:'text',          cellStyle:'font-weight: normal; font-size: 14px;'},
-        {key:'Counsel',                 sortable:false, tdClass: 'border-top', headerStyle:'text',          cellStyle:'font-weight:normal; font-size:16px'},
-        {key:'Counsel Designation Filed',sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:'font-weight:normal; font-size:16px'},
+        {key:'name',                      label:'Name',                     sortable:true,  tdClass: 'border-top',  headerStyle:'text-primary', cellStyle:'transform: translate(-10px,-4px); border:0px; font-size:16px'},
+        {key:'dob',                       label:'D.O.B.',                   sortable:false, tdClass: 'border-top',  headerStyle:'text',         cellStyle:'font-weight:normal; font-size:16px'},
+        {key:'status',                    label:'Status',                   sortable:false, tdClass: 'border-top', headerStyle:'text',          cellStyle:'font-weight: normal; font-size: 14px;'},
+        {key:'counsel',                   label:'Counsel',                  sortable:false, tdClass: 'border-top', headerStyle:'text',          cellStyle:'font-weight:normal; font-size:16px'},
+        {key:'counselDesignationFiled',   label:'Counsel Designation Filed',sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:'font-weight:normal; font-size:16px'},
     ];
 
     mounted() {

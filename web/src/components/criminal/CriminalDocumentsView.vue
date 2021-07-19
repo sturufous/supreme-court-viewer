@@ -28,9 +28,9 @@
             <b-dropdown  variant="light text-info" :text="getNameOfParticipant(activeCriminalParticipantIndex)" class="m-0">    
                 <b-dropdown-item-button  
                     v-for="participant in SortedParticipants" 
-                    :key="participant['Index']"
-                    v-on:click="setActiveParticipantIndex(participant['Index'])">
-                        {{participant['Name']}}                        
+                    :key="participant.index"
+                    v-on:click="setActiveParticipantIndex(participant.index)">
+                        {{participant.name}}                        
                 </b-dropdown-item-button> 
             </b-dropdown>                 
         </b-card>
@@ -54,11 +54,11 @@
                         <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
                     </template>
 
-                    <template  v-slot:head(Date) > 
+                    <template  v-slot:head(date) > 
                          <b class="text-danger" >{{getNameOfDateInTabs}}</b>
                     </template>
 
-                    <template v-slot:head(Select) >                                  
+                    <template v-slot:head(select) >                                  
                         <b-form-checkbox                            
                             class="m-0"
                             v-model="allDocumentsChecked"
@@ -82,7 +82,7 @@
 
                     <template v-slot:[`cell(${fields[fieldsTab][documentPlace[fieldsTab]].key})`]="data" >
                         <b-button 
-                            v-if="data.item.PdfAvail" 
+                            v-if="data.item.pdfAvail" 
                             variant="outline-primary text-info" 
                             style="border:0px; font-size:16px"
                             @click="cellClick(data)"
@@ -166,7 +166,7 @@ export default class CriminalDocumentsView extends Vue {
     loadingPdf = false;    
     activetab = 'ALL';
     tabIndex = 0;              
-    sortBy = 'Date';
+    sortBy = 'date';
     sortDesc = true;
     hoverRow =-1;
     hoverCol = 0;
@@ -181,26 +181,26 @@ export default class CriminalDocumentsView extends Vue {
 
     fields = [ 
         [
-            {key:'Select',label:'',sortable:false,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},
-            {key:'Date',               sortable:true,   tdClass: 'border-top',  headerStyle:'text-danger'},
-            {key:'Document Type',      sortable:true,   tdClass: 'border-top',  cellStyle:'text-align:left;', headerStyle:'text-primary'},
-            {key:'Category',           sortable:false,  tdClass: 'border-top',  headerStyle:'text'},
-            {key:'Pages',              sortable:false,  tdClass: 'border-top',  headerStyle:'text'},
+            {key:'select',          label:'',sortable:false,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},
+            {key:'date',            label:'Date',                   sortable:true,   tdClass: 'border-top',  headerStyle:'text-danger'},
+            {key:'documentType',    label:'Document Type',      sortable:true,   tdClass: 'border-top',  cellStyle:'text-align:left;', headerStyle:'text-primary'},
+            {key:'category',        label:'Category',           sortable:false,  tdClass: 'border-top',  headerStyle:'text'},
+            {key:'pages',           label:'Pages',              sortable:false,  tdClass: 'border-top',  headerStyle:'text'},
         ],
         [
-            {key:'Select',label:'',sortable:false,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},
-            {key:'Document Type',    sortable:false,  tdClass: 'border-top', cellStyle:'text-align:left;', headerStyle:'text-primary'},
-            {key:'Category',         sortable:true,   tdClass: 'border-top', headerStyle:'text'},
-            {key:'Pages',            sortable:false,  tdClass: 'border-top', headerStyle:'text'},
+            {key:'select',label:'',sortable:false,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},
+            {key:'documentType',    label:'Document Type',    sortable:false,  tdClass: 'border-top', cellStyle:'text-align:left;', headerStyle:'text-primary'},
+            {key:'category',        label:'Category',         sortable:true,   tdClass: 'border-top', headerStyle:'text'},
+            {key:'pages',           label:'Pages',             sortable:false,  tdClass: 'border-top', headerStyle:'text'},
         ],
         [
-            {key:'Select',label:'',sortable:false,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},
-            {key:'Date',               sortable:true,   tdClass: 'border-top',  headerStyle:'text-danger'},
-            {key:'Document Type',      sortable:true,   tdClass: 'border-top',  cellStyle:'text-align:left;', headerStyle:'text-primary'},
-            {key:'Status',             sortable:true,   tdClass: 'border-top',  headerStyle:'text-primary'},
-            {key:'Status Date',        sortable:true,   tdClass: 'border-top',  headerStyle:'text-primary'},
-            {key:'Category',           sortable:false,  tdClass: 'border-top',  headerStyle:'text'},
-            {key:'Pages',              sortable:false,  tdClass: 'border-top',  headerStyle:'text'},
+            {key:'select',          label:'',sortable:false,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},
+            {key:'date',            label:'Date',               sortable:true,   tdClass: 'border-top',  headerStyle:'text-danger'},
+            {key:'documentType',    label:'Document Type',      sortable:true,   tdClass: 'border-top',  cellStyle:'text-align:left;', headerStyle:'text-primary'},
+            {key:'status',          label:'Status',   sortable:true,   tdClass: 'border-top',  headerStyle:'text-primary'},
+            {key:'statusDate',      label:'Status Date',   sortable:true,   tdClass: 'border-top',  headerStyle:'text-primary'},
+            {key:'category',        label:'Category',           sortable:false,  tdClass: 'border-top',  headerStyle:'text'},
+            {key:'pages',           label:'Pages',               sortable:false,  tdClass: 'border-top',  headerStyle:'text'},
         ]  
         
     ];
@@ -237,7 +237,7 @@ export default class CriminalDocumentsView extends Vue {
 
     public getNameOfParticipant(num)
     {
-        this.UpdateDisplayName({'lastName': this.participantFiles[num]["Last Name"], 'givenName': this.participantFiles[num]["First Name"]});
+        this.UpdateDisplayName({'lastName': this.participantFiles[num]["lastName"], 'givenName': this.participantFiles[num]["firstName"]});
         return this.displayName;
     }
 
@@ -252,16 +252,16 @@ export default class CriminalDocumentsView extends Vue {
         });
         
         this.selectedDocuments = {zipName: fileName, csrRequests: [], documentRequests: [], ropRequests: []};
-        for(const doc of this.participantFiles[this.activeCriminalParticipantIndex]["Documents"]){
+        for(const doc of this.participantFiles[this.activeCriminalParticipantIndex].documents){
             if (doc.isChecked && doc.isEnabled) {
-                const id = doc["Image ID"];                
+                const id = doc.imageId;                
                 const documentRequest = {} as documentRequestsInfoType;
                 documentRequest.isCriminal = true;
                 const documentData: DocumentData = { 
                     courtClass: this.criminalFileInformation.detailsData.courtClassCd, 
                     courtLevel: this.criminalFileInformation.detailsData.courtLevelCd, 
-                    dateFiled: Vue.filter('beautify-date')(doc["Date"]),
-                    documentDescription: doc["Document Type"],
+                    dateFiled: Vue.filter('beautify-date')(doc.date),
+                    documentDescription: doc.documentType,
                     documentId: id,
                     fileId: this.criminalFileInformation.fileNumber,
                     fileNumberText: this.criminalFileInformation.detailsData.fileNumberTxt,
@@ -274,23 +274,23 @@ export default class CriminalDocumentsView extends Vue {
             }        
         }
 
-        for(const doc of this.participantFiles[this.activeCriminalParticipantIndex]["Record of Proceedings"]){
+        for(const doc of this.participantFiles[this.activeCriminalParticipantIndex].recordOfProceedings){
             if (doc.isChecked && doc.isEnabled) {                
                 const ropRequest = {} as ropRequestsInfoType;
-                const partId = doc['Part ID'];
+                const partId = doc.partId;
                 const documentData: DocumentData = { 
                     courtClass: this.criminalFileInformation.detailsData.courtClassCd, 
                     courtLevel: this.criminalFileInformation.detailsData.courtLevelCd, 
-                    documentDescription: doc["Document Type"],
+                    documentDescription: doc.documentType,
                     fileId: this.criminalFileInformation.fileNumber,
                     fileNumberText: this.criminalFileInformation.detailsData.fileNumberTxt,
                     location: this.criminalFileInformation.detailsData.homeLocationAgencyName,
                     partId: partId,
-                    profSeqNo: doc['Prof Seq No']
+                    profSeqNo: doc.profSeqNo
                 };
                 ropRequest.pdfFileName = shared.generateFileName(CourtDocumentType.ROP, documentData);
                 ropRequest.partId = partId;
-                ropRequest.profSequenceNumber = doc['Prof Seq No'];
+                ropRequest.profSequenceNumber = doc.profSeqNo;
                 ropRequest.courtLevelCode = this.criminalFileInformation.courtLevel;
                 ropRequest.courtClassCode = this.criminalFileInformation.courtClass;
                 this.selectedDocuments.ropRequests.push(ropRequest); 
@@ -322,26 +322,26 @@ export default class CriminalDocumentsView extends Vue {
     public checkAllDocuments(checked){       
         if(this.activetab == 'ROP')
         {
-            for(const docInx in this.participantFiles[this.activeCriminalParticipantIndex]["Record of Proceedings"]){
-                if (this.participantFiles[this.activeCriminalParticipantIndex]["Record of Proceedings"][docInx].isEnabled) {
-                    this.participantFiles[this.activeCriminalParticipantIndex]["Record of Proceedings"][docInx].isChecked = checked
+            for(const docInx in this.participantFiles[this.activeCriminalParticipantIndex].recordOfProceedings){
+                if (this.participantFiles[this.activeCriminalParticipantIndex].recordOfProceedings[docInx].isEnabled) {
+                    this.participantFiles[this.activeCriminalParticipantIndex].recordOfProceedings[docInx].isChecked = checked
                 }        
             }
         }
         else {
             if(this.activetab != 'ALL')
             { 
-                if (this.participantFiles[this.activeCriminalParticipantIndex]["Documents"]["Category"].toUpperCase() == this.activetab.toUpperCase()){
-                    for(const docInx in this.participantFiles[this.activeCriminalParticipantIndex]["Documents"]){
-                        if (this.participantFiles[this.activeCriminalParticipantIndex]["Documents"][docInx].isEnabled) {
-                            this.participantFiles[this.activeCriminalParticipantIndex]["Documents"][docInx].isChecked = checked
+                if (this.participantFiles[this.activeCriminalParticipantIndex].documents["Category"].toUpperCase() == this.activetab.toUpperCase()){
+                    for(const docInx in this.participantFiles[this.activeCriminalParticipantIndex].documents){
+                        if (this.participantFiles[this.activeCriminalParticipantIndex].documents[docInx].isEnabled) {
+                            this.participantFiles[this.activeCriminalParticipantIndex].documents[docInx].isChecked = checked
                         }        
                     }
                 }
             } else {
-                for(const docInx in this.participantFiles[this.activeCriminalParticipantIndex]["Documents"]){
-                    if (this.participantFiles[this.activeCriminalParticipantIndex]["Documents"][docInx].isEnabled) {
-                        this.participantFiles[this.activeCriminalParticipantIndex]["Documents"][docInx].isChecked = checked
+                for(const docInx in this.participantFiles[this.activeCriminalParticipantIndex].documents){
+                    if (this.participantFiles[this.activeCriminalParticipantIndex].documents[docInx].isEnabled) {
+                        this.participantFiles[this.activeCriminalParticipantIndex].documents[docInx].isChecked = checked
                     }        
                 }
             }
@@ -351,16 +351,16 @@ export default class CriminalDocumentsView extends Vue {
     public toggleSelectedDocuments() {  
         Vue.nextTick(()=>{
             if(this.activetab == 'ROP') {
-                const checkedDocs = this.participantFiles[this.activeCriminalParticipantIndex]["Record of Proceedings"].filter(doc=>{return doc.isChecked})
-                const enabledDocs = this.participantFiles[this.activeCriminalParticipantIndex]["Record of Proceedings"].filter(doc=>{return doc.isEnabled})
+                const checkedDocs = this.participantFiles[this.activeCriminalParticipantIndex].recordOfProceedings.filter(doc=>{return doc.isChecked})
+                const enabledDocs = this.participantFiles[this.activeCriminalParticipantIndex].recordOfProceedings.filter(doc=>{return doc.isEnabled})
                 if(checkedDocs.length == enabledDocs.length)
                     this.allDocumentsChecked = true
                 else
                     this.allDocumentsChecked = false
 
             } else {
-                const checkedDocs = this.participantFiles[this.activeCriminalParticipantIndex]["Documents"].filter(doc=>{return doc.isChecked})
-                const enabledDocs = this.participantFiles[this.activeCriminalParticipantIndex]["Documents"].filter(doc=>{return doc.isEnabled})
+                const checkedDocs = this.participantFiles[this.activeCriminalParticipantIndex].documents.filter(doc=>{return doc.isChecked})
+                const enabledDocs = this.participantFiles[this.activeCriminalParticipantIndex].documents.filter(doc=>{return doc.isEnabled})
                 if(checkedDocs.length == enabledDocs.length)
                     this.allDocumentsChecked = true
                 else
@@ -376,49 +376,49 @@ export default class CriminalDocumentsView extends Vue {
         for(const partIndex in this.participantList)
         {         
             const partInfo = this.participantList[partIndex];
-            partInfo["Documents"] = [];
-            partInfo["Record of Proceedings"] = [];            
+            partInfo.documents = [];
+            partInfo.recordOfProceedings = [];            
             const document: participantDocumentsInfoType[] = [];
             const rop: participantROPInfoType[] = [];
             
-            for(const doc of partInfo.DocumentsJson)
+            for(const doc of partInfo.documentsJson)
             {
                 if(doc.category != 'rop') {
                     const docInfo = {} as participantDocumentsInfoType; 
-                    docInfo["Date"]= doc.issueDate? doc.issueDate.split(' ')[0] : ''; 
-                    docInfo["Document Type"]= doc.docmFormDsc;
-                    docInfo["Category"]= doc.category? doc.category: doc.docmClassification;
-                    docInfo["Pages"]= doc.documentPageCount;
-                    docInfo["PdfAvail"]= doc.imageId? true : false
-                    docInfo["Image ID"]= doc.imageId;
-                    docInfo["Status"] = doc.docmDispositionDsc;
-                    docInfo["Status Date"] = doc.docmDispositionDate;
-                    docInfo.isEnabled = docInfo["PdfAvail"];
+                    docInfo.date = doc.issueDate? doc.issueDate.split(' ')[0] : ''; 
+                    docInfo.documentType = doc.docmFormDsc;
+                    docInfo.category = doc.category? doc.category: doc.docmClassification;
+                    docInfo.pages = doc.documentPageCount;
+                    docInfo.pdfAvail = doc.imageId? true : false
+                    docInfo.imageId = doc.imageId;
+                    docInfo.status = doc.docmDispositionDsc;
+                    docInfo.statusDate = doc.docmDispositionDate;
+                    docInfo.isEnabled = docInfo.pdfAvail;
                     docInfo.isChecked = false;
-                    if (docInfo["Category"] != "PSR") {
-                        docInfo["Category"] = docInfo["Category"].charAt(0).toUpperCase() + docInfo["Category"].slice(1).toLowerCase();                        
+                    if (docInfo.category != "PSR") {
+                        docInfo.category = docInfo.category.charAt(0).toUpperCase() + docInfo.category.slice(1).toLowerCase();                        
                     }                                                     
-                    if((this.categories.indexOf(docInfo["Category"]) < 0) ) this.categories.push(docInfo["Category"]) 
+                    if((this.categories.indexOf(docInfo.category) < 0) ) this.categories.push(docInfo.category) 
                     
                     document.push(docInfo);
                 }
                 else {
                     const docInfo = {} as participantROPInfoType;                   
-                    docInfo["Document Type"]= 'Record of Proceedings';
-                    docInfo["Category"]= "ROP";
-                    docInfo["Pages"]= doc.documentPageCount;
-                    docInfo["PdfAvail"]= true 
-                    docInfo["Index"] = partIndex;
-                    docInfo["Prof Seq No"] = partInfo["Prof Seq No"];
-                    docInfo["Part ID"] = partInfo["Part ID"];
-                    docInfo.isEnabled = docInfo["PdfAvail"];
+                    docInfo.documentType = 'Record of Proceedings';
+                    docInfo.category = "ROP";
+                    docInfo.pages = doc.documentPageCount;
+                    docInfo.pdfAvail = true 
+                    docInfo.index = partIndex;
+                    docInfo.profSeqNo = partInfo.profSeqNo;
+                    docInfo.partId = partInfo.partId;
+                    docInfo.isEnabled = docInfo.pdfAvail;
                     docInfo.isChecked = false;
                     rop.push(docInfo);
                     ropExists = true
                 }
             }
-            partInfo["Documents"] = document;
-            partInfo["Record of Proceedings"] = rop;                        
+            partInfo.documents = document;
+            partInfo.recordOfProceedings = rop;                        
             this.participantFiles.push(partInfo);
         }
 
@@ -436,16 +436,16 @@ export default class CriminalDocumentsView extends Vue {
         if(this.activetab == 'ROP')
         {
             this.fieldsTab = fieldTab.Summary;
-            return this.participantFiles[this.activeCriminalParticipantIndex]["Record of Proceedings"];
+            return this.participantFiles[this.activeCriminalParticipantIndex].recordOfProceedings;
         }
         else{  
-            return this.participantFiles[this.activeCriminalParticipantIndex]["Documents"].filter(doc => {                
+            return this.participantFiles[this.activeCriminalParticipantIndex].documents.filter(doc => {                
                 this.fieldsTab = fieldTab.Categories;
                 if(this.activetab == 'Bail')
                 {
                     this.fieldsTab = fieldTab.Bail;
                     
-                    if (doc["Category"].toUpperCase() == this.activetab.toUpperCase()){
+                    if (doc.category.toUpperCase() == this.activetab.toUpperCase()){
                         return true;
                     }                                    
                                   
@@ -453,7 +453,7 @@ export default class CriminalDocumentsView extends Vue {
                 } 
                 else if ( this.activetab != 'ALL' )
                 {
-                    if (doc["Category"].toUpperCase() == this.activetab.toUpperCase()) return true;                                   
+                    if (doc.category.toUpperCase() == this.activetab.toUpperCase()) return true;                                   
                                   
                     return false;                     
                 }
@@ -485,10 +485,10 @@ export default class CriminalDocumentsView extends Vue {
     get NumberOfDocuments() {       
         if(this.activetab == 'ROP')
         {           
-            return(this.participantFiles[this.activeCriminalParticipantIndex]["Record of Proceedings"].length)
+            return(this.participantFiles[this.activeCriminalParticipantIndex].recordOfProceedings.length)
         }
         else{  
-            return(this.participantFiles[this.activeCriminalParticipantIndex]["Documents"].length)            
+            return(this.participantFiles[this.activeCriminalParticipantIndex].documents.length)            
         }    
     }
 
@@ -496,13 +496,13 @@ export default class CriminalDocumentsView extends Vue {
     {   
         this.loadingPdf = true;
         const documentType = eventData.item.Category == "ROP" ? CourtDocumentType.ROP : CourtDocumentType.Criminal;
-        const index = eventData.item["Index"];
+        const index = eventData.item.index;
         const documentData: DocumentData = { 
             courtClass: this.criminalFileInformation.detailsData.courtClassCd, 
             courtLevel: this.criminalFileInformation.detailsData.courtLevelCd, 
-            dateFiled: Vue.filter('beautify-date')(eventData.item["Date"]),
-            documentId: eventData.item["Image ID"], 
-            documentDescription: eventData.item["Document Type"],
+            dateFiled: Vue.filter('beautify-date')(eventData.item.date),
+            documentId: eventData.item.imageId, 
+            documentDescription: eventData.item.documentType,
             fileId: this.criminalFileInformation.fileNumber, 
             fileNumberText: this.criminalFileInformation.detailsData.fileNumberTxt,
             partId: index ? this.participantFiles[index]["Part ID"] : '', 

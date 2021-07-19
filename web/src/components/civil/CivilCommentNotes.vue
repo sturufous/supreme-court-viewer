@@ -17,7 +17,7 @@
             small              
             striped
             >
-                <template  v-slot:cell(NotesFieldName)="data">                    
+                <template  v-slot:cell(notesFieldName)="data">                    
                     <span>
                         <b> {{ data.value }}</b>
                     </span>                    
@@ -45,8 +45,8 @@ export default class CivilCommentNotes extends Vue {
     notesExist = false
 
     fields = [
-        {key:"NotesFieldName", tdClass: 'border-top', label: "Notes Field Name"},
-        {key:"NotesValue", tdClass: 'border-top', label: "Notes Value"}
+        {key:"notesFieldName",  label: "Notes Field Name", tdClass: 'border-top'},
+        {key:"notesValue",      label: "Notes Value",      tdClass: 'border-top'}
     ];
 
     public getCivilNotes(): void {
@@ -54,18 +54,18 @@ export default class CivilCommentNotes extends Vue {
         const data = this.civilFileInformation.detailsData;
         
         let notesInfo = {} as civilNotesType;
-        notesInfo['NotesFieldName'] = "Trial Remark";
-        notesInfo['NotesValue'] = data.trialRemarkTxt? data.trialRemarkTxt: '';
+        notesInfo.notesFieldName = "Trial Remark";
+        notesInfo.notesValue = data.trialRemarkTxt? data.trialRemarkTxt: '';
         this.civilNotes.push(notesInfo);
         notesInfo = {} as civilNotesType;
 
-        notesInfo['NotesFieldName'] = "Comment To Judge";
-        notesInfo['NotesValue'] = data.commentToJudgeTxt? data.commentToJudgeTxt: '';
+        notesInfo.notesFieldName = "Comment To Judge";
+        notesInfo.notesValue = data.commentToJudgeTxt? data.commentToJudgeTxt: '';
         this.civilNotes.push(notesInfo);
         notesInfo = {} as civilNotesType;
 
-        notesInfo['NotesFieldName'] = "File Comment";
-        notesInfo['NotesValue'] = data.fileCommentText? data.fileCommentText: '';
+        notesInfo.notesFieldName = "File Comment";
+        notesInfo.notesValue = data.fileCommentText? data.fileCommentText: '';
         this.civilNotes.push(notesInfo);        
         if (data.trialRemarkTxt || data.commentToJudgeTxt || data.fileCommentText) {
             this.notesExist = true;

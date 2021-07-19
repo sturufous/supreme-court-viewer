@@ -45,7 +45,7 @@
                     </template>
 
                     <template v-slot:[`cell(${fields[fieldsTab][datePlace[fieldsTab]].key})`]="data" >
-                        <span v-if="data.item.Sealed" :style="data.field.cellStyle" class="text-muted">
+                        <span v-if="data.item.sealed" :style="data.field.cellStyle" class="text-muted">
                             {{ data.value | beautify-date}}
                         </span>
                         <span v-else :style="data.field.cellStyle">
@@ -55,22 +55,22 @@
 
                     <template v-slot:[`cell(${fields[fieldsTab][documentPlace[fieldsTab]].key})`]="data" >
                         <b-button 
-                            v-if="data.item.PdfAvail && !data.item.Sealed" 
+                            v-if="data.item.pdfAvail && !data.item.sealed" 
                             variant="outline-primary text-info" 
                             :style="data.field.cellStyle"
                             @click="cellClick(data)"
                             size="sm">
                                 {{data.value}}
                         </b-button>
-                        <span class="ml-2" v-else-if="!data.item.PdfAvail && !data.item.Sealed">
+                        <span class="ml-2" v-else-if="!data.item.pdfAvail && !data.item.sealed">
                              {{data.value}}
                         </span>
-                        <span class="ml-2 text-muted" v-else-if="data.item.Sealed">
+                        <span class="ml-2 text-muted" v-else-if="data.item.sealed">
                              {{data.value}}
                         </span>
                     </template>
 
-                    <template v-slot:head(Select) >                                  
+                    <template v-slot:head(select) >                                  
                         <b-form-checkbox                            
                             class="m-0"
                             v-model="allDocumentsChecked"
@@ -78,7 +78,7 @@
                             size="sm"/>
                     </template>
 
-                    <template v-slot:cell(Select)="data" >                                  
+                    <template v-slot:cell(select)="data" >                                  
                         <b-form-checkbox
                             size="sm"
                             class="m-0"
@@ -88,29 +88,29 @@
                             />
                     </template>
 
-                    <template v-slot:cell(Act)="data" >
+                    <template v-slot:cell(act)="data" >
                         <b-badge 
                             variant="secondary"
                             :style="data.field.cellStyle"                     
                             v-for="(act, actIndex) in data.value"  
                             v-bind:key="actIndex"                               
                             v-b-tooltip.hover.left 
-                            :title="act.Description"> 
-                                {{act.Code}}<br> 
+                            :title="act.description"> 
+                                {{act.code}}<br> 
                         </b-badge>
                     </template>
 
-                    <template v-slot:cell(Issues)="data" >                               
+                    <template v-slot:cell(issues)="data" >                               
                         <li 
                             v-for="(issue, issueIndex) in data.value"  
                             v-bind:key="issueIndex"
                             :style="data.field.cellStyle">
-                            <span v-if="data.item.Sealed" class="text-muted">{{ issue }}</span>
+                            <span v-if="data.item.sealed" class="text-muted">{{ issue }}</span>
                             <span v-else>{{ issue }}</span>
                         </li>
                     </template>
-                    <template v-slot:cell(Seq)="data">
-                        <span v-if="data.item.Sealed" class="ml-2 text-muted" :style="data.field.cellStyle"> 
+                    <template v-slot:cell(seq)="data">
+                        <span v-if="data.item.sealed" class="ml-2 text-muted" :style="data.field.cellStyle"> 
                             {{data.value}}
                         </span>
                         <span v-else class="ml-2" :style="data.field.cellStyle"> 
@@ -119,7 +119,7 @@
                     </template>
                     
                     <template v-slot:cell()="data">
-                        <span v-if="data.field.key == 'Filed By Name'" >
+                        <span v-if="data.field.key == 'filedByName'" >
                             <li 
                                 v-for="(filed, filedIndex) in data.value"  
                                 v-bind:key="filedIndex"
@@ -191,53 +191,53 @@ export default class CivilDocumentsView extends Vue {
 
     fields = [ 
         [
-            {key:'Select',label:'',sortable:false,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},
-            {key:'Seq',label:'Seq.',  sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
-            {key:'Document Type',  sortable:true,  headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 16px; text-align:left;'}, 
-            {key:'Aff No.',        sortable:false, headerStyle:'text',          cellStyle:'font-size: 16px;'},           
-            {key:'Act',            sortable:false, headerStyle:'text',          cellStyle:'display: block; margin-top: 1px; font-size: 14px; max-width : 50px;'},
-            {key:'Date Filed',     sortable:true,  headerStyle:'text-danger',   cellStyle:'font-size: 16px;'},
-            {key:'Sworn By',       sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px'},                
-            {key:'Issues',         sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px;'},
-            {key:'Filed By Name',  sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px'},
-            {key:'Comment',        sortable:false, headerStyle:'text',          cellStyle:'font-size: 12px; max-width:300px;', tdClass: 'max-width-300'}
+            {key:'select',        label:'',               sortable:false, headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},
+            {key:'seq',           label:'Seq.',           sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
+            {key:'documentType',  label:'Document Type',  sortable:true,  headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 16px; text-align:left;'}, 
+            {key:'affNo',         label:'Aff No.',        sortable:false, headerStyle:'text',          cellStyle:'font-size: 16px;'},           
+            {key:'act',           label: 'Act',           sortable:false, headerStyle:'text',          cellStyle:'display: block; margin-top: 1px; font-size: 14px; max-width : 50px;'},
+            {key:'dateFiled',     label:'Date Filed',     sortable:true,  headerStyle:'text-danger',   cellStyle:'font-size: 16px;'},
+            {key:'swornBy',       label:'Sworn By',       sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px'},                
+            {key:'issues',        label:'Issues',         sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px;'},
+            {key:'filedByName',   label:'Filed By Name',  sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px'},
+            {key:'comment',       label:'Comment',        sortable:false, headerStyle:'text',          cellStyle:'font-size: 12px; max-width:300px;', tdClass: 'max-width-300'}
         ],        
         [
-            {key:'Select',label:'',  sortable:false,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},            
-            {key:'Document Type',    sortable:false, headerStyle:'text-primary',    cellStyle:'border:0px; font-size: 16px;'},
-            {key:'Appearance Date',  sortable:true,  headerStyle:'text-danger',     cellStyle:'font-size: 16px;'}
+            {key:'select',         label:'',                 sortable:false,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},            
+            {key:'documentType',   label:'Document Type',    sortable:false, headerStyle:'text-primary',    cellStyle:'border:0px; font-size: 16px;'},
+            {key:'appearanceDate', label:'Appearance Date',  sortable:true,  headerStyle:'text-danger',     cellStyle:'font-size: 16px;'}
         ],
         [
-            {key:'Select',label:'',sortable:false,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},            
-            {key:'Seq',label:'Seq.',  sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
-            {key:'Document Type',  sortable:true,  headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 16px; text-align:left;'},
-            {key:'Date Filed',     sortable:false, headerStyle:'text-primary',   cellStyle:'font-size: 16px;'},
-            {key:'Order Made Date',sortable:true,  headerStyle:'text-primary',   cellStyle:'font-size: 16px;'},
-            {key:'Filed By Name',  sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px'},
-            {key:'Comment',        sortable:false, headerStyle:'text',          cellStyle:'font-size: 12px; max-width:300px;', tdClass: 'max-width-300'}
+            {key:'select',          label:'',               sortable:false,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},            
+            {key:'seq',             label:'Seq.',           sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
+            {key:'documentType',    label:'Document Type',  sortable:true,  headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 16px; text-align:left;'},
+            {key:'dateFiled',       label:'Date Filed',     sortable:false, headerStyle:'text-primary',   cellStyle:'font-size: 16px;'},
+            {key:'orderMadeDate',   label:'Order Made Date',sortable:true,  headerStyle:'text-primary',   cellStyle:'font-size: 16px;'},
+            {key:'filedByName',     label:'Filed By Name',  sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px'},
+            {key:'comment',         label:'Comment',        sortable:false, headerStyle:'text',          cellStyle:'font-size: 12px; max-width:300px;', tdClass: 'max-width-300'}
         ],
         [
-            {key:'Select',label:'',      sortable:false,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},            
-            {key:'Seq',label:'Seq.',        sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
-            {key:'Document Type',        sortable:true,  headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 16px; text-align:left;'},
-            {key:'Act',                  sortable:false, headerStyle:'text',          cellStyle:'display: block; margin-top: 1px; font-size: 14px; max-width : 50px;'},
-            {key:'Next Appearance Date', sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
-            {key:'Date Filed',           sortable:false, headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
-            {key:'Issues',               sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px;'},
-            {key:'Filed By Name',        sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px;'},
-            {key:'Comment',              sortable:false, headerStyle:'text',          cellStyle:'font-size: 12px; max-width:300px;', tdClass: 'max-width-300'}
+            {key:'select',              label:'',      sortable:false,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},            
+            {key:'seq',                 label:'Seq.',        sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
+            {key:'documentType',        label:'Document Type',       sortable:true,  headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 16px; text-align:left;'},
+            {key:'act',                 label: 'Act',                 sortable:false, headerStyle:'text',          cellStyle:'display: block; margin-top: 1px; font-size: 14px; max-width : 50px;'},
+            {key:'nextAppearanceDate',  label:'Next Appearance Date', sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
+            {key:'dateFiled',           label:'Date Filed',           sortable:false, headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
+            {key:'issues',              label:'Issues',               sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px;'},
+            {key:'filedByName',         label:'Filed By Name',        sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px;'},
+            {key:'comment',             label:'Comment',              sortable:false, headerStyle:'text',          cellStyle:'font-size: 12px; max-width:300px;', tdClass: 'max-width-300'}
         ],
         [
-            {key:'Select',label:'',sortable:false,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},
-            {key:'Seq',label:'Seq.',  sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
-            {key:'Document Type',  sortable:true,  headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 16px; text-align:left;'},
-            {key:'Aff No.',        sortable:false, headerStyle:'text',          cellStyle:'font-size: 16px;'},           
-            {key:'Date Filed',     sortable:true,  headerStyle:'text-danger',   cellStyle:'font-size: 16px;'},
-            {key:'Sworn By',       sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px'},           
-            {key:'Filed By Name',  sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px'},
-            {key:'Issues',         sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px;'},
-            {key:'Act',            sortable:false, headerStyle:'text',          cellStyle:'display: block; margin-top: 1px; font-size: 14px; max-width : 50px;'},
-            {key:'Comment',        sortable:false, headerStyle:'text',          cellStyle:'font-size: 12px; max-width:300px;', tdClass: 'max-width-300'}
+            {key:'select',         label:'',               sortable:false, headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},
+            {key:'seq',            label:'Seq.',           sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
+            {key:'documentType',   label:'Document Type',  sortable:true,  headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 16px; text-align:left;'},
+            {key:'affNo',          label:'Aff No.',        sortable:false, headerStyle:'text',          cellStyle:'font-size: 16px;'},           
+            {key:'dateFiled',      label:'Date Filed',     sortable:true,  headerStyle:'text-danger',   cellStyle:'font-size: 16px;'},
+            {key:'swornBy',        label:'Sworn By',       sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px'},           
+            {key:'filedByName',    label:'Filed By Name',  sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px'},
+            {key:'issues',         label:'Issues',         sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 16px; margin-left: 20px;'},
+            {key:'act',            label:'Act',            sortable:false, headerStyle:'text',          cellStyle:'display: block; margin-top: 1px; font-size: 14px; max-width : 50px;'},
+            {key:'comment',        label:'Comment',        sortable:false, headerStyle:'text',          cellStyle:'font-size: 12px; max-width:300px;', tdClass: 'max-width-300'}
         ]
     ];
 
@@ -268,11 +268,11 @@ export default class CivilDocumentsView extends Vue {
         this.loadingPdf = true;
         const documentType = eventData.value == "CourtSummary" ? CourtDocumentType.CSR : CourtDocumentType.Civil;
         const documentData: DocumentData = { 
-            appearanceDate: eventData.item['Appearance Date'],
-            appearanceId: eventData.item['Appearance ID'],
-            dateFiled: eventData.item['Date Filed'],
-            documentDescription: eventData.item['Document Type'],
-            documentId: eventData.item['Document ID'], 
+            appearanceDate: eventData.item.appearanceDate,
+            appearanceId: eventData.item.appearanceId,
+            dateFiled: eventData.item.dateFiled,
+            documentDescription: eventData.item.documentType,
+            documentId: eventData.item.documentId, 
             fileId: this.civilFileInformation.fileNumber,
             fileNumberText: this.civilFileInformation.detailsData.fileNumberTxt,
             courtClass: this.civilFileInformation.detailsData.courtClassCd,
@@ -294,13 +294,13 @@ export default class CivilDocumentsView extends Vue {
         this.selectedDocuments = {zipName: fileName, csrRequests: [], documentRequests: [], ropRequests: []};
         for(const doc of this.documents){
             if (doc.isChecked && doc.isEnabled) {
-                const id = doc["Document ID"]                
+                const id = doc.documentId;                
                 const documentRequest = {} as documentRequestsInfoType;
                 documentRequest.isCriminal = false;
                 const documentData: DocumentData = { 
                     courtLevel: this.civilFileInformation.detailsData.courtLevelCd,
-                    dateFiled: Vue.filter('beautify-date')(doc["Date Filed"]),
-                    documentDescription: doc["Document Type"],
+                    dateFiled: Vue.filter('beautify-date')(doc.dateFiled),
+                    documentDescription: doc.documentType,
                     documentId: id,
                     fileNumberText:  this.civilFileInformation.detailsData.fileNumberTxt,
                     location: this.civilFileInformation.detailsData.homeLocationAgencyName
@@ -314,14 +314,14 @@ export default class CivilDocumentsView extends Vue {
 
         for(const doc of this.summaryDocuments){
             if (doc.isChecked && doc.isEnabled) {                
-                const id = doc["Appearance ID"]                      
+                const id = doc.appearanceId;                      
                 const csrRequest = {} as csrRequestsInfoType;
                 csrRequest.appearanceId = id;
                 const documentData: DocumentData = { 
                     appearanceId: csrRequest.appearanceId,
-                    appearanceDate: Vue.filter('beautify-date')(doc["Appearance Date"]),
+                    appearanceDate: Vue.filter('beautify-date')(doc.appearanceDate),
                     courtLevel: this.civilFileInformation.detailsData.courtLevelCd,
-                    documentDescription: doc["Document Type"],
+                    documentDescription: doc.documentType,
                     fileNumberText:  this.civilFileInformation.detailsData.fileNumberTxt,
                     location: this.civilFileInformation.detailsData.homeLocationAgencyName
                 }
@@ -365,26 +365,26 @@ export default class CivilDocumentsView extends Vue {
            
             if(this.activetab == 'CONCLUDED') {
                 for(const docInx in this.documents){
-                    if (this.documents[docInx]["Concluded"] === "Y" && this.documents[docInx].isEnabled) {
+                    if (this.documents[docInx].concluded === "Y" && this.documents[docInx].isEnabled) {
                         this.documents[docInx].isChecked = checked
                     }        
                 }                
             } else if(this.activetab == 'SCHEDULED') {
                 for(const docInx in this.documents){
-                    if (this.documents[docInx]["Next Appearance Date"] && this.documents[docInx]["Concluded"] !== "Y" && this.documents[docInx].isEnabled) {
+                    if (this.documents[docInx].nextAppearanceDate && this.documents[docInx].concluded !== "Y" && this.documents[docInx].isEnabled) {
                         this.documents[docInx].isChecked = checked
                     }        
                 }                    
             } else if(this.activetab == 'ORDERS') {
                 for(const docInx in this.documents){
-                    if (this.documents[docInx]["Category"].toUpperCase() == this.activetab.toUpperCase() && this.documents[docInx].isEnabled) {
-                        this.documents[docInx].isChecked = checked
+                    if (this.documents[docInx].category.toUpperCase() == this.activetab.toUpperCase() && this.documents[docInx].isEnabled) {
+                        this.documents[docInx].isChecked = checked;
                     }        
                 }
             } else if ( this.activetab != 'ALL' ) {
                 for(const docInx in this.documents) {
-                    if (this.documents[docInx]["Category"].toUpperCase() == this.activetab.toUpperCase() && this.documents[docInx].isEnabled) {
-                        this.documents[docInx].isChecked = checked
+                    if (this.documents[docInx].category.toUpperCase() == this.activetab.toUpperCase() && this.documents[docInx].isEnabled) {
+                        this.documents[docInx].isChecked = checked;
                     }        
                 }                
             } else {
@@ -442,12 +442,12 @@ export default class CivilDocumentsView extends Vue {
             return this.documents.filter(doc => {                
                 this.fieldsTab = fieldTab.Categories;
                 if(this.activetab == 'CONCLUDED') {
-                    if(doc["Concluded"] === "Y") return true; else return false;
+                    if(doc.concluded === "Y") return true; else return false;
                 
                 } 
                 else if(this.activetab == 'SCHEDULED') {
                     this.fieldsTab = fieldTab.Scheduled;
-                    if(doc["Next Appearance Date"] && doc["Concluded"] !== "Y"){        
+                    if(doc.nextAppearanceDate && doc.concluded !== "Y"){        
                         return true;                    
                     } else {
                         return false
@@ -457,17 +457,16 @@ export default class CivilDocumentsView extends Vue {
                 {
                     this.fieldsTab = fieldTab.Orders;
                     
-                    if (doc["Category"].toUpperCase() == this.activetab.toUpperCase()){
+                    if (doc.category.toUpperCase() == this.activetab.toUpperCase()){
                         return true;
                     }                                    
                                   
                     return false; 
                 } 
                 else if(this.activetab == 'AFFIDAVITS')
-                {
-                    console.log('HI')
+                {                    
                     this.fieldsTab = fieldTab.Affidavits;
-                    if (doc["Category"].toUpperCase() == this.activetab.toUpperCase()) {                        
+                    if (doc.category.toUpperCase() == this.activetab.toUpperCase()) {                        
                         return true;
                     }                                                                       
                                   
@@ -475,7 +474,7 @@ export default class CivilDocumentsView extends Vue {
                 }
                 else if ( this.activetab != 'ALL' )
                 {
-                    if (doc["Category"].toUpperCase() == this.activetab.toUpperCase()) {                        
+                    if (doc.category.toUpperCase() == this.activetab.toUpperCase()) {                        
                         return true;
                     }                                                                       
                                   
@@ -494,12 +493,12 @@ export default class CivilDocumentsView extends Vue {
         if(this.activetab == 'COURT SUMMARY')
         {
             this.sortDesc = true;
-            return 'Appearance Date';
+            return 'appearanceDate';
         }
         else
         {
            this.sortDesc = false;
-           return 'Seq'; 
+           return 'seq'; 
         }
     }
 

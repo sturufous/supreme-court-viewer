@@ -93,6 +93,7 @@ import "@store/modules/CommonInformation";
 import base64url from 'base64url';
 import shared from '../shared';
 import { CourtDocumentType, DocumentData } from '../../types/shared';
+import { criminalHearingRestrictionType, criminalParticipantType } from '@/types/criminal/jsonTypes';
 const criminalState = namespace('CriminalFileInformation');
 const commonState = namespace("CommonInformation");
 
@@ -145,11 +146,12 @@ export default class CriminalCaseDetails extends Vue {
     isMounted = false;
     downloadCompleted = true;
     banExists = false;
-    errorCode =0;
-    errorText ='';
+    errorCode = 0;
+    errorText = '';
     
-    participantJson;
-    adjudicatorRestrictionsJson;
+    participantJson: criminalParticipantType[] = [];
+    adjudicatorRestrictionsJson: criminalHearingRestrictionType[] = [];
+
     sidePanelTitles = [ 
        'Case Details', 'Future Appearances', 'Past Appearances', 'Witnesses', 'Documents', 'Sentence/Order Details'    
     ];
@@ -217,7 +219,7 @@ export default class CriminalCaseDetails extends Vue {
         {         
             const partInfo = this.participantList[partIndex];
             
-            for(const doc of partInfo.DocumentsJson)
+            for(const doc of partInfo.documentsJson)
             {
                 if(doc.category != 'rop') {                    
                     if (doc.imageId) {
@@ -249,12 +251,12 @@ export default class CriminalCaseDetails extends Vue {
                         documentDescription: 'ROP',
                         fileNumberText: this.criminalFileInformation.detailsData.fileNumberTxt,
                         partId: partId,
-                        profSeqNo: partInfo['Prof Seq No'],
+                        profSeqNo: partInfo.profSeqNo,
                         location: this.criminalFileInformation.detailsData.homeLocationAgencyName
                     };
                     ropRequest.pdfFileName = shared.generateFileName(CourtDocumentType.ROP, documentData);
                     ropRequest.partId = partId;
-                    ropRequest.profSequenceNumber = partInfo['Prof Seq No'];
+                    ropRequest.profSequenceNumber = partInfo.profSeqNo;
                     ropRequest.courtLevelCode = this.criminalFileInformation.courtLevel;
                     ropRequest.courtClassCode = this.criminalFileInformation.courtClass;
                     documentsToDownload.ropRequests.push(ropRequest);                    
@@ -328,63 +330,63 @@ export default class CriminalCaseDetails extends Vue {
         for (const partIndex in this.participantJson) {
             const participantInfo = {} as participantListInfoType;
             const jParticipant = this.participantJson[partIndex];
-            participantInfo["Index"] = partIndex;
-            participantInfo["First Name"] = jParticipant.givenNm.trim().length>0 ? jParticipant.givenNm : "";
-            participantInfo["Last Name"] = jParticipant.lastNm ? jParticipant.lastNm : jParticipant.orgNm;
-            this.UpdateDisplayName({'lastName': participantInfo["Last Name"], 'givenName': participantInfo["First Name"]});
-            participantInfo["Name"] = this.displayName;
+            participantInfo.index = partIndex;
+            participantInfo.firstName = jParticipant.givenNm.trim().length>0 ? jParticipant.givenNm : "";
+            participantInfo.lastName = jParticipant.lastNm ? jParticipant.lastNm : jParticipant.orgNm;
+            this.UpdateDisplayName({'lastName': participantInfo.lastName, 'givenName': participantInfo.firstName});
+            participantInfo.name = this.displayName;
 
-            participantInfo["D.O.B."] = jParticipant.birthDt? (new Date(jParticipant.birthDt.split(' ')[0])).toUTCString().substr(4,12) : '';
-            participantInfo["Part ID"] = jParticipant.partId;
-            participantInfo["Prof Seq No"] = jParticipant.profSeqNo;
-            participantInfo["Charges"] = [];         
+            participantInfo.dob = jParticipant.birthDt? (new Date(jParticipant.birthDt.split(' ')[0])).toUTCString().substr(4,12) : '';
+            participantInfo.partId = jParticipant.partId;
+            participantInfo.profSeqNo = jParticipant.profSeqNo;
+            participantInfo.charges = [];         
             const charges: chargesInfoType[] = [];         
             for(const charge of jParticipant.charge)
             {              
                 const chargeInfo = {} as chargesInfoType;                   
-                chargeInfo["Description"]= charge.sectionDscTxt
-                chargeInfo["Code"]= charge.sectionTxt
+                chargeInfo.description = charge.sectionDscTxt
+                chargeInfo.code = charge.sectionTxt
                 charges.push(chargeInfo);
             }
-            participantInfo["Charges"] = charges;
+            participantInfo.charges = charges;
 
-            participantInfo["Status"] = [];
+            participantInfo.status = [];
             for (const status of this.statusFields)
             {
                 if(jParticipant[status.code] =='Y')
-                    participantInfo["Status"].push(status);
+                    participantInfo.status.push(status);
             }
             
             for(const ban of jParticipant.ban)
             {              
                 const banInfo = {} as bansInfoType;
-                banInfo["Ban Participant"] = participantInfo["Name"];                   
-                banInfo["Ban Type"] = ban.banTypeDescription;
-                banInfo["Order Date"] = ban.banOrderedDate;                   
-                banInfo["Act"] = ban.banTypeAct;
-                banInfo["Sect."] = ban.banTypeSection;                   
-                banInfo["Sub"] = ban.banTypeSubSection;
-                banInfo["Description"] = ban.banStatuteId;                   
-                banInfo["Comment"] = ban.banCommentText;                  
+                banInfo.banParticipant = participantInfo.name;                   
+                banInfo.banType = ban.banTypeDescription;
+                banInfo.orderDate = ban.banOrderedDate;                   
+                banInfo.act = ban.banTypeAct;
+                banInfo.sect = ban.banTypeSection;                   
+                banInfo.sub = ban.banTypeSubSection;
+                banInfo.description = ban.banStatuteId;                   
+                banInfo.comment = ban.banCommentText;                  
                 this.bans.push(banInfo);
             }                      
 
-            participantInfo['DocumentsJson'] = jParticipant.document;
-            participantInfo['CountsJson'] = jParticipant.count;
+            participantInfo.documentsJson = jParticipant.document;
+            participantInfo.countsJson = jParticipant.count;
 
             this.UpdateDisplayName({'lastName': jParticipant.counselLastNm? jParticipant.counselLastNm: '', 'givenName': jParticipant.counselGivenNm? jParticipant.counselGivenNm: ''});
-            participantInfo['Counsel'] = this.displayName.trim.length? 'JUSTIN: ' + this.displayName: '';
-            participantInfo['Counsel Designation Filed'] = jParticipant.designatedCounselYN
+            participantInfo.counsel = this.displayName.trim.length? 'JUSTIN: ' + this.displayName: '';
+            participantInfo.counselDesignationFiled = jParticipant.designatedCounselYN
             this.participantList.push(participantInfo);
         }
 
         for (const jRestriction of this.adjudicatorRestrictionsJson) {
             const restrictionInfo = {} as adjudicatorRestrictionsInfoType;     
-            restrictionInfo["Adj Restriction"] = jRestriction.adjInitialsTxt?jRestriction.hearingRestrictionTypeDsc+ ": " + jRestriction.adjInitialsTxt:jRestriction.hearingRestrictionTypeDsc;
-            restrictionInfo["Full Name"] = jRestriction.adjFullNm;                 
-            restrictionInfo["Adjudicator"] =   jRestriction.adjInitialsTxt?jRestriction.adjInitialsTxt +" - " + jRestriction.adjFullNm: jRestriction.adjFullNm;
-            restrictionInfo["Status"] = jRestriction.hearingRestrictionTypeDsc + ' ';
-            restrictionInfo["Applies to"] = jRestriction.partNm ? jRestriction.partNm: 'All participants on file'      
+            restrictionInfo.adjRestriction = jRestriction.adjInitialsTxt?jRestriction.hearingRestrictionTypeDsc+ ": " + jRestriction.adjInitialsTxt:jRestriction.hearingRestrictionTypeDsc;
+            restrictionInfo.fullName = jRestriction.adjFullNm;                 
+            restrictionInfo.adjudicator =   jRestriction.adjInitialsTxt?jRestriction.adjInitialsTxt +" - " + jRestriction.adjFullNm: jRestriction.adjFullNm;
+            restrictionInfo.status = jRestriction.hearingRestrictionTypeDsc + ' ';
+            restrictionInfo.appliesTo = jRestriction.partNm ? jRestriction.partNm: 'All participants on file'      
             this.adjudicatorRestrictionsInfo.push(restrictionInfo);      
         }
     }

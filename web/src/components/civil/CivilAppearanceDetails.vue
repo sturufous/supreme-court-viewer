@@ -45,13 +45,13 @@
                         small               
                         responsive="sm"
                         >
-                            <template v-slot:head(Result)>
+                            <template v-slot:head(result)>
                                 <b>Result</b><b style="margin-left: 20px">Issues</b>
                             </template>
 
                             <template v-slot:[`cell(${documentFields[1].key})`]="data" >
                                 <b-button 
-                                    v-if="data.item.PdfAvail && !data.item.Sealed" 
+                                    v-if="data.item.pdfAvail && !data.item.sealed" 
                                     variant="outline-primary text-info" 
                                     :style="data.field.cellStyle"
                                     @click="documentClick(data)"
@@ -61,29 +61,29 @@
                                 <span
                                     class="ml-2"
                                     :style="data.field.cellLabelStyle"
-                                    v-else-if="!data.item.PdfAvail && !data.item.Sealed">
+                                    v-else-if="!data.item.pdfAvail && !data.item.sealed">
                                         {{data.value}}
                                 </span>
                                 <span class="ml-2 text-muted"
-                                      v-else-if="data.item.Sealed"
+                                      v-else-if="data.item.sealed"
                                       :style="data.field.cellLabelStyle">
                                     {{data.value}}
                                 </span>
                             </template>
 
-                            <template v-slot:cell(Act)="data" >
+                            <template v-slot:cell(act)="data" >
                                 <b-badge 
                                     variant="secondary"
                                     :style="data.field.cellStyle"                     
                                     v-for="(act, actIndex) in data.value"  
                                     v-bind:key="actIndex"                               
                                     v-b-tooltip.hover.left
-                                    :title="act.Description"> 
-                                        {{act.Code}} 
+                                    :title="act.description"> 
+                                        {{act.code}} 
                                 </b-badge>
                             </template>
-                            <template v-slot:cell(Seq.)="data">
-                                <span v-if="data.item.Sealed" class="ml-2 text-muted" :style="data.field.cellStyle"> 
+                            <template v-slot:cell(seq)="data">
+                                <span v-if="data.item.sealed" class="ml-2 text-muted" :style="data.field.cellStyle"> 
                                     {{data.value}}
                                 </span>
                                 <span v-else class="ml-2" :style="data.field.cellStyle"> 
@@ -91,7 +91,7 @@
                                 </span>
                             </template>
                             <template v-slot:[`cell(${documentFields[3].key})`]="data" >
-                                <span v-if="data.item.Sealed" 
+                                <span v-if="data.item.sealed" 
                                       :style="data.field.cellStyle"
                                       class="text-muted">
                                     {{ data.value | beautify-date}}
@@ -101,9 +101,9 @@
                                 </span>
                             </template>
 
-                            <template v-slot:cell(Result)="data" >
+                            <template v-slot:cell(result)="data" >
                                 <b-table
-                                    :items="data.item.Issues"
+                                    :items="data.item.issues"
                                     :fields="issueFields"
                                     borderless 
                                     thead-class="d-none"
@@ -114,8 +114,8 @@
                                         <col style=" width: 70px ">
                                     </template>
                                     
-                                    <template v-slot:cell(Issue)="dataR" >
-                                        <li v-if="data.item.Sealed" 
+                                    <template v-slot:cell(issue)="dataR" >
+                                        <li v-if="data.item.sealed" 
                                             class="text-muted" 
                                             :style="dataR.field.cellStyle">                                        
                                             {{ dataR.value }}
@@ -125,13 +125,13 @@
                                             {{ dataR.value }}
                                         </li>
                                     </template>
-                                    <template v-slot:cell(Result)="dataR" >
+                                    <template v-slot:cell(result)="dataR" >
                                         <span :style="dataR.field.cellStyle">
                                             <b-badge
                                                 v-if="dataR.value"                                     
                                                 variant="secondary"
                                                 v-b-tooltip.hover.left
-                                                :title="dataR.item['ResultDsc']">
+                                                :title="dataR.item['resultDsc']">
                                                     {{dataR.value}}                               
                                             </b-badge>
                                         </span>
@@ -216,45 +216,45 @@
                 <b v-bind:key="index"> {{ data.label }}</b>
             </template>                
             <template v-for="(field,index) in partyFields" v-slot:[`cell(${field.key})`]="data" >                                                        
-                <span v-bind:key="index" :style="field.cellStyle" v-if="data.field.key == 'Current Counsel' && data.value.length>0">
+                <span v-bind:key="index" :style="field.cellStyle" v-if="data.field.key == 'currentCounsel' && data.value.length>0">
                     <span v-for="(counsel, counselIndex) in data.value" v-bind:key="counselIndex">
-                        <span v-if="counsel.Info.length == 0">CEIS: {{ counsel.Name }}<br></span>
+                        <span v-if="counsel.info.length == 0">CEIS: {{ counsel.name }}<br></span>
                         <span
                             class="text-success"  
                             v-bind:key="index"
-                            v-else-if="counsel.Info.length > 0"
-                            v-b-tooltip.hover.right.html="counsel.Info"> 
-                                CEIS: {{ counsel.Name }} 
+                            v-else-if="counsel.info.length > 0"
+                            v-b-tooltip.hover.right.html="counsel.info"> 
+                                CEIS: {{ counsel.name }} 
                         <br></span>
                     </span>
                 </span>
-                <span v-bind:key="index" :style="field.cellStyle" v-else-if="data.field.key == 'Role' && data.value.length>0">
+                <span v-bind:key="index" :style="field.cellStyle" v-else-if="data.field.key == 'role' && data.value.length>0">
                     <span v-for="(role, roleIndex) in data.value"  v-bind:key="roleIndex">{{ role }}<br></span>
                 </span>
-                <span v-bind:key="index" :style="field.cellStyle" v-else-if="data.field.key == 'Name' && data.item.Info.length == 0">  {{ data.value }} </span>
+                <span v-bind:key="index" :style="field.cellStyle" v-else-if="data.field.key == 'name' && data.item.info.length == 0">  {{ data.value }} </span>
                 <span
                     class="text-success"  
                     v-bind:key="index"
                     :style="field.cellStyle"
-                    v-else-if="data.field.key == 'Name' && data.item.Info.length > 0"                    
-                    v-b-tooltip.hover.right.html="data.item.Info"
+                    v-else-if="data.field.key == 'name' && data.item.info.length > 0"                    
+                    v-b-tooltip.hover.right.html="data.item.info"
                     >
                     {{ data.value }} 
                 </span>
-                <span v-bind:key="index" :style="field.cellStyle" v-else-if="data.field.key == 'Representative' && data.value.length>0">
+                <span v-bind:key="index" :style="field.cellStyle" v-else-if="data.field.key == 'representative' && data.value.length>0">
                     <span v-for="(rep, repIndex) in data.value" v-bind:key="repIndex">
-                        <span v-if="rep.Info.length == 0">{{ rep.Name }}<br></span>
+                        <span v-if="rep.info.length == 0">{{ rep.name }}<br></span>
                         <span
                             class="text-success"  
                             v-bind:key="index"
-                            v-else-if="rep.Info.length > 0"
-                            v-b-tooltip.hover.left.html="rep.Info">
-                            {{ rep.Name }} 
+                            v-else-if="rep.info.length > 0"
+                            v-b-tooltip.hover.left.html="rep.info">
+                            {{ rep.name }} 
                         <br></span>
                     </span>
                 </span>
-                <span v-bind:key="index" :style="field.cellStyle" v-else-if="data.field.key == 'Legal Representative' && data.value.length>0">
-                    <span v-for="(legalRep, legalRepIndex) in data.value"  v-bind:key="legalRepIndex"><b>{{ legalRep.Type }}</b>-{{legalRep.Name}}<br></span>
+                <span v-bind:key="index" :style="field.cellStyle" v-else-if="data.field.key == 'legalRepresentative' && data.value.length>0">
+                    <span v-for="(legalRep, legalRepIndex) in data.value"  v-bind:key="legalRepIndex"><b>{{ legalRep.type }}</b>-{{legalRep.name}}<br></span>
                 </span>
 
             </template>
@@ -280,7 +280,7 @@ import shared from "../shared";
 import { CourtDocumentType, DocumentData } from '../../types/shared';
 import "@store/modules/CommonInformation";
 import "@store/modules/CivilFileInformation";
-import {appearanceAdditionalInfoType, civilAppearanceInfoType, appearancePartiesType, appearanceMethodsType, appearanceDocumentsType, civilFileInformationType} from '../../types/civil';
+import {appearanceAdditionalInfoType, civilAppearanceInfoType, appearancePartiesType, appearanceMethodsType, appearanceDocumentsType, civilFileInformationType, civilAppearanceDetailsInfoType} from '../../types/civil';
 import {inputNamesType } from '../../types/common'
 const civilState = namespace("CivilFileInformation");
 const commonState = namespace("CommonInformation");
@@ -310,44 +310,44 @@ export default class CivilAppearanceDetails extends Vue {
     isDataReady = false;
     stripedStyle = false;
     appearanceDetailsJson; 
-    additionalInfo = {};
+    additionalInfo = {} as civilAppearanceDetailsInfoType;
     adjudicatorComment = '';
     showAdjudicatorComment = false;
 
     addInfoFields =  
     [
-        {key:'key',    sortable:false},
-        {key:'value',  sortable:false},
+        {key:'key',     label:'key',    sortable:false},
+        {key:'value',   label:'value',  sortable:false}
     ];   
    
     issueFields =
     [
-        {key:'Result',  sortable:false,  cellStyle: 'display: block; font-size: 14px;'},
-        {key:'Issue',   sortable:false,  cellStyle: 'font-weight: normal; font-size: 14px; padding-top:4px; line-height: 120%;'}
+        {key:'result',  label:'Result',  sortable:false,  cellStyle: 'display: block; font-size: 14px;'},
+        {key:'issue',   label:'Issue',  sortable:false,  cellStyle: 'font-weight: normal; font-size: 14px; padding-top:4px; line-height: 120%;'}
     ]
 
     documentFields =  
     [
-        {key:'Seq.',           sortable:false,  tdClass: 'border-top', cellClass:'text',                  cellStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
-        {key:'Document Type',  sortable:false,  tdClass: 'border-top', cellClass:'text',                  cellStyle: 'border:0px; font-size: 14px;', cellLabelStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
-        {key:'Act',            sortable:false,  tdClass: 'border-top', cellClass:'badge badge-dark mt-2', cellStyle: 'display: block; margin-top: 1px; font-size: 12px; max-width : 50px;'},
-        {key:'Date Filed',     sortable:false,  tdClass: 'border-top', cellClass:'text',                  cellStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
-        {key:'Result',         sortable:false,  tdClass: 'border-top', cellClass:'badge badge-dark mt-2', cellStyle: 'display: block; margin-top: 1px; font-size: 14px;'}
+        {key:'seq',             label:'Seq.',            sortable:false,  tdClass: 'border-top', cellClass:'text',                  cellStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
+        {key:'documentType',    label:'Document Type',   sortable:false,  tdClass: 'border-top', cellClass:'text',                  cellStyle: 'border:0px; font-size: 14px;', cellLabelStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
+        {key:'act',             label:'Act',             sortable:false,  tdClass: 'border-top', cellClass:'badge badge-dark mt-2', cellStyle: 'display: block; margin-top: 1px; font-size: 12px; max-width : 50px;'},
+        {key:'dateFiled',       label:'Date Filed',      sortable:false,  tdClass: 'border-top', cellClass:'text',                  cellStyle: 'font-weight: normal; font-size: 14px; padding-top:12px'},
+        {key:'result',          label:'Result',          sortable:false,  tdClass: 'border-top', cellClass:'badge badge-dark mt-2', cellStyle: 'display: block; margin-top: 1px; font-size: 14px;'}
     ];
     
     partyFields =  
     [
-        {key:'Name',                  sortable:false, tdClass: 'border-top',  cellStyle:'font-weight: bold; font-size: 14px;'},
-        {key:'Role',                  sortable:false, tdClass: 'border-top',  cellStyle:'font-size: 14px; white-space: pre-line;'},
-        {key:'Current Counsel',       sortable:false, tdClass: 'border-top',  cellStyle: 'display: block; font-size: 14px; white-space: initial;'},
-        {key:'Legal Representative',  sortable:false, tdClass: 'border-top',  cellStyle:'font-size: 14px; white-space: pre-line;'},
-        {key:'Representative',        sortable:false, tdClass: 'border-top',  cellStyle: 'display: block; font-size: 14px; white-space: initial;'}
+        {key:'name',                label:'Name',                  sortable:false, tdClass: 'border-top',  cellStyle:'font-weight: bold; font-size: 14px;'},
+        {key:'role',                label:'Role',                  sortable:false, tdClass: 'border-top',  cellStyle:'font-size: 14px; white-space: pre-line;'},
+        {key:'currentCounsel',      label:'Current Counsel',       sortable:false, tdClass: 'border-top',  cellStyle: 'display: block; font-size: 14px; white-space: initial;'},
+        {key:'legalRepresentative', label:'Legal Representative',  sortable:false, tdClass: 'border-top',  cellStyle:'font-size: 14px; white-space: pre-line;'},
+        {key:'representative',      label:'Representative',        sortable:false, tdClass: 'border-top',  cellStyle: 'display: block; font-size: 14px; white-space: initial;'}
         
     ];
 
     appearanceMethodsField = 
     [
-        {key:'Key', cellClass:'text-danger', cellStyle:'white-space: pre-line'}
+        {key:'key', label:'Key', cellClass:'text-danger', cellStyle:'white-space: pre-line'}
     ]
 
 
@@ -381,9 +381,9 @@ export default class CivilAppearanceDetails extends Vue {
     
     public getAdditionalInfo()
     {   
-        this.additionalInfo["Supplemental Equipment"] = this.appearanceInfo.supplementalEquipmentTxt? this.appearanceInfo.supplementalEquipmentTxt: '';
-        this.additionalInfo["Security Restriction"] = this.appearanceInfo.securityRestrictionTxt? this.appearanceInfo.securityRestrictionTxt: '';
-        this.additionalInfo["Out-Of-Town Judge"] =  this.appearanceInfo.outOfTownJudgeTxt? this.appearanceInfo.outOfTownJudgeTxt: '';
+        this.additionalInfo.supplementalEquipment = this.appearanceInfo.supplementalEquipmentTxt? this.appearanceInfo.supplementalEquipmentTxt: '';
+        this.additionalInfo.securityRestriction = this.appearanceInfo.securityRestrictionTxt? this.appearanceInfo.securityRestrictionTxt: '';
+        this.additionalInfo.outOfTownJudge =  this.appearanceInfo.outOfTownJudgeTxt? this.appearanceInfo.outOfTownJudgeTxt: '';
 
         for(const info in this.additionalInfo)
             if(this.additionalInfo[info].length>0)
@@ -397,32 +397,32 @@ export default class CivilAppearanceDetails extends Vue {
         {              
             const docInfo = {} as appearanceDocumentsType;
             const document = this.appearanceDetailsJson.document[documentIndex]              
-            docInfo["Seq."] = document.fileSeqNo;
-            docInfo["Document Type"]= document.documentTypeDescription
-            docInfo["DocTypeCd"]= document.documentTypeCd
-            docInfo["ID"]= document.civilDocumentId
-            docInfo["PdfAvail"] = document.imageId? true : false
-            docInfo["Act"] = [];            
+            docInfo.seq = document.fileSeqNo;
+            docInfo.documentType = document.documentTypeDescription
+            docInfo.docTypeCd = document.documentTypeCd
+            docInfo.id= document.civilDocumentId
+            docInfo.pdfAvail = document.imageId? true : false
+            docInfo.act = [];            
             if (document.documentSupport && document.documentSupport.length > 0) {
                 for (const act of document.documentSupport) {
-                    docInfo["Act"].push({'Code': act.actCd, 'Description': act.actDsc})
+                    docInfo.act.push({'code': act.actCd, 'description': act.actDsc})
                 }
             }
             
             if (document.sealedYN == "Y") {                
-                docInfo["Sealed"] = true;
+                docInfo.sealed = true;
             } else {
-                docInfo["Sealed"] = false;
+                docInfo.sealed = false;
             }
             
-            docInfo["Date Filed"]= document.filedDt? document.filedDt.split(' ')[0] : '';
-            docInfo["Result"]= document.appearanceResultCd
-            docInfo["Result Description"]= document.appearanceResultDesc
-            docInfo["Issues"] = [];
-            docInfo["Index"] = documentIndex;
+            docInfo.dateFiled = document.filedDt? document.filedDt.split(' ')[0] : '';
+            docInfo.result = document.appearanceResultCd
+            docInfo.resultDescription = document.appearanceResultDesc
+            docInfo.issues = [];
+            docInfo.index = documentIndex;
             if (document.issue && document.issue.length > 0) {
                 for (const issue of document.issue) {
-                    docInfo["Issues"].push({'Issue': issue.issueDsc, 'Result': issue.issueResultCd, 'ResultDsc': issue.issueResultDsc})
+                    docInfo.issues.push({'issue': issue.issueDsc, 'result': issue.issueResultCd, 'resultDsc': issue.issueResultDsc})
                 }
             }    
 
@@ -432,28 +432,28 @@ export default class CivilAppearanceDetails extends Vue {
         for(const party of this.appearanceDetailsJson.party)
         {              
             const partyInfo = {} as appearancePartiesType;             
-            partyInfo["First Name"] = party.givenNm? party.givenNm: '';
-            partyInfo["Last Name"] =  party.lastNm? party.lastNm: party.orgNm ;
-            this.UpdateDisplayName({'lastName': partyInfo["Last Name"], 'givenName': partyInfo["First Name"]});
-            partyInfo["Name"] = this.displayName
-            partyInfo["Info"] = '';
+            partyInfo.firstName = party.givenNm? party.givenNm: '';
+            partyInfo.lastName =  party.lastNm? party.lastNm: party.orgNm ;
+            this.UpdateDisplayName({'lastName': partyInfo.lastName, 'givenName': partyInfo.firstName});
+            partyInfo.name = this.displayName
+            partyInfo.info = '';
             if (party.appearanceMethodDesc) {
-                partyInfo["Info"] = 'Appeared by ' + party.appearanceMethodDesc;
+                partyInfo.info = 'Appeared by ' + party.appearanceMethodDesc;
             }
             if (party.partyAppearanceMethodDesc) {
-                if (partyInfo["Info"].length > 0) {
-                    partyInfo["Info"] += '<br>'
+                if (partyInfo.info.length > 0) {
+                    partyInfo.info += '<br>'
                 }
                 //TODO: remove the pre-text when the longDesc is passed through the api
-                partyInfo["Info"]+= 'Appearance: ' + party.partyAppearanceMethodDesc;
+                partyInfo.info+= 'Appearance: ' + party.partyAppearanceMethodDesc;
             }
             if (party.attendanceMethodDesc) {
-                if (partyInfo["Info"].length > 0) {
-                    partyInfo["Info"] += '<br>'
+                if (partyInfo.info.length > 0) {
+                    partyInfo.info += '<br>'
                 }
-                partyInfo["Info"]+= 'Attendance: ' + party.attendanceMethodDesc;
+                partyInfo.info+= 'Attendance: ' + party.attendanceMethodDesc;
             }
-            partyInfo["Current Counsel"] = [];
+            partyInfo.currentCounsel = [];
             if (party.counsel && party.counsel.length > 0) {
                 for (const counsel of party.counsel) {
                     let info = '';
@@ -466,10 +466,10 @@ export default class CivilAppearanceDetails extends Vue {
                         }
                         info+= "Appeared by " + counsel.counselAppearanceMethodDesc
                     }
-                    partyInfo["Current Counsel"].push({"Name": counsel.counselFullName, "Info": info})
+                    partyInfo.currentCounsel.push({"name": counsel.counselFullName, "info": info})
                 }
             }
-            partyInfo["Representative"] = [];
+            partyInfo.representative = [];
             if (party.representative && party.representative.length > 0) {
                 for (const rep of party.representative) {
                     let info = '';
@@ -488,20 +488,20 @@ export default class CivilAppearanceDetails extends Vue {
                         }
                         info+= "Instruction: " + rep.instruction
                     }
-                    partyInfo["Representative"].push({"Name": rep.repFullName,
-                                                      "Info": info})
+                    partyInfo.representative.push({"name": rep.repFullName,
+                                                      "info": info})
                 }
             }
-            partyInfo["Legal Representative"] = [];
+            partyInfo.legalRepresentative = [];
             if (party.legalRepresentative && party.legalRepresentative.length > 0) {
                 for (const legalRep of party.legalRepresentative) {
-                    partyInfo["Legal Representative"].push({"Name": legalRep.legalRepFullName, "Type": legalRep.legalRepTypeDsc})
+                    partyInfo.legalRepresentative.push({"name": legalRep.legalRepFullName, "type": legalRep.legalRepTypeDsc})
                 }
             }
-            partyInfo["Role"] = [];
+            partyInfo.role = [];
             if (party.partyRole && party.partyRole.length > 0) {
                 for (const role of party.partyRole) {
-                    partyInfo["Role"].push(role.roleTypeDsc)
+                    partyInfo.role.push(role.roleTypeDsc)
                 }
             }
             this.appearanceParties.push(partyInfo);
@@ -510,23 +510,24 @@ export default class CivilAppearanceDetails extends Vue {
         for(const appearanceMethod of this.appearanceDetailsJson.appearanceMethod)
         {              
             const methodInfo = {} as appearanceMethodsType;             
-            methodInfo["role"] = appearanceMethod.roleTypeDesc;
-            methodInfo["method"] = appearanceMethod.appearanceMethodDesc;
+            methodInfo.role = appearanceMethod.roleTypeDesc;
+            methodInfo.method = appearanceMethod.appearanceMethodDesc;
             this.appearanceMethods.push(methodInfo)
         }
     }
 
     public documentClick(document) 
     {
+        console.log(this.civilFileInformation)
         this.loadingPdf = true;
         const documentType = document.item == null ? CourtDocumentType.CSR : CourtDocumentType.Civil;
         const documentData: DocumentData = {
             appearanceId: document.appearanceId, 
             appearanceDate: document.appearanceDate,
             courtLevel: this.civilFileInformation.detailsData.courtLevelCd,
-            dateFiled: document.item ? Vue.filter('beautify-date')(document.item['Date Filed']) : '',
-            documentId: document.item ? document.item['ID'] : '', 
-            documentDescription: document.item ? document.item['Document Type'] : document.documentDescription,
+            dateFiled: document.item ? Vue.filter('beautify-date')(document.item.dateFiled) : '',
+            documentId: document.item ? document.item.id : '', 
+            documentDescription: document.item ? document.item.documentType : document.documentDescription,
             fileId: this.civilFileInformation.fileNumber,
             fileNumberText:  this.civilFileInformation.detailsData.fileNumberTxt,
             location: this.civilFileInformation.detailsData.homeLocationAgencyName
