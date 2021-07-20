@@ -115,7 +115,7 @@
                         </div>
                     </template>
 
-                    <template  v-slot:cell(nonPartyName)="data">
+                    <template v-if="hasNonParty"  v-slot:cell(nonPartyName)="data">
                         <div v-for="(nonPartyName,index) in data.value" v-bind:key="index">
                             <span :style="data.field.cellStyle"> {{ nonPartyName }}</span>
                         </div>
@@ -165,6 +165,9 @@ export default class CivilProvidedDocumentsView extends Vue {
     
     @civilState.State
     public civilFileInformation!: civilFileInformationType
+
+    @civilState.State
+    public hasNonParty!: boolean
 
     @civilState.Action
     public UpdateCivilFile!: (newCivilFileInformation: civilFileInformationType) => void

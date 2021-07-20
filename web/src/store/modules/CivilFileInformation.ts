@@ -5,7 +5,8 @@ import { VuexModule, Module, Mutation, Action } from 'vuex-module-decorators'
 })
 class CivilFileInformation extends VuexModule {
   public civilFileInformation = { }
-  public civilFileInfoLoaded = false
+  public civilFileInfoLoaded = false;
+  public hasNonParty = false;
 
   public showSections = {
     'Case Details': true,
@@ -36,6 +37,16 @@ class CivilFileInformation extends VuexModule {
   @Action
   public UpdateCivilFileInfoLoaded(newCivilFileInfoLoaded): void {
     this.context.commit('setCivilFileInfoLoaded', newCivilFileInfoLoaded)
+  }
+
+  @Mutation
+  public setHasNonParty(hasNonParty: boolean): void {
+    this.hasNonParty = hasNonParty
+  }
+
+  @Action
+  public UpdateHasNonParty(newHasNonParty: boolean): void {
+    this.context.commit('setHasNonParty', newHasNonParty)
   }
 
   @Mutation

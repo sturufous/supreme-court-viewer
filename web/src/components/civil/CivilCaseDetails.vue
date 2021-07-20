@@ -130,6 +130,9 @@ export default class CivilCaseDetails extends Vue {
     @commonState.Action
     public UpdateDisplayName!: (newInputNames: inputNamesType) => void
 
+    @civilState.Action
+    public UpdateHasNonParty!: (newHasNonParty: boolean) => void
+
     leftPartiesInfo: partiesInfoType[] = [];
     rightPartiesInfo: partiesInfoType[] = [];
     adjudicatorRestrictionsInfo: adjudicatorRestrictionsInfoType[] = [];
@@ -449,7 +452,7 @@ export default class CivilCaseDetails extends Vue {
                 this.summaryDocumentsInfo.push(docInfo);
             }
         } 
-
+        this.UpdateHasNonParty(false);
         for(const providedDocIndex in this.providedDocumentsDetailsJson)
         {             
             const jDoc =  this.providedDocumentsDetailsJson[providedDocIndex];            
@@ -464,6 +467,9 @@ export default class CivilCaseDetails extends Vue {
                 if (refDocInterest.PartyId)providedDocInfo.partyId.push(refDocInterest.PartyId);
                 if (refDocInterest.PartyName)providedDocInfo.partyName.push(refDocInterest.PartyName);
                 if (refDocInterest.NonPartyName)providedDocInfo.nonPartyName.push(refDocInterest.NonPartyName);                
+            }
+            if (providedDocInfo.nonPartyName.length > 0) {
+                this.UpdateHasNonParty(true);
             }
             providedDocInfo.appearanceDate = jDoc.AppearanceDate;
             providedDocInfo.descriptionText = jDoc.DescriptionText;
