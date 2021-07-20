@@ -86,13 +86,13 @@ import CriminalCrownNotes from '@components/criminal/CriminalCrownNotes.vue';
 import CriminalWitnesses from '@components/criminal/CriminalWitnesses.vue';
 import CriminalSentence from '@components/criminal/CriminalSentence.vue';
 import CustomOverlay from "../CustomOverlay.vue";
-import {bansInfoType, chargesInfoType, participantListInfoType, criminalFileInformationType, ropRequestsInfoType} from '../../types/criminal';
-import {inputNamesType, adjudicatorRestrictionsInfoType, documentRequestsInfoType, archiveInfoType } from '../../types/common'
+import {bansInfoType, chargesInfoType, participantListInfoType, criminalFileInformationType, ropRequestsInfoType} from '@/types/criminal';
+import {inputNamesType, adjudicatorRestrictionsInfoType, documentRequestsInfoType, archiveInfoType } from '@/types/common'
 import '@store/modules/CriminalFileInformation';
 import "@store/modules/CommonInformation";
 import base64url from 'base64url';
 import shared from '../shared';
-import { CourtDocumentType, DocumentData } from '../../types/shared';
+import { CourtDocumentType, DocumentData } from '@/types/shared';
 import { criminalHearingRestrictionType, criminalParticipantType } from '@/types/criminal/jsonTypes';
 const criminalState = namespace('CriminalFileInformation');
 const commonState = namespace("CommonInformation");

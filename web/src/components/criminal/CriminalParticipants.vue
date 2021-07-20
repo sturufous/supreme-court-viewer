@@ -73,8 +73,8 @@ import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import "@store/modules/CriminalFileInformation";
 import "@store/modules/CommonInformation";
-import {participantListInfoType, criminalFileInformationType} from '../../types/criminal';
-import {inputNamesType} from '../../types/common'
+import {participantListInfoType, criminalFileInformationType} from '@/types/criminal';
+import {inputNamesType} from '@/types/common';
 const criminalState = namespace("CriminalFileInformation");
 const commonState = namespace("CommonInformation");
 

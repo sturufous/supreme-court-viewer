@@ -1,5 +1,5 @@
-import { VuexModule, Module, Mutation, Action } from 'vuex-module-decorators'
-import {iconStyleType} from '../../types/common'
+import { VuexModule, Module, Mutation, Action } from 'vuex-module-decorators';
+import {iconStyleType} from '@/types/common';
 
 enum appearanceStatus {UNCF='Unconfirmed', CNCL='Canceled', SCHD='Scheduled' }
 

@@ -19,6 +19,11 @@ export interface participantListInfoType {
     recordOfProceedings: participantROPInfoType[];
 }
 
+export interface appearanceNotesInfoType {
+    judgeRec: string;
+    appNote: string;
+}
+
 export interface chargesInfoType {
     description: string;
     code: string;
@@ -92,11 +97,6 @@ export interface participantROPInfoType {
     isChecked:boolean;
     isEnabled:boolean; 
 } 
-
-export interface participantFilesInfoType {
-    documents: participantDocumentsInfoType[];
-    recordOfProceedings: participantROPInfoType[]
-}
 
 export interface criminalAppearancesListType {
     index: string;

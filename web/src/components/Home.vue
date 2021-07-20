@@ -81,9 +81,9 @@
     const civilState = namespace('CivilFileInformation');
     import '@store/modules/CriminalFileInformation';
     const criminalState = namespace('CriminalFileInformation');    
-    import {criminalFileInformationType, fileSearchCriminalInfoType} from '../types/criminal';
-    import {civilFileInformationType, fileSearchCivilInfoType} from '../types/civil';
-    import {courtRoomsAndLocationsInfoType, locationInfoType} from '../types/courtlist';   
+    import {criminalFileInformationType, fileSearchCriminalInfoType} from '@/types/criminal';
+    import {civilFileInformationType, fileSearchCivilInfoType} from '@/types/civil';
+    import {courtRoomsAndLocationsInfoType, locationInfoType} from '@/types/courtlist';   
     import { courtRoomsJsonInfoType } from '@/types/common';
 
     @Component

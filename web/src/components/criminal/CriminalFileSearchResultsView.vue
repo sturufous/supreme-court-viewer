@@ -64,8 +64,8 @@
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import * as _ from 'underscore';
-import {criminalFileInformationType, fileSearchCriminalInfoType} from '../../types/criminal';
-import {inputNamesType} from '../../types/common';
+import {criminalFileInformationType, fileSearchCriminalInfoType} from '@/types/criminal';
+import {inputNamesType} from '@/types/common';
 import "@store/modules/CommonInformation";
 const commonState = namespace("CommonInformation");
 import "@store/modules/CriminalFileInformation";
@@ -93,7 +93,6 @@ export default class CriminalFileSearchResultsView extends Vue {
     isDataReady = false;
     errorCode=0
     errorText=''
-    fileInformation = {};
     
     fields =  
     [        

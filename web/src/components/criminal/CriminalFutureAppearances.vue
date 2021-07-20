@@ -103,8 +103,8 @@ import { namespace } from "vuex-class";
 import * as _ from 'underscore';
 import CriminalAppearanceDetails from '@components/criminal/CriminalAppearanceDetails.vue';
 import "@store/modules/CommonInformation";
-import {criminalAppearancesListType, criminalAppearanceInfoType, criminalFileInformationType} from '../../types/criminal';
-import {inputNamesType, durationType} from '../../types/common'
+import {criminalAppearancesListType, criminalAppearanceInfoType, criminalFileInformationType} from '@/types/criminal';
+import {inputNamesType, durationType} from '@/types/common';
 import { criminalApprDetailType } from "@/types/criminal/jsonTypes";
 const criminalState = namespace("CriminalFileInformation");
 const commonState = namespace("CommonInformation");

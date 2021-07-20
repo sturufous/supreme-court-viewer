@@ -86,15 +86,15 @@ import CivilParties from '@components/civil/CivilParties.vue';
 import CivilHeaderTop from '@components/civil/CivilHeaderTop.vue';
 import CivilHeader from '@components/civil/CivilHeader.vue';
 import CivilSidePanel from '@components/civil/CivilSidePanel.vue';
-import {civilFileInformationType, partiesInfoType, documentsInfoType, summaryDocumentsInfoType, referenceDocumentsInfoType, csrRequestsInfoType} from '../../types/civil';
-import {inputNamesType, adjudicatorRestrictionsInfoType, archiveInfoType, documentRequestsInfoType } from '../../types/common'
+import {civilFileInformationType, partiesInfoType, documentsInfoType, summaryDocumentsInfoType, referenceDocumentsInfoType, csrRequestsInfoType} from '@/types/civil';
+import {inputNamesType, adjudicatorRestrictionsInfoType, archiveInfoType, documentRequestsInfoType } from '@/types/common'
 import "@store/modules/CommonInformation";
 import "@store/modules/CivilFileInformation";
 import CustomOverlay from "../CustomOverlay.vue"
-import { civilReferenceDocumentJsonType } from '../../types/civil/jsonTypes';
+import { civilDocumentType, civilHearingRestrictionType, civilReferenceDocumentJsonType, partyType } from '@/types/civil/jsonTypes';
 import base64url from 'base64url';
 import shared from '../shared';
-import { CourtDocumentType, DocumentData } from '../../types/shared';
+import { CourtDocumentType, DocumentData } from '@/types/shared';
 const civilState = namespace("CivilFileInformation");
 const commonState = namespace("CommonInformation");
 
@@ -145,9 +145,9 @@ export default class CivilCaseDetails extends Vue {
     showSealedWarning = false;
     errorCode =0 ;
     errorText='';
-    partiesJson;    
-    adjudicatorRestrictionsJson;
-    documentsDetailsJson;
+    partiesJson: partyType[] = [];    
+    adjudicatorRestrictionsJson: civilHearingRestrictionType[] = [];
+    documentsDetailsJson: civilDocumentType[] = [];
     providedDocumentsDetailsJson: civilReferenceDocumentJsonType[] = [];
     categories: string[] = [];
     providedDocumentCategories: string[] = [];

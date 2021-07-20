@@ -123,8 +123,8 @@ import * as _ from 'underscore';
 import { namespace } from "vuex-class";
 import "@store/modules/CriminalFileInformation";
 import "@store/modules/CommonInformation";
-import {bansInfoType, participantListInfoType, criminalFileInformationType} from '../../types/criminal';
-import {inputNamesType, adjudicatorRestrictionsInfoType } from '../../types/common'
+import {bansInfoType, participantListInfoType, criminalFileInformationType} from '@/types/criminal';
+import {inputNamesType, adjudicatorRestrictionsInfoType } from '@/types/common'
 const criminalState = namespace("CriminalFileInformation");
 const commonState = namespace("CommonInformation");
 

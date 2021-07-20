@@ -1,3 +1,4 @@
+import { participantSentencesDetailsInfoType } from '@/types/criminal';
 import { VuexModule, Module, Mutation, Action } from 'vuex-module-decorators'
 
 @Module({
@@ -8,7 +9,7 @@ class CriminalFileInformation extends VuexModule {
   public criminalFileInfoLoaded = false
   public activeCriminalParticipantIndex = 0
 
-  public criminalParticipantSentenceInformation = { }
+  public criminalParticipantSentenceInformation = {} as participantSentencesDetailsInfoType;
 
   public showSections = {
     'Case Details': true,

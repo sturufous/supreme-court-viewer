@@ -198,8 +198,9 @@ import * as _ from 'underscore';
 
 import CriminalList from "@components/courtlist/CriminalList.vue";
 import CivilList from "@components/courtlist/CivilList.vue";
-import {courtListInformationInfoType, roomsInfoType, courtRoomsAndLocationsInfoType, locationInfoType} from '../../types/courtlist';
+import {courtListInformationInfoType, roomsInfoType, courtRoomsAndLocationsInfoType, locationInfoType} from '@/types/courtlist';
 import '@store/modules/CourtListInformation';
+import { courtRoomsJsonInfoType } from '@/types/common';
 const courtListState = namespace('CourtListInformation');
 
 @Component({
@@ -233,8 +234,8 @@ export default class CourtList extends Vue {
     totalMins =0;
     totalTime = '';
     totalTimeUnit = 'Hours';
-    courtRoomsAndLocationsJson;
-    courtRoomsAndLocations: courtRoomsAndLocationsInfoType[] = []
+    courtRoomsAndLocationsJson: courtRoomsJsonInfoType[] = [];
+    courtRoomsAndLocations: courtRoomsAndLocationsInfoType[] = [];
 
     selectedDate = (new Date).toISOString().substring(0,10);
     validSelectedDate = this.selectedDate;

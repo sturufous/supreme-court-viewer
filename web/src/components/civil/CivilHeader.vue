@@ -111,7 +111,7 @@
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import "@store/modules/CivilFileInformation";
-import {civilFileInformationType, partiesInfoType} from '../../types/civil';
+import {civilFileInformationType, partiesInfoType} from '@/types/civil';
 import { adjudicatorRestrictionsInfoType } from "@/types/common";
 const civilState = namespace("CivilFileInformation");
 

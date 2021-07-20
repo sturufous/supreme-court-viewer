@@ -144,13 +144,13 @@ import { Component, Vue} from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
 import base64url from "base64url";
 import '@store/modules/CivilFileInformation';
-import {civilFileInformationType, referenceDocumentsInfoType} from '../../types/civil';
-import { CourtDocumentType, DocumentData } from '../../types/shared';
+import {civilFileInformationType, referenceDocumentsInfoType} from '@/types/civil';
+import { CourtDocumentType, DocumentData } from '@/types/shared';
 const civilState = namespace('CivilFileInformation');
 
 import CustomOverlay from "../CustomOverlay.vue"
 import shared from "../shared"
-import { archiveInfoType, documentRequestsInfoType } from '../../types/common';
+import { archiveInfoType, documentRequestsInfoType } from '@/types/common';
 enum fieldTab {Categories=0}
 
 @Component({
@@ -170,7 +170,6 @@ export default class CivilProvidedDocumentsView extends Vue {
     public UpdateCivilFile!: (newCivilFileInformation: civilFileInformationType) => void
 
     documents: referenceDocumentsInfoType[] = [];
-    documentsDetailsJson;
     loadingPdf = false;
     isMounted = false;
     isDataReady = false;
@@ -206,7 +205,6 @@ export default class CivilProvidedDocumentsView extends Vue {
             this.isDataReady = true;
         }        
         this.isMounted = true;
-        console.log(this.documents)
     }
 
     mounted () {    

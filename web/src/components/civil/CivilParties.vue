@@ -69,7 +69,7 @@
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import "@store/modules/CivilFileInformation";
-import {civilFileInformationType, partiesInfoType} from '../../types/civil';
+import {civilFileInformationType, partiesInfoType} from '@/types/civil';
 const civilState = namespace("CivilFileInformation");
 
 @Component
@@ -85,7 +85,7 @@ export default class CivilParties extends Vue {
     rightRole = '';
     numberOfLeftParties = 0
     numberOfRightParties = 0;
-    sortBy = 'Name';
+    sortBy = 'name';
     sortDesc = false;
 
     fields =  

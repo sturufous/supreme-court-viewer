@@ -142,8 +142,8 @@ import { namespace } from 'vuex-class';
 import CriminalSentenceDetails from '@components/criminal/CriminalSentenceDetails.vue';
 import '@store/modules/CriminalFileInformation';
 import "@store/modules/CommonInformation";
-import {countInfoType, participantListInfoType, participantSentencesDetailsInfoType, participantSentencesInfoType, criminalFileInformationType} from '../../types/criminal';
-import {inputNamesType} from '../../types/common'
+import {countInfoType, participantListInfoType, participantSentencesDetailsInfoType, participantSentencesInfoType, criminalFileInformationType} from '@/types/criminal';
+import {inputNamesType} from '@/types/common'
 import { criminalParticipantType } from '@/types/criminal/jsonTypes';
 const criminalState = namespace("CriminalFileInformation");
 const commonState = namespace("CommonInformation");
@@ -174,8 +174,7 @@ export default class CriminalSentence extends Vue {
     public UpdateDisplayName!: (newInputNames: inputNamesType) => void
 
     participantSentences: participantSentencesInfoType[] = [];
-    participantList: participantListInfoType[] = [];
-    
+    participantList: participantListInfoType[] = [];    
     participantJson: criminalParticipantType[] = [];   
     
     isMounted = false;    

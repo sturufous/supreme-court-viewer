@@ -38,8 +38,8 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
-import {criminalFileInformationType} from '../../types/criminal';
-import {adjudicatorRestrictionsInfoType } from '../../types/common'
+import {criminalFileInformationType} from '@/types/criminal';
+import {adjudicatorRestrictionsInfoType } from '@/types/common';
 import "@store/modules/CriminalFileInformation";
 const criminalState = namespace("CriminalFileInformation");
 

@@ -214,9 +214,9 @@ import { Component, Vue, Prop } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import CivilAppearanceDetails from '@components/civil/CivilAppearanceDetails.vue';
 import * as _ from 'underscore';
-import {courtListInformationInfoType, civilListInfoType} from '../../types/courtlist';
-import {civilFileInformationType, civilAppearanceInfoType} from '../../types/civil';
-import {inputNamesType, durationType, iconInfoType, iconStyleType} from '../../types/common'
+import {courtListInformationInfoType, civilListInfoType} from '@/types/courtlist';
+import {civilFileInformationType, civilAppearanceInfoType} from '@/types/civil';
+import {inputNamesType, durationType, iconInfoType, iconStyleType} from '@/types/common'
 import "@store/modules/CommonInformation";
 const commonState = namespace("CommonInformation");
 import '@store/modules/CourtListInformation';
@@ -473,8 +473,7 @@ export default class CivilList extends Vue {
     }
     
     public OpenDetails(data)
-    {
-        console.log(data)
+    {       
         if(!data.detailsShowing)
         {            
             this.appearanceInfo.fileNo = data.item.fileId;
@@ -488,7 +487,6 @@ export default class CivilList extends Vue {
 
     public OpenCivilFilePage(data)
     {
-        console.log(data)
         const fileInformation = { } as civilFileInformationType
         fileInformation.fileNumber = data.item.fileId;
         this.UpdateCivilFile(fileInformation)

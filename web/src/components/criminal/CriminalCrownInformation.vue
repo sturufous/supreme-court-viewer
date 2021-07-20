@@ -18,7 +18,7 @@
                     <span v-if="data.item.crownInfoFieldName == 'Crown Assigned' ">
                         <b v-for="(assignee, index) in data.item.crownInfoValue.split('+')"  v-bind:key="index" style= "white-space: pre-line">{{ assignee }} <br></b>
                     </span>
-                    <span v-if="data.item.CrownInfoFieldName != 'Crown Assigned' ">
+                    <span v-if="data.item.crownInfoFieldName != 'Crown Assigned' ">
                         <b > {{ data.value }}</b>
                     </span>                    
                 </template> 
@@ -32,8 +32,8 @@ import { Component, Vue } from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
 import '@store/modules/CriminalFileInformation';
 import "@store/modules/CommonInformation";
-import {criminalFileInformationType, criminalCrownInformationInfoType} from '../../types/criminal';
-import {inputNamesType} from '../../types/common'
+import {criminalFileInformationType, criminalCrownInformationInfoType} from '@/types/criminal';
+import {inputNamesType} from '@/types/common';
 const criminalState = namespace("CriminalFileInformation");
 const commonState = namespace("CommonInformation");
 

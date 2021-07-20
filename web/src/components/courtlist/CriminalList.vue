@@ -203,14 +203,15 @@ import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import * as _ from 'underscore';
 import CriminalAppearanceDetails from '@components/criminal/CriminalAppearanceDetails.vue';
-import {courtListInformationInfoType, criminalListInfoType} from '../../types/courtlist';
-import {criminalFileInformationType, criminalAppearanceInfoType} from '../../types/criminal';
-import {inputNamesType, durationType, iconInfoType, iconStyleType } from '../../types/common'
+import {courtListInformationInfoType, criminalListInfoType} from '@/types/courtlist';
+import {criminalFileInformationType, criminalAppearanceInfoType} from '@/types/criminal';
+import {inputNamesType, durationType, iconInfoType, iconStyleType } from '@/types/common';
 import "@store/modules/CommonInformation";
 const commonState = namespace("CommonInformation");
 import '@store/modules/CourtListInformation';
 const courtListState = namespace('CourtListInformation');
 import "@store/modules/CriminalFileInformation";
+import { criminalCourtListType } from "@/types/courtlist/jsonTypes";
 const criminalState = namespace("CriminalFileInformation");
 
 enum HearingType {'A'= '+','G' = '@','D'='-', 'S' = '*'  }
@@ -259,7 +260,7 @@ export default class CriminalList extends Vue {
     public UpdateTime!: (time: string) => void
    
     criminalList: criminalListInfoType[] = [];    
-    criminalCourtListJson;
+    criminalCourtListJson: criminalCourtListType[] = [];
     courtRoom;
     isMounted = false;
     isDataReady = false;

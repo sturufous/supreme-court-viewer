@@ -131,7 +131,7 @@
                                                 v-if="dataR.value"                                     
                                                 variant="secondary"
                                                 v-b-tooltip.hover.left
-                                                :title="dataR.item['resultDsc']">
+                                                :title="dataR.item.resultDsc">
                                                     {{dataR.value}}                               
                                             </b-badge>
                                         </span>
@@ -277,11 +277,11 @@
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import shared from "../shared";
-import { CourtDocumentType, DocumentData } from '../../types/shared';
+import { CourtDocumentType, DocumentData } from '@/types/shared';
 import "@store/modules/CommonInformation";
 import "@store/modules/CivilFileInformation";
-import {appearanceAdditionalInfoType, civilAppearanceInfoType, appearancePartiesType, appearanceMethodsType, appearanceDocumentsType, civilFileInformationType, civilAppearanceDetailsInfoType} from '../../types/civil';
-import {inputNamesType } from '../../types/common'
+import {appearanceAdditionalInfoType, civilAppearanceInfoType, appearancePartiesType, appearanceMethodsType, appearanceDocumentsType, civilFileInformationType, civilAppearanceDetailsInfoType} from '@/types/civil';
+import {inputNamesType } from '@/types/common';
 const civilState = namespace("CivilFileInformation");
 const commonState = namespace("CommonInformation");
 
@@ -517,8 +517,7 @@ export default class CivilAppearanceDetails extends Vue {
     }
 
     public documentClick(document) 
-    {
-        console.log(this.civilFileInformation)
+    {        
         this.loadingPdf = true;
         const documentType = document.item == null ? CourtDocumentType.CSR : CourtDocumentType.Civil;
         const documentData: DocumentData = {

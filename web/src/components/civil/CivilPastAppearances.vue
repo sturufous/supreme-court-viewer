@@ -110,8 +110,9 @@ import * as _ from 'underscore';
 import CivilAppearanceDetails from '@components/civil/CivilAppearanceDetails.vue';
 import "@store/modules/CommonInformation";
 import "@store/modules/CivilFileInformation";
-import {civilFileInformationType, civilAppearanceInfoType, civilAppearancesListType} from '../../types/civil';
-import {inputNamesType, durationType } from '../../types/common'
+import {civilFileInformationType, civilAppearanceInfoType, civilAppearancesListType} from '@/types/civil';
+import {inputNamesType, durationType } from '@/types/common'
+import { civilApprDetailType } from "@/types/civil/jsonTypes";
 const civilState = namespace("CivilFileInformation");
 const commonState = namespace("CommonInformation");
 
@@ -164,7 +165,7 @@ export default class CivilPastAppearances extends Vue {
 
     isMounted = false;
     isDataReady = false;
-    pastAppearancesJson;    
+    pastAppearancesJson: civilApprDetailType[] = [];    
     sortBy = 'date';
     sortDesc = true;    
 
@@ -208,17 +209,17 @@ export default class CivilPastAppearances extends Vue {
             appInfo.date = jApp.appearanceDt.split(' ')[0]
             if(new Date(appInfo.date) >= currentDate) continue;            
             appInfo.formattedDate = Vue.filter('beautify-date')(appInfo.date);
-            appInfo.documentType = jApp.documentTypeDsc;
+            appInfo.documentType = jApp.documentTypeDsc? jApp.documentTypeDsc: '';
             appInfo.result = jApp.appearanceResultCd;
             appInfo.resultDescription = jApp.appearanceResultDsc? jApp.appearanceResultDsc: '';
             appInfo.time = this.getTime(jApp.appearanceTm.split(' ')[1].substr(0,5));
             appInfo.reason = jApp.appearanceReasonCd;
             appInfo.reasonDescription = jApp.appearanceReasonDsc? jApp.appearanceReasonDsc: '';
             appInfo.duration = this.getDuration(jApp.estimatedTimeHour, jApp.estimatedTimeMin)           
-            appInfo.location = jApp.courtLocation;
+            appInfo.location = jApp.courtLocation? jApp.courtLocation: '';
             appInfo.room =jApp.courtRoomCd              
             appInfo.status = jApp.appearanceStatusCd ? appearanceStatus[jApp.appearanceStatusCd] :''
-            appInfo.statusStyle = this.getStatusStyle(appInfo["Status"])
+            appInfo.statusStyle = this.getStatusStyle(appInfo.status)
             appInfo.presider =  jApp.judgeInitials ? jApp.judgeInitials :''
             appInfo.judgeFullName =  jApp.judgeInitials ? jApp.judgeFullNm : ''
 

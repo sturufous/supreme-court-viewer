@@ -74,6 +74,8 @@ export interface civilDocumentType {
     imageId: string;
     fileSeqNo: string;
     documentTypeCd: string;
+    affidavitNo: string;
+    swornByNm: string;
     filedDt: string;
     filedByName: string;
     commentTxt: string;
@@ -148,6 +150,10 @@ export interface civilApprDetailType {
     appearanceResultCd: string;
     appearanceCcn: string;
     documentTypeCd: string;
+    documentTypeDsc?: string;
+    appearanceResultDsc?: string;
+    appearanceReasonDsc?: string;
+    courtLocation?: string;
     documentRecCount: string;
     supplementalEquipmentTxt: string;
     securityRestrictionTxt: string;

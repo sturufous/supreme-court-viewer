@@ -64,8 +64,8 @@
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import * as _ from 'underscore';
-import {civilFileInformationType, fileSearchCivilInfoType} from '../../types/civil';
-import {inputNamesType} from '../../types/common';
+import {civilFileInformationType, fileSearchCivilInfoType} from '@/types/civil';
+import {inputNamesType} from '@/types/common';
 import "@store/modules/CommonInformation";
 const commonState = namespace("CommonInformation");
 import "@store/modules/CivilFileInformation";
@@ -93,7 +93,6 @@ export default class CivilFileSearchResultsView extends Vue {
     isDataReady = false;
     errorCode=0
     errorText=''
-    fileInformation = {};
     
     fields =  
     [        

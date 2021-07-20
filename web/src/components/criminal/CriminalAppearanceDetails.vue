@@ -217,7 +217,7 @@
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import shared from "../shared";
-import {criminalFileInformationType, appearanceAdditionalInfoType, appearanceMethodDetailsInfoType, appearanceChargesInfoType, criminalAppearanceInfoType, criminalAppearanceMethodsInfoType, initiatingDocument, criminalAppearanceDetailsInfoType} from '../../types/criminal';
+import {criminalFileInformationType, appearanceAdditionalInfoType, appearanceMethodDetailsInfoType, appearanceChargesInfoType, criminalAppearanceInfoType, criminalAppearanceMethodsInfoType, initiatingDocument, criminalAppearanceDetailsInfoType, appearanceNotesInfoType} from '@/types/criminal';
 import "@store/modules/CriminalFileInformation";
 import { CourtDocumentType, DocumentData } from "@/types/shared";
 const criminalState = namespace("CriminalFileInformation");
@@ -248,7 +248,7 @@ export default class CriminalAppearanceDetails extends Vue {
     sortDesc = true;
     showNotes = false;
     informationsFileExists = false;
-    notes = {};       
+    notes = {} as appearanceNotesInfoType;       
     appearanceDetailsInfo = {} as criminalAppearanceDetailsInfoType;
     initiatingDocuments: initiatingDocument[] = [];    
 
@@ -325,8 +325,7 @@ export default class CriminalAppearanceDetails extends Vue {
         if (this.appearanceDetailsJson.initiatingDocuments && this.appearanceDetailsJson.initiatingDocuments.length>0) {
             this.initiatingDocuments.push(this.appearanceDetailsJson.initiatingDocuments[0])
             this.informationsFileExists = true;
-        }
-        console.log(this.initiatingDocuments)
+        }        
              
         for(const charge of this.appearanceDetailsJson.charges)
         {              

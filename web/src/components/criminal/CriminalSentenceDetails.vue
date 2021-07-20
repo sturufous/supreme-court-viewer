@@ -67,18 +67,18 @@ import { Component, Vue} from 'vue-property-decorator';
 import * as _ from 'underscore';
 import { namespace } from 'vuex-class';
 import '@store/modules/CriminalFileInformation';
-import {participantSentencesInfoType} from '../../types/criminal';
+import {participantSentencesDetailsInfoType, participantSentencesInfoType} from '@/types/criminal';
 const criminalState = namespace("CriminalFileInformation");
 
 @Component
 export default class CriminalSentenceDetails extends Vue {   
 
     @criminalState.State
-    public criminalParticipantSentenceInformation
+    public criminalParticipantSentenceInformation!: participantSentencesDetailsInfoType
             
     sortBy = 'date';
     dateSortDir = 'desc';   
-    isMounted = false
+    isMounted = false;
     selectedParticipant = 0;
     participantSentences: participantSentencesInfoType[] = [];
 

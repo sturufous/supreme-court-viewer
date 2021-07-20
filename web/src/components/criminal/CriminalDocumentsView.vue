@@ -115,8 +115,8 @@ import { namespace } from 'vuex-class';
 import * as _ from 'underscore';
 import '@store/modules/CriminalFileInformation';
 import "@store/modules/CommonInformation";
-import {participantFilesInfoType, participantROPInfoType, participantListInfoType, participantDocumentsInfoType, criminalFileInformationType, ropRequestsInfoType} from '../../types/criminal';
-import {inputNamesType} from '../../types/common'
+import {participantROPInfoType, participantListInfoType, participantDocumentsInfoType, criminalFileInformationType, ropRequestsInfoType} from '@/types/criminal';
+import {inputNamesType} from '@/types/common'
 import base64url from 'base64url';
 
 import shared from '../shared';
@@ -124,8 +124,8 @@ const criminalState = namespace("CriminalFileInformation");
 const commonState = namespace("CommonInformation");
 
 import CustomOverlay from "../CustomOverlay.vue"
-import { archiveInfoType, documentRequestsInfoType } from '../../types/common';
-import { CourtDocumentType, DocumentData } from '../../types/shared';
+import { archiveInfoType, documentRequestsInfoType } from '@/types/common';
+import { CourtDocumentType, DocumentData } from '@/types/shared';
 
 
 enum fieldTab {Categories=0, Summary, Bail}
@@ -155,7 +155,7 @@ export default class CriminalDocumentsView extends Vue {
     @commonState.Action
     public UpdateDisplayName!: (newInputNames: inputNamesType) => void
 
-    participantFiles: participantFilesInfoType[] = [];
+    participantFiles: participantListInfoType[] = [];
     participantList: participantListInfoType[] = [];
     categories: string[] = [];   
 
@@ -236,8 +236,8 @@ export default class CriminalDocumentsView extends Vue {
     }
 
     public getNameOfParticipant(num)
-    {
-        this.UpdateDisplayName({'lastName': this.participantFiles[num]["lastName"], 'givenName': this.participantFiles[num]["firstName"]});
+    {       
+        this.UpdateDisplayName({'lastName': this.participantFiles[num].lastName, 'givenName': this.participantFiles[num].firstName});
         return this.displayName;
     }
 
@@ -330,14 +330,13 @@ export default class CriminalDocumentsView extends Vue {
         }
         else {
             if(this.activetab != 'ALL')
-            { 
-                if (this.participantFiles[this.activeCriminalParticipantIndex].documents["Category"].toUpperCase() == this.activetab.toUpperCase()){
-                    for(const docInx in this.participantFiles[this.activeCriminalParticipantIndex].documents){
-                        if (this.participantFiles[this.activeCriminalParticipantIndex].documents[docInx].isEnabled) {
-                            this.participantFiles[this.activeCriminalParticipantIndex].documents[docInx].isChecked = checked
-                        }        
-                    }
+            {
+                for(const docInx in this.participantFiles[this.activeCriminalParticipantIndex].documents){
+                    if (this.participantFiles[this.activeCriminalParticipantIndex].documents[docInx].category.toUpperCase() == this.activetab.toUpperCase() && this.participantFiles[this.activeCriminalParticipantIndex].documents[docInx].isEnabled) {
+                        this.participantFiles[this.activeCriminalParticipantIndex].documents[docInx].isChecked = checked
+                    }        
                 }
+                
             } else {
                 for(const docInx in this.participantFiles[this.activeCriminalParticipantIndex].documents){
                     if (this.participantFiles[this.activeCriminalParticipantIndex].documents[docInx].isEnabled) {
@@ -429,7 +428,7 @@ export default class CriminalDocumentsView extends Vue {
 
     get SortedParticipants()
     {         
-        return _.sortBy(this.participantFiles,(participant=>{return (participant["Last Name"]? participant["Last Name"].toUpperCase() : '')}))       
+        return _.sortBy(this.participantFiles,(participant=>{return (participant.lastName? participant.lastName.toUpperCase() : '')}))       
     }
 
     get FilteredDocuments() {       
@@ -495,8 +494,8 @@ export default class CriminalDocumentsView extends Vue {
     public cellClick(eventData)
     {   
         this.loadingPdf = true;
-        const documentType = eventData.item.Category == "ROP" ? CourtDocumentType.ROP : CourtDocumentType.Criminal;
-        const index = eventData.item.index;
+        const documentType = eventData.item.category == "ROP" ? CourtDocumentType.ROP : CourtDocumentType.Criminal;
+        const index = eventData.index;
         const documentData: DocumentData = { 
             courtClass: this.criminalFileInformation.detailsData.courtClassCd, 
             courtLevel: this.criminalFileInformation.detailsData.courtLevelCd, 
@@ -505,8 +504,8 @@ export default class CriminalDocumentsView extends Vue {
             documentDescription: eventData.item.documentType,
             fileId: this.criminalFileInformation.fileNumber, 
             fileNumberText: this.criminalFileInformation.detailsData.fileNumberTxt,
-            partId: index ? this.participantFiles[index]["Part ID"] : '', 
-            profSeqNo: index ? this.participantFiles[index]["Prof Seq No"]: '', 
+            partId: index ? this.participantFiles[index]["partID"] : '', 
+            profSeqNo: index ? this.participantFiles[index]["profSeqNo"]: '', 
             location: this.criminalFileInformation.detailsData.homeLocationAgencyName
         };
         shared.openDocumentsPdf(documentType, documentData);
