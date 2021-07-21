@@ -47,7 +47,7 @@ namespace Scv.Api
                 options.AddConsole(c =>
                 {
                     c.DisableColors = true;
-                    c.TimestampFormat = "[yyyy-MM-dd HH:mm:ss] ";
+                    c.TimestampFormat = "[yyyy-MM-dd HH:mm:ss.fff] ";
                 });
             });
 
