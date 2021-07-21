@@ -230,7 +230,7 @@ export default class CriminalAppearanceDetails extends Vue {
     public criminalFileInformation!: criminalFileInformationType;
 
     @criminalState.State
-    public appearanceInfo!: criminalAppearanceInfoType;
+    public criminalAppearanceInfo!: criminalAppearanceInfoType;
     
     appearanceAdditionalInfo: appearanceAdditionalInfoType[] = [];
     appearanceCharges: appearanceChargesInfoType[] = [];    
@@ -288,7 +288,7 @@ export default class CriminalAppearanceDetails extends Vue {
 
     @Prop() tagcasename
     public getAppearanceDetails(): void {      
-        this.$http.get('api/files/criminal/'+ this.appearanceInfo.fileNo+'/appearance-detail/'+this.appearanceInfo.appearanceId+ '/'+this.appearanceInfo.partId)
+        this.$http.get('api/files/criminal/'+ this.criminalAppearanceInfo.fileNo+'/appearance-detail/'+this.criminalAppearanceInfo.appearanceId+ '/'+this.criminalAppearanceInfo.partId)
             .then(Response => Response.json(), err => {console.log(err);window.alert("bad data!");} )        
             .then(data => {
                 if(data){  
@@ -307,9 +307,9 @@ export default class CriminalAppearanceDetails extends Vue {
     
     public getAppearanceInfo()
     {                      
-        this.appearanceDetailsInfo.supplementalEquipment = this.appearanceInfo.supplementalEquipmentTxt? this.appearanceInfo.supplementalEquipmentTxt: '';
-        this.appearanceDetailsInfo.securityRestriction = this.appearanceInfo.securityRestrictionTxt? this.appearanceInfo.securityRestrictionTxt: '';
-        this.appearanceDetailsInfo.outOfTownJudge =  this.appearanceInfo.outOfTownJudgeTxt? this.appearanceInfo.outOfTownJudgeTxt: '';
+        this.appearanceDetailsInfo.supplementalEquipment = this.criminalAppearanceInfo.supplementalEquipmentTxt? this.criminalAppearanceInfo.supplementalEquipmentTxt: '';
+        this.appearanceDetailsInfo.securityRestriction = this.criminalAppearanceInfo.securityRestrictionTxt? this.criminalAppearanceInfo.securityRestrictionTxt: '';
+        this.appearanceDetailsInfo.outOfTownJudge =  this.criminalAppearanceInfo.outOfTownJudgeTxt? this.criminalAppearanceInfo.outOfTownJudgeTxt: '';
 
         for(const info in this.appearanceDetailsInfo) {
             if(this.appearanceDetailsInfo[info].length>0)
@@ -412,10 +412,10 @@ export default class CriminalAppearanceDetails extends Vue {
             dateFiled: Vue.filter('beautify-date')(this.initiatingDocuments[0].issueDate),
             documentDescription: courtDocumentType == CourtDocumentType.ROP ? "ROP" : "Information",
             documentId: this.initiatingDocuments[0].imageId, 
-            fileId: this.appearanceInfo.fileNo,
+            fileId: this.criminalAppearanceInfo.fileNo,
             fileNumberText: this.criminalFileInformation.detailsData.fileNumberTxt,
-            partId: this.appearanceInfo.partId,
-            profSeqNo: this.appearanceInfo.profSeqNo, 
+            partId: this.criminalAppearanceInfo.partId,
+            profSeqNo: this.criminalAppearanceInfo.profSeqNo, 
             location: this.criminalFileInformation.detailsData.homeLocationAgencyName
         }; 
         shared.openDocumentsPdf(courtDocumentType, documentData); 

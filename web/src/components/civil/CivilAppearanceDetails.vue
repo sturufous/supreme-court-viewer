@@ -26,7 +26,7 @@
                                 class="mt-0"
                                 v-b-tooltip.hover.right                                
                                 title="Download Court Summary"
-                                @click="documentClick({ appearanceId: appearanceInfo.appearanceId, appearanceDate: appearanceInfo.date, documentDescription: 'CourtSummary' })"
+                                @click="documentClick({ appearanceId: civilAppearanceInfo.appearanceId, appearanceDate: civilAppearanceInfo.date, documentDescription: 'CourtSummary' })"
                                 size="sm">                                        
                                 <b-icon icon="file-earmark-arrow-down" font-scale="2"></b-icon>
                             </b-button>
@@ -292,7 +292,7 @@ export default class CivilAppearanceDetails extends Vue {
     public displayName!: string;   
 
     @civilState.State
-    public appearanceInfo!: civilAppearanceInfoType;        
+    public civilAppearanceInfo!: civilAppearanceInfoType;        
 
     @civilState.State
     public civilFileInformation!: civilFileInformationType
@@ -360,7 +360,7 @@ export default class CivilAppearanceDetails extends Vue {
 
     public getAppearanceDetails(): void {      
             
-        this.$http.get('api/files/civil/'+ this.appearanceInfo.fileNo +'/appearance-detail/'+this.appearanceInfo.appearanceId)
+        this.$http.get('api/files/civil/'+ this.civilAppearanceInfo.fileNo +'/appearance-detail/'+this.civilAppearanceInfo.appearanceId)
             .then(Response => Response.json(), err => {console.log(err);window.alert("bad data!");} )        
             .then(data => {
                 if(data){ 
@@ -381,9 +381,9 @@ export default class CivilAppearanceDetails extends Vue {
     
     public getAdditionalInfo()
     {   
-        this.additionalInfo.supplementalEquipment = this.appearanceInfo.supplementalEquipmentTxt? this.appearanceInfo.supplementalEquipmentTxt: '';
-        this.additionalInfo.securityRestriction = this.appearanceInfo.securityRestrictionTxt? this.appearanceInfo.securityRestrictionTxt: '';
-        this.additionalInfo.outOfTownJudge =  this.appearanceInfo.outOfTownJudgeTxt? this.appearanceInfo.outOfTownJudgeTxt: '';
+        this.additionalInfo.supplementalEquipment = this.civilAppearanceInfo.supplementalEquipmentTxt? this.civilAppearanceInfo.supplementalEquipmentTxt: '';
+        this.additionalInfo.securityRestriction = this.civilAppearanceInfo.securityRestrictionTxt? this.civilAppearanceInfo.securityRestrictionTxt: '';
+        this.additionalInfo.outOfTownJudge =  this.civilAppearanceInfo.outOfTownJudgeTxt? this.civilAppearanceInfo.outOfTownJudgeTxt: '';
 
         for(const info in this.additionalInfo)
             if(this.additionalInfo[info].length>0)

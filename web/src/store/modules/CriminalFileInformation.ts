@@ -20,7 +20,7 @@ class CriminalFileInformation extends VuexModule {
     'Sentence/Order Details': false
   }
 
-  public appearanceInfo = {}
+  public criminalAppearanceInfo = {}
 
   @Mutation
   public setCriminalFile(criminalFileInformation): void {
@@ -74,13 +74,13 @@ class CriminalFileInformation extends VuexModule {
   }
 
   @Mutation
-  public setAppearanceInfo(appearanceInfo): void {
-    this.appearanceInfo = appearanceInfo
+  public setCriminalAppearanceInfo(criminalAppearanceInfo): void {
+    this.criminalAppearanceInfo = criminalAppearanceInfo
   }
 
   @Action
-  public UpdateAppearanceInfo(newAppearanceInfo): void {
-    this.context.commit('setAppearanceInfo', newAppearanceInfo)
+  public UpdateCriminalAppearanceInfo(newCriminalAppearanceInfo): void {
+    this.context.commit('setCriminalAppearanceInfo', newCriminalAppearanceInfo)
   }
 
 

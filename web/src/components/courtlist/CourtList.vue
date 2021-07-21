@@ -178,9 +178,10 @@
     
             <b-card no-body v-if="isDataReady">
                 <b-row cols="1" class = "mx-2 mt-2 mb-5">
-                    <criminal-list v-if="criminalCases>0"/>
+                    <!-- <criminal-list v-if="criminalCases>0"/>
                     <civil-list v-if="familyCases>0" civilClass='family'/>
-                    <civil-list v-if="civilCases>0" civilClass='civil'/>
+                    <civil-list v-if="civilCases>0" civilClass='civil'/> -->
+                    <court-list-layout />
                     <b-card class="mb-5"/>
                     
                 </b-row> 
@@ -198,6 +199,7 @@ import * as _ from 'underscore';
 
 import CriminalList from "@components/courtlist/CriminalList.vue";
 import CivilList from "@components/courtlist/CivilList.vue";
+import CourtListLayout from "@components/courtlist/CourtListLayout.vue";
 import {courtListInformationInfoType, roomsInfoType, courtRoomsAndLocationsInfoType, locationInfoType} from '@/types/courtlist';
 import '@store/modules/CourtListInformation';
 import { courtRoomsJsonInfoType } from '@/types/common';
@@ -206,7 +208,8 @@ const courtListState = namespace('CourtListInformation');
 @Component({
     components: {
         CriminalList,
-        CivilList
+        CivilList,
+        CourtListLayout
     }
 })
 export default class CourtList extends Vue {

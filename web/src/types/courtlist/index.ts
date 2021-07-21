@@ -1,5 +1,5 @@
-import {iconStyleType} from '../common';
-import {courtListType} from '../courtlist/jsonTypes';
+import { iconStyleType } from '../common';
+import { courtListType } from '../courtlist/jsonTypes';
 
 export interface courtListInformationInfoType {
     detailsData: courtListType;
@@ -18,7 +18,7 @@ export interface courtRoomsAndLocationsInfoType {
 export interface locationInfoType {
     Location: string;
     LocationID: string;
-    Rooms : roomsInfoType[]
+    Rooms: roomsInfoType[]
 
 }
 
@@ -47,6 +47,7 @@ export interface civilListInfoType {
     hearingRestrictions: hearingRestrictionInfoType[];
     notes: civilNotesInfoType;
     noteExist: boolean;
+    listClass: string;
 }
 
 export interface hearingRestrictionInfoType {
@@ -63,14 +64,14 @@ export interface civilNotesInfoType {
     TrialNotes: string;
     FileComment: string;
     CommentToJudge: string;
-    SheriffComment:string;
+    SheriffComment: string;
 }
 
 export interface criminalListInfoType {
     index: string;
     seq: number;
     fileNumber: string;
-    tag: string;    
+    tag: string;
     icons: iconStyleType[];
     caseAge: string;
     time: string;
@@ -94,12 +95,13 @@ export interface criminalListInfoType {
     partId: string;
     justinNo: string;
     appearanceId: string;
-    fileMarkers: fileMarkerInfoType[];    
+    fileMarkers: fileMarkerInfoType[];
     hearingRestrictions: hearingRestrictionInfoType[];
     trialNotes: string;
     trialRemarks: trialRemarkInfoType[];
     notes: criminalNotesInfoType;
     noteExist: boolean;
+    listClass: string;
 }
 
 export interface criminalNotesInfoType {
@@ -107,6 +109,56 @@ export interface criminalNotesInfoType {
     text: string;
 }
 
-export interface trialRemarkInfoType {    
+export interface trialRemarkInfoType {
     txt: string;
+}
+
+export interface courtListInfoType {
+    index: string;
+    seq: number;
+    fileNumber: string;
+    tag: string;
+    icons: iconStyleType[];
+    time: string;
+    room: string;
+    parties?: string;
+    partiesTruncApplied?: boolean;
+    partiesDesc?: string;
+    accused?: string;
+    accusedTruncApplied?: boolean;
+    accusedDesc?: string;
+    caseAge?: string;
+    crown?: string;
+    crownDesc?: string;
+    courtLevel?: string;
+    courtClass?: string;
+    profSeqNo?: string;
+    partId?: string;
+    justinNo?: string;
+    trialNotes?: string;
+    trialRemarks?: trialRemarkInfoType[];    
+    reason: string;
+    reasonDesc: string;
+    est: string;
+    supplementalEquipment: string;
+    securityRestriction: string;
+    outOfTownJudge: string;
+    counsel: string;
+    counselDesc: string;
+    fileId: string;
+    appearanceId: string;
+    fileMarkers: fileMarkerInfoType[];
+    hearingRestrictions: hearingRestrictionInfoType[];
+    notes: courtNotesInfoType;
+    noteExist: boolean;
+    listClass: string;
+}
+
+export interface courtNotesInfoType {
+    TrialNotes?: string;
+    FileComment?: string;
+    CommentToJudge?: string;
+    SheriffComment?: string;
+    remarks?: trialRemarkInfoType[];
+    text?: string;
 }

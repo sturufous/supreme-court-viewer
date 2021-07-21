@@ -148,10 +148,10 @@ export default class CivilFutureAppearances extends Vue {
     public civilFileInformation!: civilFileInformationType;
     
     @civilState.State
-    public appearanceInfo!: civilAppearanceInfoType;
+    public civilAppearanceInfo!: civilAppearanceInfoType;
 
     @civilState.Action
-    public UpdateAppearanceInfo!: (newAppearanceInfo: civilAppearanceInfoType) => void        
+    public UpdateCivilAppearanceInfo!: (newCivilAppearanceInfo: civilAppearanceInfoType) => void        
 
     @commonState.Action
     public UpdateDisplayName!: (newInputNames: inputNamesType) => void    
@@ -254,14 +254,14 @@ export default class CivilFutureAppearances extends Vue {
     {
         if(!data.detailsShowing)
         {
-            this.appearanceInfo.fileNo = this.civilFileInformation.fileNumber;    
-            this.appearanceInfo.date = data.item.formattedDate;        
-            this.appearanceInfo.appearanceId = data.item.appearanceId;
-            this.appearanceInfo.supplementalEquipmentTxt = data.item.supplementalEquipment;
-            this.appearanceInfo.securityRestrictionTxt = data.item.securityRestriction;
-            this.appearanceInfo.outOfTownJudgeTxt = data.item.outOfTownJudge;
+            this.civilAppearanceInfo.fileNo = this.civilFileInformation.fileNumber;    
+            this.civilAppearanceInfo.date = data.item.formattedDate;        
+            this.civilAppearanceInfo.appearanceId = data.item.appearanceId;
+            this.civilAppearanceInfo.supplementalEquipmentTxt = data.item.supplementalEquipment;
+            this.civilAppearanceInfo.securityRestrictionTxt = data.item.securityRestriction;
+            this.civilAppearanceInfo.outOfTownJudgeTxt = data.item.outOfTownJudge;
 
-            this.UpdateAppearanceInfo(this.appearanceInfo);
+            this.UpdateCivilAppearanceInfo(this.civilAppearanceInfo);
         }        
     }
 

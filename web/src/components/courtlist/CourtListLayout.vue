@@ -1,14 +1,14 @@
 <template>
 
     <b-card bg-variant="white" no-body>
-        <div>
-            <h2 :class="'mx-4 mt-5 font-weight-normal text-'+civilClass">{{getClassName}}</h2>
-            <hr :class="'bg-'+civilClass+' mx-3'" style="height: 5px;"/> 
-        </div>
+        <!-- <div>
+            <h2 :class="'mx-4 mt-5 font-weight-normal text-'+data.item.listClass">{{getClassName}}</h2>
+            <hr :class="'bg-'+data.item.listClass+' mx-3'" style="height: 5px;"/> 
+        </div> -->
 
-        <b-card v-if="!isDataReady && isMounted" no-body>
+        <!-- <b-card v-if="!isDataReady && isMounted" no-body>
             <span class="text-muted ml-4 mb-5"> No {{getClassName}} List has been found. </span>
-        </b-card>
+        </b-card> -->
 
         <b-card bg-variant="light" v-if= "!isMounted && !isDataReady" >
             <b-overlay :show= "true"> 
@@ -24,7 +24,7 @@
 
         <b-card bg-variant="white" v-if="isDataReady" no-body class="mx-3" style="overflow:auto">           
             <b-table
-            :items="SortedCivilList"
+            :items="SortedCourtList"
             :fields="fields"            
             borderless
             small
@@ -47,22 +47,25 @@
                     <b-button 
                         style=" font-size:16px" 
                         size="sm"
-                        :id="civilClass+'case-'+data.item.Tag"
-                        :href="'#'+civilClass+'case-'+data.item.Tag"
-                        @click="OpenDetails(data); data.toggleDetails();" 
-                        :variant="'outline-primary border-white text-'+civilClass" 
+                        :id="data.item.listClass+'case-'+data.item.tag"
+                        :href="'#'+data.item.listClass+'case-'+data.item.tag"
+                        @click="(data.item.listClass == 'criminal')?OpenCriminalDetails(data):OpenCivilDetails(data); data.toggleDetails();" 
+                        :variant="'outline-primary border-white text-'+data.item.listClass" 
                         class="mr-2">
-                            <b-icon-caret-right-fill :variant="civilClass" v-if="!data.item['_showDetails']"></b-icon-caret-right-fill>
-                            <b-icon-caret-down-fill :variant="civilClass" v-if="data.item['_showDetails']"></b-icon-caret-down-fill>
+                            <b-icon-caret-right-fill :variant="data.item.listClass" v-if="!data.item['_showDetails']"></b-icon-caret-right-fill>
+                            <b-icon-caret-down-fill :variant="data.item.listClass" v-if="data.item['_showDetails']"></b-icon-caret-down-fill>
                             {{data.value}}
                     </b-button>                  
                 </template>
 
                 <template v-slot:row-details="data">
-                    <b-card no-body bg-border="dark"> 
-                        <civil-appearance-details :tagcasename="civilClass+'case-'+data.item.Tag" />
+                    <b-card v-if="data.item.listClass == 'criminal'" no-body bg-border="dark"> 
+                        <criminal-appearance-details :tagcasename="'criminalcase-'+data.item.tag"/>
                     </b-card>
-                </template> 
+                    <b-card v-else no-body bg-border="dark"> 
+                        <civil-appearance-details :tagcasename="data.item.listClass+'case-'+data.item.tag" />
+                    </b-card>
+                </template>                
                 
                 <template  v-slot:cell(reason)="data">
                     <b-badge
@@ -87,44 +90,77 @@
                             font-scale="1.25">                            
                         </b-icon>
                     </b-badge>    
+                </template>
+
+                <template v-slot:cell(accused)="data">
+                    <b-button
+                        v-if="data.item.listClass == 'criminal'" 
+                        style="font-size:16px; font-weight: bold;" 
+                        size="sm" 
+                        @click="OpenCriminalFilePage(data)" 
+                        v-b-tooltip.hover.right
+                        :title="data.item['accusedTruncApplied']?data.item['accusedDesc']:null"
+                        variant="outline-primary border-white text-criminal" 
+                        class="mr-2">                            
+                            {{data.value}}
+                    </b-button>
                 </template> 
 
-                <template  v-slot:cell(parties)="data">
+                <template v-slot:cell(parties)="data">
                     <b-button
-                        v-if="data.value.length>0"
+                        v-if="data.item.listClass != 'criminal' && data.value.length>0"
                         style="font-size:16px; font-weight: bold;" 
                         size="sm" 
                         @click="OpenCivilFilePage(data)" 
                         v-b-tooltip.hover.right                            
                         :title="data.item.partiesTruncApplied?data.item.partiesDesc:null"
-                        :variant="'outline-primary border-white text-'+civilClass" 
+                        :variant="'outline-primary border-white text-'+data.item.listClass" 
                         class="mr-2">                            
                             {{data.value}}
                     </b-button>
                     <b-button
-                        v-else
+                        v-else-if="data.item.listClass != 'criminal' && data.value.length == 0"
                         style="font-size:16px; font-weight: bold;" 
                         size="sm" 
                         @click="OpenCivilFilePage(data)" 
                         v-b-tooltip.hover.right                            
                         :title="data.item.partiesTruncApplied?data.item.partiesDesc:null"
-                        :variant="'outline-primary border-white text-'+civilClass" 
+                        :variant="'outline-primary border-white text-'+data.item.listClass" 
                         class="mr-2">                            
                             File
                     </b-button>                                  
-                </template>
+                </template>                
                 
-                <template  v-slot:cell(counsel)="data">
+                <template v-slot:cell(counsel)="data">
+                    <span v-if="data.item.listClass == 'criminal'">
+                        {{data.value}}
+                    </span>
                     <b-badge
-                        v-if="data.item.counselDesc"
+                        v-if="data.item.listClass != 'criminal' && data.item.counselDesc"
                         variant="white text-success"                        
                         v-b-tooltip.hover.left.html = "getFullCounsel(data.item.counselDesc)"
                         style="margin-top: 4px; font-size: 16px; font-weight:normal"> 
                             {{data.value}}
                     </b-badge>
-                    <b-badge v-else
+                    <b-badge v-else-if="data.item.listClass != 'criminal' && !data.item.counselDesc"
                         variant="white"
                         style="margin-top: 4px; font-size: 16px; font-weight:normal" >
+                            {{data.value}}
+                    </b-badge>
+                </template>
+
+                <template  v-slot:cell(crown)="data">
+                    <b-badge
+                        v-if="data.item.listClass == 'criminal' && data.item.crownDesc"
+                        variant="white text-success"                        
+                        v-b-tooltip.hover.left                           
+                        :title="data.item.crownDesc"
+                        style="margin-top: 4px; font-size: 16px; font-weight:normal"> 
+                            {{data.value}}
+                    </b-badge>
+                    <b-badge v-else-if="data.item.listClass == 'criminal' && !data.item.crownDesc"
+                        variant="white"
+                        style="margin-top: 4px; font-size: 16px; font-weight:normal">
                             {{data.value}}
                     </b-badge>
                 </template>
@@ -201,6 +237,29 @@
                 border-variant="white">
                     {{notes.sheriffComment}}
             </b-card>
+
+            <b-card 
+                v-if="notes.text" 
+                title="Trial Notes" 
+                border-variant="white">
+                    {{notes.text}}
+            </b-card>
+            <!-- As per Kevin's request SCV-140, hide JCM Notes. 
+            <b-card 
+                v-if="notes.remarks.length>0" 
+                title="Crown Notes to JCM" 
+                border-variant="white">
+                    <b-table        
+                        borderless
+                        :items="notes.remarks"                                    
+                        thead-class="d-none"
+                        responsive="sm"          
+                        striped
+                        >
+                    </b-table>
+               
+            </b-card>             
+            -->
                      
             <b-button class="mt-3 bg-info" @click="$bvModal.hide('bv-modal-notes')">Close</b-button>
         </b-modal> 
@@ -214,7 +273,9 @@ import { Component, Vue, Prop } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import CivilAppearanceDetails from '@components/civil/CivilAppearanceDetails.vue';
 import * as _ from 'underscore';
-import {courtListInformationInfoType, civilListInfoType} from '@/types/courtlist';
+import CriminalAppearanceDetails from '@components/criminal/CriminalAppearanceDetails.vue';
+import {criminalFileInformationType, criminalAppearanceInfoType} from '@/types/criminal';
+import {courtListInformationInfoType, civilListInfoType, criminalListInfoType, courtListInfoType} from '@/types/courtlist';
 import {civilFileInformationType, civilAppearanceInfoType} from '@/types/civil';
 import {inputNamesType, durationType, iconInfoType, iconStyleType} from '@/types/common'
 import "@store/modules/CommonInformation";
@@ -224,15 +285,19 @@ const courtListState = namespace('CourtListInformation');
 import "@store/modules/CivilFileInformation";
 import { civilCourtListType } from "@/types/courtlist/jsonTypes";
 const civilState = namespace("CivilFileInformation");
+import "@store/modules/CriminalFileInformation";
+import { criminalCourtListType } from "@/types/courtlist/jsonTypes";
+const criminalState = namespace("CriminalFileInformation");
 
 enum HearingType {'A'= '+','G' = '@','D'='-', 'S' = '*'  }
 
 @Component({
     components: {
-        CivilAppearanceDetails
+        CivilAppearanceDetails,
+        CriminalAppearanceDetails
     }
 })
-export default class CivilList extends Vue {
+export default class CourtListLayout extends Vue {
 
     @courtListState.State
     public courtListInformation!: courtListInformationInfoType
@@ -240,11 +305,20 @@ export default class CivilList extends Vue {
     @civilState.State
     public civilAppearanceInfo!: civilAppearanceInfoType;
 
+    @criminalState.State
+    public criminalAppearanceInfo!: criminalAppearanceInfoType;
+
     @civilState.Action
     public UpdateCivilAppearanceInfo!: (newCivilAppearanceInfo: civilAppearanceInfoType) => void 
     
     @civilState.Action
     public UpdateCivilFile!: (newCivilFileInformation: civilFileInformationType) => void   
+
+    @criminalState.Action
+    public UpdateCriminalAppearanceInfo!: (newAppearanceInfo: criminalAppearanceInfoType) => void       
+
+    @criminalState.Action
+    public UpdateCriminalFile!: (newCriminalFileInformation: criminalFileInformationType) => void
 
     @commonState.State
     public iconStyles!: iconStyleType[];
@@ -270,15 +344,18 @@ export default class CivilList extends Vue {
     @commonState.Action
     public UpdateTime!: (time: string) => void
     
-    @Prop() civilClass
+    // @Prop() civilClass
 
-    civilList: civilListInfoType[] = [];    
+    //civilList: civilListInfoType[] = [];    
     civilCourtListJson: civilCourtListType[] = [];
+    //criminalList: criminalListInfoType[] = [];    
+    criminalCourtListJson: criminalCourtListType[] = [];
+    courtList: courtListInfoType[] = []; 
     courtRoom;
     isMounted = false;
     isDataReady = false;
     showNotes = false;
-    notes = {TrialNotes:'', FileComment:'', CommentToJudge:'', SheriffComment:''};      
+    notes = {remarks:[], text:'', TrialNotes:'', FileComment:'', CommentToJudge:'', SheriffComment:''};      
     
     fields =  
     [
@@ -286,6 +363,8 @@ export default class CivilList extends Vue {
         {key:'fileNumber',              label:'File Number',         tdClass: 'border-top', headerStyle:'', cellStyle:''},
         {key:'icons',                   label:'Icons',               tdClass: 'border-top', thClass:'text-white', cellStyle:''},
         {key:'parties',                 label:'Parties',             tdClass: 'border-top', headerStyle:'', cellStyle:'text-primary'},
+        {key:'accused',                label:'Accused',              tdClass: 'border-top', headerStyle:'', cellStyle:'text-primary'},
+        
         {key:'time',                    label:'Time',                tdClass: 'border-top', headerStyle:'', cellStyle:''},
         {key:'est',                     label:'Est.',                tdClass: 'border-top', headerStyle:'', cellStyle:''},
         {key:'reason',                  label:'Reason',              tdClass: 'border-top', headerStyle:'', cellStyle:''},
@@ -293,29 +372,187 @@ export default class CivilList extends Vue {
         {key:'counsel',                 label:'Counsel',             tdClass: 'border-top', headerStyle:'', cellStyle:''},
         {key:'fileMarkers',             label:'File Markers',        tdClass: 'border-top', headerStyle:'', cellStyle:''},
         {key:'hearingRestrictions',     label:'Hearing Restrictions', tdClass: 'border-top', headerStyle:'', cellStyle:''},
-        {key:'notes',                   label:'Notes',               tdClass: 'border-top', headerStyle:'', cellStyle:''},
+        {key:'crown',                  label:'Crown',                tdClass: 'border-top', headerStyle:'', cellStyle:''},
+        {key:'caseAge',                label:'Case Age',             tdClass: 'border-top', headerStyle:'', cellStyle:''},
+        {key:'notes',                   label:'Notes',               tdClass: 'border-top', headerStyle:'', cellStyle:''}
     ];
     
     mounted() {
-        this.getCivilList();
+        this.getCourtList();        
     }
 
-    public getCivilList(): void 
+    public getCourtList(): void 
     {            
         const data = this.courtListInformation.detailsData;       
-        this.civilCourtListJson = data.civilCourtList
-        this.courtRoom = data.courtRoomCode    
-        this.ExtractCivilListInfo()
-        if(this.civilList.length)
+        this.civilCourtListJson = data.civilCourtList;        
+        this.courtRoom = data.courtRoomCode;  
+        this.ExtractCivilListInfo();
+        this.criminalCourtListJson = data.criminalCourtList;
+        this.ExtractCriminalListInfo();
+        console.log(this.courtList)
+        if(this.courtList.length)
         {                    
             this.isDataReady = true;
         }    
         this.isMounted = true;
-    } 
+    }
+    
+    public ExtractCriminalListInfo(): void {
+
+        for (const criminalListIndex in this.criminalCourtListJson) 
+        {
+            const criminalListInfo = {} as courtListInfoType;
+            const jcriminalList = this.criminalCourtListJson[criminalListIndex];
+
+            criminalListInfo.index = criminalListIndex;
+
+            criminalListInfo.seq = jcriminalList.appearanceSequenceNumber?parseInt(jcriminalList.appearanceSequenceNumber):0
+            criminalListInfo.fileNumber = jcriminalList.fileNumberText
+            criminalListInfo.tag = criminalListInfo.fileNumber+'-'+criminalListInfo.seq;  
+
+            criminalListInfo.icons = [];
+            const iconInfo: iconInfoType[] = []
+            let iconExists = false;
+            if (jcriminalList.appearanceStatusCd){
+                iconInfo.push({"info": jcriminalList.appearanceStatusCd, "desc": ''})
+                iconExists = true;
+            }              
+            if (jcriminalList.video){
+                iconInfo.push({"info": "Video", "desc": ''})
+                iconExists = true;
+            }
+            if (jcriminalList.fileHomeLocationName){
+                iconInfo.push({"info": "Home", "desc": jcriminalList.fileHomeLocationName});
+                iconExists = true;
+            }            
+            if (iconExists){
+                this.UpdateIconStyle(iconInfo);
+                criminalListInfo.icons = this.iconStyles;
+            }
+            criminalListInfo.caseAge= jcriminalList.caseAgeDaysNumber? jcriminalList.caseAgeDaysNumber: '';
+            criminalListInfo.time = this.getTime(jcriminalList.appearanceTime.split(' ')[1].substr(0,5));
+
+            criminalListInfo.room = this.courtRoom;
+
+            const accusedName = this.getNameOfAccusedTrunc(jcriminalList.accusedFullName);
+            criminalListInfo.accused = accusedName.name;            
+            criminalListInfo.accusedTruncApplied = accusedName.trunc;
+            criminalListInfo.accusedDesc = jcriminalList.accusedFullName;
+
+            criminalListInfo.reason = jcriminalList.appearanceReasonCd;
+            criminalListInfo.reasonDesc = jcriminalList.appearanceReasonDesc;
+
+            criminalListInfo.counsel = jcriminalList.counselFullName;
+
+            criminalListInfo.crown = '';
+            criminalListInfo.crownDesc = '';            
+            if(jcriminalList.crown && jcriminalList.crown.length>0)
+            {               
+                let firstCrownSet=false
+                for(const crown of jcriminalList.crown)
+                {
+                    if(crown.assigned)  
+                    { 
+                        if(!firstCrownSet)
+                        {
+                            criminalListInfo.crown = crown.fullName;
+                            firstCrownSet = true;
+                        }
+                        else
+                        {
+                            criminalListInfo.crownDesc += crown.fullName +', ';
+                        }
+                    }
+                }
+
+                if(criminalListInfo.crownDesc) criminalListInfo.crownDesc += criminalListInfo.crown;
+            }
+            criminalListInfo.est = this.getDuration(jcriminalList.estimatedTimeHour, jcriminalList.estimatedTimeMin)
+            criminalListInfo.partId =  jcriminalList.fileInformation.partId
+            criminalListInfo.justinNo = jcriminalList.fileInformation.mdocJustinNo
+            criminalListInfo.appearanceId = jcriminalList.criminalAppearanceID
+
+            criminalListInfo.fileMarkers = [];
+            if (jcriminalList.inCustody){
+                criminalListInfo.fileMarkers.push({abbr: 'IC', key: 'In Custody'})
+            }            
+            if (jcriminalList.otherFileInformationText) {
+                criminalListInfo.fileMarkers.push({abbr: 'OTH', key: jcriminalList.otherFileInformationText})
+            }
+            if (jcriminalList.detained) {
+                criminalListInfo.fileMarkers.push({abbr: 'DO', key: 'Detention Order'})
+            }
+
+            criminalListInfo.hearingRestrictions = [];
+            for (const hearingRestriction of jcriminalList.hearingRestriction)
+            {
+                const marker =  hearingRestriction.adjInitialsText +  HearingType[hearingRestriction.hearingRestrictiontype]  
+                const markerDesc =  hearingRestriction.judgeName + ' ('+ hearingRestriction.hearingRestrictionTypeDesc+')'          
+                criminalListInfo.hearingRestrictions.push({abbr:marker, key:markerDesc});
+            }
+            criminalListInfo.trialNotes = jcriminalList.trialRemarkTxt;
+
+            criminalListInfo.trialRemarks = [];
+            if (jcriminalList.trialRemark) {
+                for (const trialRemark of jcriminalList.trialRemark)
+                {
+                    criminalListInfo.trialRemarks.push({txt:trialRemark.commentTxt})
+                }
+            }
+            criminalListInfo.notes={remarks:criminalListInfo.trialRemarks, text:criminalListInfo.trialNotes}            
+            criminalListInfo.supplementalEquipment = jcriminalList.supplementalEquipment
+            criminalListInfo.securityRestriction = jcriminalList.securityRestriction
+            criminalListInfo.outOfTownJudge = jcriminalList.outOfTownJudge
+
+            criminalListInfo.courtLevel = jcriminalList.fileInformation.courtLevelCd
+            criminalListInfo.courtClass = jcriminalList.fileInformation.courtClassCd
+            criminalListInfo.profSeqNo = jcriminalList.fileInformation.profSeqNo;                       
+            criminalListInfo.noteExist = this.isCriminalNoteAvailable(criminalListInfo);
+            criminalListInfo.listClass = 'criminal'
+           // this.criminalList.push(criminalListInfo); 
+            this.courtList.push(criminalListInfo);
+        }
+    }
+
+    public isCriminalNoteAvailable(criminalListInfo)
+    {
+        if(criminalListInfo.trialRemarks.length>0) return true;
+        if(criminalListInfo.trialNotes) return true;
+        return false;
+    }
+    public OpenCriminalNotes(notesData) {
+        this.notes = notesData;
+        this.showNotes=true;           
+    }
+
+    public getNameOfParticipant(lastName, givenName) {
+        this.UpdateDisplayName({'lastName': lastName, 'givenName': givenName});
+        return this.displayName;        
+    }
+
+    public OpenCriminalFilePage(data)
+    {
+        const fileInformation = { } as criminalFileInformationType
+        fileInformation.fileNumber = data.item.justinNo
+        this.UpdateCriminalFile(fileInformation)
+        const routeData = this.$router.resolve({name:'CriminalCaseDetails', params: {fileNumber: fileInformation.fileNumber}})
+        window.open(routeData.href, '_blank');
+    }
+
+    public getNameOfAccusedTrunc(nameOfAccused) 
+    {
+        const maximumFullNameLength = 20
+        if(nameOfAccused.length > maximumFullNameLength)   
+            return {name: nameOfAccused.substr(0, maximumFullNameLength) +' ... ', trunc:true};   
+        else 
+            return  {name: nameOfAccused, trunc:false};        
+    }
 
   
     public ExtractCivilListInfo(): void {
-        const listClass = this.civilClass=='family'? ['F','E']: ['I', 'B', 'V', 'D', 'H', 'P', 'S']; 
+        // const listClass = this.civilClass=='family'? ['F','E']: ['I', 'B', 'V', 'D', 'H', 'P', 'S']; 
+        const familyListClass = ['F','E'];
+        const civilListClass = ['I', 'B', 'V', 'D', 'H', 'P', 'S'];
         /* 
             Unfortunately these don't follow the usual pattern of the other lookups.
             B = "Bankruptcy"
@@ -329,13 +566,19 @@ export default class CivilList extends Vue {
             SCH – Supreme Court Chambers
             SCV – Supreme Court Trial List
         */
-        for (const civilListIndex in this.civilCourtListJson) 
-        {
+        console.log(this.civilCourtListJson)
+        
+        for (const civilListIndex in this.civilCourtListJson) {
+
             const civilListInfo = {} as civilListInfoType;
             const jcivilList = this.civilCourtListJson[civilListIndex];
-
+            console.log(jcivilList)
             civilListInfo.index = civilListIndex;
-            if(listClass.indexOf(jcivilList.activityClassCd) == -1) continue;
+            if(familyListClass.indexOf(jcivilList.activityClassCd) != -1){
+                civilListInfo.listClass = 'family';
+            } else if (civilListClass.indexOf(jcivilList.activityClassCd) != -1){
+                civilListInfo.listClass = 'civil';
+            }
 
             civilListInfo.seq=jcivilList.courtListPrintSortNumber? parseInt(jcivilList.courtListPrintSortNumber):0
 
@@ -410,7 +653,8 @@ export default class CivilList extends Vue {
 
             civilListInfo.notes ={TrialNotes: jcivilList.trialRemarkTxt, FileComment:jcivilList.fileCommentText, CommentToJudge:jcivilList.commentToJudgeText, SheriffComment:jcivilList.sheriffCommentText};                       
             civilListInfo.noteExist = this.isNoteAvailable(civilListInfo);
-            this.civilList.push(civilListInfo);
+            console.log(civilListInfo)
+            this.courtList.push(civilListInfo);
         }
     }
 
@@ -453,12 +697,7 @@ export default class CivilList extends Vue {
         } else {
             return {name: '', trunc:truncApplied};
         }    
-    }
-
-    public getNameOfParticipant(lastName, givenName) {
-        this.UpdateDisplayName({'lastName': lastName, 'givenName': givenName});
-        return this.displayName;        
-    }
+    }    
 
     public getTime(time)
     {
@@ -471,8 +710,25 @@ export default class CivilList extends Vue {
         this.UpdateDuration({'hr': hr, 'min': min});
         return this.duration;
     }
+
+    public OpenCriminalDetails(data)
+    {
+        if(!data.detailsShowing)
+        {
+            this.criminalAppearanceInfo.fileNo = data.item.justinNo;
+            this.criminalAppearanceInfo.appearanceId = data.item.appearanceId;
+            this.criminalAppearanceInfo.partId = data.item.partId;
+            this.criminalAppearanceInfo.supplementalEquipmentTxt = data.item.supplementalEquipment;
+            this.criminalAppearanceInfo.securityRestrictionTxt = data.item.securityRestriction;
+            this.criminalAppearanceInfo.outOfTownJudgeTxt = data.item.outOfTownJudge;
+            this.criminalAppearanceInfo.courtLevel = data.item.courtLevel;
+            this.criminalAppearanceInfo.courtClass = data.item.courtClass;
+            this.criminalAppearanceInfo.profSeqNo = data.item.profSeqNo;
+            this.UpdateCriminalAppearanceInfo(this.criminalAppearanceInfo);
+        }        
+    }
     
-    public OpenDetails(data)
+    public OpenCivilDetails(data)
     {       
         if(!data.detailsShowing)
         {            
@@ -493,24 +749,34 @@ export default class CivilList extends Vue {
         const routeData = this.$router.resolve({name:'CivilCaseDetails', params: {fileNumber: fileInformation.fileNumber}})
         window.open(routeData.href, '_blank');        
     }
-
     
     public getFullCounsel(counselDesc)
     {
         return '<b style="white-space: pre-line;">'+ counselDesc+ '</b>'
     }
 
-    get getClassName()
-    {
-        if (this.civilClass=='family') 
-            return 'Family';
-        else
-            return 'Civil';
-    }
+    // get getClassName()
+    // {
+    //     if (this.civilClass=='family') 
+    //         return 'Family';
+    //     else
+    //         return 'Civil';
+    // }
 
-    get SortedCivilList()
-    {           
-        return  _.sortBy(this.civilList, 'seq')      
+    // get SortedCivilList()
+    // {           
+    //     return  _.sortBy(this.civilList, 'seq')      
+    // }
+
+    // get SortedCriminalList()
+    // {                
+    //     return  _.sortBy(this.criminalList, 'seq')
+    // }
+
+    get SortedCourtList()
+    {      
+        // TODO: sort by appearance time          
+        return  _.sortBy(this.courtList, 'seq')
     }
 }
 </script>

@@ -227,10 +227,10 @@ export default class CriminalList extends Vue {
     public courtListInformation!: courtListInformationInfoType
 
     @criminalState.State
-    public appearanceInfo!: criminalAppearanceInfoType;
+    public criminalAppearanceInfo!: criminalAppearanceInfoType;
 
     @criminalState.Action
-    public UpdateAppearanceInfo!: (newAppearanceInfo: criminalAppearanceInfoType) => void       
+    public UpdateCriminalAppearanceInfo!: (newCriminalAppearanceInfo: criminalAppearanceInfoType) => void       
 
     @criminalState.Action
     public UpdateCriminalFile!: (newCriminalFileInformation: criminalFileInformationType) => void
@@ -451,16 +451,16 @@ export default class CriminalList extends Vue {
     {
         if(!data.detailsShowing)
         {
-            this.appearanceInfo.fileNo = data.item.justinNo;
-            this.appearanceInfo.appearanceId = data.item.appearanceId;
-            this.appearanceInfo.partId = data.item.partId;
-            this.appearanceInfo.supplementalEquipmentTxt = data.item.supplementalEquipment;
-            this.appearanceInfo.securityRestrictionTxt = data.item.securityRestriction;
-            this.appearanceInfo.outOfTownJudgeTxt = data.item.outOfTownJudge;
-            this.appearanceInfo.courtLevel = data.item.courtLevel;
-            this.appearanceInfo.courtClass = data.item.courtClass;
-            this.appearanceInfo.profSeqNo = data.item.profSeqNo;
-            this.UpdateAppearanceInfo(this.appearanceInfo);
+            this.criminalAppearanceInfo.fileNo = data.item.justinNo;
+            this.criminalAppearanceInfo.appearanceId = data.item.appearanceId;
+            this.criminalAppearanceInfo.partId = data.item.partId;
+            this.criminalAppearanceInfo.supplementalEquipmentTxt = data.item.supplementalEquipment;
+            this.criminalAppearanceInfo.securityRestrictionTxt = data.item.securityRestriction;
+            this.criminalAppearanceInfo.outOfTownJudgeTxt = data.item.outOfTownJudge;
+            this.criminalAppearanceInfo.courtLevel = data.item.courtLevel;
+            this.criminalAppearanceInfo.courtClass = data.item.courtClass;
+            this.criminalAppearanceInfo.profSeqNo = data.item.profSeqNo;
+            this.UpdateCriminalAppearanceInfo(this.criminalAppearanceInfo);
         }        
     }
 

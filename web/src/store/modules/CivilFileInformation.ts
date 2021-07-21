@@ -17,7 +17,7 @@ class CivilFileInformation extends VuexModule {
     'Provided Documents': false
   }
 
-  public appearanceInfo = {}
+  public civilAppearanceInfo = {}
 
   @Mutation
   public setCivilFile(civilFileInformation): void {
@@ -60,13 +60,13 @@ class CivilFileInformation extends VuexModule {
   }
 
   @Mutation
-  public setAppearanceInfo(appearanceInfo): void {
-    this.appearanceInfo = appearanceInfo
+  public setCivilAppearanceInfo(civilAppearanceInfo): void {
+    this.civilAppearanceInfo = civilAppearanceInfo
   }
 
   @Action
-  public UpdateAppearanceInfo(newAppearanceInfo): void {
-    this.context.commit('setAppearanceInfo', newAppearanceInfo)
+  public UpdateCivilAppearanceInfo(newCivilAppearanceInfo): void {
+    this.context.commit('setCivilAppearanceInfo', newCivilAppearanceInfo)
   }
 
 }
