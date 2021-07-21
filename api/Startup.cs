@@ -45,9 +45,9 @@ namespace Scv.Api
         {
             services.AddLogging(options =>
             {
-                options.AddSimpleConsole(c =>
+                options.AddConsole(c =>
                 {
-                    c.ColorBehavior = LoggerColorBehavior.Disabled;
+                    c.DisableColors = true;
                     c.TimestampFormat = "[yyyy-MM-dd HH:mm:ss.fff] ";
                 });
             });
