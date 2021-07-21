@@ -43,7 +43,6 @@ namespace tests.api.Controllers
         private readonly FileServicesClient _fileServicesClient;
         private readonly string _agencyIdentifierId;
         private readonly string _partId;
-        ClaimsPrincipal principal;
         #endregion Variables
 
         #region Constructor
@@ -70,7 +69,7 @@ namespace tests.api.Controllers
                 new Claim(CustomClaimTypes.IsSupremeUser, "True"),
             };
             var identity = new ClaimsIdentity(claims, "Cookies");
-            principal = new ClaimsPrincipal(identity);
+            var principal = new ClaimsPrincipal(identity);
 
             _service = new FilesService(fileServices.Configuration, fileServicesClient, new Mapper(), lookupService, locationService, new CachingService(), principal);
 
