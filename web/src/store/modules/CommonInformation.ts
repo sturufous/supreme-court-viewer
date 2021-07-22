@@ -1,5 +1,5 @@
 import { VuexModule, Module, Mutation, Action } from 'vuex-module-decorators';
-import {iconStyleType} from '@/types/common';
+import {courtRoomsJsonInfoType, iconStyleType} from '@/types/common';
 
 enum appearanceStatus {UNCF='Unconfirmed', CNCL='Canceled', SCHD='Scheduled' }
 
@@ -13,6 +13,16 @@ class CommonInformation extends VuexModule {
   public duration = ''
   public statusStyle = ''
   public iconStyles: iconStyleType[] = [];
+  public courtRoomsAndLocations: courtRoomsJsonInfoType[] = [];
+
+  @Mutation
+  public setCourtRoomsAndLocations(courtRoomsAndLocations): void {   
+    this.courtRoomsAndLocations = courtRoomsAndLocations
+  }
+  @Action
+  public UpdateCourtRoomsAndLocations(newCourtRoomsAndLocations) { 
+    this.context.commit('setCourtRoomsAndLocations', newCourtRoomsAndLocations)
+  }
 
   @Mutation
   public setDisplayName(displayName): void {   

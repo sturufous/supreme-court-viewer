@@ -129,7 +129,11 @@
                         class="mr-2">                            
                             File
                     </b-button>                                  
-                </template>                
+                </template>  
+
+                <template  v-slot:cell(time)="data">
+                    {{data.value| convert-time}}
+                </template>              
                 
                 <template v-slot:cell(counsel)="data">
                     <span v-if="data.item.listClass == 'criminal'">
@@ -165,7 +169,7 @@
                     </b-badge>
                 </template>
 
-                <template v-slot:[`cell(${fields[9].key})`]="data" >
+                <template v-slot:[`cell(${fields[10].key})`]="data" >
                         <b-badge  
                             v-for="(field,index) in data.value"
                             :key="index" 
@@ -177,7 +181,7 @@
                         </b-badge>
                 </template>
 
-                <template v-slot:[`cell(${fields[10].key})`]="data" >
+                <template v-slot:[`cell(${fields[11].key})`]="data" >
                         <b-badge  
                             v-for="(field,index) in data.value"
                             :key="index" 
@@ -355,7 +359,7 @@ export default class CourtListLayout extends Vue {
     isMounted = false;
     isDataReady = false;
     showNotes = false;
-    notes = {remarks:[], text:'', TrialNotes:'', FileComment:'', CommentToJudge:'', SheriffComment:''};      
+    notes = {remarks:[], text:'', trialNotes:'', fileComment:'', commentToJudge:'', sheriffComment:''};      
     
     fields =  
     [
@@ -701,8 +705,10 @@ export default class CourtListLayout extends Vue {
 
     public getTime(time)
     {
-        this.UpdateTime(time);
-        return this.time;      
+        console.log(time)
+       // this.UpdateTime(time);
+       // return this.time;      
+       return time
     }
 
     public getDuration(hr, min)
@@ -776,7 +782,7 @@ export default class CourtListLayout extends Vue {
     get SortedCourtList()
     {      
         // TODO: sort by appearance time          
-        return  _.sortBy(this.courtList, 'seq')
+        return  _.sortBy(this.courtList, 'time')
     }
 }
 </script>

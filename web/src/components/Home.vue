@@ -1,20 +1,20 @@
 <template>
     <b-card bg-variant="white" class="home">
         <b-card >
-            <b-card-title class="h2"> Temporary landing page for SCV </b-card-title>
+            <b-card-title class="my-0 h2"> Temporary landing page for SCV </b-card-title>
         </b-card>
-        <b-row cols="2" >
+        <b-row cols="2"  body-class="py-0">
             <b-col md="6" cols="6"> 
-                <b-card  align="left" >
-                    <b-card >
-                        <b-card-title class="h3"> Search by File ID: </b-card-title>
+                <b-card  align="left"  body-class="py-1">
+                    <b-card>
+                        <b-card-title class="my-0 h3"> Search by File ID: </b-card-title>
                     </b-card>
-                    <b-card >
-                        <b-card-text for="fileId"> File ID: </b-card-text>                
+                    <b-card  body-class="py-1">
+                        <b-card-text class="mb-1" for="fileId"> File ID: </b-card-text>                
                         <b-form-input id="fileId" v-model="fileInformation.fileNumber" placeholder="Enter File ID"></b-form-input>                
                     </b-card>
                     <b-card> 
-                        <b-card-text for="civil/criminal"> Civil/Criminal: </b-card-text>
+                        <b-card-text class="mb-1" for="civil/criminal"> Civil/Criminal: </b-card-text>
                         <b-form-select v-model="selected" :options="options"></b-form-select>               
                     </b-card>                
                     <b-card >
@@ -23,20 +23,20 @@
                 </b-card>
             </b-col>
             <b-col md="6" cols="6"> 
-                <b-card  align="left" >
+                <b-card  align="left"  body-class="pt-1 pb-0" >
                     <b-card >
-                        <b-card-title class="h3"> Search by File Number and Location: </b-card-title>
+                        <b-card-title class="h3 my-0"> Search by File Number and Location: </b-card-title>
                     </b-card>
-                    <b-card >
-                        <b-card-text for="filenumber"> File Number: </b-card-text>                
+                    <b-card  body-class="py-1">
+                        <b-card-text class="mb-1" for="filenumber"> File Number: </b-card-text>                
                         <b-form-input id="filenumber" v-model="fileSearch.fileNumber" placeholder="Enter File Number"></b-form-input>                
                     </b-card>
-                    <b-card> 
-                        <b-card-text for="civil/criminal"> Civil/Criminal: </b-card-text>
+                    <b-card  body-class="pb-1"> 
+                        <b-card-text class="mb-1" for="civil/criminal"> Civil/Criminal: </b-card-text>
                         <b-form-select v-model="selectedFileSearch" :options="options"></b-form-select>               
                     </b-card>
                     <b-card> 
-                        <b-card-text for="location"> Location: </b-card-text>
+                        <b-card-text class="mb-1" for="location"> Location: </b-card-text>
                         <b-form-select
                         v-model="selectedCourtLocation"
                         id="locationSelect"
@@ -47,13 +47,13 @@
                         style="height:39px">
                         </b-form-select>               
                     </b-card>                
-                    <b-card >
+                    <b-card  class="pb-0">
                         <b-button @click="navigateToFilesView(fileSearch)">Search</b-button>
                     </b-card>                    
                 </b-card>
             </b-col>
         </b-row>
-        <b-card >
+        <b-card body-class="mt-0 pt-0">
             <b-button @click="navigateToCourtList()">Court List</b-button>
         </b-card>
 
@@ -120,8 +120,8 @@
         selectedCourtLocationState=true;
         
         // TODO: add validation so that the user has to enter values before clicking the search button
-        navigateToDocumentsView(fileInformation): void {
-            if(this.selected == 'civil') {
+        public navigateToDocumentsView(fileInformation): void {
+            if(this.selected == 'civil') {                
                 this.UpdateCivilFile(fileInformation)
                 this.$router.push({name:'CivilCaseDetails', params: {fileNumber: fileInformation.fileNumber}})
             } else if(this.selected == 'criminal') {
@@ -130,7 +130,7 @@
             }            
         }
 
-        navigateToFilesView(fileSearch): void {
+        public navigateToFilesView(fileSearch): void {
             fileSearch.location = this.selectedCourtLocation.LocationID;
             if(this.selectedFileSearch == 'civil') {                
                 this.$router.push({name:'CivilFileSearchResultsView', query: {fileNumber: fileSearch.fileNumber, location: fileSearch.location}});                
@@ -194,7 +194,7 @@
             this.syncFlag = true;     
         }
         
-        navigateToCourtList(): void {
+        public navigateToCourtList(): void {
             this.$router.push({name:'CourtList'})
         }
     }
