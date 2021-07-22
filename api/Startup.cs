@@ -25,6 +25,7 @@ using Scv.Api.Infrastructure.Middleware;
 using Scv.Api.Services.EF;
 using Scv.Db.Models;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
 
 namespace Scv.Api
 {
@@ -47,7 +48,7 @@ namespace Scv.Api
                 options.AddConsole(c =>
                 {
                     c.DisableColors = true;
-                    c.TimestampFormat = "[yyyy-MM-dd HH:mm:ss] ";
+                    c.TimestampFormat = "[yyyy-MM-dd HH:mm:ss.fff] ";
                 });
             });
 
