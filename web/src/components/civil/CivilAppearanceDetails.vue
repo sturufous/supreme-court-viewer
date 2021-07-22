@@ -281,7 +281,7 @@ import { CourtDocumentType, DocumentData } from '@/types/shared';
 import "@store/modules/CommonInformation";
 import "@store/modules/CivilFileInformation";
 import {appearanceAdditionalInfoType, civilAppearanceInfoType, appearancePartiesType, appearanceMethodsType, appearanceDocumentsType, civilFileInformationType, civilAppearanceDetailsInfoType} from '@/types/civil';
-import {inputNamesType } from '@/types/common';
+import {courtRoomsJsonInfoType, inputNamesType } from '@/types/common';
 const civilState = namespace("CivilFileInformation");
 const commonState = namespace("CommonInformation");
 
@@ -289,13 +289,16 @@ const commonState = namespace("CommonInformation");
 export default class CivilAppearanceDetails extends Vue {
 
     @commonState.State
-    public displayName!: string;   
+    public displayName!: string;
+    
+    @commonState.State
+    public courtRoomsAndLocations!: courtRoomsJsonInfoType[];
 
     @civilState.State
     public civilAppearanceInfo!: civilAppearanceInfoType;        
 
-    @civilState.State
-    public civilFileInformation!: civilFileInformationType
+    // @civilState.State
+    // public civilFileInformation!: civilFileInformationType
     
     @commonState.Action
     public UpdateDisplayName!: (newInputNames: inputNamesType) => void
@@ -517,20 +520,24 @@ export default class CivilAppearanceDetails extends Vue {
     }
 
     public documentClick(document) 
-    {        
+    {       console.log(document) 
+    console.log(this.appearanceDetailsJson)
+
         this.loadingPdf = true;
         const documentType = document.item == null ? CourtDocumentType.CSR : CourtDocumentType.Civil;
+        const location = this.courtRoomsAndLocations.filter( location=> {return (location.locationId == this.appearanceDetailsJson?.agencyId)})[0]?.name
         const documentData: DocumentData = {
             appearanceId: document.appearanceId, 
-            appearanceDate: document.appearanceDate,
-            courtLevel: this.civilFileInformation.detailsData.courtLevelCd,
+            appearanceDate: this.appearanceDetailsJson?.appearanceDt.substring(0,10),
+            courtLevel: this.appearanceDetailsJson?.courtLevelCd,
             dateFiled: document.item ? Vue.filter('beautify-date')(document.item.dateFiled) : '',
             documentId: document.item ? document.item.id : '', 
             documentDescription: document.item ? document.item.documentType : document.documentDescription,
-            fileId: this.civilFileInformation.fileNumber,
-            fileNumberText:  this.civilFileInformation.detailsData.fileNumberTxt,
-            location: this.civilFileInformation.detailsData.homeLocationAgencyName
+            fileId:  this.civilAppearanceInfo.fileNo,
+            fileNumberText:  this.appearanceDetailsJson.fileNumberTxt,
+            location: location? location :''
         };
+        console.log(documentData)
         shared.openDocumentsPdf(documentType, documentData);
         this.loadingPdf = false;
     }

@@ -278,7 +278,7 @@ export default class CivilList extends Vue {
     isMounted = false;
     isDataReady = false;
     showNotes = false;
-    notes = {TrialNotes:'', FileComment:'', CommentToJudge:'', SheriffComment:''};      
+    notes = {trialNotes:'', fileComment:'', commentToJudge:'', sheriffComment:''};      
     
     fields =  
     [

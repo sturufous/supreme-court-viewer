@@ -80,7 +80,7 @@
                          {{ data.value | beautify-date}}
                     </template> 
 
-                    <template v-slot:[`cell(${fields[fieldsTab][documentPlace[fieldsTab]].key})`]="data" >
+                    <template v-slot:[`cell(${fields[fieldsTab][documentPlace[fieldsTab]].key})`]="data" >                       
                         <b-button 
                             v-if="data.item.pdfAvail" 
                             variant="outline-primary text-info" 
@@ -92,6 +92,10 @@
                         <span class="ml-2" v-else>
                              {{data.value}}
                         </span>
+                    </template>
+
+                    <template v-slot:cell(statusDate)=data >
+                        {{data.value|beautify-date}}
                     </template>
 
                 </b-table>
@@ -391,7 +395,7 @@ export default class CriminalDocumentsView extends Vue {
                     docInfo.pdfAvail = doc.imageId? true : false
                     docInfo.imageId = doc.imageId;
                     docInfo.status = doc.docmDispositionDsc;
-                    docInfo.statusDate = doc.docmDispositionDate;
+                    docInfo.statusDate = doc.docmDispositionDate?.substring(0,10);
                     docInfo.isEnabled = docInfo.pdfAvail;
                     docInfo.isChecked = false;
                     if (docInfo.category != "PSR") {
@@ -493,21 +497,23 @@ export default class CriminalDocumentsView extends Vue {
 
     public cellClick(eventData)
     {   
+
         this.loadingPdf = true;
-        const documentType = eventData.item.category == "ROP" ? CourtDocumentType.ROP : CourtDocumentType.Criminal;
+        const documentType = eventData.item?.category == "ROP" ? CourtDocumentType.ROP : CourtDocumentType.Criminal;
         const index = eventData.index;
         const documentData: DocumentData = { 
             courtClass: this.criminalFileInformation.detailsData.courtClassCd, 
             courtLevel: this.criminalFileInformation.detailsData.courtLevelCd, 
             dateFiled: Vue.filter('beautify-date')(eventData.item.date),
-            documentId: eventData.item.imageId, 
-            documentDescription: eventData.item.documentType,
+            documentId: eventData.item?.imageId, 
+            documentDescription: eventData.item?.documentType,
             fileId: this.criminalFileInformation.fileNumber, 
             fileNumberText: this.criminalFileInformation.detailsData.fileNumberTxt,
-            partId: index ? this.participantFiles[index]["partID"] : '', 
-            profSeqNo: index ? this.participantFiles[index]["profSeqNo"]: '', 
+            partId:  eventData.item?.partId, 
+            profSeqNo:  eventData.item?.profSeqNo, 
             location: this.criminalFileInformation.detailsData.homeLocationAgencyName
         };
+
         shared.openDocumentsPdf(documentType, documentData);
         this.loadingPdf = false;
     }

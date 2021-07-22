@@ -2,6 +2,10 @@
   "iisSettings": {
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
+    "iis": {
+      "applicationUrl": "http://localhost/api",
+      "sslPort": 0
+    },
     "iisExpress": {
       "applicationUrl": "http://localhost:9877",
       "sslPort": 44369
@@ -30,7 +34,6 @@
     },
     "IIS Express (launchBrowser = false)": {
       "commandName": "IISExpress",
-      "launchBrowser": false,
       "launchUrl": "api/",
       "environmentVariables": {
         "CORS_DOMAIN": "http://localhost:1337",

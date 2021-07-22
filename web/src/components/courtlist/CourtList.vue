@@ -205,6 +205,9 @@ import '@store/modules/CourtListInformation';
 import { courtRoomsJsonInfoType } from '@/types/common';
 const courtListState = namespace('CourtListInformation');
 
+const commonState = namespace("CommonInformation");
+import '@store/modules/CourtListInformation';
+
 @Component({
     components: {
         CriminalList,
@@ -218,7 +221,10 @@ export default class CourtList extends Vue {
     public courtListInformation!: courtListInformationInfoType
 
     @courtListState.Action
-    public UpdateCourtList!: (newCourtListInformation: courtListInformationInfoType) => void  
+    public UpdateCourtList!: (newCourtListInformation: courtListInformationInfoType) => void
+    
+    @commonState.Action
+    public UpdateCourtRoomsAndLocations!: (newCourtRoomsAndLocations) => void
 
     errorCode=0
     errorText=''
@@ -264,6 +270,7 @@ export default class CourtList extends Vue {
             ).then(data => {
                 if(data){
                     this.courtRoomsAndLocationsJson = data
+                    this.UpdateCourtRoomsAndLocations(data)
                     this.ExtractCourtRoomsAndLocationsInfo();
                     if(this.courtRoomsAndLocations.length>0)
                     {                    
