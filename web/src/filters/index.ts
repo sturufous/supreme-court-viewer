@@ -20,3 +20,13 @@ Vue.filter('beautify-date-time', function(date){
 Vue.filter('truncate', function (text: string, stop: number) {
     return (stop+3 < text.length) ? text.slice(0, stop)+'...' : text
 })
+
+Vue.filter('convert-time', function(time) {
+    const time12 = (Number(time.substr(0,2)) % 12 || 12 ) + time.substr(2,3)
+    
+    if (Number(time.substr(0,2))<12) {
+      return time12 +' AM'
+    } else {
+      return time12 +' PM'
+    }  
+})

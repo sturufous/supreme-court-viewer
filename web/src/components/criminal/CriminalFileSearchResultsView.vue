@@ -44,13 +44,13 @@
                     <b-button
                         style="font-size:16px; font-weight: bold; border: none;" 
                         size="sm" 
-                        @click="OpenCriminalFilePage(data.item['File Id'])"                        
+                        @click="OpenCriminalFilePage(data.item.fileId)"                        
                         variant="outline-primary text-criminal" 
                         class="mr-2">                            
                             {{data.value}}
                     </b-button>
                 </template>
-                <template  v-slot:cell(Participants)="data">
+                <template  v-slot:cell(participants)="data">
                     <span v-for="(participant, index) in data.value" v-bind:key="index" style= "white-space: pre-line">
                         {{ participant }} <br>
                     </span>
@@ -64,8 +64,8 @@
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import * as _ from 'underscore';
-import {criminalFileInformationType, fileSearchCriminalInfoType} from '../../types/criminal';
-import {inputNamesType} from '../../types/common';
+import {criminalFileInformationType, fileSearchCriminalInfoType} from '@/types/criminal';
+import {inputNamesType} from '@/types/common';
 import "@store/modules/CommonInformation";
 const commonState = namespace("CommonInformation");
 import "@store/modules/CriminalFileInformation";
@@ -93,14 +93,13 @@ export default class CriminalFileSearchResultsView extends Vue {
     isDataReady = false;
     errorCode=0
     errorText=''
-    fileInformation = {};
     
     fields =  
     [        
-        {key:'File Number',             tdClass: 'border-top'},
-        {key:'Participants',        tdClass: 'border-top'},
-        {key:'Next Appearance',        tdClass: 'border-top'},
-        {key:'File Id',             tdClass: 'border-top'}
+        {key:'fileNumber',      label:'File Number',          tdClass: 'border-top'},
+        {key:'participants',    label:'Participants',      tdClass: 'border-top'},
+        {key:'nextAppearance',  label:'Next Appearance',       tdClass: 'border-top'},
+        {key:'fileId',          label:'File Id',          tdClass: 'border-top'}
     ];
 
      mounted() {
@@ -128,11 +127,11 @@ export default class CriminalFileSearchResultsView extends Vue {
                                 this.UpdateDisplayName({'lastName': lastName, 'givenName': firstName});
                                 participantInfo.push(this.displayName);
                             }
-                            criminalListInfo.Participants = participantInfo;
-                            criminalListInfo["File Number"] = jcriminalList.fileNumberTxt
-                            criminalListInfo["File Id"] = jcriminalList.justinNo;
-                            criminalListInfo["Next Appearance"] = Vue.filter('beautify-date')(jcriminalList.nextApprDt);
-                            criminalListInfo["Level"] = CourtLevel[jcriminalList.courtLevelCd];                            
+                            criminalListInfo.participants = participantInfo;
+                            criminalListInfo.fileNumber = jcriminalList.fileNumberTxt
+                            criminalListInfo.fileId = jcriminalList.justinNo;
+                            criminalListInfo.nextAppearance = Vue.filter('beautify-date')(jcriminalList.nextApprDt);
+                            criminalListInfo.level = CourtLevel[jcriminalList.courtLevelCd];                            
                             this.criminalList.push(criminalListInfo);
                         }                               
                         if(this.criminalList.length)
@@ -157,7 +156,7 @@ export default class CriminalFileSearchResultsView extends Vue {
     }
 
     get SortedList() {                
-        return  _.sortBy(this.criminalList, 'Next Appearance').reverse()
+        return  _.sortBy(this.criminalList, 'nextAppearance').reverse()
     }
 
     public navigateToLandingPage() {

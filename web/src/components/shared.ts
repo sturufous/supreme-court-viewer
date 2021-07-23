@@ -1,4 +1,4 @@
-import { CourtDocumentType, DocumentData } from "../types/shared";
+import { CourtDocumentType, DocumentData } from "@/types/shared";
 import base64url from "base64url";
 
 export default {

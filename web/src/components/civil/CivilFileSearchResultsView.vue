@@ -50,7 +50,7 @@
                             {{data.value}}
                     </b-button>
                 </template>            
-                <template  v-slot:cell(Parties)="data">
+                <template  v-slot:cell(parties)="data">
                     <span v-for="(party, index) in data.value" v-bind:key="index" style= "white-space: pre-line">
                         {{ party }} <br>
                     </span>
@@ -64,8 +64,8 @@
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import * as _ from 'underscore';
-import {civilFileInformationType, fileSearchCivilInfoType} from '../../types/civil';
-import {inputNamesType} from '../../types/common';
+import {civilFileInformationType, fileSearchCivilInfoType} from '@/types/civil';
+import {inputNamesType} from '@/types/common';
 import "@store/modules/CommonInformation";
 const commonState = namespace("CommonInformation");
 import "@store/modules/CivilFileInformation";
@@ -93,13 +93,12 @@ export default class CivilFileSearchResultsView extends Vue {
     isDataReady = false;
     errorCode=0
     errorText=''
-    fileInformation = {};
     
     fields =  
     [        
-        {key:'File Id',             tdClass: 'border-top'},        
-        {key:'Parties',             tdClass: 'border-top'},
-        {key:'Level',               tdClass: 'border-top'}
+        {key:'fileId',  label:'File Id',  tdClass: 'border-top'},        
+        {key:'parties', label:'Parties',  tdClass: 'border-top'},
+        {key:'level',   label:'Level',    tdClass: 'border-top'}
     ];
 
     mounted() {      
@@ -132,9 +131,9 @@ export default class CivilFileSearchResultsView extends Vue {
                                 const roleDsc = (jParty.leftRightCd == "R")? rightRole: leftRole;
                                 partyInfo.push(this.displayName + " (" + roleDsc + ")");
                             }
-                            civilListInfo.Parties = partyInfo;
-                            civilListInfo["File Id"] = jcivilList.physicalFileId;
-                            civilListInfo["Level"] = CourtLevel[jcivilList.courtLevelCd];
+                            civilListInfo.parties = partyInfo;
+                            civilListInfo.fileId = jcivilList.physicalFileId;
+                            civilListInfo.level = CourtLevel[jcivilList.courtLevelCd];
                             this.civilList.push(civilListInfo);                            
                         }                        
 
@@ -164,7 +163,7 @@ export default class CivilFileSearchResultsView extends Vue {
     }
 
     get SortedList() {                
-        return  _.sortBy(this.civilList, 'File Id')
+        return  _.sortBy(this.civilList, 'fileId')
     }
 
     public navigateToLandingPage() {

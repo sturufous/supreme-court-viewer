@@ -11,14 +11,14 @@
         <b-nav-text
             class="mt-2 ml-1 mr-2"
             style="font-size: 11px;">
-              {{agencyLocation.Name}} 
-              <span v-if="agencyLocation.Code"> 
-                ({{agencyLocation.Code}}) 
+              {{agencyLocation.name}} 
+              <span v-if="agencyLocation.code"> 
+                ({{agencyLocation.code}}) 
               </span>
         </b-nav-text>
 
         <b-nav-text class="text-muted mr-3" style="margin-top: 8px; font-size: 11px;">
-            {{agencyLocation.Region}}
+            {{agencyLocation.region}}
         </b-nav-text>
 
         <b-dropdown class="mt-1 mr-2" no-caret right variant="white"> 
@@ -38,14 +38,14 @@
             <b-dropdown-item-button
                 disabled
                 v-for="leftParty in leftPartiesInfo"
-                v-bind:key="leftParty.Index"
-            >{{leftParty.Name}}</b-dropdown-item-button>
+                v-bind:key="leftParty.index"
+            >{{leftParty.name}}</b-dropdown-item-button>
             <b-dropdown-divider></b-dropdown-divider>
             <b-dropdown-item-button 
                 disabled
                 v-for="rightParty in rightPartiesInfo"
-                v-bind:key="rightParty.Index"
-            >{{rightParty.Name}}</b-dropdown-item-button>
+                v-bind:key="rightParty.index"
+            >{{rightParty.name}}</b-dropdown-item-button>
         </b-dropdown>     
  
         <b-nav-text  style="margin-top: 4px;font-size: 12px;" variant="white">
@@ -70,8 +70,8 @@
                 <b-button style="font-size: 12px; padding: 5px 5px;" 
                           variant="secondary" 
                           v-b-tooltip.hover.left 
-                          :title='restriction["Full Name"]'>
-                    {{restriction["Adj Restriction"]}}
+                          :title='restriction.fullName'>
+                    {{restriction.adjRestriction}}
                 </b-button>
             </b-dropdown-item-button>
         </b-nav-item-dropdown>
@@ -111,7 +111,8 @@
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import "@store/modules/CivilFileInformation";
-import {civilFileInformationType} from '../../types/civil';
+import {civilFileInformationType, partiesInfoType} from '@/types/civil';
+import { adjudicatorRestrictionsInfoType } from "@/types/common";
 const civilState = namespace("CivilFileInformation");
 
 @Component
@@ -125,13 +126,13 @@ export default class CivilHeader extends Vue {
   fileNumberText;
   sheriffComment;
   activityClassCode;
-  agencyLocation = {Name:'', Code:'0', Region:'' };
+  agencyLocation = {name:'', code:'0', region:'' };
   isMounted = false;
   isSealed = false;
   partyDisplayedTxt;
-  leftPartiesInfo;
-  rightPartiesInfo; 
-  adjudicatorRestrictionsInfo;
+  leftPartiesInfo: partiesInfoType[] = [];
+  rightPartiesInfo: partiesInfoType[] = []; 
+  adjudicatorRestrictionsInfo: adjudicatorRestrictionsInfoType[] = [];
   activityClassCodeMapping = {
       S: 'color: #21B851;',
       R: 'color: #17A5E7;',
@@ -150,9 +151,9 @@ export default class CivilHeader extends Vue {
       const data = this.civilFileInformation.detailsData;
       this.fileNumberText = data.fileNumberTxt;
       this.activityClassCode = data.activityClassCd;      
-      this.agencyLocation.Name = data.homeLocationAgencyName;
-      this.agencyLocation.Code = data.homeLocationAgencyCode;
-      this.agencyLocation.Region = data.homeLocationRegionName;
+      this.agencyLocation.name = data.homeLocationAgencyName;
+      this.agencyLocation.code = data.homeLocationAgencyCode;
+      this.agencyLocation.region = data.homeLocationRegionName;
       this.partyDisplayedTxt = data.socTxt;
       this.sheriffComment = data.sheriffCommentText? data.sheriffCommentText: '';
       this.isSealed = this.civilFileInformation.isSealed;
