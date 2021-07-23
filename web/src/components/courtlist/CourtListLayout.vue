@@ -273,13 +273,13 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
+import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import CivilAppearanceDetails from '@components/civil/CivilAppearanceDetails.vue';
 import * as _ from 'underscore';
 import CriminalAppearanceDetails from '@components/criminal/CriminalAppearanceDetails.vue';
 import {criminalFileInformationType, criminalAppearanceInfoType} from '@/types/criminal';
-import {courtListInformationInfoType, civilListInfoType, criminalListInfoType, courtListInfoType} from '@/types/courtlist';
+import {courtListInformationInfoType, civilListInfoType, courtListInfoType} from '@/types/courtlist';
 import {civilFileInformationType, civilAppearanceInfoType} from '@/types/civil';
 import {inputNamesType, durationType, iconInfoType, iconStyleType} from '@/types/common'
 import "@store/modules/CommonInformation";

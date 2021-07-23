@@ -80,7 +80,7 @@
     import '@store/modules/CivilFileInformation';
     const civilState = namespace('CivilFileInformation');
     import '@store/modules/CriminalFileInformation';
-    const criminalState = namespace('CriminalFileInformation');    
+    const criminalState = namespace('CriminalFileInformation');
     import {criminalFileInformationType, fileSearchCriminalInfoType} from '@/types/criminal';
     import {civilFileInformationType, fileSearchCivilInfoType} from '@/types/civil';
     import {courtRoomsAndLocationsInfoType, locationInfoType} from '@/types/courtlist';   
@@ -94,7 +94,7 @@
 
         @criminalState.Action
         public UpdateCriminalFile!: (newCriminalFileInformation: criminalFileInformationType) => void
-                 
+
         selected = 'criminal';
         selectedFileSearch = 'criminal';
         options= [
@@ -140,7 +140,7 @@
         }
 
         mounted () { 
-            this.getListOfAvailableCourts();
+            this.getListOfAvailableCourts();            
         }
 
         public getListOfAvailableCourts(): void 

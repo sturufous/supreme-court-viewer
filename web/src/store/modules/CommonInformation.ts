@@ -14,6 +14,7 @@ class CommonInformation extends VuexModule {
   public statusStyle = ''
   public iconStyles: iconStyleType[] = [];
   public courtRoomsAndLocations: courtRoomsJsonInfoType[] = [];
+  public enableArchive = false;
 
   @Mutation
   public setCourtRoomsAndLocations(courtRoomsAndLocations): void {   
@@ -22,7 +23,7 @@ class CommonInformation extends VuexModule {
   @Action
   public UpdateCourtRoomsAndLocations(newCourtRoomsAndLocations) { 
     this.context.commit('setCourtRoomsAndLocations', newCourtRoomsAndLocations)
-  }
+  } 
 
   @Mutation
   public setDisplayName(displayName): void {   
@@ -133,7 +134,18 @@ class CommonInformation extends VuexModule {
       } 
     }   
     this.context.commit('setIconStyle', iconStyles)
-  }  
+  }
+
+  @Mutation
+  public setEnableArchive(newEnableArchive): void {   
+    this.enableArchive = newEnableArchive;
+  }
+
+  @Action
+  public UpdateEnableArchive(newEnableArchive): void {
+    this.context.commit('setEnableArchive', newEnableArchive)
+  }
+
 }
 
 export default CommonInformation 

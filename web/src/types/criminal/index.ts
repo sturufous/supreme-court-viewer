@@ -241,6 +241,8 @@ export interface fileSearchCriminalInfoType {
     participants: string[];
     fileId: string;
     level: string;
+    fileNumber: string;
+    nextAppearance: string;
 }
 
 export interface initiatingDocument {

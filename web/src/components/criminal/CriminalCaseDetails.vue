@@ -39,7 +39,7 @@
                         {{selectedSideBar}}
                     </h2>         
                     <custom-overlay v-if="isDataReady" :show="!downloadCompleted" style="padding: 0 1rem; margin-left:auto; margin-right:2rem;">
-                        <b-button @click="downloadDocuments()" size="md" variant="info" style="padding: 0 1rem; margin-left:auto; margin-right:2rem;"> Download All Documents </b-button>
+                        <b-button v-if="enableArchive" @click="downloadDocuments()" size="md" variant="info" style="padding: 0 1rem; margin-left:auto; margin-right:2rem;"> Download All Documents </b-button>
                     </custom-overlay>
             </b-row>  
 
@@ -128,6 +128,9 @@ export default class CriminalCaseDetails extends Vue {
     
     @commonState.State
     public displayName!: string;
+
+    @commonState.State
+    public enableArchive!: boolean;
     
     @criminalState.State
     public criminalFileInformation!: criminalFileInformationType

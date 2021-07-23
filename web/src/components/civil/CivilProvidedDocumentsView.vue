@@ -5,7 +5,7 @@
             <b-row>         
                 <h3 class="ml-5 my-1 p-0 font-weight-normal" v-if="!showSections['Provided Documents']"> Provided Documents ({{NumberOfDocuments}}) </h3>
                 <custom-overlay :show="!downloadCompleted" style="padding: 0 1rem; margin-left:auto; margin-right:2rem;">
-                    <b-button @click="downloadDocuments()" size="sm" variant="success" style="padding: 0 1rem; margin-left:auto; margin-right:2rem;"> Download Selected </b-button>
+                    <b-button v-if="enableArchive" @click="downloadDocuments()" size="sm" variant="success" style="padding: 0 1rem; margin-left:auto; margin-right:2rem;"> Download Selected </b-button>
                 </custom-overlay>
             </b-row>
             <hr class="mx-3 bg-light" style="height: 5px;"/>                   
@@ -82,7 +82,7 @@
                         </b-button>                        
                     </template>
 
-                    <template v-slot:head(select) >                                  
+                    <template v-if="enableArchive" v-slot:head(select) >                                  
                         <b-form-checkbox                            
                             class="m-0"
                             v-model="allDocumentsChecked"
@@ -90,7 +90,7 @@
                             size="sm"/>
                     </template>
 
-                    <template v-slot:cell(select)="data" >                                  
+                    <template v-if="enableArchive" v-slot:cell(select)="data" >                                  
                         <b-form-checkbox
                             size="sm"
                             class="m-0"
@@ -144,10 +144,11 @@ import { Component, Vue} from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
 import base64url from "base64url";
 import '@store/modules/CivilFileInformation';
+import "@store/modules/CommonInformation";
 import {civilFileInformationType, referenceDocumentsInfoType} from '@/types/civil';
 import { CourtDocumentType, DocumentData } from '@/types/shared';
 const civilState = namespace('CivilFileInformation');
-
+const commonState = namespace("CommonInformation");
 import CustomOverlay from "../CustomOverlay.vue"
 import shared from "../shared"
 import { archiveInfoType, documentRequestsInfoType } from '@/types/common';
@@ -159,6 +160,9 @@ enum fieldTab {Categories=0}
     }
 })
 export default class CivilProvidedDocumentsView extends Vue {
+
+    @commonState.State
+    public enableArchive!: boolean;
 
     @civilState.State
     public showSections

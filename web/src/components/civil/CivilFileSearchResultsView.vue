@@ -163,7 +163,7 @@ export default class CivilFileSearchResultsView extends Vue {
     }
 
     get SortedList() {                
-        return  _.sortBy(this.civilList, 'File Id')
+        return  _.sortBy(this.civilList, 'fileId')
     }
 
     public navigateToLandingPage() {

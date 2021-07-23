@@ -5,7 +5,7 @@
             <b-row class="ml-0">         
                 <h3 class="mx-4 font-weight-normal"> Documents ({{NumberOfDocuments}}) </h3>
                 <custom-overlay :show="!downloadCompleted" style="padding: 0 1rem; margin-left:auto; margin-right:2rem;">
-                    <b-button @click="downloadDocuments()" size="sm" variant="success" style="padding: 0 1rem; margin-left:auto; margin-right:2rem;"> Download Selected </b-button>
+                    <b-button v-if="enableArchive" @click="downloadDocuments()" size="sm" variant="success" style="padding: 0 1rem; margin-left:auto; margin-right:2rem;"> Download Selected </b-button>
                 </custom-overlay>
             </b-row>
             <hr class="mx-3 mb-0 bg-light" style="height: 5px;"/>         
@@ -58,7 +58,7 @@
                          <b class="text-danger" >{{getNameOfDateInTabs}}</b>
                     </template>
 
-                    <template v-slot:head(select) >                                  
+                    <template v-if="enableArchive" v-slot:head(select) >                                  
                         <b-form-checkbox                            
                             class="m-0"
                             v-model="allDocumentsChecked"
@@ -66,7 +66,7 @@
                             size="sm"/>
                     </template>
 
-                    <template v-slot:[`cell(${fields[fieldsTab][0].key})`]="data" >                                  
+                    <template v-if="enableArchive" v-slot:[`cell(${fields[fieldsTab][0].key})`]="data" >                                  
                         <b-form-checkbox
                             size="sm"
                             class="m-0"
@@ -145,7 +145,10 @@ export default class CriminalDocumentsView extends Vue {
     public activeCriminalParticipantIndex
     
     @commonState.State
-    public displayName!: string;    
+    public displayName!: string;  
+    
+    @commonState.State
+    public enableArchive!: boolean;
     
     @criminalState.Action
     public UpdateActiveCriminalParticipantIndex!: (newActiveCriminalParticipantIndex: string) => void

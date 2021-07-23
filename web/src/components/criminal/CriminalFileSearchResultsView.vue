@@ -44,13 +44,13 @@
                     <b-button
                         style="font-size:16px; font-weight: bold; border: none;" 
                         size="sm" 
-                        @click="OpenCriminalFilePage(data.item['File Id'])"                        
+                        @click="OpenCriminalFilePage(data.item.fileId)"                        
                         variant="outline-primary text-criminal" 
                         class="mr-2">                            
                             {{data.value}}
                     </b-button>
                 </template>
-                <template  v-slot:cell(Participants)="data">
+                <template  v-slot:cell(participants)="data">
                     <span v-for="(participant, index) in data.value" v-bind:key="index" style= "white-space: pre-line">
                         {{ participant }} <br>
                     </span>
@@ -128,10 +128,10 @@ export default class CriminalFileSearchResultsView extends Vue {
                                 participantInfo.push(this.displayName);
                             }
                             criminalListInfo.participants = participantInfo;
-                            criminalListInfo["File Number"] = jcriminalList.fileNumberTxt
+                            criminalListInfo.fileNumber = jcriminalList.fileNumberTxt
                             criminalListInfo.fileId = jcriminalList.justinNo;
-                            criminalListInfo["Next Appearance"] = Vue.filter('beautify-date')(jcriminalList.nextApprDt);
-                            criminalListInfo["Level"] = CourtLevel[jcriminalList.courtLevelCd];                            
+                            criminalListInfo.nextAppearance = Vue.filter('beautify-date')(jcriminalList.nextApprDt);
+                            criminalListInfo.level = CourtLevel[jcriminalList.courtLevelCd];                            
                             this.criminalList.push(criminalListInfo);
                         }                               
                         if(this.criminalList.length)
@@ -156,7 +156,7 @@ export default class CriminalFileSearchResultsView extends Vue {
     }
 
     get SortedList() {                
-        return  _.sortBy(this.criminalList, 'Next Appearance').reverse()
+        return  _.sortBy(this.criminalList, 'nextAppearance').reverse()
     }
 
     public navigateToLandingPage() {

@@ -280,7 +280,7 @@ import shared from "../shared";
 import { CourtDocumentType, DocumentData } from '@/types/shared';
 import "@store/modules/CommonInformation";
 import "@store/modules/CivilFileInformation";
-import {appearanceAdditionalInfoType, civilAppearanceInfoType, appearancePartiesType, appearanceMethodsType, appearanceDocumentsType, civilFileInformationType, civilAppearanceDetailsInfoType} from '@/types/civil';
+import {appearanceAdditionalInfoType, civilAppearanceInfoType, appearancePartiesType, appearanceMethodsType, appearanceDocumentsType, civilAppearanceDetailsInfoType} from '@/types/civil';
 import {courtRoomsJsonInfoType, inputNamesType } from '@/types/common';
 const civilState = namespace("CivilFileInformation");
 const commonState = namespace("CommonInformation");
