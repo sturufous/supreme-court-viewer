@@ -8,10 +8,11 @@ export const SessionManager = {
             const enableArchive = false //response.data.enableArchive;
             store.commit("CommonInformation/setEnableArchive",enableArchive);
             
-            return { enableArchive };
+            return true;
         }
         catch (error) {
             console.log(error);  
+            return false;
         }
     }
 }
