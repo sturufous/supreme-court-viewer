@@ -38,6 +38,7 @@ namespace Scv.Api.Infrastructure
         {
             services.AddHttpClient<FileServicesClient>(client =>
             {
+                client.Timeout = TimeSpan.FromMinutes(5);
                 client.DefaultRequestHeaders.Authorization = new BasicAuthenticationHeaderValue(
                     configuration.GetNonEmptyValue("FileServicesClient:Username"),
                     configuration.GetNonEmptyValue("FileServicesClient:Password"));
