@@ -26,7 +26,7 @@
                 <template v-slot:cell(status)="data" >                   
                     <b-badge 
                         variant="primary" 
-                        style="font-weight: normal; font-size: 16px;"> 
+                        :style="data.field.cellStyle"> 
                         {{ data.value }}
                     </b-badge>
                 </template>
@@ -56,7 +56,7 @@ export default class  CivilAdjudicatorRestrictions extends Vue {
 
   fields = [
       {key:'adjudicator',   label:'Adjudicator',    sortable:true, tdClass: 'border-top',  headerStyle:'text-primary'},       
-      {key:'status',        label:'Status',         sortable:true, tdClass: 'border-top',  headerStyle:'text-primary'},
+      {key:'status',        label:'Status',         sortable:true, tdClass: 'border-top',  headerStyle:'text-primary', cellStyle: 'font-weight: normal; font-size: 16px;'},
       {key:'appliesTo',     label:'Applies to',     sortable:true, tdClass: 'border-top',  headerStyle:'text-primary'}           
   ];
   

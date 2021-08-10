@@ -22,8 +22,21 @@
                             <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
                         </template>                
                         <template v-for="(field,index) in fields" v-slot:[`cell(${field.key})`]="data" >
-                            <span v-bind:key="index" :style="field.cellStyle" v-if="data.field.key != 'counsel'">  {{ data.value }} </span>
-                            <span v-bind:key="index" :style="field.cellStyle" v-if="data.field.key == 'counsel'"><span v-for="(counsel, counselIndex) in data.value"  v-bind:key="counselIndex" style= "white-space: pre-line" >CEIS: {{ counsel }}</span> </span>
+                            <span 
+                                v-bind:key="index" 
+                                :style="field.cellStyle" 
+                                v-if="data.field.key != 'counsel'">  {{ data.value }} </span>
+                            <span 
+                                v-bind:key="index" 
+                                :style="field.cellStyle" 
+                                v-if="data.field.key == 'counsel'">
+                                <span 
+                                    v-for="(counsel, counselIndex) in data.value"  
+                                    v-bind:key="counselIndex" 
+                                    style= "white-space: pre-line" >
+                                    CEIS: {{ counsel }}
+                                </span>
+                            </span>
                         </template>
                         
                     </b-table>
@@ -51,8 +64,16 @@
                         </template>                
                         <template v-for="(field,index) in fields" v-slot:[`cell(${field.key})`]="data" >
                             <span v-bind:key="index" :style="field.cellStyle" v-if="data.field.key != 'counsel'">  {{ data.value }} </span>
-                            <span v-bind:key="index" :style="field.cellStyle" v-if="data.field.key == 'counsel'">
-                                <span v-for="(counsel, counselIndex) in data.value"  v-bind:key="counselIndex" style= "white-space: pre-line" >CEIS: {{ counsel }}<br></span>
+                            <span 
+                                v-bind:key="index" 
+                                :style="field.cellStyle" 
+                                v-if="data.field.key == 'counsel'">
+                                <span 
+                                    v-for="(counsel, counselIndex) in data.value"  
+                                    v-bind:key="counselIndex" 
+                                    style= "white-space: pre-line" >
+                                    CEIS: {{ counsel }}<br>
+                                </span>
                             </span>
                         </template>
                         

@@ -48,7 +48,12 @@
 
             <template v-slot:cell(date)="data" >
                 <span :class="data.field.cellClass" :style="data.field.cellStyle"> 
-                    <b-button style="transform: translate(-2px,-7px); font-size:14px;" size="sm" @click="OpenDetails(data);data.toggleDetails();" variant="outline-primary border-white  text-info" class="mr-2">
+                    <b-button 
+                        style="transform: translate(-2px,-7px); font-size:14px;" 
+                        size="sm" 
+                        @click="OpenDetails(data);data.toggleDetails();" 
+                        variant="outline-primary border-white  text-info" 
+                        class="mr-2">
                         <b-icon-caret-right-fill v-if="!data.item['_showDetails']"></b-icon-caret-right-fill>
                         <b-icon-caret-down-fill v-if="data.item['_showDetails']"></b-icon-caret-down-fill>
                         {{data.item.formattedDate}}

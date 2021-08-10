@@ -66,11 +66,11 @@
                         </span>
                     </template>
 
-                    <template v-slot:[`cell(${fields[fieldsTab][entryDatePlace[fieldsTab]].key})`]="data" >                        
+                    <!-- <template v-slot:[`cell(${fields[fieldsTab][entryDatePlace[fieldsTab]].key})`]="data" >                        
                         <span :style="data.field.cellStyle">
                             {{ data.value | beautify-date-time}}
                         </span>
-                    </template>                     
+                    </template>                      -->
 
                     <template v-slot:[`cell(${fields[fieldsTab][documentPlace[fieldsTab]].key})`]="data" >
                         <b-button                             
@@ -184,9 +184,9 @@ export default class CivilProvidedDocumentsView extends Vue {
     sortDesc = false;
     categories: string[] = []; 
     fieldsTab = fieldTab.Categories;
-    documentPlace = [2]
-    appearanceDatePlace = [3]
-    entryDatePlace = [4]
+    documentPlace = [3]
+    appearanceDatePlace = [4]
+    entryDatePlace = [5]
     selectedDocuments = {} as archiveInfoType; 
     downloadCompleted = true;
     allDocumentsChecked = false;     
@@ -195,10 +195,10 @@ export default class CivilProvidedDocumentsView extends Vue {
         [
             {key:'select',                   label:'',                sortable:false, headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},
             {key:'partyName',                label:'Party Name',      sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
-            {key:'nonPartyName',             label:'Non Party Name',  sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
+            {key:'nonPartyName',             label:'Non Party',  sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
             {key:'referenceDocumentTypeDsc', label:'Document Type',   sortable:false, headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 16px;text-align:left;'},
             {key:'appearanceDate',           label:'Appearance Date', sortable:true,  headerStyle:'text',          cellStyle:'font-size: 16px;'},
-            {key:'enterDtm',                 label:'Created Date',    sortable:true,  headerStyle:'text',          cellStyle:'font-size: 16px;'},
+            // {key:'enterDtm',                 label:'Created Date',    sortable:true,  headerStyle:'text',          cellStyle:'font-size: 16px;'},
             {key:'descriptionText',          label:'Description',     sortable:false, headerStyle:'text',          cellStyle:'font-size: 12px;'}
         ]         
     ];

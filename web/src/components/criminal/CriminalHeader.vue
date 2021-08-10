@@ -94,7 +94,7 @@
                     <template v-slot:cell()="data">
                         <span style="transform: translate(0, +6px)">{{ data.value }}</span>
                     </template>    
-                    <template v-slot:[`cell(${fields[0].key})`]="data" >
+                    <template v-slot:cell(banParticipant)="data" >
                         <span style="transform: translate(0, +5px)" v-if="data.item.comment.length == 0">{{ data.value }}</span>
                         <b-button
                             class="text-success bg-white border-white"

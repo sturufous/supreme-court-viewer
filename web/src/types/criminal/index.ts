@@ -238,11 +238,18 @@ export interface showSectionsInfoType {
 }
 
 export interface fileSearchCriminalInfoType {
-    participants: string[];
+    participants: participantInfoType[];
     fileId: string;
     level: string;
     fileNumber: string;
     nextAppearance: string;
+    isChecked:boolean;
+    today: boolean;
+}
+
+export interface participantInfoType {
+    name: string;
+    charge: string;
 }
 
 export interface initiatingDocument {
