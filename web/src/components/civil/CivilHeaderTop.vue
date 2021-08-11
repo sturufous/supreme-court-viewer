@@ -15,7 +15,7 @@
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import '@store/modules/CivilFileInformation';
-import {civilFileInformationType} from '../../types/civil';
+import {civilFileInformationType} from '@/types/civil';
 const civilState = namespace('CivilFileInformation');
 
 @Component
@@ -24,8 +24,8 @@ export default class CivilHeaderTop extends Vue {
   @civilState.State
   public civilFileInformation!: civilFileInformationType;
   
-  courtLevelDescription;
-  courtClassDescription;
+  courtLevelDescription = '';
+  courtClassDescription = '';
   isMounted = false;
 
   mounted() {

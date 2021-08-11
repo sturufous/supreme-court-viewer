@@ -30,7 +30,6 @@
     },
     "IIS Express (launchBrowser = false)": {
       "commandName": "IISExpress",
-      "launchBrowser": false,
       "launchUrl": "api/",
       "environmentVariables": {
         "CORS_DOMAIN": "http://localhost:1337",

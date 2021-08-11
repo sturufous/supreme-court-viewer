@@ -11,14 +11,14 @@
         <b-nav-text
             class="mt-2 ml-1 mr-2"
             style="font-size: 11px;">
-              {{agencyLocation.Name}} 
-              <span v-if="agencyLocation.Code"> 
-                ({{agencyLocation.Code}}) 
+              {{agencyLocation.name}} 
+              <span v-if="agencyLocation.code"> 
+                ({{agencyLocation.code}}) 
               </span>
         </b-nav-text>
 
         <b-nav-text class="text-muted mr-3 mt-2" style="font-size: 11px;">
-            {{agencyLocation.Region}}
+            {{agencyLocation.region}}
         </b-nav-text>       
 
         <b-nav-item-dropdown class="mr-3 mt-1" right no-caret size="sm">
@@ -34,9 +34,9 @@
             </template>
             <b-dropdown-item-button
                 v-for="participant in SortedParticipants"
-                :key="participant['Index']"
-                v-on:click="setActiveParticipantIndex(participant['Index'])"
-            >{{participant['Name']}}</b-dropdown-item-button>
+                :key="participant.index"
+                v-on:click="setActiveParticipantIndex(participant.index)"
+            >{{participant.name}}</b-dropdown-item-button>
         </b-nav-item-dropdown>
 
         <b-nav-text style="margin-top: 4px;font-size: 12px;" variant="white">
@@ -61,8 +61,8 @@
                   <b-button style="font-size: 12px; padding: 5px 5px;" 
                             variant="secondary" 
                             v-b-tooltip.hover.left 
-                            :title='restriction["Full Name"]'>
-                      {{restriction["Adj Restriction"]}}
+                            :title='restriction.fullName'>
+                      {{restriction.adjRestriction}}
                   </b-button>
             </b-dropdown-item-button>
         </b-nav-item-dropdown>
@@ -94,13 +94,13 @@
                     <template v-slot:cell()="data">
                         <span style="transform: translate(0, +6px)">{{ data.value }}</span>
                     </template>    
-                    <template v-slot:[`cell(${fields[0].key})`]="data" >
-                        <span style="transform: translate(0, +5px)" v-if="data.item.Comment.length == 0">{{ data.value }}</span>
+                    <template v-slot:cell(banParticipant)="data" >
+                        <span style="transform: translate(0, +5px)" v-if="data.item.comment.length == 0">{{ data.value }}</span>
                         <b-button
                             class="text-success bg-white border-white"
                             v-else
                             v-b-tooltip.hover.left
-                            v-b-tooltip.hover.html="data.item.Comment"> 
+                            v-b-tooltip.hover.html="data.item.comment"> 
                                 {{ data.value }} 
                         </b-button>
                     </template>
@@ -123,8 +123,8 @@ import * as _ from 'underscore';
 import { namespace } from "vuex-class";
 import "@store/modules/CriminalFileInformation";
 import "@store/modules/CommonInformation";
-import {bansInfoType, participantListInfoType, criminalFileInformationType} from '../../types/criminal';
-import {inputNamesType, adjudicatorRestrictionsInfoType } from '../../types/common'
+import {bansInfoType, participantListInfoType, criminalFileInformationType} from '@/types/criminal';
+import {inputNamesType, adjudicatorRestrictionsInfoType } from '@/types/common'
 const criminalState = namespace("CriminalFileInformation");
 const commonState = namespace("CommonInformation");
 
@@ -153,19 +153,17 @@ export default class CriminalHeader extends Vue {
   maximumFullNameLength = 15;
   numberOfParticipants = 0;
   fileNumberText;
-  agencyLocation = {Name:'', Code:'0', Region:'' };
-  adjudicatorRestrictionsJson;
+  agencyLocation = {name:'', code:'0', region:'' };
   isMounted = false;
-  participantJson;
   
   fields =  
   [
-      {key:'Ban Participant', sortable:false, tdClass: 'border-top',  headerStyle:'table-borderless text-primary'},       
-      {key:'Ban Type',        sortable:false, tdClass: 'border-top',  headerStyle:'text-primary'},
-      {key:'Order Date',      sortable:false, tdClass: 'border-top',  headerStyle:'text-primary'},
-      {key:'Act',             sortable:false, tdClass: 'border-top',  headerStyle:'text-primary'},       
-      {key:'Sub',             sortable:false, tdClass: 'border-top',  headerStyle:'text-primary'},
-      {key:'Description',     sortable:false, tdClass: 'border-top',  headerStyle:'text-primary'},
+      {key:'banParticipant',   label:'Ban Participant', sortable:false, tdClass: 'border-top',  headerStyle:'table-borderless text-primary'},       
+      {key:'banType',          label:'Ban Type',        sortable:false, tdClass: 'border-top',  headerStyle:'text-primary'},
+      {key:'orderDate',        label:'Order Date',      sortable:false, tdClass: 'border-top',  headerStyle:'text-primary'},
+      {key:'act',               label:'Act',             sortable:false, tdClass: 'border-top',  headerStyle:'text-primary'},       
+      {key:'sub',               label:'Sub',             sortable:false, tdClass: 'border-top',  headerStyle:'text-primary'},
+      {key:'description',       label:'Description',     sortable:false, tdClass: 'border-top',  headerStyle:'text-primary'},
            
   ];
 
@@ -176,24 +174,23 @@ export default class CriminalHeader extends Vue {
   public getHeaderInfo(): void {      
       const data = this.criminalFileInformation.detailsData;
       this.fileNumberText = data.fileNumberTxt;      
-      this.agencyLocation.Name = data.homeLocationAgencyName;
-      this.agencyLocation.Code = data.homeLocationAgencyCode;
-      this.agencyLocation.Region = data.homeLocationRegionName;
+      this.agencyLocation.name = data.homeLocationAgencyName;
+      this.agencyLocation.code = data.homeLocationAgencyCode;
+      this.agencyLocation.region = data.homeLocationRegionName;
       this.adjudicatorRestrictions = this.criminalFileInformation.adjudicatorRestrictionsInfo;
       this.participantList = this.criminalFileInformation.participantList
       this.bans = this.criminalFileInformation.bans
       this.numberOfParticipants = this.participantList.length - 1;
       this.isMounted = true; 
-      this.setActiveParticipantIndex(this.SortedParticipants[0].Index)
+      this.setActiveParticipantIndex(this.SortedParticipants[0].index)
   }
 
-  public setActiveParticipantIndex(index)
-  {                   
+  public setActiveParticipantIndex(index) {                   
       this.UpdateActiveCriminalParticipantIndex(index);  
   }	
 
   public getNameOfParticipant(num) {        
-      this.UpdateDisplayName({'lastName': this.participantList[num]["Last Name"], 'givenName': this.participantList[num]["First Name"]});
+      this.UpdateDisplayName({'lastName': this.participantList[num].lastName, 'givenName': this.participantList[num].firstName});
       return this.displayName;
   }
 
@@ -208,9 +205,8 @@ export default class CriminalHeader extends Vue {
      
   }
 
-  get SortedParticipants()
-  {         
-      return _.sortBy(this.participantList,(participant=>{return (participant["Last Name"]? participant["Last Name"].toUpperCase() : '')}))       
+  get SortedParticipants() {              
+      return _.sortBy(this.participantList,(participant=>{return (participant.lastName? participant.lastName.toUpperCase() : '')}))       
   }
 
 }

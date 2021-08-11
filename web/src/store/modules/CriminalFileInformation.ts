@@ -1,3 +1,4 @@
+import { participantSentencesDetailsInfoType } from '@/types/criminal';
 import { VuexModule, Module, Mutation, Action } from 'vuex-module-decorators'
 
 @Module({
@@ -8,7 +9,7 @@ class CriminalFileInformation extends VuexModule {
   public criminalFileInfoLoaded = false
   public activeCriminalParticipantIndex = 0
 
-  public criminalParticipantSentenceInformation = { }
+  public criminalParticipantSentenceInformation = {} as participantSentencesDetailsInfoType;
 
   public showSections = {
     'Case Details': true,
@@ -19,7 +20,7 @@ class CriminalFileInformation extends VuexModule {
     'Sentence/Order Details': false
   }
 
-  public appearanceInfo = {}
+  public criminalAppearanceInfo = {}
 
   @Mutation
   public setCriminalFile(criminalFileInformation): void {
@@ -73,13 +74,13 @@ class CriminalFileInformation extends VuexModule {
   }
 
   @Mutation
-  public setAppearanceInfo(appearanceInfo): void {
-    this.appearanceInfo = appearanceInfo
+  public setCriminalAppearanceInfo(criminalAppearanceInfo): void {
+    this.criminalAppearanceInfo = criminalAppearanceInfo
   }
 
   @Action
-  public UpdateAppearanceInfo(newAppearanceInfo): void {
-    this.context.commit('setAppearanceInfo', newAppearanceInfo)
+  public UpdateCriminalAppearanceInfo(newCriminalAppearanceInfo): void {
+    this.context.commit('setCriminalAppearanceInfo', newCriminalAppearanceInfo)
   }
 
 

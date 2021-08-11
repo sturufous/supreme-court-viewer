@@ -30,13 +30,13 @@
                     <template v-for="(field,index) in witnessFields" v-slot:[`head(${field.key})`]="data">
                         <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
                     </template> 
-                    <template v-slot:cell(Name)="data" >                        
-                        <span :class="data.field.cellStyle" >  {{ data.value }} </span>
-                        <span v-if="data.item['Agency']"> <br> ({{data.item.Agency}}: {{data.item['Pin Code']}}) </span>
+                    <template v-slot:cell(name)="data" >                        
+                        <span >  {{ data.value }} </span>
+                        <span v-if="data.item.agency"> <br> ({{data.item.agency}}: {{data.item.pinCode}}) </span>
                     </template>
 
-                    <template v-slot:cell(Required)="data" >                        
-                        <b-badge :class="data.field.cellStyle" style="font-weight: normal; font-size:16px" >  {{ data.value }} </b-badge>                    
+                    <template v-slot:cell(required)="data" >                        
+                        <b-badge class="text-white bg-danger font-weight-bold" :style="data.field.cellStyle" >  {{ data.value }} </b-badge>                    
                     </template>
 
                 </b-table>
@@ -53,7 +53,7 @@
                 borderless
                 :tbody-tr-class="totalBackground"
                 >
-                    <template  v-slot:cell(WitnessCountValue)="data">
+                    <template  v-slot:cell(witnessCountValue)="data">
                         <span >
                             <b > {{ data.value }}</b>
                         </span>                    
@@ -71,8 +71,9 @@ import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import "@store/modules/CriminalFileInformation";
 import "@store/modules/CommonInformation";
-import {witnessListInfoType, witnessCountInfoType, criminalFileInformationType} from '../../types/criminal';
-import {inputNamesType} from '../../types/common'
+import {witnessListInfoType, witnessCountInfoType, criminalFileInformationType} from '@/types/criminal';
+import {inputNamesType} from '@/types/common';
+import { witnessType } from "@/types/criminal/jsonTypes";
 const criminalState = namespace("CriminalFileInformation");
 const commonState = namespace("CommonInformation");
 
@@ -92,24 +93,24 @@ export default class CriminalWitnesses extends Vue {
     witnessCounts: witnessCountInfoType[] = [];
   
     isMounted = false;
-    witnessesJson;
+    witnessesJson: witnessType[] = [];
     numberOfTotalWitnesses = 0;
     numberOfPersonnelWitnesses = 0;
     numberOfCivilianWitnesses = 0;
     numberOfExpertWitnesses = 0;
-    sortBy = 'Name';
+    sortBy = 'name';
     sortDesc = false;   
     selectedType = 'Required Only';
 
     witnessFields = [
-        {key:'Name',         sortable:true, tdClass: 'border-top',  headerStyle:'text-primary',   cellStyle:'text-danger'},
-        {key:'Type',         sortable:true, tdClass: 'border-top',  headerStyle:'text-primary',   cellStyle:'text'},
-        {key:'Required',     sortable:true, tdClass: 'border-top',  headerStyle:'text-primary',   cellStyle:'text-white bg-danger font-weight-bold'}
+        {key:'name',        label:'Name',         sortable:true, tdClass: 'border-top text-danger',  headerStyle:'text-primary',   cellStyle:''},
+        {key:'type',        label:'Type',         sortable:true, tdClass: 'border-top',              headerStyle:'text-primary',   cellStyle:'text'},
+        {key:'required',    label:'Required',     sortable:true, tdClass: 'border-top',              headerStyle:'text-primary',   cellStyle:'font-weight: normal; font-size:16px'}
     ];
 
     witnessCountsFields = [
-        {key:"WitnessCountFieldName", tdClass: 'border-top',label: "Witness Count Field Name"},
-        {key:"WitnessCountValue", tdClass: 'border-top',label: "Witness Count Value"}
+        {key:"witnessCountFieldName", tdClass: 'border-top',label: "Witness Count Field Name"},
+        {key:"witnessCountValue",     tdClass: 'border-top',label: "Witness Count Value"}
     ];
 
     witnessDropDownFields = ['All Witnesses', 'Required Only', 'Personnel Only', 'Civilian Only', 'Expert Only']
@@ -131,44 +132,44 @@ export default class CriminalWitnesses extends Vue {
             const witnessInfo = {} as witnessListInfoType;
             const jWitness = this.witnessesJson[witnessIndex];
             
-            witnessInfo["First Name"] = jWitness.givenNm ? jWitness.givenNm : '';
-            witnessInfo["Last Name"] = jWitness.lastNm ? jWitness.lastNm : '';
-            this.UpdateDisplayName({'lastName': witnessInfo["Last Name"], 'givenName': witnessInfo["First Name"]});
-            witnessInfo["Name"] = this.displayName;            
-            witnessInfo["Type"] = jWitness.witnessTypeDsc? jWitness.witnessTypeDsc : '';
-            witnessInfo["Required"] = jWitness.requiredYN == "Y"? 'Required': '';
-            witnessInfo["Agency"] = jWitness.agencyDsc? jWitness.agencyDsc: '';
-            witnessInfo["Pin Code"] = jWitness.pinCodeTxt? jWitness.pinCodeTxt: '';
+            witnessInfo.firstName = jWitness.givenNm ? jWitness.givenNm : '';
+            witnessInfo.lastName = jWitness.lastNm ? jWitness.lastNm : '';
+            this.UpdateDisplayName({'lastName': witnessInfo.lastName, 'givenName': witnessInfo.firstName});
+            witnessInfo.name = this.displayName;            
+            witnessInfo.type = jWitness.witnessTypeDsc? jWitness.witnessTypeDsc : '';
+            witnessInfo.required = jWitness.requiredYN == "Y"? 'Required': '';
+            witnessInfo.agency = jWitness.agencyDsc? jWitness.agencyDsc: '';
+            witnessInfo.pinCode = jWitness.pinCodeTxt? jWitness.pinCodeTxt: '';
             if (jWitness.witnessTypeCd) {
                 if (jWitness.witnessTypeCd == 'PO' || jWitness.witnessTypeCd == 'PRO') {
                     this.numberOfPersonnelWitnesses += 1;
-                    witnessInfo["Type Category"] = 'Personnel'
+                    witnessInfo.typeCategory = 'Personnel'
                 } else if (jWitness.witnessTypeCd == 'CIV') {
                     this.numberOfCivilianWitnesses += 1;
-                    witnessInfo["Type Category"] = 'Civilian'
+                    witnessInfo.typeCategory = 'Civilian'
                 } else if (jWitness.witnessTypeCd == 'EXP') {
                     this.numberOfExpertWitnesses += 1;
-                    witnessInfo["Type Category"] = 'Expert'
+                    witnessInfo.typeCategory = 'Expert'
                 }
             }                                   
             this.witnessList.push(witnessInfo);
         }
         this.numberOfTotalWitnesses = this.witnessList.length;
         let countInfo = {} as witnessCountInfoType;
-        countInfo['WitnessCountFieldName'] = "Personnel Witnesses";
-        countInfo['WitnessCountValue'] = this.numberOfPersonnelWitnesses;
+        countInfo.witnessCountFieldName = "Personnel Witnesses";
+        countInfo.witnessCountValue = this.numberOfPersonnelWitnesses;
         this.witnessCounts.push(countInfo);
         countInfo = {} as witnessCountInfoType;
-        countInfo['WitnessCountFieldName'] = "Civilian Witnesses";
-        countInfo['WitnessCountValue'] = this.numberOfCivilianWitnesses;
+        countInfo.witnessCountFieldName = "Civilian Witnesses";
+        countInfo.witnessCountValue = this.numberOfCivilianWitnesses;
         this.witnessCounts.push(countInfo);
         countInfo = {} as witnessCountInfoType;
-        countInfo['WitnessCountFieldName'] = "Expert Witnesses";
-        countInfo['WitnessCountValue'] = this.numberOfExpertWitnesses;
+        countInfo.witnessCountFieldName = "Expert Witnesses";
+        countInfo.witnessCountValue = this.numberOfExpertWitnesses;
         this.witnessCounts.push(countInfo);
         countInfo = {} as witnessCountInfoType;
-        countInfo['WitnessCountFieldName'] = "Total";
-        countInfo['WitnessCountValue'] = this.numberOfTotalWitnesses;
+        countInfo.witnessCountFieldName = "Total";
+        countInfo.witnessCountValue = this.numberOfTotalWitnesses;
         this.witnessCounts.push(countInfo);
     }
 
@@ -181,13 +182,13 @@ export default class CriminalWitnesses extends Vue {
 
     get filteredWitnessList() {
         return this.witnessList.filter(witness => {
-            if (witness["Required"] == 'Required' && this.selectedType == 'Required Only') {
+            if (witness.required == 'Required' && this.selectedType == 'Required Only') {
                 return true
-            } else if (witness["Type Category"] == 'Personnel' && this.selectedType == 'Personnel Only') {
+            } else if (witness.typeCategory == 'Personnel' && this.selectedType == 'Personnel Only') {
                 return true
-            } else if (witness["Type Category"] == 'Civilian' && this.selectedType == 'Civilian Only') {
+            } else if (witness.typeCategory == 'Civilian' && this.selectedType == 'Civilian Only') {
                 return true
-            } else if (witness["Type Category"] == 'Expert' && this.selectedType == 'Expert Only') {
+            } else if (witness.typeCategory == 'Expert' && this.selectedType == 'Expert Only') {
                 return true
             } else if (this.selectedType == 'All Witnesses') {
                 return true;

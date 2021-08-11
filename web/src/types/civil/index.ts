@@ -2,185 +2,199 @@ import {adjudicatorRestrictionsInfoType, documentRequestsInfoType} from '../comm
 import {civilFileDetailsType} from '../civil/jsonTypes';
 
 export interface partiesInfoType {
-
-    "Party ID": string,
-    "Role": string,
-    "Counsel": string[],
-    "Left/Right": string,
-    "First Name": string,
-    "Last Name": string,
-    "Name": string,
-    "ID": string,
-    "Index": number
+    partyId: string;
+    role: string;
+    counsel: string[];
+    leftRight: string;
+    firstName: string;
+    lastName: string;
+    name: string;
+    id: string;
+    index: number;
 }
 
 export interface actType {
-    "Code": string,
-    "Description": string
+    code: string;
+    description: string;
 }
 
 export interface documentsInfoType {
-    "Seq.": string,
-    "Document Type": string,
-    "Concluded": string,
-    "Next Appearance Date": string, 
-    "Category": string,
-    "Act": actType[],           
-    "Sealed": boolean,
-    "Document ID": string,            
-    "PdfAvail": boolean, 
-    "Date Filed": string,
-    "Issues": string[],
-    "Comment": string,
-    "Filed By Name": string[],
-    "Date Granted": string,
-    "isChecked":boolean,
-    "isEnabled":boolean
+    index?: string;
+    seq: string;
+    documentType: string;
+    concluded: string;
+    nextAppearanceDate: string; 
+    category: string;
+    swornBy: string;
+    affNo: string;
+    act: actType[];           
+    sealed: boolean;
+    documentId: string;            
+    pdfAvail: boolean; 
+    dateFiled: string;
+    issues: string[];
+    comment: string;
+    orderMadeDate?: string;
+    filedByName: string[];
+    dateGranted: string;
+    isChecked:boolean;
+    isEnabled:boolean;
 }
 
 export interface referenceDocumentsInfoType {
-    partyId: string,
-    appearanceId: string,
-    partyName: string,
-    appearanceDate: string,
-    descriptionText: string,
-    enterDtm: string,
-    referenceDocumentTypeDsc: string,
-    objectGuid: string,
-    isChecked: boolean,
+    partyId: string[];
+    appearanceId: string;
+    partyName: string[];
+    nonPartyName: string[];
+    appearanceDate: string;
+    descriptionText: string;
+    enterDtm?: string;
+    referenceDocumentTypeDsc: string;
+    objectGuid: string;
+    isChecked: boolean;
     isEnabled: boolean
 }
 
 export interface summaryDocumentsInfoType {
-    "Document Type": string,
-    "Appearance Date": string,
-    "Appearance ID": string,
-    "PdfAvail": boolean,
-    "isChecked":boolean,
-    "isEnabled":boolean    
+    index?: string;
+    documentType: string;
+    appearanceDate: string;
+    appearanceId: string;
+    pdfAvail: boolean;
+    isChecked:boolean;
+    isEnabled:boolean;    
 }
 
 export interface civilFileInformationType {
-    "adjudicatorRestrictionsInfo": adjudicatorRestrictionsInfoType[],
-    "fileNumber": string,
-    "detailsData": civilFileDetailsType,
-    "leftPartiesInfo": partiesInfoType[],
-    "rightPartiesInfo": partiesInfoType[],
-    "isSealed": boolean,
-    "documentsInfo": documentsInfoType[],
-    "referenceDocumentInfo": referenceDocumentsInfoType[],
-    "summaryDocumentsInfo": summaryDocumentsInfoType[],
-    "categories": string[],
-    "providedDocumentCategories": string[]
+    adjudicatorRestrictionsInfo: adjudicatorRestrictionsInfoType[];
+    fileNumber: string;
+    detailsData: civilFileDetailsType;
+    leftPartiesInfo: partiesInfoType[];
+    rightPartiesInfo: partiesInfoType[];
+    isSealed: boolean;
+    documentsInfo: documentsInfoType[];
+    referenceDocumentInfo: referenceDocumentsInfoType[];
+    summaryDocumentsInfo: summaryDocumentsInfoType[];
+    categories: string[];
+    providedDocumentCategories: string[];
 }
 
 export interface csrRequestsInfoType {
-    pdfFileName: string,
-    appearanceId: string
+    pdfFileName: string;
+    appearanceId: string;
 }
 
 export interface civilAppearanceInfoType {
-    "fileNo": string,
-    "appearanceId": string
-    "supplementalEquipmentTxt": string,
-    "securityRestrictionTxt": string,
-    "outOfTownJudgeTxt": string,
-    "date": string
+    fileNo: string;
+    appearanceId: string
+    supplementalEquipmentTxt: string;
+    securityRestrictionTxt: string;
+    outOfTownJudgeTxt: string;
+    date: string;
+}
+
+export interface civilAppearanceDetailsInfoType {
+    supplementalEquipment: string;
+    outOfTownJudge: string;
+    securityRestriction: string; 
 }
 
 export interface civilIssueType {
-    "Issue": string,
-    "Result": string,
-    "ResultDsc": string
+    issue: string;
+    result: string;
+    resultDsc: string;
 }
 
 export interface appearanceDocumentsType {
-    "Seq.": string,
-    "Document Type": string,
-    "DocTypeCd": string,
-    "ID": string,
-    "PdfAvail": boolean,
-    "Act": actType[],            
-    "Sealed": boolean,
-    "Date Filed": string,
-    "Result": string,
-    "Result Description": string,
-    "Issues": civilIssueType[],
-    "Index": string
+    seq: string;
+    documentType: string;
+    docTypeCd: string;
+    id: string;
+    pdfAvail: boolean;
+    act: actType[];            
+    sealed: boolean;
+    dateFiled: string;
+    result: string;
+    resultDescription: string;
+    issues: civilIssueType[];
+    index: string;
 }
 
 export interface currentCounselType {
-    "Name": string, 
-    "Info": string
+    name: string; 
+    info: string
 }
 
 export interface representativeType {
-    "Name": string, 
-    "Info": string
+    name: string; 
+    info: string
 }
 
 export interface legalRepresentativeType {
-    "Name": string, 
-    "Type": string
+    name: string; 
+    type: string
 }
 
 export interface appearancePartiesType {
-    "First Name": string,
-    "Last Name": string,
-    "Name": string,
-    "Info": string,
-    "Current Counsel": currentCounselType[],
-    "Representative": representativeType[],
-    "Legal Representative": legalRepresentativeType[],
-    "Role": string[]
+    firstName: string;
+    lastName: string;
+    name: string;
+    info: string;
+    currentCounsel: currentCounselType[];
+    representative: representativeType[];
+    legalRepresentative: legalRepresentativeType[];
+    role: string[];
 }
 
 export interface appearanceMethodsType {
-    "role": string,
-    "method": string
+    role: string;
+    method: string;
 }
 
 export interface appearanceAdditionalInfoType {
-    "key": string,
-    "value": string
+    key: string;
+    value: string;
 }
 
 export interface civilAppearancesListType {
-    "Index": string,
-    "Date": string,
-    "FormattedDate": string,
-    "Document Type": string,
-    "Result": string,
-    "Result Description": string,
-    "Time": string,
-    "Reason": string,
-    "Reason Description": string,
-    "Duration": string,
-    "Location": string,
-    "Room": string,
-    "Status": string,
-    "Status Style": string,
-    "Presider": string,
-    "Judge Full Name": string,
-    "Appearance ID": string,
-    "Supplemental Equipment": string,
-    "Security Restriction": string,
-    "OutOfTown Judge": string
+    index: string;
+    date: string;
+    formattedDate: string;
+    documentType: string;
+    result: string;
+    resultDescription: string;
+    time: string;
+    reason: string;
+    reasonDescription: string;
+    duration: string;
+    location: string;
+    room: string;
+    status: string;
+    statusStyle: string;
+    presider: string;
+    judgeFullName: string;
+    appearanceId: string;
+    supplementalEquipment: string;
+    securityRestriction: string;
+    outOfTownJudge: string;
 }
 
 export interface civilNotesType {
-    "NotesFieldName": string,
-    "NotesValue": string
+    notesFieldName: string;
+    notesValue: string
 }
 
 export interface civilShowSectionsType {
-    "Case Details": boolean,
-    "Future Appearances": boolean,
-    "Past Appearances": boolean
+    caseDetails: boolean;
+    futureAppearances: boolean;
+    pastAppearances: boolean;
 }
 
 export interface fileSearchCivilInfoType {
-    "Parties": string[],
-    "File Id": string,
-    "Level": string
+    parties: string[];
+    fileId: string;
+    fileNumber?: string;
+    nextAppearance: string;
+    level?: string;
+    isChecked:boolean;
 }
