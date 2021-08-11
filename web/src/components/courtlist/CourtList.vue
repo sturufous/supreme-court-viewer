@@ -177,13 +177,9 @@
             </b-card>
     
             <b-card no-body v-if="isDataReady">
-                <b-row cols="1" class = "mx-2 mt-2 mb-5">
-                    <!-- <criminal-list v-if="criminalCases>0"/>
-                    <civil-list v-if="familyCases>0" civilClass='family'/>
-                    <civil-list v-if="civilCases>0" civilClass='civil'/> -->
+                <b-row cols="1" class = "mx-2 mt-2 mb-5">                   
                     <court-list-layout />
-                    <b-card class="mb-5"/>
-                    
+                    <b-card class="mb-5"/>                    
                 </b-row> 
             </b-card>
         </b-card> 
@@ -197,8 +193,6 @@ import { Component, Vue } from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
 import * as _ from 'underscore';
 
-import CriminalList from "@components/courtlist/CriminalList.vue";
-import CivilList from "@components/courtlist/CivilList.vue";
 import CourtListLayout from "@components/courtlist/CourtListLayout.vue";
 import {courtListInformationInfoType, roomsInfoType, courtRoomsAndLocationsInfoType, locationInfoType} from '@/types/courtlist';
 import '@store/modules/CourtListInformation';
@@ -209,9 +203,7 @@ const commonState = namespace("CommonInformation");
 import '@store/modules/CourtListInformation';
 
 @Component({
-    components: {
-        CriminalList,
-        CivilList,
+    components: {       
         CourtListLayout
     }
 })

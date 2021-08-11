@@ -49,7 +49,7 @@
                                 <b>Result</b><b style="margin-left: 20px">Issues</b>
                             </template>
 
-                            <template v-slot:[`cell(${documentFields[1].key})`]="data" >
+                            <template v-slot:cell(documentType)="data" >
                                 <b-button 
                                     v-if="data.item.pdfAvail && !data.item.sealed" 
                                     variant="outline-primary text-info" 
@@ -90,7 +90,7 @@
                                     {{data.value}}
                                 </span>
                             </template>
-                            <template v-slot:[`cell(${documentFields[3].key})`]="data" >
+                            <template v-slot:cell(dateFiled)="data" >
                                 <span v-if="data.item.sealed" 
                                       :style="data.field.cellStyle"
                                       class="text-muted">
@@ -295,10 +295,7 @@ export default class CivilAppearanceDetails extends Vue {
     public courtRoomsAndLocations!: courtRoomsJsonInfoType[];
 
     @civilState.State
-    public civilAppearanceInfo!: civilAppearanceInfoType;        
-
-    // @civilState.State
-    // public civilFileInformation!: civilFileInformationType
+    public civilAppearanceInfo!: civilAppearanceInfoType;    
     
     @commonState.Action
     public UpdateDisplayName!: (newInputNames: inputNamesType) => void

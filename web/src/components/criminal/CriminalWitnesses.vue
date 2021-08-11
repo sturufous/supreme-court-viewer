@@ -31,12 +31,12 @@
                         <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
                     </template> 
                     <template v-slot:cell(name)="data" >                        
-                        <span :class="data.field.cellStyle" >  {{ data.value }} </span>
+                        <span >  {{ data.value }} </span>
                         <span v-if="data.item.agency"> <br> ({{data.item.agency}}: {{data.item.pinCode}}) </span>
                     </template>
 
                     <template v-slot:cell(required)="data" >                        
-                        <b-badge :class="data.field.cellStyle" style="font-weight: normal; font-size:16px" >  {{ data.value }} </b-badge>                    
+                        <b-badge class="text-white bg-danger font-weight-bold" :style="data.field.cellStyle" >  {{ data.value }} </b-badge>                    
                     </template>
 
                 </b-table>
@@ -103,9 +103,9 @@ export default class CriminalWitnesses extends Vue {
     selectedType = 'Required Only';
 
     witnessFields = [
-        {key:'name',        label:'Name',         sortable:true, tdClass: 'border-top',  headerStyle:'text-primary',   cellStyle:'text-danger'},
-        {key:'type',        label:'Type',         sortable:true, tdClass: 'border-top',  headerStyle:'text-primary',   cellStyle:'text'},
-        {key:'required',    label:'Required',     sortable:true, tdClass: 'border-top',  headerStyle:'text-primary',   cellStyle:'text-white bg-danger font-weight-bold'}
+        {key:'name',        label:'Name',         sortable:true, tdClass: 'border-top text-danger',  headerStyle:'text-primary',   cellStyle:''},
+        {key:'type',        label:'Type',         sortable:true, tdClass: 'border-top',              headerStyle:'text-primary',   cellStyle:'text'},
+        {key:'required',    label:'Required',     sortable:true, tdClass: 'border-top',              headerStyle:'text-primary',   cellStyle:'font-weight: normal; font-size:16px'}
     ];
 
     witnessCountsFields = [

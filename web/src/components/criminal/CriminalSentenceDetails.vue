@@ -83,21 +83,21 @@ export default class CriminalSentenceDetails extends Vue {
     participantSentences: participantSentencesInfoType[] = [];
 
     fields = [        
-        {key:'date',                     label:'Date',  sortable:true,   tdClass: 'border-top', headerStyle:'text-primary'},
-        {key:'count',                    label:'Count',  sortable:true,   tdClass: 'border-top', headerStyle:'text-primary'},
-        {key:'chargeIssue',              label:'Charge/Issue', sortable:false,  tdClass: 'border-top', headerStyle:'text'},
-        {key:'finding',                  label:'Finding', sortable:true,   tdClass: 'border-top', headerStyle:'text-danger'},        
-        {key:'sentenceDispositionType',  label:'Sentence/ Disposition Type',   sortable:false, tdClass: 'border-top', headerStyle:'text'},   
-        {key:'term',                     label:'Term', sortable:false,  tdClass: 'border-top', headerStyle:'text'},
-        {key:'amount',                   label:'Amount', sortable:false,  tdClass: 'border-top', headerStyle:'text'},
-        {key:'dueDateUntil',             label:'Due Date/ Until', sortable:false,  tdClass: 'border-top', headerStyle:'text'},
-        {key:'effectiveDate',            label:'Effective Date',sortable:false,  tdClass: 'border-top', headerStyle:'text'},
+        {key:'date',                     label:'Date',                         sortable:true,   tdClass: 'border-top', headerStyle:'text-primary'},
+        {key:'count',                    label:'Count',                        sortable:true,   tdClass: 'border-top', headerStyle:'text-primary'},
+        {key:'chargeIssue',              label:'Charge/Issue',                 sortable:false,  tdClass: 'border-top', headerStyle:'text'},
+        {key:'finding',                  label:'Finding',                      sortable:true,   tdClass: 'border-top', headerStyle:'text-danger'},        
+        {key:'sentenceDispositionType',  label:'Sentence/ Disposition Type',   sortable:false,  tdClass: 'border-top', headerStyle:'text'},   
+        {key:'term',                     label:'Term',                         sortable:false,  tdClass: 'border-top', headerStyle:'text'},
+        {key:'amount',                   label:'Amount',                       sortable:false,  tdClass: 'border-top', headerStyle:'text'},
+        {key:'dueDateUntil',             label:'Due Date/ Until',              sortable:false,  tdClass: 'border-top', headerStyle:'text'},
+        {key:'effectiveDate',            label:'Effective Date',               sortable:false,  tdClass: 'border-top', headerStyle:'text'},
     ];
     
     public getParticipants(): void {       
          
-        this.participantSentences = this.criminalParticipantSentenceInformation.participantSentences
-        this.selectedParticipant = this.criminalParticipantSentenceInformation.selectedParticipant         
+        this.participantSentences = this.criminalParticipantSentenceInformation.participantSentences;
+        this.selectedParticipant = this.criminalParticipantSentenceInformation.selectedParticipant;         
         this.isMounted = true;
     }
 

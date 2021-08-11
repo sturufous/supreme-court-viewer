@@ -476,7 +476,7 @@ export default class CivilCaseDetails extends Vue {
             }
             providedDocInfo.appearanceDate = jDoc.AppearanceDate;
             providedDocInfo.descriptionText = jDoc.DescriptionText;
-            providedDocInfo.enterDtm = jDoc.EnterDtm;
+            // providedDocInfo.enterDtm = jDoc.EnterDtm;
             providedDocInfo.referenceDocumentTypeDsc = jDoc.ReferenceDocumentTypeDsc;
             providedDocInfo.objectGuid = jDoc.ObjectGuid;
             providedDocInfo.isChecked = false;

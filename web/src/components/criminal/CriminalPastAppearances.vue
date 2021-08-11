@@ -40,7 +40,7 @@
 
                 <template  v-slot:cell()="data">
                     <b-badge                        
-                        style="font-weight: normal; font-size: 16px; padding-top:12px" 
+                        :style="data.field.cellStyle" 
                         variant="white" > 
                             {{data.value}} 
                     </b-badge>
@@ -174,15 +174,15 @@ export default class CriminalPastAppearances extends Vue {
 
     fields =  
     [
-        {key:'date',      label:'Date',         sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'transform: translate(0,-7px); font-size:16px', cellClass:'text-info mt-2 d-inline-flex'},
-        {key:'reason',    label:'Reason',       sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'margin-top: 10px; font-size: 14px;'},
-        {key:'time',      label:'Time',         sortable:false, tdClass: 'border-top', headerStyle:'text'},
-        {key:'duration',  label:'Duration',     sortable:false, tdClass: 'border-top', headerStyle:'text'},
-        {key:'location',  label:'Location',     sortable:true,  tdClass: 'border-top', headerStyle:'text-primary'},
-        {key:'room',      label:'Room',         sortable:false, tdClass: 'border-top', headerStyle:'text'},
-        {key:'presider',  label:'Presider',     sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'margin-top: 10px; font-size: 14px;'},
-        {key:'accused',   label:'Accused',      sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'font-size: 16px;'},
-        {key:'status',    label:'Status',       sortable:true,  tdClass: 'border-top', headerStyle:'text-primary', cellStyle:'font-weight: normal; font-size: 16px; width:110px'},
+        {key:'date',      label:'Date',         sortable:true,  tdClass: 'border-top', headerStyle:'text-primary',  cellStyle:'transform: translate(0,-7px); font-size:16px', cellClass:'text-info mt-2 d-inline-flex'},
+        {key:'reason',    label:'Reason',       sortable:true,  tdClass: 'border-top', headerStyle:'text-primary',  cellStyle:'margin-top: 10px; font-size: 14px;'},
+        {key:'time',      label:'Time',         sortable:false, tdClass: 'border-top', headerStyle:'text',          cellStyle: 'font-weight: normal; font-size: 16px; padding-top:12px'},
+        {key:'duration',  label:'Duration',     sortable:false, tdClass: 'border-top', headerStyle:'text',          cellStyle: 'font-weight: normal; font-size: 16px; padding-top:12px'},
+        {key:'location',  label:'Location',     sortable:true,  tdClass: 'border-top', headerStyle:'text-primary',  cellStyle: 'font-weight: normal; font-size: 16px; padding-top:12px'},
+        {key:'room',      label:'Room',         sortable:false, tdClass: 'border-top', headerStyle:'text',          cellStyle: 'font-weight: normal; font-size: 16px; padding-top:12px'},
+        {key:'presider',  label:'Presider',     sortable:true,  tdClass: 'border-top', headerStyle:'text-primary',  cellStyle:'margin-top: 10px; font-size: 14px;'},
+        {key:'accused',   label:'Accused',      sortable:true,  tdClass: 'border-top', headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
+        {key:'status',    label:'Status',       sortable:true,  tdClass: 'border-top', headerStyle:'text-primary',  cellStyle:'font-weight: normal; font-size: 16px; width:110px'},
     ];
     
     mounted() {

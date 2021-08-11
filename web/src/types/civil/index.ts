@@ -48,7 +48,7 @@ export interface referenceDocumentsInfoType {
     nonPartyName: string[];
     appearanceDate: string;
     descriptionText: string;
-    enterDtm: string;
+    enterDtm?: string;
     referenceDocumentTypeDsc: string;
     objectGuid: string;
     isChecked: boolean;
@@ -193,5 +193,8 @@ export interface civilShowSectionsType {
 export interface fileSearchCivilInfoType {
     parties: string[];
     fileId: string;
-    level: string
+    fileNumber?: string;
+    nextAppearance: string;
+    level?: string;
+    isChecked:boolean;
 }

@@ -503,7 +503,7 @@ export default class CriminalDocumentsView extends Vue {
 
         this.loadingPdf = true;
         const documentType = eventData.item?.category == "ROP" ? CourtDocumentType.ROP : CourtDocumentType.Criminal;
-        const index = eventData.index;
+        // const index = eventData.index;
         const documentData: DocumentData = { 
             courtClass: this.criminalFileInformation.detailsData.courtClassCd, 
             courtLevel: this.criminalFileInformation.detailsData.courtLevelCd, 

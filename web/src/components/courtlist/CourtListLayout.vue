@@ -1,14 +1,6 @@
 <template>
 
-    <b-card bg-variant="white" no-body>
-        <!-- <div>
-            <h2 :class="'mx-4 mt-5 font-weight-normal text-'+data.item.listClass">{{getClassName}}</h2>
-            <hr :class="'bg-'+data.item.listClass+' mx-3'" style="height: 5px;"/> 
-        </div> -->
-
-        <!-- <b-card v-if="!isDataReady && isMounted" no-body>
-            <span class="text-muted ml-4 mb-5"> No {{getClassName}} List has been found. </span>
-        </b-card> -->
+    <b-card bg-variant="white" no-body>     
 
         <b-card bg-variant="light" v-if= "!isMounted && !isDataReady" >
             <b-overlay :show= "true"> 
@@ -36,16 +28,15 @@
 
                 <template  v-slot:cell()="data">
                     <b-badge                        
-                        style="font-weight: normal; font-size: 16px; padding-top:8px" 
-                        :class="data.field.cellStyle"
+                        :style="data.field.cellStyle"
                         variant="white" > 
                             {{data.value}} 
                     </b-badge>
                 </template>
 
-                <template v-slot:[`cell(${fields[1].key})`]="data" >                     
+                <template v-slot:cell(fileNumber)="data" >                     
                     <b-button 
-                        style=" font-size:16px" 
+                        :style="data.field.cellStyle" 
                         size="sm"
                         :id="data.item.listClass+'case-'+data.item.tag"
                         :href="'#'+data.item.listClass+'case-'+data.item.tag"
@@ -72,7 +63,7 @@
                         variant="secondary"
                         v-b-tooltip.hover.right                            
                         :title="data.item.reasonDesc"
-                        style="margin-top: 6px; font-size: 14px;"> 
+                        :style="data.field.cellStyle"> 
                             {{data.value}}
                     </b-badge>
                 </template>
@@ -95,7 +86,7 @@
                 <template v-slot:cell(accused)="data">
                     <b-button
                         v-if="data.item.listClass == 'criminal'" 
-                        style="font-size:16px; font-weight: bold;" 
+                        :style="data.field.cellStyle" 
                         size="sm" 
                         @click="OpenCriminalFilePage(data)" 
                         v-b-tooltip.hover.right
@@ -109,7 +100,7 @@
                 <template v-slot:cell(parties)="data">
                     <b-button
                         v-if="data.item.listClass != 'criminal' && data.value.length>0"
-                        style="font-size:16px; font-weight: bold;" 
+                        :style="data.field.cellStyle" 
                         size="sm" 
                         @click="OpenCivilFilePage(data)" 
                         v-b-tooltip.hover.right                            
@@ -120,7 +111,7 @@
                     </b-button>
                     <b-button
                         v-else-if="data.item.listClass != 'criminal' && data.value.length == 0"
-                        style="font-size:16px; font-weight: bold;" 
+                        :style="data.field.cellStyle" 
                         size="sm" 
                         @click="OpenCivilFilePage(data)" 
                         v-b-tooltip.hover.right                            
@@ -131,24 +122,28 @@
                     </b-button>                                  
                 </template>  
 
-                <template  v-slot:cell(time)="data">
-                    {{data.value| convert-time}}
+                <template  v-slot:cell(time)="data" >
+                    <div  :style="data.field.cellStyle">
+                        {{data.value| convert-time}}
+                    </div>
                 </template>              
                 
                 <template v-slot:cell(counsel)="data">
-                    <span v-if="data.item.listClass == 'criminal'">
+                    <div 
+                        v-if="data.item.listClass == 'criminal'"
+                        :style="data.field.cellStyle">
                         {{data.value}}
-                    </span>
+                    </div>
                     <b-badge
                         v-if="data.item.listClass != 'criminal' && data.item.counselDesc"
                         variant="white text-success"                        
                         v-b-tooltip.hover.left.html = "getFullCounsel(data.item.counselDesc)"
-                        style="margin-top: 4px; font-size: 16px; font-weight:normal"> 
+                        :style="data.field.cellStyle"> 
                             {{data.value}}
                     </b-badge>
                     <b-badge v-else-if="data.item.listClass != 'criminal' && !data.item.counselDesc"
                         variant="white"
-                        style="margin-top: 4px; font-size: 16px; font-weight:normal" >
+                        :style="data.field.cellStyle" >
                             {{data.value}}
                     </b-badge>
                 </template>
@@ -159,34 +154,34 @@
                         variant="white text-success"                        
                         v-b-tooltip.hover.left                           
                         :title="data.item.crownDesc"
-                        style="margin-top: 4px; font-size: 16px; font-weight:normal"> 
+                        :style="data.field.cellStyle"> 
                             {{data.value}}
                     </b-badge>
                     <b-badge v-else-if="data.item.listClass == 'criminal' && !data.item.crownDesc"
                         variant="white"
-                        style="margin-top: 4px; font-size: 16px; font-weight:normal">
+                        :style="data.field.cellStyle">
                             {{data.value}}
                     </b-badge>
                 </template>
 
-                <template v-slot:[`cell(${fields[10].key})`]="data" >
+                <template v-slot:cell(fileMarkers)="data" >
                         <b-badge  
                             v-for="(field,index) in data.value"
                             :key="index" 
                             class="mr-1"
-                            style="margin-top: 6px; font-weight: normal; font-size: 14px;"
+                            :style="data.field.cellStyle"
                             v-b-tooltip.hover.right 
                             :title='field.key' > 
                             {{ field.abbr }} 
                         </b-badge>
                 </template>
 
-                <template v-slot:[`cell(${fields[11].key})`]="data" >
+                <template v-slot:cell(hearingRestrictions)="data" >
                         <b-badge  
                             v-for="(field,index) in data.value"
                             :key="index" 
                             class="mr-1"
-                            style="margin-top: 6px; font-weight: normal; font-size: 14px;"
+                            :style="data.field.cellStyle"
                             v-b-tooltip.hover.right 
                             :title='field.key' > 
                             {{ field.abbr }} 
@@ -197,7 +192,7 @@
                     <b-button
                         v-if="data.item.noteExist"
                         size="sm"
-                        style=" font-size:12px; border:0px;"
+                        :style="data.field.cellStyle"
                         @click="OpenNotes(data.value)"                        
                         variant="outline-primary border-white text-info" 
                         class="mt-1"
@@ -346,13 +341,9 @@ export default class CourtListLayout extends Vue {
     public UpdateDuration!: (duration: durationType) => void
 
     @commonState.Action
-    public UpdateTime!: (time: string) => void
-    
-    // @Prop() civilClass
-
-    //civilList: civilListInfoType[] = [];    
-    civilCourtListJson: civilCourtListType[] = [];
-    //criminalList: criminalListInfoType[] = [];    
+    public UpdateTime!: (time: string) => void    
+   
+    civilCourtListJson: civilCourtListType[] = [];       
     criminalCourtListJson: criminalCourtListType[] = [];
     courtList: courtListInfoType[] = []; 
     courtRoom;
@@ -363,22 +354,22 @@ export default class CourtListLayout extends Vue {
     
     fields =  
     [
-        {key:'seq',                     label:'Seq.',                tdClass: 'border-top', headerStyle:'', cellStyle:''},        
-        {key:'fileNumber',              label:'File Number',         tdClass: 'border-top', headerStyle:'', cellStyle:''},
-        {key:'icons',                   label:'Icons',               tdClass: 'border-top', thClass:'text-white', cellStyle:''},
-        {key:'parties',                 label:'Parties',             tdClass: 'border-top', headerStyle:'', cellStyle:'text-primary'},
-        {key:'accused',                label:'Accused',              tdClass: 'border-top', headerStyle:'', cellStyle:'text-primary'},
+        {key:'seq',                     label:'Seq.',                 tdClass: 'border-top',              cellStyle:'font-weight: normal; font-size: 16px; padding-top:8px'},        
+        {key:'fileNumber',              label:'File Number',          tdClass: 'border-top',              cellStyle:'font-size:16px'},
+        {key:'icons',                   label:'Icons',                tdClass: 'border-top',              cellStyle:'font-weight: normal; font-size: 16px; padding-top:9px', thClass:'text-white'},
+        {key:'parties',                 label:'Parties',              tdClass: 'border-top',              cellStyle:'font-size:16px; font-weight: bold;'},
+        {key:'accused',                 label:'Accused',              tdClass: 'border-top',              cellStyle:'font-size:16px; font-weight: bold;'},
         
-        {key:'time',                    label:'Time',                tdClass: 'border-top', headerStyle:'', cellStyle:''},
-        {key:'est',                     label:'Est.',                tdClass: 'border-top', headerStyle:'', cellStyle:''},
-        {key:'reason',                  label:'Reason',              tdClass: 'border-top', headerStyle:'', cellStyle:''},
-        {key:'room',                    label:'Room',                tdClass: 'border-top', headerStyle:'', cellStyle:'text-primary'},
-        {key:'counsel',                 label:'Counsel',             tdClass: 'border-top', headerStyle:'', cellStyle:''},
-        {key:'fileMarkers',             label:'File Markers',        tdClass: 'border-top', headerStyle:'', cellStyle:''},
-        {key:'hearingRestrictions',     label:'Hearing Restrictions', tdClass: 'border-top', headerStyle:'', cellStyle:''},
-        {key:'crown',                  label:'Crown',                tdClass: 'border-top', headerStyle:'', cellStyle:''},
-        {key:'caseAge',                label:'Case Age',             tdClass: 'border-top', headerStyle:'', cellStyle:''},
-        {key:'notes',                   label:'Notes',               tdClass: 'border-top', headerStyle:'', cellStyle:''}
+        {key:'time',                    label:'Time',                 tdClass: 'border-top',              cellStyle:'margin-top: 3px;'},
+        {key:'est',                     label:'Est.',                 tdClass: 'border-top',              cellStyle:'font-weight: normal; font-size: 16px; padding-top:8px'},
+        {key:'reason',                  label:'Reason',               tdClass: 'border-top',              cellStyle:'margin-top: 6px; font-size: 14px;'},
+        {key:'room',                    label:'Room',                 tdClass: 'border-top text-primary', cellStyle:'font-weight: normal; font-size: 16px; padding-top:9px'},
+        {key:'counsel',                 label:'Counsel',              tdClass: 'border-top',              cellStyle:'margin-top: 3px; font-size: 16px; font-weight:normal;'},
+        {key:'fileMarkers',             label:'File Markers',         tdClass: 'border-top',              cellStyle:'margin-top: 6px; font-weight: normal; font-size: 14px;'},
+        {key:'hearingRestrictions',     label:'Hearing Restrictions', tdClass: 'border-top',              cellStyle:'margin-top: 6px; font-weight: normal; font-size: 14px;'},
+        {key:'crown',                   label:'Crown',                tdClass: 'border-top',              cellStyle:'margin-top: 4px; font-size: 16px; font-weight:normal;'},
+        {key:'caseAge',                 label:'Case Age',             tdClass: 'border-top',              cellStyle:'font-weight: normal; font-size: 16px; padding-top:9px'},
+        {key:'notes',                   label:'Notes',                tdClass: 'border-top',              cellStyle:'font-size:12px; border:0px;'}
     ];
     
     mounted() {
@@ -513,7 +504,6 @@ export default class CourtListLayout extends Vue {
             criminalListInfo.profSeqNo = jcriminalList.fileInformation.profSeqNo;                       
             criminalListInfo.noteExist = this.isCriminalNoteAvailable(criminalListInfo);
             criminalListInfo.listClass = 'criminal'
-           // this.criminalList.push(criminalListInfo); 
             this.courtList.push(criminalListInfo);
         }
     }
@@ -554,7 +544,7 @@ export default class CourtListLayout extends Vue {
 
   
     public ExtractCivilListInfo(): void {
-        // const listClass = this.civilClass=='family'? ['F','E']: ['I', 'B', 'V', 'D', 'H', 'P', 'S']; 
+        
         const familyListClass = ['F','E'];
         const civilListClass = ['I', 'B', 'V', 'D', 'H', 'P', 'S'];
         /* 
@@ -569,14 +559,12 @@ export default class CourtListLayout extends Vue {
             Future:
             SCH – Supreme Court Chambers
             SCV – Supreme Court Trial List
-        */
-        console.log(this.civilCourtListJson)
+        */        
         
         for (const civilListIndex in this.civilCourtListJson) {
 
             const civilListInfo = {} as civilListInfoType;
-            const jcivilList = this.civilCourtListJson[civilListIndex];
-            console.log(jcivilList)
+            const jcivilList = this.civilCourtListJson[civilListIndex];            
             civilListInfo.index = civilListIndex;
             if(familyListClass.indexOf(jcivilList.activityClassCd) != -1){
                 civilListInfo.listClass = 'family';
@@ -656,8 +644,7 @@ export default class CourtListLayout extends Vue {
             }            
 
             civilListInfo.notes ={TrialNotes: jcivilList.trialRemarkTxt, FileComment:jcivilList.fileCommentText, CommentToJudge:jcivilList.commentToJudgeText, SheriffComment:jcivilList.sheriffCommentText};                       
-            civilListInfo.noteExist = this.isNoteAvailable(civilListInfo);
-            console.log(civilListInfo)
+            civilListInfo.noteExist = this.isNoteAvailable(civilListInfo);            
             this.courtList.push(civilListInfo);
         }
     }
@@ -704,10 +691,7 @@ export default class CourtListLayout extends Vue {
     }    
 
     public getTime(time)
-    {
-        console.log(time)
-       // this.UpdateTime(time);
-       // return this.time;      
+    {          
        return time
     }
 
@@ -760,24 +744,6 @@ export default class CourtListLayout extends Vue {
     {
         return '<b style="white-space: pre-line;">'+ counselDesc+ '</b>'
     }
-
-    // get getClassName()
-    // {
-    //     if (this.civilClass=='family') 
-    //         return 'Family';
-    //     else
-    //         return 'Civil';
-    // }
-
-    // get SortedCivilList()
-    // {           
-    //     return  _.sortBy(this.civilList, 'seq')      
-    // }
-
-    // get SortedCriminalList()
-    // {                
-    //     return  _.sortBy(this.criminalList, 'seq')
-    // }
 
     get SortedCourtList()
     {      

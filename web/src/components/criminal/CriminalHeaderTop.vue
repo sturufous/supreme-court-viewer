@@ -27,6 +27,14 @@ export default class CriminalHeaderTop extends Vue {
   @criminalState.State
   public criminalFileInformation!: criminalFileInformationType;  
 
+  courtLevelDescription;
+  courtClassDescription;
+  indictable;
+  assignmentTypeDescription;
+  hasCrownNotesToJCM = false;
+  hasAssignmentTypeDsc = false;
+  isMounted = false;
+
   mounted() {
     this.getFileDescription();
   }
@@ -40,18 +48,9 @@ export default class CriminalHeaderTop extends Vue {
         this.hasAssignmentTypeDsc = true;
       }
       this.hasCrownNotesToJCM = data.trialRemark && data.trialRemark.length > 0;
-      this.indictable = data.indictableYN =='Y'? 'Indictable' : 'Summarily';
-     
+      this.indictable = data.indictableYN =='Y'? 'Indictable' : 'Summarily';     
       this.isMounted = true;          
-  } 
-
-  courtLevelDescription;
-  courtClassDescription;
-  indictable;
-  assignmentTypeDescription;
-  hasCrownNotesToJCM = false;
-  hasAssignmentTypeDsc = false;
-  isMounted = false;
+  }  
  
 }
 </script>
