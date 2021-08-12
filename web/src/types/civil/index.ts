@@ -1,4 +1,4 @@
-import {adjudicatorRestrictionsInfoType, documentRequestsInfoType} from '../common';
+import {adjudicatorRestrictionsInfoType} from '../common';
 import {civilFileDetailsType} from '../civil/jsonTypes';
 
 export interface partiesInfoType {
