@@ -47,7 +47,7 @@
             <b-card bg-variant="light" v-if="isDataReady" style="max-height: 500px; overflow-y: auto;" no-body class="mx-3 mb-5">           
                 <b-table
                 :items="FilteredDocuments"
-                :fields="fields[fieldsTab]"
+                :fields="fields"
                 sort-by="appearanceDate"
                 :sort-desc.sync="sortDesc"
                 :no-sort-reset="true"
@@ -56,23 +56,23 @@
                 striped
                 responsive="sm"
                 >   
-                    <template v-for="(field,index) in fields[fieldsTab]" v-slot:[`head(${field.key})`]="data">
+                    <template v-for="(field,index) in fields" v-slot:[`head(${field.key})`]="data">
                         <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
                     </template>
 
-                    <template v-slot:[`cell(${fields[fieldsTab][appearanceDatePlace[fieldsTab]].key})`]="data" >                        
+                    <template v-slot:cell(appearanceDate)="data" >                        
                         <span :style="data.field.cellStyle">
                             {{ data.value | beautify-date}}
                         </span>
                     </template>
 
-                    <!-- <template v-slot:[`cell(${fields[fieldsTab][entryDatePlace[fieldsTab]].key})`]="data" >                        
+                    <!-- <template v-slot:cell(enterDtm)="data" >                        
                         <span :style="data.field.cellStyle">
                             {{ data.value | beautify-date-time}}
                         </span>
                     </template>                      -->
 
-                    <template v-slot:[`cell(${fields[fieldsTab][documentPlace[fieldsTab]].key})`]="data" >
+                    <template v-slot:cell(referenceDocumentTypeDsc)="data" >
                         <b-button                             
                             variant="outline-primary text-info" 
                             :style="data.field.cellStyle"
@@ -115,9 +115,9 @@
                         </div>
                     </template>
 
-                    <template v-if="hasNonParty"  v-slot:cell(nonPartyName)="data">
-                        <div v-for="(nonPartyName,index) in data.value" v-bind:key="index">
-                            <span :style="data.field.cellStyle"> {{ nonPartyName }}</span>
+                    <template v-slot:cell(nonPartyName)="data">
+                        <div v-for="(nonParty,index) in data.value" v-bind:key="index">
+                            <span :style="data.field.cellStyle"> {{ nonParty }}</span>
                         </div>
                     </template>                       
                     
@@ -184,23 +184,21 @@ export default class CivilProvidedDocumentsView extends Vue {
     sortDesc = false;
     categories: string[] = []; 
     fieldsTab = fieldTab.Categories;
-    documentPlace = [3]
-    appearanceDatePlace = [4]
-    entryDatePlace = [5]
+    fields: any = [];
     selectedDocuments = {} as archiveInfoType; 
     downloadCompleted = true;
     allDocumentsChecked = false;     
 
-    fields = [ 
-        [
-            {key:'select',                   label:'',                sortable:false, headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},
-            {key:'partyName',                label:'Party Name',      sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
-            {key:'nonPartyName',             label:'Non Party',  sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
-            {key:'referenceDocumentTypeDsc', label:'Document Type',   sortable:false, headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 16px;text-align:left;'},
-            {key:'appearanceDate',           label:'Appearance Date', sortable:true,  headerStyle:'text',          cellStyle:'font-size: 16px;'},
-            // {key:'enterDtm',                 label:'Created Date',    sortable:true,  headerStyle:'text',          cellStyle:'font-size: 16px;'},
-            {key:'descriptionText',          label:'Description',     sortable:false, headerStyle:'text',          cellStyle:'font-size: 12px;'}
-        ]         
+    initialFields = [ 
+        
+        {key:'select',                   label:'',                sortable:false, headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},
+        {key:'partyName',                label:'Party Name',      sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
+        {key:'nonPartyName',             label:'Non Party',  sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
+        {key:'referenceDocumentTypeDsc', label:'Document Type',   sortable:false, headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 16px;text-align:left;'},
+        {key:'appearanceDate',           label:'Appearance Date', sortable:true,  headerStyle:'text',          cellStyle:'font-size: 16px;'},
+        // {key:'enterDtm',                 label:'Created Date',    sortable:true,  headerStyle:'text',          cellStyle:'font-size: 16px;'},
+        {key:'descriptionText',          label:'Description',     sortable:false, headerStyle:'text',          cellStyle:'font-size: 12px;'}
+               
     ];
 
     public getDocuments(): void {        
@@ -208,6 +206,10 @@ export default class CivilProvidedDocumentsView extends Vue {
         this.categories = this.civilFileInformation.providedDocumentCategories;
         this.categories.sort()
         if(this.categories.indexOf("ALL") < 0) this.categories.unshift("ALL")
+        this.fields = JSON.parse(JSON.stringify(this.initialFields));
+        if (!this.hasNonParty){
+            this.fields.splice(2, 1);
+        }        
         if (this.documents.length > 0){
             this.isDataReady = true;
         }        

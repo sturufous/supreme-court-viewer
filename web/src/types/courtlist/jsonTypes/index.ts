@@ -565,35 +565,4 @@ export interface courtListType {
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   
+  } 

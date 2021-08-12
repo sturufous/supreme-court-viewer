@@ -470,9 +470,11 @@ export default class CivilCaseDetails extends Vue {
                 if (refDocInterest.PartyId)providedDocInfo.partyId.push(refDocInterest.PartyId);
                 if (refDocInterest.PartyName)providedDocInfo.partyName.push(refDocInterest.PartyName);
                 if (refDocInterest.NonPartyName)providedDocInfo.nonPartyName.push(refDocInterest.NonPartyName);                
-            }
+            }           
             if (providedDocInfo.nonPartyName.length > 0) {
                 this.UpdateHasNonParty(true);
+            } else {
+                this.UpdateHasNonParty(false);
             }
             providedDocInfo.appearanceDate = jDoc.AppearanceDate;
             providedDocInfo.descriptionText = jDoc.DescriptionText;

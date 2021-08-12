@@ -79,6 +79,12 @@
                         {{ party }} <br>
                     </span>
                 </template>
+                <template  v-slot:cell(nextAppearance)="data">
+                    <span  
+                        :style="data.field.cellStyle">
+                        {{ data.value | beautify-date }}
+                    </span>
+                </template>
             </b-table>
         </b-card>      
     </b-card>
@@ -131,6 +137,7 @@ export default class CivilFileSearchResultsView extends Vue {
         {key:'select',  label:'',         tdClass: 'border-top', cellStyle:'font-size: 16px;', sortable:false, headerStyle:'text-primary', thClass:''},                
         {key:'fileNumber',  label:'File Number',  tdClass: 'border-top', cellStyle: 'font-size:16px; font-weight: bold; border: none;'},        
         {key:'parties', label:'Parties',  tdClass: 'border-top', cellStyle: 'white-space: pre-line'},
+        {key:'nextAppearance',  label:'Next Appearance',   tdClass: 'border-top', cellStyle: 'white-space: pre-line'},    
         {key:'level',   label:'Level',    tdClass: 'border-top'}
     ];
 
@@ -168,6 +175,7 @@ export default class CivilFileSearchResultsView extends Vue {
                             civilListInfo.parties = partyInfo;
                             civilListInfo.fileId = jcivilList.physicalFileId;
                             civilListInfo.fileNumber = jcivilList.fileNumberTxt;
+                            civilListInfo.nextAppearance = '';
                             civilListInfo.level = CourtLevel[jcivilList.courtLevelCd];
                             this.civilList.push(civilListInfo);                            
                         }                        
