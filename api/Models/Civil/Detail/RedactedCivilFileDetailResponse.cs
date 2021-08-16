@@ -44,5 +44,7 @@ namespace Scv.Api.Models.Civil.Detail
         /// </summary>
         public ICollection<CivilHearingRestriction> HearingRestriction { get; set; }
         public CivilAppearanceResponse Appearances { get; set; }
+        //Used just for searching.
+        public string NextApprDt { get; set; }
     }
 }

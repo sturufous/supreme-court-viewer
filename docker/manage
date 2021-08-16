@@ -106,7 +106,7 @@ build-web() {
     --copy \
 	-e "WEB_BASE_HREF=${WEB_BASE_HREF-/scjscv/}" \
     '../web' \
-    'centos/nodejs-10-centos7:10' \
+    'quay.io/centos7/nodejs-12-centos7' \
     'scv-web-artifacts'
   echo -e "===================================================================================================="
 
@@ -137,7 +137,7 @@ build-web-dev() {
   ${S2I_EXE} build \
     -e "DEV_MODE=true" \
     '../web' \
-    'centos/nodejs-10-centos7:10' \
+    'quay.io/centos7/nodejs-12-centos7' \
     'scv-web-dev'
   echo -e "===================================================================================================="
 }
