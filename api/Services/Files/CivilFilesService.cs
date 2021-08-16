@@ -91,26 +91,30 @@ namespace Scv.Api.Services.Files
                 CourtLevel = courtLevelCd
             });
 
-            var targetIds = fileSearchResponse?.FileDetail?.Where(fd => !courtClassSet || fd.CourtClassCd == courtClass)
-                                                           .SelectToList(fd => fd.PhysicalFileId);
+            var fileIdAndAppearanceDate = fileSearchResponse?.FileDetail?.Where(fd => !courtClassSet || fd.CourtClassCd == courtClass)
+                                                           .SelectToList(fd => new { fd.PhysicalFileId, fd.NextApprDt });
 
-            if (targetIds == null || targetIds.Count == 0)
+            if (fileIdAndAppearanceDate == null || fileIdAndAppearanceDate.Count == 0)
                 return fileDetails;
 
             //Return the basic entry without doing a lookup.
-            if (targetIds.Count == 1)
-                return new List<RedactedCivilFileDetailResponse> { new RedactedCivilFileDetailResponse { PhysicalFileId = targetIds.First() }} ;
+            if (fileIdAndAppearanceDate.Count == 1)
+                return new List<RedactedCivilFileDetailResponse> { new RedactedCivilFileDetailResponse { PhysicalFileId = fileIdAndAppearanceDate.First().PhysicalFileId }} ;
 
             var fileDetailTasks = new List<Task<CivilFileDetailResponse>>();
-            foreach (var fileId in targetIds)
+            foreach (var fileId in fileIdAndAppearanceDate)
             {
                 async Task<CivilFileDetailResponse> FileDetails() =>
-                    await _filesClient.FilesCivilGetAsync(_requestAgencyIdentifierId, _requestPartId, _applicationCode, fileId);
+                    await _filesClient.FilesCivilGetAsync(_requestAgencyIdentifierId, _requestPartId, _applicationCode, fileId.PhysicalFileId);
                 fileDetailTasks.Add(_cache.GetOrAddAsync($"CivilFileDetail-{fileId}-{_requestAgencyIdentifierId}", FileDetails));
             }
 
             var fileDetailResponses = await fileDetailTasks.WhenAll();
             fileDetails = fileDetailResponses.SelectToList(fdr => _mapper.Map<RedactedCivilFileDetailResponse>(fdr));
+
+            foreach (var fileDetail in fileDetails)
+                fileDetail.NextApprDt = fileIdAndAppearanceDate.First(fa => fa.PhysicalFileId == fileDetail.PhysicalFileId)
+                    .NextApprDt;
 
             return fileDetails;
         }
