@@ -16,6 +16,7 @@ using Scv.Api.Infrastructure.Encryption;
 using Scv.Api.Services;
 using Scv.Api.Services.Files;
 using BasicAuthenticationHeaderValue = JCCommon.Framework.BasicAuthenticationHeaderValue;
+using Scv.Api.Infrastructure.Handler;
 
 namespace Scv.Api.Infrastructure
 {
@@ -36,13 +37,15 @@ namespace Scv.Api.Infrastructure
 
         public static IServiceCollection AddHttpClientsAndScvServices(this IServiceCollection services, IConfiguration configuration)
         {
+            services.AddTransient<TimingHandler>();
             services.AddHttpClient<FileServicesClient>(client =>
             {
+                client.Timeout = TimeSpan.FromMinutes(5);
                 client.DefaultRequestHeaders.Authorization = new BasicAuthenticationHeaderValue(
                     configuration.GetNonEmptyValue("FileServicesClient:Username"),
                     configuration.GetNonEmptyValue("FileServicesClient:Password"));
                 client.BaseAddress = new Uri(configuration.GetNonEmptyValue("FileServicesClient:Url").EnsureEndingForwardSlash());
-            });
+            }).AddHttpMessageHandler<TimingHandler>();
 
             services.AddHttpClient<LookupCodeServicesClient>(client =>
             {
@@ -50,7 +53,7 @@ namespace Scv.Api.Infrastructure
                     configuration.GetNonEmptyValue("LookupServicesClient:Username"),
                     configuration.GetNonEmptyValue("LookupServicesClient:Password"));
                 client.BaseAddress = new Uri(configuration.GetNonEmptyValue("LookupServicesClient:Url").EnsureEndingForwardSlash());
-            });
+            }).AddHttpMessageHandler<TimingHandler>();
 
             services.AddHttpClient<LocationServicesClient>(client =>
             {
@@ -58,7 +61,7 @@ namespace Scv.Api.Infrastructure
                     configuration.GetNonEmptyValue("LocationServicesClient:Username"),
                     configuration.GetNonEmptyValue("LocationServicesClient:Password"));
                 client.BaseAddress = new Uri(configuration.GetNonEmptyValue("LocationServicesClient:Url").EnsureEndingForwardSlash());
-            });
+            }).AddHttpMessageHandler<TimingHandler>();
 
             services.AddHttpClient<UserServiceClient>(client =>
             {
@@ -67,7 +70,8 @@ namespace Scv.Api.Infrastructure
                     configuration.GetNonEmptyValue("UserServicesClient:Password"));
                 client.BaseAddress = new Uri(configuration.GetNonEmptyValue("UserServicesClient:Url")
                     .EnsureEndingForwardSlash());
-            });
+            }).AddHttpMessageHandler<TimingHandler>();
+
             services.AddHttpContextAccessor();
             services.AddTransient(s => s.GetService<IHttpContextAccessor>().HttpContext.User);
             services.AddScoped<FilesService>();

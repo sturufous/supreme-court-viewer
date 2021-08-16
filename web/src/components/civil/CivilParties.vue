@@ -22,8 +22,21 @@
                             <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
                         </template>                
                         <template v-for="(field,index) in fields" v-slot:[`cell(${field.key})`]="data" >
-                            <span v-bind:key="index" :style="field.cellStyle" v-if="data.field.key != 'Counsel'">  {{ data.value }} </span>
-                            <span v-bind:key="index" :style="field.cellStyle" v-if="data.field.key == 'Counsel'"><span v-for="(counsel, counselIndex) in data.value"  v-bind:key="counselIndex" style= "white-space: pre-line" >CEIS: {{ counsel }}</span> </span>
+                            <span 
+                                v-bind:key="index" 
+                                :style="field.cellStyle" 
+                                v-if="data.field.key != 'counsel'">  {{ data.value }} </span>
+                            <span 
+                                v-bind:key="index" 
+                                :style="field.cellStyle" 
+                                v-if="data.field.key == 'counsel'">
+                                <span 
+                                    v-for="(counsel, counselIndex) in data.value"  
+                                    v-bind:key="counselIndex" 
+                                    style= "white-space: pre-line" >
+                                    CEIS: {{ counsel }}
+                                </span>
+                            </span>
                         </template>
                         
                     </b-table>
@@ -50,9 +63,17 @@
                             <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
                         </template>                
                         <template v-for="(field,index) in fields" v-slot:[`cell(${field.key})`]="data" >
-                            <span v-bind:key="index" :style="field.cellStyle" v-if="data.field.key != 'Counsel'">  {{ data.value }} </span>
-                            <span v-bind:key="index" :style="field.cellStyle" v-if="data.field.key == 'Counsel'">
-                                <span v-for="(counsel, counselIndex) in data.value"  v-bind:key="counselIndex" style= "white-space: pre-line" >CEIS: {{ counsel }}<br></span>
+                            <span v-bind:key="index" :style="field.cellStyle" v-if="data.field.key != 'counsel'">  {{ data.value }} </span>
+                            <span 
+                                v-bind:key="index" 
+                                :style="field.cellStyle" 
+                                v-if="data.field.key == 'counsel'">
+                                <span 
+                                    v-for="(counsel, counselIndex) in data.value"  
+                                    v-bind:key="counselIndex" 
+                                    style= "white-space: pre-line" >
+                                    CEIS: {{ counsel }}<br>
+                                </span>
                             </span>
                         </template>
                         
@@ -69,7 +90,7 @@
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import "@store/modules/CivilFileInformation";
-import {civilFileInformationType, partiesInfoType} from '../../types/civil';
+import {civilFileInformationType, partiesInfoType} from '@/types/civil';
 const civilState = namespace("CivilFileInformation");
 
 @Component
@@ -85,14 +106,14 @@ export default class CivilParties extends Vue {
     rightRole = '';
     numberOfLeftParties = 0
     numberOfRightParties = 0;
-    sortBy = 'Name';
+    sortBy = 'name';
     sortDesc = false;
 
     fields =  
     [
-        {key:'Name',                  sortable:true,  tdClass: 'border-top',  headerStyle:'text-primary',   cellStyle:'font-weight: bold; font-size: 14px;'},
-        {key:'Role',                  sortable:false, tdClass: 'border-top',  headerStyle:'text',         cellStyle:'font-size: 14px;'},
-        {key:'Counsel',               sortable:false, tdClass: 'border-top', headerStyle:'text',         cellStyle:'font-size: 14px;'}
+        {key:'name',    label:'Name',      sortable:true,  tdClass: 'border-top',  headerStyle:'text-primary',   cellStyle:'font-weight: bold; font-size: 14px;'},
+        {key:'role',    label:'Role',      sortable:false, tdClass: 'border-top',  headerStyle:'text',           cellStyle:'font-size: 14px;'},
+        {key:'counsel', label:'Counsel',   sortable:false, tdClass: 'border-top',  headerStyle:'text',           cellStyle:'font-size: 14px;'}
     ];
     
     mounted() {

@@ -23,10 +23,10 @@
                 <template v-for="(field,index) in fields" v-slot:[`head(${field.key})`]="data">
                     <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
                 </template>
-                <template v-slot:cell(Status)="data" >                   
+                <template v-slot:cell(status)="data" >                   
                     <b-badge 
                         variant="primary" 
-                        style="font-weight: normal; font-size: 16px;"> 
+                        :style="data.field.cellStyle"> 
                         {{ data.value }}
                     </b-badge>
                 </template>
@@ -39,8 +39,8 @@
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import "@store/modules/CivilFileInformation";
-import {civilFileInformationType} from '../../types/civil';
-import {adjudicatorRestrictionsInfoType } from '../../types/common'
+import {civilFileInformationType} from '@/types/civil';
+import {adjudicatorRestrictionsInfoType } from '@/types/common';
 const civilState = namespace("CivilFileInformation");
 
 @Component
@@ -50,14 +50,14 @@ export default class  CivilAdjudicatorRestrictions extends Vue {
   public civilFileInformation!: civilFileInformationType;
     
   adjudicatorRestrictionsInfo: adjudicatorRestrictionsInfoType[] = []; 
-  sortBy = 'Adjudicator';
+  sortBy = 'adjudicator';
   sortDesc = false;
   isMounted = false;
 
   fields = [
-      {key:'Adjudicator', sortable:true, tdClass: 'border-top',  headerStyle:'text-primary'},       
-      {key:'Status',      sortable:true, tdClass: 'border-top',  headerStyle:'text-primary'},
-      {key:'Applies to',  sortable:true, tdClass: 'border-top',  headerStyle:'text-primary'}           
+      {key:'adjudicator',   label:'Adjudicator',    sortable:true, tdClass: 'border-top',  headerStyle:'text-primary'},       
+      {key:'status',        label:'Status',         sortable:true, tdClass: 'border-top',  headerStyle:'text-primary', cellStyle: 'font-weight: normal; font-size: 16px;'},
+      {key:'appliesTo',     label:'Applies to',     sortable:true, tdClass: 'border-top',  headerStyle:'text-primary'}           
   ];
   
   mounted() {

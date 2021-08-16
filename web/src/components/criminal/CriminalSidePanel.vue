@@ -20,7 +20,7 @@
 import { Component, Vue } from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
 import '@store/modules/CriminalFileInformation';
-import {showSectionsInfoType} from '../../types/criminal';
+import {showSectionsInfoType} from '@/types/criminal';
 const criminalState = namespace('CriminalFileInformation');
 
 @Component

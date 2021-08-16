@@ -5,7 +5,8 @@ import { VuexModule, Module, Mutation, Action } from 'vuex-module-decorators'
 })
 class CivilFileInformation extends VuexModule {
   public civilFileInformation = { }
-  public civilFileInfoLoaded = false
+  public civilFileInfoLoaded = false;
+  public hasNonParty = false;
 
   public showSections = {
     'Case Details': true,
@@ -16,7 +17,7 @@ class CivilFileInformation extends VuexModule {
     'Provided Documents': false
   }
 
-  public appearanceInfo = {}
+  public civilAppearanceInfo = {}
 
   @Mutation
   public setCivilFile(civilFileInformation): void {
@@ -39,6 +40,16 @@ class CivilFileInformation extends VuexModule {
   }
 
   @Mutation
+  public setHasNonParty(hasNonParty: boolean): void {
+    this.hasNonParty = hasNonParty
+  }
+
+  @Action
+  public UpdateHasNonParty(newHasNonParty: boolean): void {
+    this.context.commit('setHasNonParty', newHasNonParty)
+  }
+
+  @Mutation
   public setShowSections(showSections): void {
     this.showSections = showSections
   }
@@ -49,13 +60,13 @@ class CivilFileInformation extends VuexModule {
   }
 
   @Mutation
-  public setAppearanceInfo(appearanceInfo): void {
-    this.appearanceInfo = appearanceInfo
+  public setCivilAppearanceInfo(civilAppearanceInfo): void {
+    this.civilAppearanceInfo = civilAppearanceInfo
   }
 
   @Action
-  public UpdateAppearanceInfo(newAppearanceInfo): void {
-    this.context.commit('setAppearanceInfo', newAppearanceInfo)
+  public UpdateCivilAppearanceInfo(newCivilAppearanceInfo): void {
+    this.context.commit('setCivilAppearanceInfo', newCivilAppearanceInfo)
   }
 
 }

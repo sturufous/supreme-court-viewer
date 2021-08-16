@@ -5,7 +5,7 @@
             <b-row>         
                 <h3 class="ml-5 my-1 p-0 font-weight-normal" v-if="!showSections['Provided Documents']"> Provided Documents ({{NumberOfDocuments}}) </h3>
                 <custom-overlay :show="!downloadCompleted" style="padding: 0 1rem; margin-left:auto; margin-right:2rem;">
-                    <b-button @click="downloadDocuments()" size="sm" variant="success" style="padding: 0 1rem; margin-left:auto; margin-right:2rem;"> Download Selected </b-button>
+                    <b-button v-if="enableArchive" @click="downloadDocuments()" size="sm" variant="success" style="padding: 0 1rem; margin-left:auto; margin-right:2rem;"> Download Selected </b-button>
                 </custom-overlay>
             </b-row>
             <hr class="mx-3 bg-light" style="height: 5px;"/>                   
@@ -47,7 +47,7 @@
             <b-card bg-variant="light" v-if="isDataReady" style="max-height: 500px; overflow-y: auto;" no-body class="mx-3 mb-5">           
                 <b-table
                 :items="FilteredDocuments"
-                :fields="fields[fieldsTab]"
+                :fields="fields"
                 sort-by="appearanceDate"
                 :sort-desc.sync="sortDesc"
                 :no-sort-reset="true"
@@ -56,23 +56,23 @@
                 striped
                 responsive="sm"
                 >   
-                    <template v-for="(field,index) in fields[fieldsTab]" v-slot:[`head(${field.key})`]="data">
+                    <template v-for="(field,index) in fields" v-slot:[`head(${field.key})`]="data">
                         <b v-bind:key="index" :class="field.headerStyle" > {{ data.label }}</b>
                     </template>
 
-                    <template v-slot:[`cell(${fields[fieldsTab][appearanceDatePlace[fieldsTab]].key})`]="data" >                        
+                    <template v-slot:cell(appearanceDate)="data" >                        
                         <span :style="data.field.cellStyle">
                             {{ data.value | beautify-date}}
                         </span>
                     </template>
 
-                    <template v-slot:[`cell(${fields[fieldsTab][entryDatePlace[fieldsTab]].key})`]="data" >                        
+                    <!-- <template v-slot:cell(enterDtm)="data" >                        
                         <span :style="data.field.cellStyle">
                             {{ data.value | beautify-date-time}}
                         </span>
-                    </template>                     
+                    </template>                      -->
 
-                    <template v-slot:[`cell(${fields[fieldsTab][documentPlace[fieldsTab]].key})`]="data" >
+                    <template v-slot:cell(referenceDocumentTypeDsc)="data" >
                         <b-button                             
                             variant="outline-primary text-info" 
                             :style="data.field.cellStyle"
@@ -82,7 +82,7 @@
                         </b-button>                        
                     </template>
 
-                    <template v-slot:head(Select) >                                  
+                    <template v-if="enableArchive" v-slot:head(select) >                                  
                         <b-form-checkbox                            
                             class="m-0"
                             v-model="allDocumentsChecked"
@@ -90,7 +90,7 @@
                             size="sm"/>
                     </template>
 
-                    <template v-slot:cell(Select)="data" >                                  
+                    <template v-if="enableArchive" v-slot:cell(select)="data" >                                  
                         <b-form-checkbox
                             size="sm"
                             class="m-0"
@@ -107,7 +107,19 @@
                             :title="data.value.length>45? data.value:''">
                             {{data.value | truncate(45)}}
                         </div>
-                    </template>                    
+                    </template>
+
+                    <template  v-slot:cell(partyName)="data">
+                        <div v-for="(partyName,index) in data.value" v-bind:key="index">
+                            <span  :style="data.field.cellStyle"> {{ partyName }}</span>
+                        </div>
+                    </template>
+
+                    <template v-slot:cell(nonPartyName)="data">
+                        <div v-for="(nonParty,index) in data.value" v-bind:key="index">
+                            <span :style="data.field.cellStyle"> {{ nonParty }}</span>
+                        </div>
+                    </template>                       
                     
                     <template v-slot:cell()="data">                       
                         <span class="ml-2" :style="data.field.cellStyle"> 
@@ -132,13 +144,14 @@ import { Component, Vue} from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
 import base64url from "base64url";
 import '@store/modules/CivilFileInformation';
-import {civilFileInformationType, referenceDocumentsInfoType} from '../../types/civil';
-import { CourtDocumentType, DocumentData } from '../../types/shared';
+import "@store/modules/CommonInformation";
+import {civilFileInformationType, referenceDocumentsInfoType} from '@/types/civil';
+import { CourtDocumentType, DocumentData } from '@/types/shared';
 const civilState = namespace('CivilFileInformation');
-
+const commonState = namespace("CommonInformation");
 import CustomOverlay from "../CustomOverlay.vue"
 import shared from "../shared"
-import { archiveInfoType, documentRequestsInfoType } from '../../types/common';
+import { archiveInfoType, documentRequestsInfoType } from '@/types/common';
 enum fieldTab {Categories=0}
 
 @Component({
@@ -148,17 +161,22 @@ enum fieldTab {Categories=0}
 })
 export default class CivilProvidedDocumentsView extends Vue {
 
+    @commonState.State
+    public enableArchive!: boolean;
+
     @civilState.State
     public showSections
     
     @civilState.State
     public civilFileInformation!: civilFileInformationType
 
+    @civilState.State
+    public hasNonParty!: boolean
+
     @civilState.Action
     public UpdateCivilFile!: (newCivilFileInformation: civilFileInformationType) => void
 
     documents: referenceDocumentsInfoType[] = [];
-    documentsDetailsJson;
     loadingPdf = false;
     isMounted = false;
     isDataReady = false;
@@ -166,22 +184,21 @@ export default class CivilProvidedDocumentsView extends Vue {
     sortDesc = false;
     categories: string[] = []; 
     fieldsTab = fieldTab.Categories;
-    documentPlace = [2]
-    appearanceDatePlace = [3]
-    entryDatePlace = [4]
+    fields: any = [];
     selectedDocuments = {} as archiveInfoType; 
     downloadCompleted = true;
     allDocumentsChecked = false;     
 
-    fields = [ 
-        [
-            {key:'Select',label:'',sortable:false,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},
-            {key:'partyName',                label:'Party Name',  sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
-            {key:'referenceDocumentTypeDsc', label:'Document Type',  sortable:false,  headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 16px;text-align:left;'},
-            {key:'appearanceDate',           label:'Appearance Date', sortable:true,  headerStyle:'text',   cellStyle:'font-size: 16px;'},
-            {key:'enterDtm',                 label:'Created Date', sortable:true,  headerStyle:'text',   cellStyle:'font-size: 16px;'},
-            {key:'descriptionText',          label:'Description', sortable:false, headerStyle:'text',          cellStyle:'font-size: 12px;'}
-        ]         
+    initialFields = [ 
+        
+        {key:'select',                   label:'',                sortable:false, headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},
+        {key:'partyName',                label:'Party Name',      sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
+        {key:'nonPartyName',             label:'Non Party',  sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 16px;'},
+        {key:'referenceDocumentTypeDsc', label:'Document Type',   sortable:false, headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 16px;text-align:left;'},
+        {key:'appearanceDate',           label:'Appearance Date', sortable:true,  headerStyle:'text',          cellStyle:'font-size: 16px;'},
+        // {key:'enterDtm',                 label:'Created Date',    sortable:true,  headerStyle:'text',          cellStyle:'font-size: 16px;'},
+        {key:'descriptionText',          label:'Description',     sortable:false, headerStyle:'text',          cellStyle:'font-size: 12px;'}
+               
     ];
 
     public getDocuments(): void {        
@@ -189,6 +206,10 @@ export default class CivilProvidedDocumentsView extends Vue {
         this.categories = this.civilFileInformation.providedDocumentCategories;
         this.categories.sort()
         if(this.categories.indexOf("ALL") < 0) this.categories.unshift("ALL")
+        this.fields = JSON.parse(JSON.stringify(this.initialFields));
+        if (!this.hasNonParty){
+            this.fields.splice(2, 1);
+        }        
         if (this.documents.length > 0){
             this.isDataReady = true;
         }        
@@ -222,7 +243,7 @@ export default class CivilProvidedDocumentsView extends Vue {
                     documentId: id,
                     fileNumberText:  this.civilFileInformation.detailsData.fileNumberTxt,
                     location: this.civilFileInformation.detailsData.homeLocationAgencyName,
-                    partyName: doc.partyName
+                    partyName: doc.partyName.toString()
                 };
                 documentRequest.pdfFileName = shared.generateFileName(CourtDocumentType.ProvidedCivil, documentData); 
                 documentRequest.base64UrlEncodedDocumentId = base64url(id);
