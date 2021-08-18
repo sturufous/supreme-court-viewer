@@ -141,7 +141,7 @@ namespace tests.api.Controllers
 
             Assert.NotNull(referenceDocuments);
             //Was 4, might need pcss cred to get 4 docs back.
-            Assert.Equal(1,referenceDocuments.Count);
+            Assert.Equal(4,referenceDocuments.Count);
 
             Assert.Contains(referenceDocuments, rd => rd.AppearanceId == "13915");
             Assert.Contains(referenceDocuments, rd => rd.DescriptionText == "Affidavit #2 of Joan Smith sworn Jul 4 2020");
@@ -561,7 +561,7 @@ namespace tests.api.Controllers
 
             Assert.Equal(4, criminalFileDocuments.Participant.First().Document.Count);
             Assert.Contains(criminalFileDocuments.Participant.First().Document,
-                doc => doc.DocmFormDsc == "Summons Criminal Code (With a very long name so I can test Cannabis names)");
+                doc => doc.DocmFormDsc == "Recognizance of Bail");
             Assert.Contains(criminalFileDocuments.Participant.First().Document, doc => doc.PartId == "61145.0002");
         }
 
