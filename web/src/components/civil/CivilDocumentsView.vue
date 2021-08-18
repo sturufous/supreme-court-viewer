@@ -188,7 +188,7 @@ export default class CivilDocumentsView extends Vue {
     categories: string[] = []; 
     fieldsTab = fieldTab.Categories;
     documentPlace = [2, 1, 2, 2, 2]
-    datePlace = [5,2,3,5, 4]
+    datePlace = [4,2,3,5, 3]
     selectedDocuments = {} as archiveInfoType; 
     downloadCompleted = true;
     allDocumentsChecked = false; 
@@ -197,10 +197,10 @@ export default class CivilDocumentsView extends Vue {
         [
             {key:'select',        label:'',               sortable:false, headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},
             {key:'seq',           label:'Seq.',           sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 14px;'},
-            {key:'documentType',  label:'Document Type',  sortable:true,  headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 14px; text-align:left;'}, 
-            {key:'affNo',         label:'Aff No.',        sortable:false, headerStyle:'text',          cellStyle:'font-size: 14px;'},           
+            {key:'documentType',  label:'Document Type',  sortable:true,  headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 14px; text-align:left;'},                       
             {key:'act',           label: 'Act',           sortable:false, headerStyle:'text',          cellStyle:'display: block; margin-top: 1px; font-size: 14px; max-width : 50px;'},
             {key:'dateFiled',     label:'Date Filed',     sortable:true,  headerStyle:'text-danger',   cellStyle:'font-size: 14px;'},
+            {key:'affNo',         label:'Aff No.',        sortable:false, headerStyle:'text',          cellStyle:'font-size: 14px;'}, 
             {key:'swornBy',       label:'Sworn By',       sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 14px; margin-left: 20px'},                
             {key:'issues',        label:'Issues',         sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 14px; margin-left: 20px;'},
             {key:'filedByName',   label:'Filed By Name',  sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 14px; margin-left: 20px'},
@@ -234,9 +234,9 @@ export default class CivilDocumentsView extends Vue {
         [
             {key:'select',         label:'',               sortable:false, headerStyle:'text-primary',  cellStyle:'font-size: 16px;', tdClass: 'border-top', thClass:''},
             {key:'seq',            label:'Seq.',           sortable:true,  headerStyle:'text-primary',  cellStyle:'font-size: 14px;'},
-            {key:'documentType',   label:'Document Type',  sortable:true,  headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 14px; text-align:left;'},
-            {key:'affNo',          label:'Aff No.',        sortable:false, headerStyle:'text',          cellStyle:'font-size: 14px;'},           
+            {key:'documentType',   label:'Document Type',  sortable:true,  headerStyle:'text-primary',  cellStyle:'border:0px; font-size: 14px; text-align:left;'},                     
             {key:'dateFiled',      label:'Date Filed',     sortable:true,  headerStyle:'text-danger',   cellStyle:'font-size: 14px;'},
+            {key:'affNo',          label:'Aff No.',        sortable:false, headerStyle:'text',          cellStyle:'font-size: 14px;'},  
             {key:'swornBy',        label:'Sworn By',       sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 14px; margin-left: 20px'},           
             {key:'filedByName',    label:'Filed By Name',  sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 14px; margin-left: 20px'},
             {key:'issues',         label:'Issues',         sortable:false, headerStyle:'text',          cellStyle:'white-space: pre-line; font-size: 14px; margin-left: 20px;'},
