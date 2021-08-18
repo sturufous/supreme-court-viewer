@@ -30,7 +30,10 @@
                         </b-form-select>               
                     </b-card>                
                     <b-card  class="pb-0">
-                        <b-button @click="navigateToFilesView(fileSearch)">Search</b-button>
+                        <b-button variant="outline-primary text-dark" @click="navigateToFilesView(fileSearch)">
+                            <b-icon-search class="mr-1" variant="dark" ></b-icon-search>
+                            Search
+                        </b-button>
                     </b-card>                    
                 </b-card>
                 <b-card  align="left"  body-class="py-1">
@@ -46,7 +49,10 @@
                         <b-form-select v-model="selected" :options="options"></b-form-select>               
                     </b-card>                
                     <b-card >
-                        <b-button @click="navigateToDocumentsView(fileInformation)">Search</b-button>
+                        <b-button variant="outline-primary text-dark" @click="navigateToDocumentsView(fileInformation)">
+                            <b-icon-search class="mr-1" variant="dark" ></b-icon-search>
+                            Search
+                        </b-button>
                     </b-card>                    
                 </b-card>
             </b-col>
@@ -56,8 +62,8 @@
                         <b-card-title class="h3 my-0"> Search by Court List: </b-card-title>
                     </b-card>
                     <b-card body-class="mt-0 pt-0">
-                        <b-button @click="navigateToCourtList()">
-                            <b-icon icon="arrow-up-right-square-fill" variant="success"></b-icon>
+                        <b-button variant="outline-primary text-dark" @click="navigateToCourtList()">
+                            <b-icon-search class="mr-1" variant="dark" ></b-icon-search>
                             Navigate to Court List Search
                         </b-button>
                     </b-card>
@@ -211,9 +217,9 @@
 </script>
 
 <style scoped>
-    button {
+    /* button {
         background-color: #036
-    }
+    } */
 
     input, select {
         width: 300px;
