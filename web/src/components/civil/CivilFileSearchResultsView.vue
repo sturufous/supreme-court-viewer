@@ -175,7 +175,7 @@ export default class CivilFileSearchResultsView extends Vue {
                             civilListInfo.parties = partyInfo;
                             civilListInfo.fileId = jcivilList.physicalFileId;
                             civilListInfo.fileNumber = jcivilList.fileNumberTxt;
-                            civilListInfo.nextAppearance = '';
+                            civilListInfo.nextAppearance = jcivilList.NextApprDt;
                             civilListInfo.level = CourtLevel[jcivilList.courtLevelCd];
                             this.civilList.push(civilListInfo);                            
                         }                        

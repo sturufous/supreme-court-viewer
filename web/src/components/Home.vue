@@ -1,31 +1,13 @@
 <template>
     <b-card bg-variant="white" class="home">
         <b-card >
-            <b-card-title class="my-0 h2"> Temporary landing page for SCV </b-card-title>
+            <b-card-title class="my-0 ml-4 h1 text-primary"> Supreme Court Viewer </b-card-title>
         </b-card>
         <b-row cols="2"  body-class="py-0">
             <b-col md="6" cols="6"> 
-                <b-card  align="left"  body-class="py-1">
-                    <b-card>
-                        <b-card-title class="my-0 h3"> Search by File ID: </b-card-title>
-                    </b-card>
-                    <b-card  body-class="py-1">
-                        <b-card-text class="mb-1" for="fileId"> File ID: </b-card-text>                
-                        <b-form-input id="fileId" v-model="fileInformation.fileNumber" placeholder="Enter File ID"></b-form-input>                
-                    </b-card>
-                    <b-card> 
-                        <b-card-text class="mb-1" for="civil/criminal"> Civil/Criminal: </b-card-text>
-                        <b-form-select v-model="selected" :options="options"></b-form-select>               
-                    </b-card>                
-                    <b-card >
-                        <b-button @click="navigateToDocumentsView(fileInformation)">Search</b-button>
-                    </b-card>                    
-                </b-card>
-            </b-col>
-            <b-col md="6" cols="6"> 
                 <b-card  align="left"  body-class="pt-1 pb-0" >
                     <b-card >
-                        <b-card-title class="h3 my-0"> Search by File Number and Location: </b-card-title>
+                        <b-card-title class="h3 my-0 text-secondary"> Search by File Number and Location: </b-card-title>
                     </b-card>
                     <b-card  body-class="py-1">
                         <b-card-text class="mb-1" for="filenumber"> File Number: </b-card-text>                
@@ -48,14 +30,48 @@
                         </b-form-select>               
                     </b-card>                
                     <b-card  class="pb-0">
-                        <b-button @click="navigateToFilesView(fileSearch)">Search</b-button>
+                        <b-button variant="outline-primary text-dark" @click="navigateToFilesView(fileSearch)">
+                            <b-icon-search class="mr-1" variant="dark" ></b-icon-search>
+                            Search
+                        </b-button>
+                    </b-card>                    
+                </b-card>
+                <b-card  align="left"  body-class="py-1">
+                    <b-card>
+                        <b-card-title class="my-0 h3"> Search by File ID: </b-card-title>
+                    </b-card>
+                    <b-card  body-class="py-1">
+                        <b-card-text class="mb-1" for="fileId"> File ID: </b-card-text>                
+                        <b-form-input id="fileId" v-model="fileInformation.fileNumber" placeholder="Enter File ID"></b-form-input>                
+                    </b-card>
+                    <b-card> 
+                        <b-card-text class="mb-1" for="civil/criminal"> Civil/Criminal: </b-card-text>
+                        <b-form-select v-model="selected" :options="options"></b-form-select>               
+                    </b-card>                
+                    <b-card >
+                        <b-button variant="outline-primary text-dark" @click="navigateToDocumentsView(fileInformation)">
+                            <b-icon-search class="mr-1" variant="dark" ></b-icon-search>
+                            Search
+                        </b-button>
                     </b-card>                    
                 </b-card>
             </b-col>
+            <b-col md="6" cols="6"> 
+                <b-card  align="left"  body-class="pt-1 pb-0" >
+                    <b-card >
+                        <b-card-title class="h3 my-0"> Search by Court List: </b-card-title>
+                    </b-card>
+                    <b-card body-class="mt-0 pt-0">
+                        <b-button variant="outline-primary text-dark" @click="navigateToCourtList()">
+                            <b-icon-search class="mr-1" variant="dark" ></b-icon-search>
+                            Navigate to Court List Search
+                        </b-button>
+                    </b-card>
+                                 
+                </b-card>
+            </b-col>
         </b-row>
-        <b-card body-class="mt-0 pt-0">
-            <b-button @click="navigateToCourtList()">Court List</b-button>
-        </b-card>
+        
 
         <b-modal v-model="openErrorModal" header-class="bg-warning text-light">
             <b-card class="h4 mx-2 py-2">
@@ -201,9 +217,9 @@
 </script>
 
 <style scoped>
-    button {
+    /* button {
         background-color: #036
-    }
+    } */
 
     input, select {
         width: 300px;
