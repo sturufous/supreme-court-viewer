@@ -2,6 +2,9 @@
     <b-card bg-variant="white" no-body>
         <div>            
             <h2 class="mx-4 mt-5 font-weight-normal text-civil ">Civil</h2>
+            <custom-overlay :show="!loadCompleted" style="padding: 0 1rem; margin-left:auto; margin-right:2rem;">
+                <b-button @click="openFiles()" variant="success" style="padding: 0 1rem; margin-left:auto; right:0; bottom: 1rem;  position: absolute;"> Open Selected </b-button>
+            </custom-overlay> 
             <hr class="mx-3 bg-civil" style="height: 5px;"/> 
         </div>
 
@@ -40,19 +43,46 @@
                  <template v-for="(field,index) in fields" v-slot:[`head(${field.key})`]="data">
                     <h3 v-bind:key="index" > {{ data.label }}</h3>
                 </template> 
-                <template  v-slot:[`cell(${fields[0].key})`]="data">
+
+                <template v-slot:head(select) >                                  
+                    <b-form-checkbox                            
+                        class="m-0"
+                        v-model="allFilesChecked"
+                        @change="checkAllFiles"                                                                       					
+                        size="sm"/>
+                </template>
+
+                <template v-slot:cell(select)="data" >                                  
+                    <b-form-checkbox
+                        size="sm"
+                        class="m-0"
+                        v-model="data.item.isChecked"
+                        @change="toggleSelectedFiles"                                            					
+                        />
+                </template>
+
+                <template v-slot:cell(fileNumber)="data">
                     <b-button
-                        style="font-size:16px; font-weight: bold; border: none;" 
+                        :style="data.field.cellStyle" 
                         size="sm" 
-                        @click="OpenCivilFilePage(data.value)"                        
+                        @click="OpenCivilFilePage(data.item.fileId)"                        
                         variant="outline-primary border-white text-civil" 
                         class="mr-2">                            
                             {{data.value}}
                     </b-button>
                 </template>            
-                <template  v-slot:cell(Parties)="data">
-                    <span v-for="(party, index) in data.value" v-bind:key="index" style= "white-space: pre-line">
+                <template  v-slot:cell(parties)="data">
+                    <span 
+                        v-for="(party, index) in data.value" 
+                        v-bind:key="index" 
+                        :style="data.field.cellStyle">
                         {{ party }} <br>
+                    </span>
+                </template>
+                <template  v-slot:cell(nextAppearance)="data">
+                    <span  
+                        :style="data.field.cellStyle">
+                        {{ data.value | beautify-date }}
                     </span>
                 </template>
             </b-table>
@@ -64,16 +94,21 @@
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import * as _ from 'underscore';
-import {civilFileInformationType, fileSearchCivilInfoType} from '../../types/civil';
-import {inputNamesType} from '../../types/common';
+import {civilFileInformationType, fileSearchCivilInfoType} from '@/types/civil';
+import {inputNamesType} from '@/types/common';
 import "@store/modules/CommonInformation";
 const commonState = namespace("CommonInformation");
 import "@store/modules/CivilFileInformation";
 const civilState = namespace("CivilFileInformation");
+import CustomOverlay from "../CustomOverlay.vue";
 
 enum CourtLevel {'P'= 'Provincial','S' = 'Supreme'}
 
-@Component
+@Component({
+    components: {
+       CustomOverlay
+    }
+})
 export default class CivilFileSearchResultsView extends Vue {    
     
     @civilState.State
@@ -91,19 +126,24 @@ export default class CivilFileSearchResultsView extends Vue {
     civilList: fileSearchCivilInfoType[] = [];    
     isMounted = false;
     isDataReady = false;
+    loadCompleted = true;
     errorCode=0
     errorText=''
-    fileInformation = {};
+    allFilesChecked = false;    
+    selectedFiles: string[] = [];
     
     fields =  
-    [        
-        {key:'File Id',             tdClass: 'border-top'},        
-        {key:'Parties',             tdClass: 'border-top'},
-        {key:'Level',               tdClass: 'border-top'}
+    [
+        {key:'select',  label:'',         tdClass: 'border-top', cellStyle:'font-size: 16px;', sortable:false, headerStyle:'text-primary', thClass:''},                
+        {key:'fileNumber',  label:'File Number',  tdClass: 'border-top', cellStyle: 'font-size:16px; font-weight: bold; border: none;'},        
+        {key:'parties', label:'Parties',  tdClass: 'border-top', cellStyle: 'white-space: pre-line'},
+        {key:'nextAppearance',  label:'Next Appearance',   tdClass: 'border-top', cellStyle: 'white-space: pre-line'},    
+        {key:'level',   label:'Level',    tdClass: 'border-top'}
     ];
 
     mounted() {      
-        this.getList();       
+        this.getList(); 
+        this.loadCompleted = true;      
     }
 
     public getList(): void {
@@ -118,7 +158,7 @@ export default class CivilFileSearchResultsView extends Vue {
             ).then(data => {
                 if(data){
                     if (data.length > 1) {
-
+                        console.log(data)
                         for (const civilListIndex in data) {
                             const civilListInfo = {} as fileSearchCivilInfoType;
                             const jcivilList = data[civilListIndex];
@@ -132,9 +172,11 @@ export default class CivilFileSearchResultsView extends Vue {
                                 const roleDsc = (jParty.leftRightCd == "R")? rightRole: leftRole;
                                 partyInfo.push(this.displayName + " (" + roleDsc + ")");
                             }
-                            civilListInfo.Parties = partyInfo;
-                            civilListInfo["File Id"] = jcivilList.physicalFileId;
-                            civilListInfo["Level"] = CourtLevel[jcivilList.courtLevelCd];
+                            civilListInfo.parties = partyInfo;
+                            civilListInfo.fileId = jcivilList.physicalFileId;
+                            civilListInfo.fileNumber = jcivilList.fileNumberTxt;
+                            civilListInfo.nextAppearance = jcivilList.NextApprDt;
+                            civilListInfo.level = CourtLevel[jcivilList.courtLevelCd];
                             this.civilList.push(civilListInfo);                            
                         }                        
 
@@ -163,8 +205,37 @@ export default class CivilFileSearchResultsView extends Vue {
         window.open(routeData.href, '_blank');
     }
 
+    public openFiles() {
+
+        this.loadCompleted = false;
+        for(const file of this.SortedList){
+            if (file.isChecked) {
+                this.OpenCivilFilePage(file.fileId);
+            }
+        }
+        this.loadCompleted = true;
+    }
+
+    public checkAllFiles(checked){
+        for(const docInx in this.SortedList) {       
+            this.SortedList[docInx].isChecked = checked;              
+        }        
+    }
+
+    public toggleSelectedFiles() {  
+        Vue.nextTick(()=>{
+
+            const checkedDocs = this.SortedList.filter(file=>{return file.isChecked});
+            
+            if(checkedDocs.length == this.SortedList.length)
+                this.allFilesChecked = true;
+            else
+                this.allFilesChecked = false;                       
+        })        
+	}
+
     get SortedList() {                
-        return  _.sortBy(this.civilList, 'File Id')
+        return  _.sortBy(this.civilList, 'fileId')
     }
 
     public navigateToLandingPage() {

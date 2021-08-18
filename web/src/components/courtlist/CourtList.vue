@@ -177,12 +177,9 @@
             </b-card>
     
             <b-card no-body v-if="isDataReady">
-                <b-row cols="1" class = "mx-2 mt-2 mb-5">
-                    <criminal-list v-if="criminalCases>0"/>
-                    <civil-list v-if="familyCases>0" civilClass='family'/>
-                    <civil-list v-if="civilCases>0" civilClass='civil'/>
-                    <b-card class="mb-5"/>
-                    
+                <b-row cols="1" class = "mx-2 mt-2 mb-5">                   
+                    <court-list-layout />
+                    <b-card class="mb-5"/>                    
                 </b-row> 
             </b-card>
         </b-card> 
@@ -196,16 +193,18 @@ import { Component, Vue } from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
 import * as _ from 'underscore';
 
-import CriminalList from "@components/courtlist/CriminalList.vue";
-import CivilList from "@components/courtlist/CivilList.vue";
-import {courtListInformationInfoType, roomsInfoType, courtRoomsAndLocationsInfoType, locationInfoType} from '../../types/courtlist';
+import CourtListLayout from "@components/courtlist/CourtListLayout.vue";
+import {courtListInformationInfoType, roomsInfoType, courtRoomsAndLocationsInfoType, locationInfoType} from '@/types/courtlist';
 import '@store/modules/CourtListInformation';
+import { courtRoomsJsonInfoType } from '@/types/common';
 const courtListState = namespace('CourtListInformation');
 
+const commonState = namespace("CommonInformation");
+import '@store/modules/CourtListInformation';
+
 @Component({
-    components: {
-        CriminalList,
-        CivilList
+    components: {       
+        CourtListLayout
     }
 })
 export default class CourtList extends Vue {
@@ -214,7 +213,10 @@ export default class CourtList extends Vue {
     public courtListInformation!: courtListInformationInfoType
 
     @courtListState.Action
-    public UpdateCourtList!: (newCourtListInformation: courtListInformationInfoType) => void  
+    public UpdateCourtList!: (newCourtListInformation: courtListInformationInfoType) => void
+    
+    @commonState.Action
+    public UpdateCourtRoomsAndLocations!: (newCourtRoomsAndLocations) => void
 
     errorCode=0
     errorText=''
@@ -233,8 +235,8 @@ export default class CourtList extends Vue {
     totalMins =0;
     totalTime = '';
     totalTimeUnit = 'Hours';
-    courtRoomsAndLocationsJson;
-    courtRoomsAndLocations: courtRoomsAndLocationsInfoType[] = []
+    courtRoomsAndLocationsJson: courtRoomsJsonInfoType[] = [];
+    courtRoomsAndLocations: courtRoomsAndLocationsInfoType[] = [];
 
     selectedDate = (new Date).toISOString().substring(0,10);
     validSelectedDate = this.selectedDate;
@@ -260,6 +262,7 @@ export default class CourtList extends Vue {
             ).then(data => {
                 if(data){
                     this.courtRoomsAndLocationsJson = data
+                    this.UpdateCourtRoomsAndLocations(data)
                     this.ExtractCourtRoomsAndLocationsInfo();
                     if(this.courtRoomsAndLocations.length>0)
                     {                    

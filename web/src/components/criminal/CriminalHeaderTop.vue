@@ -18,34 +18,14 @@
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import "@store/modules/CriminalFileInformation";
+import { criminalFileInformationType } from "@/types/criminal";
 const criminalState = namespace("CriminalFileInformation");
 
 @Component
-export default class CriminalHeaderTop extends Vue {
+export default class CriminalHeaderTop extends Vue {  
   
-  /* eslint-disable */
   @criminalState.State
-  public criminalFileInformation!: any;
-  /* eslint-enable */ 
-
-
-  mounted() {
-    this.getFileDescription();
-  }
-
-  public getFileDescription(): void {      
-      const data = this.criminalFileInformation.detailsData;
-      this.courtClassDescription = data.courtClassDescription;      
-      this.courtLevelDescription = data.courtLevelDescription;
-      if (data.assignmentTypeDsc && data.assignmentTypeDsc.length > 0) {
-        this.assignmentTypeDescription = data.assignmentTypeDsc;
-        this.hasAssignmentTypeDsc = true;
-      }
-      this.hasCrownNotesToJCM = data.trialRemark.length > 0;
-      this.indictable = data.indictableYN =='Y'? 'Indictable' : 'Summarily';
-     
-      this.isMounted = true;          
-  } 
+  public criminalFileInformation!: criminalFileInformationType;  
 
   courtLevelDescription;
   courtClassDescription;
@@ -54,6 +34,23 @@ export default class CriminalHeaderTop extends Vue {
   hasCrownNotesToJCM = false;
   hasAssignmentTypeDsc = false;
   isMounted = false;
+
+  mounted() {
+    this.getFileDescription();
+  }
+
+  public getFileDescription(): void {      
+      const data = this.criminalFileInformation.detailsData;    
+      this.courtClassDescription = data.courtClassDescription;      
+      this.courtLevelDescription = data.courtLevelDescription;
+      if (data.assignmentTypeDsc && data.assignmentTypeDsc.length > 0) {
+        this.assignmentTypeDescription = data.assignmentTypeDsc;
+        this.hasAssignmentTypeDsc = true;
+      }
+      this.hasCrownNotesToJCM = data.trialRemark && data.trialRemark.length > 0;
+      this.indictable = data.indictableYN =='Y'? 'Indictable' : 'Summarily';     
+      this.isMounted = true;          
+  }  
  
 }
 </script>
