@@ -346,13 +346,14 @@ export default class CourtListLayout extends Vue {
     civilCourtListJson: civilCourtListType[] = [];       
     criminalCourtListJson: criminalCourtListType[] = [];
     courtList: courtListInfoType[] = []; 
+    fields: any = [];
     courtRoom;
     isMounted = false;
     isDataReady = false;
     showNotes = false;
     notes = {remarks:[], text:'', trialNotes:'', fileComment:'', commentToJudge:'', sheriffComment:''};      
     
-    fields =  
+    initialFields =  
     [
         {key:'seq',                     label:'Seq.',                 tdClass: 'border-top',              cellStyle:'font-weight: normal; font-size: 16px; padding-top:8px'},        
         {key:'fileNumber',              label:'File Number',          tdClass: 'border-top',              cellStyle:'font-size:16px'},
@@ -385,6 +386,13 @@ export default class CourtListLayout extends Vue {
         this.criminalCourtListJson = data.criminalCourtList;
         this.ExtractCriminalListInfo();
         console.log(this.courtList)
+        this.fields = JSON.parse(JSON.stringify(this.initialFields));
+        if (this.criminalCourtListJson.length == 0){
+            this.fields.splice(4, 1)
+        }
+        if (this.civilCourtListJson.length == 0){
+            this.fields.splice(3, 1)
+        }
         if(this.courtList.length)
         {                    
             this.isDataReady = true;

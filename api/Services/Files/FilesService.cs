@@ -5,6 +5,7 @@ using JCCommon.Clients.FileServices;
 using LazyCache;
 using MapsterMapper;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Serialization;
 using Scv.Api.Helpers;
 using Scv.Api.Helpers.ContractResolver;
@@ -37,13 +38,15 @@ namespace Scv.Api.Services.Files
             LookupService lookupService,
             LocationService locationService,
             IAppCache cache,
-            ClaimsPrincipal claimsPrincipal)
+            ClaimsPrincipal claimsPrincipal,
+            ILoggerFactory factory
+            )
         {
             _filesClient = filesClient;
             _filesClient.JsonSerializerSettings.ContractResolver = new SafeContractResolver { NamingStrategy = new CamelCaseNamingStrategy() };
             _cache = cache;
             _cache.DefaultCachePolicy.DefaultCacheDurationSeconds = int.Parse(configuration.GetNonEmptyValue("Caching:FileExpiryMinutes")) * 60;
-            Civil = new CivilFilesService(configuration, filesClient, mapper, lookupService, locationService, _cache, claimsPrincipal);
+            Civil = new CivilFilesService(configuration, filesClient, mapper, lookupService, locationService, _cache, claimsPrincipal, factory.CreateLogger<CivilFilesService>());
             Criminal = new CriminalFilesService(configuration, filesClient, mapper, lookupService, locationService, _cache, claimsPrincipal);
 
             _applicationCode = claimsPrincipal.ApplicationCode();

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -8,10 +7,10 @@ using JCCommon.Clients.FileServices;
 using LazyCache;
 using MapsterMapper;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Serialization;
 using Scv.Api.Helpers;
 using Scv.Api.Helpers.ContractResolver;
-using Scv.Api.Helpers.Exceptions;
 using Scv.Api.Helpers.Extensions;
 using Scv.Api.Models.Civil.AppearanceDetail;
 using Scv.Api.Models.Civil.Appearances;
@@ -27,6 +26,7 @@ namespace Scv.Api.Services.Files
     {
         #region Variables
 
+        private readonly ILogger<CivilFilesService> _logger;
         private readonly IAppCache _cache;
         private readonly FileServicesClient _filesClient;
         private readonly IMapper _mapper;
@@ -46,7 +46,8 @@ namespace Scv.Api.Services.Files
             LookupService lookupService,
             LocationService locationService,
             IAppCache cache,
-            ClaimsPrincipal user)
+            ClaimsPrincipal user,
+            ILogger<CivilFilesService> logger)
         {
             _filesClient = filesClient;
             _filesClient.JsonSerializerSettings.ContractResolver = new SafeContractResolver { NamingStrategy = new CamelCaseNamingStrategy() };
@@ -57,6 +58,7 @@ namespace Scv.Api.Services.Files
             _applicationCode = user.ApplicationCode();
             _requestAgencyIdentifierId = user.AgencyCode();
             _requestPartId = user.ParticipantId();
+            _logger = logger;
         }
 
         #endregion Constructor
@@ -91,26 +93,35 @@ namespace Scv.Api.Services.Files
                 CourtLevel = courtLevelCd
             });
 
-            var targetIds = fileSearchResponse?.FileDetail?.Where(fd => !courtClassSet || fd.CourtClassCd == courtClass)
-                                                           .SelectToList(fd => fd.PhysicalFileId);
+            if (fileSearchResponse.ResponseCd != "0")
+                _logger.LogInformation("Civil search returned responseCd != 0");
 
-            if (targetIds == null || targetIds.Count == 0)
+            ValidUserHelper.CheckIfValidUser(fileSearchResponse.ResponseMessageTxt);
+
+            var fileIdAndAppearanceDate = fileSearchResponse?.FileDetail?.Where(fd => !courtClassSet || fd.CourtClassCd == courtClass)
+                                                           .SelectToList(fd => new { fd.PhysicalFileId, fd.NextApprDt });
+
+            if (fileIdAndAppearanceDate == null || fileIdAndAppearanceDate.Count == 0)
                 return fileDetails;
 
             //Return the basic entry without doing a lookup.
-            if (targetIds.Count == 1)
-                return new List<RedactedCivilFileDetailResponse> { new RedactedCivilFileDetailResponse { PhysicalFileId = targetIds.First() }} ;
+            if (fileIdAndAppearanceDate.Count == 1)
+                return new List<RedactedCivilFileDetailResponse> { new RedactedCivilFileDetailResponse { PhysicalFileId = fileIdAndAppearanceDate.First().PhysicalFileId }} ;
 
             var fileDetailTasks = new List<Task<CivilFileDetailResponse>>();
-            foreach (var fileId in targetIds)
+            foreach (var fileId in fileIdAndAppearanceDate)
             {
                 async Task<CivilFileDetailResponse> FileDetails() =>
-                    await _filesClient.FilesCivilGetAsync(_requestAgencyIdentifierId, _requestPartId, _applicationCode, fileId);
+                    await _filesClient.FilesCivilGetAsync(_requestAgencyIdentifierId, _requestPartId, _applicationCode, fileId.PhysicalFileId);
                 fileDetailTasks.Add(_cache.GetOrAddAsync($"CivilFileDetail-{fileId}-{_requestAgencyIdentifierId}", FileDetails));
             }
 
             var fileDetailResponses = await fileDetailTasks.WhenAll();
             fileDetails = fileDetailResponses.SelectToList(fdr => _mapper.Map<RedactedCivilFileDetailResponse>(fdr));
+
+            foreach (var fileDetail in fileDetails)
+                fileDetail.NextApprDt = fileIdAndAppearanceDate.First(fa => fa.PhysicalFileId == fileDetail.PhysicalFileId)
+                    .NextApprDt;
 
             return fileDetails;
         }
