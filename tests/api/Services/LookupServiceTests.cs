@@ -43,13 +43,6 @@ namespace tests.api.Services
             Assert.Equal("AFFIDAVITS", documentCategory);
         }
 
-        [Fact]
-        public async Task Lookup_Party_Appearances()
-        {
-            var go = await _lookupService.GetCriminalAccusedAttend("P");
-
-        }
-
         #region Helpers
         private void SetupLookupServiceTests()
         {
