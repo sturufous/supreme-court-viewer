@@ -15,8 +15,8 @@ namespace Scv.Api.Models.Search
         public string FilePermissions { get; set; }
         public string FileSuffixNo { get; set; }
         public string MdocRefTypeCode { get; set; }
-        public CourtClassCd2? CourtClass { get; set; }
-        public CourtLevelCd2? CourtLevel { get; set; }
+        public CourtClassCd? CourtClass { get; set; }
+        public CourtLevelCd? CourtLevel { get; set; }
         public NameSearchTypeCd? NameSearchTypeCd { get; set; }
         public string LastName { get; set; }
         public string OrgName { get; set; }

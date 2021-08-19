@@ -70,7 +70,7 @@ namespace Scv.Api.Controllers
         [Route("civil")]
         public async Task<ActionResult<List<RedactedCivilFileDetailResponse>>> GetCivilFileIdsByAgencyIdCodeAndFileNumberText(string location, string fileNumber)
         {
-            var courtLevel = User.IsSupremeUser() ? CourtLevelCd3.S : CourtLevelCd3.P;
+            var courtLevel = User.IsSupremeUser() ? CourtLevelCd.S : CourtLevelCd.P;
             var civilFiles = await _civilFilesService.GetFilesByAgencyIdCodeAndFileNumberText(location, fileNumber, courtLevel);
             if (civilFiles == null || civilFiles.Count == 0)
                 throw new NotFoundException("Couldn't find civil file with this location and file number.");
@@ -174,7 +174,7 @@ namespace Scv.Api.Controllers
         [Route("criminal")]
         public async Task<ActionResult<List<RedactedCriminalFileDetailResponse>>> GetCriminalFileIdsByAgencyIdCodeAndFileNumberText(string location, string fileNumber)
         {
-            var courtLevel = User.IsSupremeUser() ? CourtLevelCd2.S : CourtLevelCd2.P;
+            var courtLevel = User.IsSupremeUser() ? CourtLevelCd.S : CourtLevelCd.P;
             var criminalFiles = await _criminalFilesService.GetFilesByAgencyIdCodeAndFileNumberText(location, fileNumber, courtLevel);
             if (criminalFiles == null || criminalFiles.Count == 0)
                 throw new NotFoundException("Couldn't find criminal file with this location and file number.");
@@ -280,17 +280,14 @@ namespace Scv.Api.Controllers
             }
 
             var documentResponse = await _filesService.DocumentAsync(documentId, isCriminal, fileId);
-
-            if (documentResponse.B64Content == null || documentResponse.B64Content.Length <= 0)
-                throw new NotFoundException("Couldn't find document with this id.");
-
-            return BuildPdfFileResponse(documentResponse.B64Content);
+            return File(documentResponse.Stream, "application/pdf");
         }
 
         [HttpPost]
         [Route("archive")]
         public async Task<IActionResult> GetArchive(ArchiveRequest archiveRequest)
         {
+            //TODO this needs to be fixed.
             if (User.IsVcUser())
             {
                 if (!await _vcCivilFileAccessHandler.HasCivilFileAccess(User, archiveRequest.VcCivilFileId))
@@ -341,14 +338,14 @@ namespace Scv.Api.Controllers
             var rops = (await ropRequestTasks.WhenAll()).ToList();
 
             if (courtSummaryReports.Any(d => d.ResponseCd != "0")) return BadRequest("One of the CSRs didn't return correctly.");
-            if (documents.Any(d => d.ResultCd != "1")) return BadRequest("One of the documents didn't return correctly.");
             if (rops.Any(d => d.ResultCd == "0")) return BadRequest("One of the ROPs didn't return correctly.");
 
             var pdfDocuments = courtSummaryReports.SelectToList(d => new PdfDocument
                 { Content = d.ReportContent, FileName = courtSummaryRequests[courtSummaryReports.IndexOf(d)].PdfFileName });
 
-            pdfDocuments.AddRange(documents.SelectToList(d => new PdfDocument
-                { Content = d.B64Content, FileName = documentRequest[documents.IndexOf(d)].PdfFileName}));
+            //TODO documents coming back are streams. this is disabled for now. 
+            /*pdfDocuments.AddRange(documents.SelectToList(d => new PdfDocument
+                { Content = d.B64Content, FileName = documentRequest[documents.IndexOf(d)].PdfFileName}));*/
 
             pdfDocuments.AddRange(rops.Select(d => new PdfDocument
                 { Content = d.B64Content, FileName = ropRequests[rops.IndexOf(d)].PdfFileName }));

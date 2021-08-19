@@ -59,7 +59,7 @@ namespace Scv.Api.Services.Files
 
        
 
-        public async Task<DocumentResponse> DocumentAsync(string documentId, bool isCriminal, string physicalFileId)
+        public async Task<FileResponse> DocumentAsync(string documentId, bool isCriminal, string physicalFileId)
         {
             return await _filesClient.FilesDocumentAsync(_requestAgencyIdentifierId, _requestPartId, _applicationCode, documentId, isCriminal ? "R" : "I", physicalFileId);
         }

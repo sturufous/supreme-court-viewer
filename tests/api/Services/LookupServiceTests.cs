@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Threading.Tasks;
 using JCCommon.Clients.LookupCodeServices;
 using LazyCache;
 using Scv.Api.Services;
@@ -40,6 +41,13 @@ namespace tests.api.Services
         {
             var documentCategory = _lookupService.GetDocumentCategory("AAS");
             Assert.Equal("AFFIDAVITS", documentCategory);
+        }
+
+        [Fact]
+        public async Task Lookup_Party_Appearances()
+        {
+            var go = await _lookupService.GetCriminalAccusedAttend("P");
+
         }
 
         #region Helpers
