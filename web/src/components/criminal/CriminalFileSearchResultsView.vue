@@ -2,8 +2,13 @@
     <b-card bg-variant="white" no-body>
         <div>
             <h2 class="mx-4 mt-5 font-weight-normal text-criminal ">Criminal</h2>  
-            <custom-overlay :show="!loadCompleted" style="padding: 0 1rem; margin-left:auto; margin-right:2rem;">
-                <b-button @click="openFiles()" variant="success" style="padding: 0 1rem; margin-left:auto; right:0; bottom: 1rem;  position: absolute;"> Open Selected </b-button>
+            <custom-overlay :show="!loadCompleted" style="padding: 0 1rem; margin-left:auto; margin-right:0.5rem;">
+                <b-button 
+                    @click="openFiles()" 
+                    variant="outline-primary bg-success text-white" 
+                    style="padding:0.5rem 1.5rem; margin-left:auto; right:0; bottom: 1rem;  position: absolute;">
+                    <b-icon-box-arrow-up-right class="mx-0 pl-0" variant="white" scale="1" ></b-icon-box-arrow-up-right>  Open Selected
+                </b-button>
             </custom-overlay>          
             <hr class="mx-3 bg-criminal" style="height: 5px;"/> 
         </div>
@@ -15,8 +20,11 @@
                 <span v-else-if="errorCode==403"> You are not authorized to access this file. </span>
                 <span v-else> Server is not responding. <b>({{errorText}})</b> </span>
             </b-card>
-            <b-card>         
-                <b-button id="backToLandingPage" variant="info" @click="navigateToLandingPage">Back to the Landing Page</b-button>
+            <b-card> 
+                <b-button id="backToLandingPage" variant="outline-primary text-dark bg-warning" @click="navigateToLandingPage">
+                    <b-icon-house-door class="mr-1 ml-0" variant="dark" scale="1" ></b-icon-house-door>
+                    Return to Main Page
+                </b-button>        
             </b-card>
         </b-card>
 
@@ -89,7 +97,16 @@
                     </span>
                 </template>
             </b-table>
-        </b-card>      
+        </b-card> 
+
+        <b-card class="mb-5" align="right">         
+            <b-button id="backToLandingPage" variant="outline-primary text-dark bg-warning" @click="navigateToLandingPage">
+                <b-icon-house-door class="mr-1 ml-0" variant="dark" scale="1" ></b-icon-house-door>
+                Return to Main Page
+            </b-button>
+        </b-card> 
+
+
     </b-card>
 </template>
 
