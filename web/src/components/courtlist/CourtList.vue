@@ -20,8 +20,11 @@
             </span>
             <span v-else > No Court Location Found. </span>                    
         </b-card>
-        <b-card>         
-            <b-button variant="info" @click="navigateToLandingPage">Back to the Landing Page</b-button>
+        <b-card>
+            <b-button id="backToLandingPage" variant="outline-primary text-dark bg-warning" @click="navigateToLandingPage">
+                <b-icon-house-door class="mr-1 ml-0" variant="dark" scale="1" ></b-icon-house-door>
+                Return to Main Page
+            </b-button>         
         </b-card>      
     </b-card>
 
@@ -177,12 +180,19 @@
             </b-card>
     
             <b-card no-body v-if="isDataReady">
-                <b-row cols="1" class = "mx-2 mt-2 mb-5">                   
+                <b-row cols="1" class = "mx-2 mt-2 mb-4">                   
                     <court-list-layout />
-                    <b-card class="mb-5"/>                    
+                    <b-card class="my-0"/>                    
                 </b-row> 
             </b-card>
         </b-card> 
+
+        <b-card class="mb-5" align="right">         
+            <b-button id="backToLandingPage" variant="outline-primary text-dark bg-warning" @click="navigateToLandingPage">
+                <b-icon-house-door class="mr-1 ml-0" variant="dark" scale="1" ></b-icon-house-door>
+                Return to Main Page
+            </b-button>
+        </b-card>
 
     </b-card>
 </div>
