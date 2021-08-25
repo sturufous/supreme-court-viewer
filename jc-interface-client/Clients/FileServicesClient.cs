@@ -402,10 +402,11 @@ namespace JCCommon.Clients.FileServices
         /// <param name="documentId">cfcAccusedFile.document array element's imageId, or cvfcCivilFile document array element's imageId</param>
         /// <param name="courtDivisionCd">R for criminal, I for non-criminal</param>
         /// <param name="fileId">Physical File Id (CEIS) or Justin No (JUSTIN)</param>
+        /// <param name="flatten">Flatten file</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<FileResponse> FilesDocumentAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, string documentId, string courtDivisionCd, string fileId)
+        public System.Threading.Tasks.Task<FileResponse> FilesDocumentAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, string documentId, string courtDivisionCd, string fileId, bool? flatten)
         {
-            return FilesDocumentAsync(requestAgencyIdentifierId, requestPartId, applicationCd, documentId, courtDivisionCd, fileId, System.Threading.CancellationToken.None);
+            return FilesDocumentAsync(requestAgencyIdentifierId, requestPartId, applicationCd, documentId, courtDivisionCd, fileId, flatten, System.Threading.CancellationToken.None);
         }
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -415,8 +416,9 @@ namespace JCCommon.Clients.FileServices
         /// <param name="documentId">cfcAccusedFile.document array element's imageId, or cvfcCivilFile document array element's imageId</param>
         /// <param name="courtDivisionCd">R for criminal, I for non-criminal</param>
         /// <param name="fileId">Physical File Id (CEIS) or Justin No (JUSTIN)</param>
+        /// <param name="flatten">Flatten file</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<FileResponse> FilesDocumentAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, string documentId, string courtDivisionCd, string fileId, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<FileResponse> FilesDocumentAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, string documentId, string courtDivisionCd, string fileId, bool? flatten, System.Threading.CancellationToken cancellationToken)
         {
             if (documentId == null)
                 throw new System.ArgumentNullException("documentId");
@@ -432,6 +434,10 @@ namespace JCCommon.Clients.FileServices
             urlBuilder_.Append(System.Uri.EscapeDataString("documentId") + "=").Append(System.Uri.EscapeDataString(ConvertToString(documentId, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             urlBuilder_.Append(System.Uri.EscapeDataString("courtDivisionCd") + "=").Append(System.Uri.EscapeDataString(ConvertToString(courtDivisionCd, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             urlBuilder_.Append(System.Uri.EscapeDataString("fileId") + "=").Append(System.Uri.EscapeDataString(ConvertToString(fileId, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            if (flatten != null) 
+            {
+                urlBuilder_.Append(System.Uri.EscapeDataString("flatten") + "=").Append(System.Uri.EscapeDataString(ConvertToString(flatten, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
             urlBuilder_.Length--;
     
             var client_ = _httpClient;
@@ -471,6 +477,12 @@ namespace JCCommon.Clients.FileServices
                         ProcessResponse(client_, response_);
     
                         var status_ = (int)response_.StatusCode;
+                        if (status_ == 400)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("Bad request.", status_, responseText_, headers_, null);
+                        }
+                        else
                         if (status_ == 404)
                         {
                             string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
