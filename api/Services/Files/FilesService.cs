@@ -58,13 +58,11 @@ namespace Scv.Api.Services.Files
 
         #region Methods
         
-        #region Courtlist & Document
-
-       
+        #region Courtlist & Document     
 
         public async Task<FileResponse> DocumentAsync(string documentId, bool isCriminal, string physicalFileId)
         {
-            return await _filesClient.FilesDocumentAsync(_requestAgencyIdentifierId, _requestPartId, _applicationCode, documentId, isCriminal ? "R" : "I", physicalFileId);
+            return await _filesClient.FilesDocumentAsync(_requestAgencyIdentifierId, _requestPartId, _applicationCode, documentId, isCriminal ? "R" : "I", physicalFileId, flatten: false);
         }
 
         #endregion Courtlist & Document
