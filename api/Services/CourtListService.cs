@@ -154,8 +154,8 @@ namespace Scv.Api.Services
         private List<Task<CivilFileAppearancesResponse>> CivilAppearancesTasks(DateTime? proceeding, List<string> fileIds)
         {
             var targetDateInPast = DateTime.Now > proceeding;
-            var lookForPastAppearances = targetDateInPast ? HistoryYN2.Y : HistoryYN2.N;
-            var lookForFutureAppearances = targetDateInPast ? FutureYN2.N : FutureYN2.Y;
+            var lookForPastAppearances = targetDateInPast ? HistoryYN.Y : HistoryYN.N;
+            var lookForFutureAppearances = targetDateInPast ? FutureYN.N : FutureYN.Y;
 
             var appearanceTasks = new List<Task<CivilFileAppearancesResponse>>();
             foreach (var fileId in fileIds)

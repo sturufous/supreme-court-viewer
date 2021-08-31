@@ -71,7 +71,7 @@ namespace Scv.Api.Services.Files
         }
 
         public async Task<List<RedactedCriminalFileDetailResponse>> GetFilesByAgencyIdCodeAndFileNumberText(string location,
-            string fileNumber, CourtLevelCd2 courtLevel = CourtLevelCd2.S)
+            string fileNumber, CourtLevelCd courtLevel = CourtLevelCd.S)
         {
             var fileDetails = new List<RedactedCriminalFileDetailResponse>();
 
