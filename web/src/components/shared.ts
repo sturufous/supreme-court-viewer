@@ -3,7 +3,7 @@ import base64url from "base64url";
 
 export default {
   openDocumentsPdf(documentType: CourtDocumentType, documentData: DocumentData): void {
-    const fileName = this.generateFileName(documentType, documentData);
+    const fileName = this.generateFileName(documentType, documentData).replace(/\//g,"_");
     const isCriminal = documentType == CourtDocumentType.Criminal;
     const documentId = documentData.documentId
       ? base64url(documentData.documentId)
