@@ -11,17 +11,17 @@ export default {
     switch (documentType) {
       case CourtDocumentType.CSR:
         window.open(
-          `${process.env.BASE_URL}api/files/civil/court-summary-report/${documentData.appearanceId}/${fileName}?vcCivilFileId=${documentData.fileId}`
+          `${process.env.BASE_URL}api/files/civil/court-summary-report/${documentData.appearanceId}/${encodeURIComponent(fileName)}?vcCivilFileId=${documentData.fileId}`
         );
         break;
       case CourtDocumentType.ROP:
         window.open(
-          `${process.env.BASE_URL}api/files/criminal/record-of-proceedings/${documentData.partId}/${fileName}?profSequenceNumber=${documentData.profSeqNo}&courtLevelCode=${documentData.courtLevel}&courtClassCode=${documentData.courtClass}`
+          `${process.env.BASE_URL}api/files/criminal/record-of-proceedings/${documentData.partId}/${encodeURIComponent(fileName)}?profSequenceNumber=${documentData.profSeqNo}&courtLevelCode=${documentData.courtLevel}&courtClassCode=${documentData.courtClass}`
         );
         break;
       default:
         window.open(
-          `${process.env.BASE_URL}api/files/document/${documentId}/${fileName}?isCriminal=${isCriminal}&fileId=${documentData.fileId}`
+          `${process.env.BASE_URL}api/files/document/${documentId}/${encodeURIComponent(fileName)}?isCriminal=${isCriminal}&fileId=${documentData.fileId}`
         );
         break;
     }
