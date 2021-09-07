@@ -19,12 +19,12 @@
             <span v-else-if="errorCode==403"> You are not authorized to access this file. </span>
             <span v-else> Server is not responding. <b>({{errorText}})</b> </span>
         </b-card>
-        <b-card>         
+        <!-- <b-card>         
             <b-button id="backToLandingPage" variant="outline-primary text-dark bg-warning" @click="navigateToLandingPage">
                 <b-icon-house-door class="mr-1 ml-0" variant="dark" scale="1" ></b-icon-house-door>
                 Return to Main Page
             </b-button>
-        </b-card>
+        </b-card> -->
     </b-card>
 
     <b-card no-body>
