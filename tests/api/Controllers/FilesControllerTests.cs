@@ -32,7 +32,8 @@ namespace tests.api.Controllers
     /// <summary>
     /// These tests, ensure Api.FilesController and JC-Client-Interface.FileServicesClient work correctly.
     /// Credit to DARS for most of these tests.
-    /// Note: these tests are intended for the development environment.
+    /// Note: these tests are intended for the development environment. If you're running the JC-Interface locally, make sure you're using dev, not localDEV. 
+    /// DEV doesn't cache lookups. 
     /// </summary>
     public class FilesControllerTests
     {
@@ -124,7 +125,7 @@ namespace tests.api.Controllers
 
             Assert.NotNull(referenceDocuments);
             //Was 4, might need PCSS CRED to get 4 docs back.
-            Assert.Equal(1, referenceDocuments.Count);
+            Assert.Equal(4, referenceDocuments.Count);
             var firstReferenceDocument = referenceDocuments.First();
 
             var document = await _controller.GetDocument(WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(firstReferenceDocument.ObjectGuid)), "hello.txt", false, "3822");
@@ -287,10 +288,10 @@ namespace tests.api.Controllers
         {
             var fcq = new FilesCivilQuery
             {
-                SearchMode = SearchMode2.PARTNAME,
+                SearchMode = SearchMode.PARTNAME,
                 FileHomeAgencyId = "83.0001",
                 LastName = "bad",
-                CourtLevel = CourtLevelCd3.P
+                CourtLevel = CourtLevelCd.P
             };
             var actionResult = await _service.Civil.SearchAsync(fcq);
 
@@ -319,7 +320,7 @@ namespace tests.api.Controllers
         {
             var fcq = new FilesCivilQuery
             {
-                SearchMode = SearchMode2.PHYSID,
+                SearchMode = SearchMode.PHYSID,
                 FileHomeAgencyId = "83.0001",
                 PhysicalFileIdSet = "2506"
             };
@@ -409,7 +410,7 @@ namespace tests.api.Controllers
                 SearchMode = SearchMode.FILENO,
                 FileHomeAgencyId = "83.0001",
                 FileNumberTxt = "98050101",
-                CourtLevel = CourtLevelCd2.P
+                CourtLevel = CourtLevelCd.P
             };
             var fileSearchResponse = await _service.Criminal.SearchAsync(fcq);
 
@@ -424,7 +425,7 @@ namespace tests.api.Controllers
                 SearchMode = SearchMode.FILENO,
                 FileHomeAgencyId = "83.0001",
                 FileNumberTxt = "98050101",
-                CourtLevel = CourtLevelCd2.S
+                CourtLevel = CourtLevelCd.S
             };
             var fileSearchResponse = await _service.Criminal.SearchAsync(fcq);
 
@@ -439,7 +440,7 @@ namespace tests.api.Controllers
                 SearchMode = SearchMode.FILENO,
                 FileHomeAgencyId = "83.0001",
                 FileNumberTxt = "98050101",
-                CourtLevel = CourtLevelCd2.S
+                CourtLevel = CourtLevelCd.S
             };
             var fileSearchResponse = await _service.Criminal.SearchAsync(fcq);
 
@@ -450,7 +451,7 @@ namespace tests.api.Controllers
                 SearchMode = SearchMode.FILENO,
                 FileHomeAgencyId = "83.0001",
                 FileNumberTxt = "98050101",
-                CourtLevel = CourtLevelCd2.P
+                CourtLevel = CourtLevelCd.P
             };
             var fileSearchResponse2 = await _service.Criminal.SearchAsync(fcq);
 
@@ -461,7 +462,7 @@ namespace tests.api.Controllers
                 SearchMode = SearchMode.FILENO,
                 FileHomeAgencyId = "83.0001",
                 FileNumberTxt = "98050101",
-                CourtLevel = CourtLevelCd2.A
+                CourtLevel = CourtLevelCd.A
             };
             var fileSearchResponse3 = await _service.Criminal.SearchAsync(fcq);
 
@@ -473,10 +474,10 @@ namespace tests.api.Controllers
         {
             var fcq = new FilesCivilQuery
             {
-                SearchMode = SearchMode2.FILENO,
+                SearchMode = SearchMode.FILENO,
                 FileHomeAgencyId = "83.0001",
                 FileNumber = "11011",
-                CourtLevel = CourtLevelCd3.P
+                CourtLevel = CourtLevelCd.P
             };
             var fileSearchResponse = await _service.Civil.SearchAsync(fcq);
 
@@ -736,7 +737,8 @@ namespace tests.api.Controllers
             Assert.Equal("Present", party.PartyAppearanceMethodDesc); //Doesn't seem to have any appearance methods
         }
 
-        [Fact]
+        
+        [Fact(Skip = "Unused for now")]
         public async Task Get_Archive()
         {
             var archiveRequest = new ArchiveRequest

@@ -402,10 +402,11 @@ namespace JCCommon.Clients.FileServices
         /// <param name="documentId">cfcAccusedFile.document array element's imageId, or cvfcCivilFile document array element's imageId</param>
         /// <param name="courtDivisionCd">R for criminal, I for non-criminal</param>
         /// <param name="fileId">Physical File Id (CEIS) or Justin No (JUSTIN)</param>
+        /// <param name="flatten">Flatten file</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<DocumentResponse> FilesDocumentAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, string documentId, string courtDivisionCd, string fileId)
+        public System.Threading.Tasks.Task<FileResponse> FilesDocumentAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, string documentId, string courtDivisionCd, string fileId, bool? flatten)
         {
-            return FilesDocumentAsync(requestAgencyIdentifierId, requestPartId, applicationCd, documentId, courtDivisionCd, fileId, System.Threading.CancellationToken.None);
+            return FilesDocumentAsync(requestAgencyIdentifierId, requestPartId, applicationCd, documentId, courtDivisionCd, fileId, flatten, System.Threading.CancellationToken.None);
         }
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -415,8 +416,9 @@ namespace JCCommon.Clients.FileServices
         /// <param name="documentId">cfcAccusedFile.document array element's imageId, or cvfcCivilFile document array element's imageId</param>
         /// <param name="courtDivisionCd">R for criminal, I for non-criminal</param>
         /// <param name="fileId">Physical File Id (CEIS) or Justin No (JUSTIN)</param>
+        /// <param name="flatten">Flatten file</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<DocumentResponse> FilesDocumentAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, string documentId, string courtDivisionCd, string fileId, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<FileResponse> FilesDocumentAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, string documentId, string courtDivisionCd, string fileId, bool? flatten, System.Threading.CancellationToken cancellationToken)
         {
             if (documentId == null)
                 throw new System.ArgumentNullException("documentId");
@@ -432,6 +434,10 @@ namespace JCCommon.Clients.FileServices
             urlBuilder_.Append(System.Uri.EscapeDataString("documentId") + "=").Append(System.Uri.EscapeDataString(ConvertToString(documentId, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             urlBuilder_.Append(System.Uri.EscapeDataString("courtDivisionCd") + "=").Append(System.Uri.EscapeDataString(ConvertToString(courtDivisionCd, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             urlBuilder_.Append(System.Uri.EscapeDataString("fileId") + "=").Append(System.Uri.EscapeDataString(ConvertToString(fileId, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            if (flatten != null) 
+            {
+                urlBuilder_.Append(System.Uri.EscapeDataString("flatten") + "=").Append(System.Uri.EscapeDataString(ConvertToString(flatten, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
             urlBuilder_.Length--;
     
             var client_ = _httpClient;
@@ -450,7 +456,7 @@ namespace JCCommon.Clients.FileServices
                         throw new System.ArgumentNullException("applicationCd");
                     request_.Headers.TryAddWithoutValidation("applicationCd", ConvertToString(applicationCd, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/octet-stream"));
     
                     PrepareRequest(client_, request_, urlBuilder_);
                     var url_ = urlBuilder_.ToString();
@@ -471,24 +477,30 @@ namespace JCCommon.Clients.FileServices
                         ProcessResponse(client_, response_);
     
                         var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
+                        if (status_ == 400)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<DocumentResponse>(response_, headers_).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("Bad request.", status_, responseText_, headers_, null);
                         }
                         else
                         if (status_ == 404)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<object>(response_, headers_).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            throw new ApiException<object>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("Document was not found.", status_, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == 500)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("Unexpected error.", status_, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == 200 || status_ == 206)
+                        {
+                            var responseStream_ = response_.Content == null ? System.IO.Stream.Null : await response_.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                            var fileResponse_ = new FileResponse(status_, headers_, responseStream_, null, response_); 
+                            disposeClient_ = false; disposeResponse_ = false; // response and client are disposed by FileResponse
+                            return fileResponse_;
                         }
                         else
                         {
@@ -516,7 +528,7 @@ namespace JCCommon.Clients.FileServices
         /// <param name="fileHomeAgencyId">File home Agency Identifier; the Justin Agency ID.  Equates to a location code.</param>
         /// <param name="filePermissions">A list of one or more of the courtClassCd codes indicating the files to which the requesting user has permissions.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<FileSearchResponse> FilesCriminalGetAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, SearchMode searchMode, string fileHomeAgencyId, string fileNumberTxt, string filePrefixTxt, string filePermissions, string fileSuffixNo, string mdocRefTypeCd, CourtClassCd2? courtClassCd, CourtLevelCd2? courtLevelCd, NameSearchTypeCd? nameSearchTypeCd, string lastNm, string orgNm, string givenNm, string birthDt, string searchByCrownPartId, SearchByCrownActiveOnlyYN? searchByCrownActiveOnlyYN, SearchByCrownFileDesignationCd? searchByCrownFileDesignationCd, string mdocJustinNoSet, string physicalFileIdSet)
+        public System.Threading.Tasks.Task<FileSearchResponse> FilesCriminalGetAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, SearchMode searchMode, string fileHomeAgencyId, string fileNumberTxt, string filePrefixTxt, string filePermissions, string fileSuffixNo, string mdocRefTypeCd, CourtClassCd? courtClassCd, CourtLevelCd? courtLevelCd, NameSearchTypeCd? nameSearchTypeCd, string lastNm, string orgNm, string givenNm, string birthDt, string searchByCrownPartId, SearchByCrownActiveOnlyYN? searchByCrownActiveOnlyYN, SearchByCrownFileDesignationCd? searchByCrownFileDesignationCd, string mdocJustinNoSet, string physicalFileIdSet)
         {
             return FilesCriminalGetAsync(requestAgencyIdentifierId, requestPartId, applicationCd, searchMode, fileHomeAgencyId, fileNumberTxt, filePrefixTxt, filePermissions, fileSuffixNo, mdocRefTypeCd, courtClassCd, courtLevelCd, nameSearchTypeCd, lastNm, orgNm, givenNm, birthDt, searchByCrownPartId, searchByCrownActiveOnlyYN, searchByCrownFileDesignationCd, mdocJustinNoSet, physicalFileIdSet, System.Threading.CancellationToken.None);
         }
@@ -528,7 +540,7 @@ namespace JCCommon.Clients.FileServices
         /// <param name="fileHomeAgencyId">File home Agency Identifier; the Justin Agency ID.  Equates to a location code.</param>
         /// <param name="filePermissions">A list of one or more of the courtClassCd codes indicating the files to which the requesting user has permissions.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<FileSearchResponse> FilesCriminalGetAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, SearchMode searchMode, string fileHomeAgencyId, string fileNumberTxt, string filePrefixTxt, string filePermissions, string fileSuffixNo, string mdocRefTypeCd, CourtClassCd2? courtClassCd, CourtLevelCd2? courtLevelCd, NameSearchTypeCd? nameSearchTypeCd, string lastNm, string orgNm, string givenNm, string birthDt, string searchByCrownPartId, SearchByCrownActiveOnlyYN? searchByCrownActiveOnlyYN, SearchByCrownFileDesignationCd? searchByCrownFileDesignationCd, string mdocJustinNoSet, string physicalFileIdSet, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<FileSearchResponse> FilesCriminalGetAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, SearchMode searchMode, string fileHomeAgencyId, string fileNumberTxt, string filePrefixTxt, string filePermissions, string fileSuffixNo, string mdocRefTypeCd, CourtClassCd? courtClassCd, CourtLevelCd? courtLevelCd, NameSearchTypeCd? nameSearchTypeCd, string lastNm, string orgNm, string givenNm, string birthDt, string searchByCrownPartId, SearchByCrownActiveOnlyYN? searchByCrownActiveOnlyYN, SearchByCrownFileDesignationCd? searchByCrownFileDesignationCd, string mdocJustinNoSet, string physicalFileIdSet, System.Threading.CancellationToken cancellationToken)
         {
             if (searchMode == null)
                 throw new System.ArgumentNullException("searchMode");
@@ -1219,7 +1231,7 @@ namespace JCCommon.Clients.FileServices
         /// <param name="fileHomeAgencyId">File home Agency Identifier; the Justin Agency ID.  Equates to a location code.</param>
         /// <param name="filePermissions">A list of one or more of the courtClassCd codes indicating the files to which the requesting user has permissions.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<FileSearchResponse> FilesCivilGetAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, SearchMode2 searchMode, string fileHomeAgencyId, string fileNumberTxt, string filePrefixTxt, string filePermissions, string fileSuffixNo, string mdocRefTypeCd, CourtClassCd3? courtClassCd, CourtLevelCd3? courtLevelCd, NameSearchTypeCd2? nameSearchTypeCd, string lastNm, string orgNm, string givenNm, string birthDt, string searchByCrownPartId, SearchByCrownActiveOnlyYN2? searchByCrownActiveOnlyYN, SearchByCrownFileDesignationCd2? searchByCrownFileDesignationCd, string mdocJustinNoSet, string physicalFileIdSet)
+        public System.Threading.Tasks.Task<FileSearchResponse> FilesCivilGetAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, SearchMode searchMode, string fileHomeAgencyId, string fileNumberTxt, string filePrefixTxt, string filePermissions, string fileSuffixNo, string mdocRefTypeCd, CourtClassCd? courtClassCd, CourtLevelCd? courtLevelCd, NameSearchTypeCd? nameSearchTypeCd, string lastNm, string orgNm, string givenNm, string birthDt, string searchByCrownPartId, SearchByCrownActiveOnlyYN? searchByCrownActiveOnlyYN, SearchByCrownFileDesignationCd? searchByCrownFileDesignationCd, string mdocJustinNoSet, string physicalFileIdSet)
         {
             return FilesCivilGetAsync(requestAgencyIdentifierId, requestPartId, applicationCd, searchMode, fileHomeAgencyId, fileNumberTxt, filePrefixTxt, filePermissions, fileSuffixNo, mdocRefTypeCd, courtClassCd, courtLevelCd, nameSearchTypeCd, lastNm, orgNm, givenNm, birthDt, searchByCrownPartId, searchByCrownActiveOnlyYN, searchByCrownFileDesignationCd, mdocJustinNoSet, physicalFileIdSet, System.Threading.CancellationToken.None);
         }
@@ -1231,7 +1243,7 @@ namespace JCCommon.Clients.FileServices
         /// <param name="fileHomeAgencyId">File home Agency Identifier; the Justin Agency ID.  Equates to a location code.</param>
         /// <param name="filePermissions">A list of one or more of the courtClassCd codes indicating the files to which the requesting user has permissions.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<FileSearchResponse> FilesCivilGetAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, SearchMode2 searchMode, string fileHomeAgencyId, string fileNumberTxt, string filePrefixTxt, string filePermissions, string fileSuffixNo, string mdocRefTypeCd, CourtClassCd3? courtClassCd, CourtLevelCd3? courtLevelCd, NameSearchTypeCd2? nameSearchTypeCd, string lastNm, string orgNm, string givenNm, string birthDt, string searchByCrownPartId, SearchByCrownActiveOnlyYN2? searchByCrownActiveOnlyYN, SearchByCrownFileDesignationCd2? searchByCrownFileDesignationCd, string mdocJustinNoSet, string physicalFileIdSet, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<FileSearchResponse> FilesCivilGetAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, SearchMode searchMode, string fileHomeAgencyId, string fileNumberTxt, string filePrefixTxt, string filePermissions, string fileSuffixNo, string mdocRefTypeCd, CourtClassCd? courtClassCd, CourtLevelCd? courtLevelCd, NameSearchTypeCd? nameSearchTypeCd, string lastNm, string orgNm, string givenNm, string birthDt, string searchByCrownPartId, SearchByCrownActiveOnlyYN? searchByCrownActiveOnlyYN, SearchByCrownFileDesignationCd? searchByCrownFileDesignationCd, string mdocJustinNoSet, string physicalFileIdSet, System.Threading.CancellationToken cancellationToken)
         {
             if (searchMode == null)
                 throw new System.ArgumentNullException("searchMode");
@@ -1917,7 +1929,7 @@ namespace JCCommon.Clients.FileServices
         /// <param name="requestPartId">Requesting Participant Id</param>
         /// <param name="applicationCd">The code for the calling application</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<CivilFileAppearancesResponse> FilesCivilAppearancesAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, FutureYN2? futureYN, HistoryYN2? historyYN, string fileId)
+        public System.Threading.Tasks.Task<CivilFileAppearancesResponse> FilesCivilAppearancesAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, FutureYN? futureYN, HistoryYN? historyYN, string fileId)
         {
             return FilesCivilAppearancesAsync(requestAgencyIdentifierId, requestPartId, applicationCd, futureYN, historyYN, fileId, System.Threading.CancellationToken.None);
         }
@@ -1927,7 +1939,7 @@ namespace JCCommon.Clients.FileServices
         /// <param name="requestPartId">Requesting Participant Id</param>
         /// <param name="applicationCd">The code for the calling application</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<CivilFileAppearancesResponse> FilesCivilAppearancesAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, FutureYN2? futureYN, HistoryYN2? historyYN, string fileId, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<CivilFileAppearancesResponse> FilesCivilAppearancesAsync(string requestAgencyIdentifierId, string requestPartId, string applicationCd, FutureYN? futureYN, HistoryYN? historyYN, string fileId, System.Threading.CancellationToken cancellationToken)
         {
             if (fileId == null)
                 throw new System.ArgumentNullException("fileId");
@@ -2124,6 +2136,166 @@ namespace JCCommon.Clients.FileServices
         }
     }
 
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
+    public enum HistoryYN
+    {
+        [System.Runtime.Serialization.EnumMember(Value = @"Y")]
+        Y = 0,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"N")]
+        N = 1,
+    
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
+    public enum FutureYN
+    {
+        [System.Runtime.Serialization.EnumMember(Value = @"Y")]
+        Y = 0,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"N")]
+        N = 1,
+    
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
+    public enum SearchByCrownActiveOnlyYN
+    {
+        [System.Runtime.Serialization.EnumMember(Value = @"Y")]
+        Y = 0,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"N")]
+        N = 1,
+    
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
+    public enum SearchByCrownFileDesignationCd
+    {
+        [System.Runtime.Serialization.EnumMember(Value = @"SPC")]
+        SPC = 0,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"GA")]
+        GA = 1,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"SA")]
+        SA = 2,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"ALL")]
+        ALL = 3,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"SG")]
+        SG = 4,
+    
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
+    public enum NameSearchTypeCd
+    {
+        [System.Runtime.Serialization.EnumMember(Value = @"E")]
+        E = 0,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"P")]
+        P = 1,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"S")]
+        S = 2,
+    
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
+    public enum SearchMode
+    {
+        [System.Runtime.Serialization.EnumMember(Value = @"FILENO")]
+        FILENO = 0,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"PARTNAME")]
+        PARTNAME = 1,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"CROWN")]
+        CROWN = 2,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"JUSTINNO")]
+        JUSTINNO = 3,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"PHYSID")]
+        PHYSID = 4,
+    
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
+    public enum CourtClassCd
+    {
+        [System.Runtime.Serialization.EnumMember(Value = @"A")]
+        A = 0,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"Y")]
+        Y = 1,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"T")]
+        T = 2,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"F")]
+        F = 3,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"C")]
+        C = 4,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"M")]
+        M = 5,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"L")]
+        L = 6,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"R")]
+        R = 7,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"B")]
+        B = 8,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"D")]
+        D = 9,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"E")]
+        E = 10,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"G")]
+        G = 11,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"H")]
+        H = 12,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"N")]
+        N = 13,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"O")]
+        O = 14,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"P")]
+        P = 15,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"S")]
+        S = 16,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"V")]
+        V = 17,
+    
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
+    public enum CourtLevelCd
+    {
+        [System.Runtime.Serialization.EnumMember(Value = @"P")]
+        P = 0,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"S")]
+        S = 1,
+    
+        [System.Runtime.Serialization.EnumMember(Value = @"A")]
+        A = 2,
+    
+    }
+    
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public partial class ClOrderToVary 
     {
@@ -4020,8 +4192,8 @@ namespace JCCommon.Clients.FileServices
         [Newtonsoft.Json.JsonProperty("documentTypeDescription", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DocumentTypeDescription { get; set; }
     
-        [Newtonsoft.Json.JsonProperty("filedByName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string FiledByName { get; set; }
+        [Newtonsoft.Json.JsonProperty("filedBy", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<ClFiledBy> FiledBy { get; set; }
     
         [Newtonsoft.Json.JsonProperty("roleTypeCode", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string RoleTypeCode { get; set; }
@@ -4535,11 +4707,11 @@ namespace JCCommon.Clients.FileServices
     
         [Newtonsoft.Json.JsonProperty("courtLevelCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
-        public FileDetailCourtLevelCd CourtLevelCd { get; set; }
+        public CourtLevelCd CourtLevelCd { get; set; }
     
         [Newtonsoft.Json.JsonProperty("courtClassCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
-        public FileDetailCourtClassCd CourtClassCd { get; set; }
+        public CourtClassCd CourtClassCd { get; set; }
     
         [Newtonsoft.Json.JsonProperty("warrantYN", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
@@ -4930,8 +5102,8 @@ namespace JCCommon.Clients.FileServices
         [Newtonsoft.Json.JsonProperty("commentToJudgeTxt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CommentToJudgeTxt { get; set; }
     
-        [Newtonsoft.Json.JsonProperty("approvalCrownAgencyCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string ApprovalCrownAgencyCd { get; set; }
+        [Newtonsoft.Json.JsonProperty("approvalCrownAgencyTypeCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string ApprovalCrownAgencyTypeCd { get; set; }
     
         [Newtonsoft.Json.JsonProperty("mdocCcn", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string MdocCcn { get; set; }
@@ -5102,6 +5274,12 @@ namespace JCCommon.Clients.FileServices
     
         [Newtonsoft.Json.JsonProperty("DateGranted", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string DateGranted { get; set; }
+    
+        [Newtonsoft.Json.JsonProperty("affidavitNo", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string AffidavitNo { get; set; }
+    
+        [Newtonsoft.Json.JsonProperty("swornByNm", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string SwornByNm { get; set; }
     
         [Newtonsoft.Json.JsonProperty("documentSupport", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<CvfcDocumentSupport> DocumentSupport { get; set; }
@@ -5569,30 +5747,6 @@ namespace JCCommon.Clients.FileServices
     }
     
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class DocumentResponse 
-    {
-        [Newtonsoft.Json.JsonProperty("resultCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string ResultCd { get; set; }
-    
-        [Newtonsoft.Json.JsonProperty("resultMessage", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string ResultMessage { get; set; }
-    
-        [Newtonsoft.Json.JsonProperty("b64Content", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string B64Content { get; set; }
-    
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-    
-        [Newtonsoft.Json.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties; }
-            set { _additionalProperties = value; }
-        }
-    
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
     public partial class JustinReportResponse 
     {
         [Newtonsoft.Json.JsonProperty("responseCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
@@ -5999,472 +6153,6 @@ namespace JCCommon.Clients.FileServices
             set { _additionalProperties = value; }
         }
     
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public enum CourtLevelCd
-    {
-        [System.Runtime.Serialization.EnumMember(Value = @"P")]
-        P = 0,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"S")]
-        S = 1,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"A")]
-        A = 2,
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public enum CourtClassCd
-    {
-        [System.Runtime.Serialization.EnumMember(Value = @"A")]
-        A = 0,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"Y")]
-        Y = 1,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"T")]
-        T = 2,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"F")]
-        F = 3,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"C")]
-        C = 4,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"M")]
-        M = 5,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"L")]
-        L = 6,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"R")]
-        R = 7,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"B")]
-        B = 8,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"D")]
-        D = 9,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"E")]
-        E = 10,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"G")]
-        G = 11,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"H")]
-        H = 12,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"N")]
-        N = 13,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"O")]
-        O = 14,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"P")]
-        P = 15,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"S")]
-        S = 16,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"V")]
-        V = 17,
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public enum SearchMode
-    {
-        [System.Runtime.Serialization.EnumMember(Value = @"FILENO")]
-        FILENO = 0,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"PARTNAME")]
-        PARTNAME = 1,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"CROWN")]
-        CROWN = 2,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"JUSTINNO")]
-        JUSTINNO = 3,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"PHYSID")]
-        PHYSID = 4,
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public enum CourtClassCd2
-    {
-        [System.Runtime.Serialization.EnumMember(Value = @"A")]
-        A = 0,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"Y")]
-        Y = 1,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"T")]
-        T = 2,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"F")]
-        F = 3,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"C")]
-        C = 4,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"M")]
-        M = 5,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"L")]
-        L = 6,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"R")]
-        R = 7,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"B")]
-        B = 8,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"D")]
-        D = 9,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"E")]
-        E = 10,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"G")]
-        G = 11,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"H")]
-        H = 12,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"N")]
-        N = 13,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"O")]
-        O = 14,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"P")]
-        P = 15,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"S")]
-        S = 16,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"V")]
-        V = 17,
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public enum CourtLevelCd2
-    {
-        [System.Runtime.Serialization.EnumMember(Value = @"P")]
-        P = 0,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"S")]
-        S = 1,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"A")]
-        A = 2,
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public enum NameSearchTypeCd
-    {
-        [System.Runtime.Serialization.EnumMember(Value = @"E")]
-        E = 0,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"P")]
-        P = 1,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"S")]
-        S = 2,
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public enum SearchByCrownActiveOnlyYN
-    {
-        [System.Runtime.Serialization.EnumMember(Value = @"Y")]
-        Y = 0,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"N")]
-        N = 1,
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public enum SearchByCrownFileDesignationCd
-    {
-        [System.Runtime.Serialization.EnumMember(Value = @"SPC")]
-        SPC = 0,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"GA")]
-        GA = 1,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"SA")]
-        SA = 2,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"ALL")]
-        ALL = 3,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"SG")]
-        SG = 4,
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public enum FutureYN
-    {
-        [System.Runtime.Serialization.EnumMember(Value = @"Y")]
-        Y = 0,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"N")]
-        N = 1,
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public enum HistoryYN
-    {
-        [System.Runtime.Serialization.EnumMember(Value = @"Y")]
-        Y = 0,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"N")]
-        N = 1,
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public enum SearchMode2
-    {
-        [System.Runtime.Serialization.EnumMember(Value = @"FILENO")]
-        FILENO = 0,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"PARTNAME")]
-        PARTNAME = 1,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"CROWN")]
-        CROWN = 2,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"JUSTINNO")]
-        JUSTINNO = 3,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"PHYSID")]
-        PHYSID = 4,
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public enum CourtClassCd3
-    {
-        [System.Runtime.Serialization.EnumMember(Value = @"A")]
-        A = 0,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"Y")]
-        Y = 1,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"T")]
-        T = 2,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"F")]
-        F = 3,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"C")]
-        C = 4,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"M")]
-        M = 5,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"L")]
-        L = 6,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"R")]
-        R = 7,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"B")]
-        B = 8,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"D")]
-        D = 9,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"E")]
-        E = 10,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"G")]
-        G = 11,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"H")]
-        H = 12,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"N")]
-        N = 13,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"O")]
-        O = 14,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"P")]
-        P = 15,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"S")]
-        S = 16,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"V")]
-        V = 17,
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public enum CourtLevelCd3
-    {
-        [System.Runtime.Serialization.EnumMember(Value = @"P")]
-        P = 0,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"S")]
-        S = 1,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"A")]
-        A = 2,
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public enum NameSearchTypeCd2
-    {
-        [System.Runtime.Serialization.EnumMember(Value = @"E")]
-        E = 0,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"P")]
-        P = 1,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"S")]
-        S = 2,
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public enum SearchByCrownActiveOnlyYN2
-    {
-        [System.Runtime.Serialization.EnumMember(Value = @"Y")]
-        Y = 0,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"N")]
-        N = 1,
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public enum SearchByCrownFileDesignationCd2
-    {
-        [System.Runtime.Serialization.EnumMember(Value = @"SPC")]
-        SPC = 0,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"GA")]
-        GA = 1,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"SA")]
-        SA = 2,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"ALL")]
-        ALL = 3,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"SG")]
-        SG = 4,
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public enum FutureYN2
-    {
-        [System.Runtime.Serialization.EnumMember(Value = @"Y")]
-        Y = 0,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"N")]
-        N = 1,
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public enum HistoryYN2
-    {
-        [System.Runtime.Serialization.EnumMember(Value = @"Y")]
-        Y = 0,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"N")]
-        N = 1,
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public enum FileDetailCourtLevelCd
-    {
-        [System.Runtime.Serialization.EnumMember(Value = @"P")]
-        P = 0,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"S")]
-        S = 1,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"A")]
-        A = 2,
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.3.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public enum FileDetailCourtClassCd
-    {
-        [System.Runtime.Serialization.EnumMember(Value = @"A")]
-        A = 0,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"Y")]
-        Y = 1,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"T")]
-        T = 2,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"F")]
-        F = 3,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"C")]
-        C = 4,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"M")]
-        M = 5,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"L")]
-        L = 6,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"R")]
-        R = 7,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"B")]
-        B = 8,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"D")]
-        D = 9,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"E")]
-        E = 10,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"G")]
-        G = 11,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"H")]
-        H = 12,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"N")]
-        N = 13,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"O")]
-        O = 14,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"P")]
-        P = 15,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"S")]
-        S = 16,
-    
-        [System.Runtime.Serialization.EnumMember(Value = @"V")]
-        V = 17,
     
     }
     
@@ -7150,6 +6838,42 @@ namespace JCCommon.Clients.FileServices
         [System.Runtime.Serialization.EnumMember(Value = @"A")]
         A = 2,
     
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.9.4.0 (NJsonSchema v10.3.1.0 (Newtonsoft.Json v12.0.0.0))")]
+    public partial class FileResponse : System.IDisposable
+    {
+        private System.IDisposable _client;
+        private System.IDisposable _response;
+
+        public int StatusCode { get; private set; }
+
+        public System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> Headers { get; private set; }
+
+        public System.IO.Stream Stream { get; private set; }
+
+        public bool IsPartial
+        {
+            get { return StatusCode == 206; }
+        }
+
+        public FileResponse(int statusCode, System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> headers, System.IO.Stream stream, System.IDisposable client, System.IDisposable response)
+        {
+            StatusCode = statusCode; 
+            Headers = headers; 
+            Stream = stream; 
+            _client = client; 
+            _response = response;
+        }
+
+        public void Dispose() 
+        {
+            Stream.Dispose();
+            if (_response != null)
+                _response.Dispose();
+            if (_client != null)
+                _client.Dispose();
+        }
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.9.4.0 (NJsonSchema v10.3.1.0 (Newtonsoft.Json v12.0.0.0))")]
