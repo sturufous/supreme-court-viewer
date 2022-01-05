@@ -148,8 +148,18 @@ namespace Scv.Api.Controllers
         {
             if (User.IsVcUser())
             {
-                //Disable Court Summary Reports.
-                return Forbid();
+                //Ensure the user has access to that FileId, and the appearanceId belongs to the FileId.
+                if (!await _vcCivilFileAccessHandler.HasCivilFileAccess(User, vcCivilFileId))
+                    return Forbid();
+
+                var civilFileDetailResponse = await _civilFilesService.FileIdAsync(vcCivilFileId, User.IsVcUser());
+                if (civilFileDetailResponse?.PhysicalFileId == null)
+                    throw new NotFoundException("Couldn't find civil file with this id.");
+                if (civilFileDetailResponse.SealedYN != "N")
+                    return Forbid();
+
+                if (!civilFileDetailResponse.Appearances.ApprDetail.Any(ad => ad.AppearanceId == appearanceId))
+                    return Forbid();
             }
 
             var justinReportResponse = await _civilFilesService.CourtSummaryReportAsync(appearanceId, JustinReportName.CEISR035);
