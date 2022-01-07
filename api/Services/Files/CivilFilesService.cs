@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Serialization;
 using Scv.Api.Helpers;
 using Scv.Api.Helpers.ContractResolver;
+using Scv.Api.Helpers.Exceptions;
 using Scv.Api.Helpers.Extensions;
 using Scv.Api.Models.Civil.AppearanceDetail;
 using Scv.Api.Models.Civil.Appearances;
@@ -35,6 +36,7 @@ namespace Scv.Api.Services.Files
         private readonly string _applicationCode;
         private readonly string _requestAgencyIdentifierId;
         private readonly string _requestPartId;
+        private List<string> _filterOutDocumentTypes;
 
         #endregion Variables
 
@@ -59,6 +61,7 @@ namespace Scv.Api.Services.Files
             _requestAgencyIdentifierId = user.AgencyCode();
             _requestPartId = user.ParticipantId();
             _logger = logger;
+            _filterOutDocumentTypes = configuration.GetNonEmptyValue("ExcludeDocumentTypeCodes").Split(",").ToList();
         }
 
         #endregion Constructor
@@ -141,6 +144,10 @@ namespace Scv.Api.Services.Files
 
             var appearances = await appearancesTask;
             var fileContent = await fileContentTask;
+
+            //TEMP fix.
+            if (isVcUser && fileDetail.CfcsaFileYN == "Y")
+                throw new NotFoundException("Currently CFCSA access not allowed.");
 
             if (fileDetail?.PhysicalFileId == null)
                 return null;
@@ -298,10 +305,10 @@ namespace Scv.Api.Services.Files
             return detail;
         }
 
-        private async Task<ICollection<CivilDocument>> PopulateDetailDocuments(ICollection<CivilDocument> documents, JCCommon.Clients.FileServices.CvfcCivilFile civilFileContent )
+        private async Task<IList<CivilDocument>> PopulateDetailDocuments(IList<CivilDocument> documents, JCCommon.Clients.FileServices.CvfcCivilFile civilFileContent )
         {
-            //TODO permission for documents.
             //Populate extra fields for document.
+            documents = documents.WhereToList(doc => !_filterOutDocumentTypes.Contains(doc.DocumentTypeCd));
             foreach (var document in documents.Where(doc => doc.Category != "CSR"))
             {
                 var documentFromFileContent = civilFileContent?.Document?.FirstOrDefault(doc => doc.DocumentId == document.CivilDocumentId);
@@ -453,6 +460,7 @@ namespace Scv.Api.Services.Files
         {
             //CivilAppearanceDocument, doesn't include appearances.
             var documents = _mapper.Map<ICollection<CivilAppearanceDocument>>(fileDetailDocuments);
+            documents = documents.WhereToList(doc => !_filterOutDocumentTypes.Contains(doc.DocumentTypeCd));
             foreach (var document in documents)
             {
                 document.Category = _lookupService.GetDocumentCategory(document.DocumentTypeCd);

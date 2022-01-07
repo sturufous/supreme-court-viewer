@@ -36,7 +36,7 @@ namespace Scv.Api.Models.Civil.Detail
         /// <summary>
         /// Extended document object.
         /// </summary>
-        public ICollection<CivilDocument> Document { get; set; }
+        public IList<CivilDocument> Document { get; set; }
 
         public ICollection<CvfcRefDocument3> ReferenceDocument { get; set; }
         /// <summary>
