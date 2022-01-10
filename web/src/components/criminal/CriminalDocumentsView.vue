@@ -378,6 +378,11 @@ export default class CriminalDocumentsView extends Vue {
           this.downloadCompleted = true;
         },
         (err) => {
+          this.$bvToast.toast(`Error - ${err.url} - ${err.status} - ${err.statusText}`, {
+            title: "An error has occured.",
+            variant: "danger",
+            autoHideDelay: 10000,
+          });
           console.log(err);
           this.downloadCompleted = true;
         }

@@ -175,6 +175,11 @@ export default class CriminalFileSearchResultsView extends Vue {
       .then(
         (Response) => Response.json(),
         (err) => {
+          this.$bvToast.toast(`Error - ${err.url} - ${err.status} - ${err.statusText}`, {
+            title: "An error has occured.",
+            variant: "danger",
+            autoHideDelay: 10000,
+          });
           this.errorCode = err.status;
           this.errorText = err.statusText;
           console.log(err);
