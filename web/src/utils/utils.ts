@@ -5,7 +5,6 @@ export const SessionManager = {
         try {
             if (!store.state.userInfo) {
                 const response = await Vue.http.get('/api/auth/info');
-                debugger;
                 store.commit("CommonInformation/setEnableArchive", response.body.enableArchive);
                 store.commit("CommonInformation/setUserInfo", response.body);
             }
