@@ -1,3 +1,4 @@
+<!-- Currently unused. -->
 <template>
     <b-card bg-variant="white" no-body class="mb-5">
         <div>
@@ -40,7 +41,7 @@ import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import "@store/modules/CivilFileInformation";
 import {civilFileInformationType} from '@/types/civil';
-import {adjudicatorRestrictionsInfoType } from '@/types/common';
+import {AdjudicatorRestrictionsInfoType } from '@/types/common';
 const civilState = namespace("CivilFileInformation");
 
 @Component
@@ -49,7 +50,7 @@ export default class  CivilAdjudicatorRestrictions extends Vue {
   @civilState.State
   public civilFileInformation!: civilFileInformationType;
     
-  adjudicatorRestrictionsInfo: adjudicatorRestrictionsInfoType[] = []; 
+  adjudicatorRestrictionsInfo: AdjudicatorRestrictionsInfoType[] = []; 
   sortBy = 'adjudicator';
   sortDesc = false;
   isMounted = false;

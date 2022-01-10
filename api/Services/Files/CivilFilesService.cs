@@ -145,7 +145,7 @@ namespace Scv.Api.Services.Files
             var appearances = await appearancesTask;
             var fileContent = await fileContentTask;
 
-            //TEMP fix.
+            //TEMP fix requested by Kevin Conn.
             if (isVcUser && fileDetail.CfcsaFileYN == "Y")
                 throw new NotFoundException("Currently CFCSA access not allowed.");
 
@@ -164,13 +164,17 @@ namespace Scv.Api.Services.Files
             detail.Party = await PopulateDetailParties(detail.Party);
             detail.Document = await PopulateDetailDocuments(detail.Document, fileContentCivilFile);
             detail.HearingRestriction = await PopulateDetailHearingRestrictions(fileDetail.HearingRestriction);
-            if (isVcUser)
+            if (isVcUser) { 
+                //SCV-266 - Disable comments for VC Users.
+                foreach (var document in detail.Document)
+                    document.CommentTxt = "";
                 detail.HearingRestriction = new List<CivilHearingRestriction>();
+            }
 
             return detail;
         }
 
-        public async Task<CivilAppearanceDetail> DetailedAppearanceAsync(string fileId, string appearanceId)
+        public async Task<CivilAppearanceDetail> DetailedAppearanceAsync(string fileId, string appearanceId, bool isVcUser = false)
         {
             async Task<CivilFileDetailResponse> FileDetails() => await _filesClient.FilesCivilGetAsync(_requestAgencyIdentifierId, _requestPartId, _applicationCode, fileId);
             async Task<CivilFileContent> FileContent() => await _filesClient.FilesCivilFilecontentAsync(_requestAgencyIdentifierId, _requestPartId, _applicationCode, null, null, null, null, fileId);
@@ -212,6 +216,13 @@ namespace Scv.Api.Services.Files
             var fileContentCivilFile = fileContent?.CivilFile?.FirstOrDefault(cf => cf.PhysicalFileID == fileId);
             var previousAppearance = fileContentCivilFile?.PreviousAppearance.FirstOrDefault(pa => pa?.AppearanceId == appearanceId);
 
+            var documents = await PopulateDetailedAppearanceDocuments(fileDetailDocuments);
+            if (isVcUser)
+            {
+                foreach (var document in documents)
+                    document.CommentTxt = "";
+            }
+
             var detailedAppearance = new CivilAppearanceDetail
             {
                 PhysicalFileId = fileId,
@@ -226,11 +237,12 @@ namespace Scv.Api.Services.Files
                 AppearanceDt = targetAppearance.AppearanceDt,
                 AppearanceMethod = await PopulateAppearanceMethods(appearanceMethods),
                 Party = await PopulateDetailedAppearancePartiesAsync(appearanceParty.Party, civilCourtList?.Parties, previousAppearance, appearanceMethods),
-                Document = await PopulateDetailedAppearanceDocuments(fileDetailDocuments),
+                Document = documents,
                 Adjudicator = await PopulateDetailedAppearanceAdjudicator(previousAppearance, appearanceMethods),
                 //AdjudicatorComment = previousAppearance?.AdjudicatorComment,
                 CourtLevelCd = detail.CourtLevelCd
             };
+
             return detailedAppearance;
         }
 

@@ -570,13 +570,13 @@ namespace tests.api.Controllers
         public async void Civil_Appearance_Details()
         {
             //Has party data.
-            var civilAppearanceDetail = await _service.Civil.DetailedAppearanceAsync("2506", "11034");
+            var civilAppearanceDetail = await _service.Civil.DetailedAppearanceAsync("2506", "11034", false);
 
             Assert.Equal(3, civilAppearanceDetail.Party.Count);
             Assert.Contains(civilAppearanceDetail.Party, p => p.LastNm == "BYSTANDER");
 
             //Has appearanceMethod data.
-            civilAppearanceDetail = await _service.Civil.DetailedAppearanceAsync("3499", "13410");
+            civilAppearanceDetail = await _service.Civil.DetailedAppearanceAsync("3499", "13410", false);
 
             Assert.Equal(1, civilAppearanceDetail.AppearanceMethod.Count);
             Assert.Equal("IP", civilAppearanceDetail.AppearanceMethod.First().AppearanceMethodCd);

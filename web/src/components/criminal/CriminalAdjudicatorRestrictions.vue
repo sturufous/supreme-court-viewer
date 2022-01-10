@@ -39,7 +39,7 @@
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import {criminalFileInformationType} from '@/types/criminal';
-import {adjudicatorRestrictionsInfoType } from '@/types/common';
+import {AdjudicatorRestrictionsInfoType } from '@/types/common';
 import "@store/modules/CriminalFileInformation";
 const criminalState = namespace("CriminalFileInformation");
 
@@ -49,7 +49,7 @@ export default class  CriminalAdjudicatorRestrictions extends Vue {
   @criminalState.State
   public criminalFileInformation!: criminalFileInformationType;
 
-  adjudicatorRestrictions: adjudicatorRestrictionsInfoType[] = [];
+  adjudicatorRestrictions: AdjudicatorRestrictionsInfoType[] = [];
     
   sortBy = 'adjudicator';
   sortDesc = false;

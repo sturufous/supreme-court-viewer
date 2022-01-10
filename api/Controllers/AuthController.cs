@@ -102,5 +102,32 @@ namespace Scv.Api.Controllers
                 Url = $"{XForwardedForHelper.BuildUrlString(forwardedHost, forwardedPort, baseUrl)}civil-file/{request.FileId}?fromA2A=true"
             });
         }
+
+
+        /// <summary>
+        /// Provides a way for the front-end to get info about the user.
+        /// </summary>
+        /// <returns></returns>
+        [Authorize(AuthenticationSchemes = "SiteMinder, OpenIdConnect", Policy = nameof(ProviderAuthorizationHandler))]
+        [HttpGet]
+        [Route("info")]
+        public ActionResult UserInfo()
+        {
+            string userType;
+            if (HttpContext.User.IsIdirUser())
+                userType = "idir";
+            else if (HttpContext.User.IsVcUser())
+                userType = "vc";
+            else 
+                userType = "judiciary";
+
+            return Ok(new
+            {
+                UserType = userType,
+                IsSupremeUser = HttpContext.User.IsSupremeUser(),
+                EnableArchive = false,
+                DateTime.UtcNow
+            });
+        }
     }
 }

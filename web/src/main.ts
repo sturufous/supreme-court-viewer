@@ -21,14 +21,13 @@ Vue.component('loading-spinner', LoadingSpinner);
 
 Vue.http.interceptors.push(function () {
 	return function (response) {
-		if (response.status == 401)
+		if (response.status == 401) { 
 			location.replace(`${process.env.BASE_URL}api/auth/login?redirectUri=${window.location}`);
+		}
 	};
 });
 
 Vue.http.options.root = process.env.BASE_URL;
-//Vue.http.headers.common['SMGOV_USERGUID'] = 'test';
-//Vue.http.headers.common['SMGOV_USERTYPE'] = 'UserType';
 
 //Redirect from / to /scjscv/
 if (location.pathname == "/")

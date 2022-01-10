@@ -1,4 +1,4 @@
-import { iconStyleType } from '../common';
+import { IconStyleType } from '../common';
 import { courtListType } from '../courtlist/jsonTypes';
 
 export interface courtListInformationInfoType {
@@ -27,7 +27,7 @@ export interface civilListInfoType {
     seq: number;
     fileNumber: string;
     tag: string;
-    icons: iconStyleType[];
+    icons: IconStyleType[];
     time: string;
     room: string;
     parties: string;
@@ -72,7 +72,7 @@ export interface criminalListInfoType {
     seq: number;
     fileNumber: string;
     tag: string;
-    icons: iconStyleType[];
+    icons: IconStyleType[];
     caseAge: string;
     time: string;
     room: string;
@@ -118,7 +118,7 @@ export interface courtListInfoType {
     seq: number;
     fileNumber: string;
     tag: string;
-    icons: iconStyleType[];
+    icons: IconStyleType[];
     time: string;
     room: string;
     parties?: string;

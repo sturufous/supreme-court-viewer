@@ -206,7 +206,7 @@ import * as _ from 'underscore';
 import CourtListLayout from "@components/courtlist/CourtListLayout.vue";
 import {courtListInformationInfoType, roomsInfoType, courtRoomsAndLocationsInfoType, locationInfoType} from '@/types/courtlist';
 import '@store/modules/CourtListInformation';
-import { courtRoomsJsonInfoType } from '@/types/common';
+import { CourtRoomsJsonInfoType } from '@/types/common';
 const courtListState = namespace('CourtListInformation');
 
 const commonState = namespace("CommonInformation");
@@ -245,7 +245,7 @@ export default class CourtList extends Vue {
     totalMins =0;
     totalTime = '';
     totalTimeUnit = 'Hours';
-    courtRoomsAndLocationsJson: courtRoomsJsonInfoType[] = [];
+    courtRoomsAndLocationsJson: CourtRoomsJsonInfoType[] = [];
     courtRoomsAndLocations: courtRoomsAndLocationsInfoType[] = [];
 
     selectedDate = (new Date).toISOString().substring(0,10);

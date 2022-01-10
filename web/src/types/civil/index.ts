@@ -1,4 +1,4 @@
-import {adjudicatorRestrictionsInfoType} from '../common';
+import {AdjudicatorRestrictionsInfoType} from '../common';
 import {civilFileDetailsType} from '../civil/jsonTypes';
 
 export interface partiesInfoType {
@@ -66,7 +66,7 @@ export interface summaryDocumentsInfoType {
 }
 
 export interface civilFileInformationType {
-    adjudicatorRestrictionsInfo: adjudicatorRestrictionsInfoType[];
+    adjudicatorRestrictionsInfo: AdjudicatorRestrictionsInfoType[];
     fileNumber: string;
     detailsData: civilFileDetailsType;
     leftPartiesInfo: partiesInfoType[];

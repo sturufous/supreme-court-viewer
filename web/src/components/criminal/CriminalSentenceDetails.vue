@@ -15,7 +15,7 @@
             <b-tbody v-for="(counts,inx) in SortedParticipantSentencesCounts" v-bind:key="inx">
                 <b-tr v-for="(sentence,index) in counts.sentenceDispositionType" v-bind:key="index" :style ="getRowStyle(index)">                            
                     
-                    <b-td :rowspan="counts.len" v-if="index==0">{{counts.date | beautify-date}}</b-td>                            
+                    <b-td :rowspan="counts.len" v-if="index==0">{{counts.date | beautify_date}}</b-td>                            
                     <b-td :rowspan="counts.len" v-if="index==0">{{counts.count}}</b-td>
                     
                     <b-td>                                
@@ -53,8 +53,8 @@
 
                     <b-td> {{counts.term[index]}} </b-td>
                     <b-td> {{counts.amount[index]}} </b-td>
-                    <b-td> {{counts.dueDateUntil[index] | beautify-date }} </b-td>
-                    <b-td> {{counts.effectiveDate[index] | beautify-date }} </b-td>
+                    <b-td> {{counts.dueDateUntil[index] | beautify_date }} </b-td>
+                    <b-td> {{counts.effectiveDate[index] | beautify_date }} </b-td>
                     
                 </b-tr>                       
             </b-tbody>

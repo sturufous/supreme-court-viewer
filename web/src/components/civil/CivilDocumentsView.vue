@@ -46,10 +46,10 @@
 
                     <template v-slot:[`cell(${fields[fieldsTab][datePlace[fieldsTab]].key})`]="data" >
                         <span v-if="data.item.sealed" :style="data.field.cellStyle" class="text-muted">
-                            {{ data.value | beautify-date}}
+                            {{ data.value | beautify_date}}
                         </span>
                         <span v-else :style="data.field.cellStyle">
-                            {{ data.value | beautify-date}}
+                            {{ data.value | beautify_date}}
                         </span>
                     </template>                     
 
@@ -154,7 +154,7 @@ import "@store/modules/CommonInformation";
 const commonState = namespace("CommonInformation");
 
 import CustomOverlay from "../CustomOverlay.vue";
-import { archiveInfoType, documentRequestsInfoType } from '@/types/common';
+import { ArchiveInfoType, DocumentRequestsInfoType } from '@/types/common';
 import shared from "../shared";
 import { CourtDocumentType, DocumentData } from '@/types/shared';
 
@@ -189,7 +189,7 @@ export default class CivilDocumentsView extends Vue {
     fieldsTab = fieldTab.Categories;
     documentPlace = [2, 1, 2, 2, 2]
     datePlace = [4,2,3,5, 3]
-    selectedDocuments = {} as archiveInfoType; 
+    selectedDocuments = {} as ArchiveInfoType; 
     downloadCompleted = true;
     allDocumentsChecked = false; 
 
@@ -299,11 +299,11 @@ export default class CivilDocumentsView extends Vue {
         for(const doc of this.documents){
             if (doc.isChecked && doc.isEnabled) {
                 const id = doc.documentId;                
-                const documentRequest = {} as documentRequestsInfoType;
+                const documentRequest = {} as DocumentRequestsInfoType;
                 documentRequest.isCriminal = false;
                 const documentData: DocumentData = { 
                     courtLevel: this.civilFileInformation.detailsData.courtLevelCd,
-                    dateFiled: Vue.filter('beautify-date')(doc.dateFiled),
+                    dateFiled: Vue.filter('beautify_date')(doc.dateFiled),
                     documentDescription: doc.documentType,
                     documentId: id,
                     fileNumberText:  this.civilFileInformation.detailsData.fileNumberTxt,
@@ -323,7 +323,7 @@ export default class CivilDocumentsView extends Vue {
                 csrRequest.appearanceId = id;
                 const documentData: DocumentData = { 
                     appearanceId: csrRequest.appearanceId,
-                    appearanceDate: Vue.filter('beautify-date')(doc.appearanceDate),
+                    appearanceDate: Vue.filter('beautify_date')(doc.appearanceDate),
                     courtLevel: this.civilFileInformation.detailsData.courtLevelCd,
                     documentDescription: doc.documentType,
                     fileNumberText:  this.civilFileInformation.detailsData.fileNumberTxt,

@@ -220,7 +220,7 @@ import shared from "../shared";
 import {criminalFileInformationType, appearanceAdditionalInfoType, appearanceMethodDetailsInfoType, appearanceChargesInfoType, criminalAppearanceInfoType, criminalAppearanceMethodsInfoType, initiatingDocument, criminalAppearanceDetailsInfoType, appearanceNotesInfoType} from '@/types/criminal';
 import "@store/modules/CriminalFileInformation";
 import { CourtDocumentType, DocumentData } from "@/types/shared";
-import { courtRoomsJsonInfoType } from "@/types/common";
+import { CourtRoomsJsonInfoType } from "@/types/common";
 const criminalState = namespace("CriminalFileInformation");
 const commonState = namespace("CommonInformation");
 
@@ -228,7 +228,7 @@ const commonState = namespace("CommonInformation");
 export default class CriminalAppearanceDetails extends Vue {
 
     @commonState.State
-    public courtRoomsAndLocations!: courtRoomsJsonInfoType[];
+    public courtRoomsAndLocations!: CourtRoomsJsonInfoType[];
 
     @criminalState.State
     public criminalFileInformation!: criminalFileInformationType;
@@ -414,7 +414,7 @@ export default class CriminalAppearanceDetails extends Vue {
         const documentData: DocumentData  = {
             courtLevel: this.criminalAppearanceInfo.courtLevel, 
             courtClass: this.criminalAppearanceInfo.courtClass,
-            dateFiled: Vue.filter('beautify-date')(this.appearanceDetailsJson?.appearanceDt),
+            dateFiled: Vue.filter('beautify_date')(this.appearanceDetailsJson?.appearanceDt),
             documentDescription: courtDocumentType == CourtDocumentType.ROP ? "ROP" : "Information",
             documentId: '',//this.initiatingDocuments[0].imageId, 
             fileId: this.criminalAppearanceInfo.fileNo,

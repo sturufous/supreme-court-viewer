@@ -1,4 +1,4 @@
-import {additionalProperties} from '../../common';
+import {AdditionalProperties} from '../../common';
 
 export interface courtListType {
     criminalCourtList: criminalCourtListType[];
@@ -7,7 +7,7 @@ export interface courtListType {
     courtRoomCode: string;
     courtProceedingsDate: string;
     fileSearchParameter: civilFileSearchParameterType[];
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -16,7 +16,7 @@ export interface courtListType {
   export interface civilFileSearchParameterType {
     courtDivisionCd: string;
     fileNumber: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -27,7 +27,7 @@ export interface courtListType {
     documentTypeDsc: string;
     adjudicatorName: string;
     dateGranted: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -38,7 +38,7 @@ export interface courtListType {
     fileSeqNumber: string;
     documentTypeDsc: string;
     filedBy: civilFiledByType [];
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -47,7 +47,7 @@ export interface courtListType {
   export interface arrestWarrantType {
     fileNumberText: string;
     warrantDate: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -55,7 +55,7 @@ export interface courtListType {
 
   export interface protectedPartyNameType {
     protectedPartyName: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -63,7 +63,7 @@ export interface courtListType {
 
   export interface restrainingPartyNameType {
     restrainingPartyName: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -76,7 +76,7 @@ export interface courtListType {
     pororderIssueDate: string;
     porconditionText: string;
     pororderExpiryDate: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -86,7 +86,7 @@ export interface courtListType {
     speakerEventDate: string;
     speakerEventTime: string;
     speakerEventText: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -101,7 +101,7 @@ export interface courtListType {
     speakerStatusCd: string;
     speakerStatusDsc: string;
     speakerEvent: speakerEventType[];
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -115,7 +115,7 @@ export interface courtListType {
     secondGivenNm: string;
     thirdGivenNm: string;
     organizationNm: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -124,7 +124,7 @@ export interface courtListType {
   export interface civilPartyRoleType {      
     roleTypeCd: string;
     roleTypeDsc: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -133,7 +133,7 @@ export interface courtListType {
   export interface civilLegalRepresentativeType {
     legalRepTypeDsc: string;
     legalRepFullName: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -144,7 +144,7 @@ export interface courtListType {
     attendanceMethodCd: string;
     phoneNumber: string;
     instruction: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -154,7 +154,7 @@ export interface courtListType {
     counselFullName: string;
     counselId: string;
     phoneNumber: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -179,7 +179,7 @@ export interface courtListType {
     legalRepresentative: civilLegalRepresentativeType[];
     partyRole: civilPartyRoleType[];
     partyName: civilPartyNameType[];
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}  
@@ -187,7 +187,7 @@ export interface courtListType {
 
   export interface civilAssetType {
     assetTypeDescription: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -209,7 +209,7 @@ export interface courtListType {
     thirdPartyOtherCount: string;
     homeAgencyCd: string;
     civilAgencyCd: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -218,7 +218,7 @@ export interface courtListType {
   export interface civilFiledByType {
     filedByName: string;
     roleTypeCode: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -228,7 +228,7 @@ export interface courtListType {
     issueDescription: string;
     issueNumber: string;
     issueType: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -255,7 +255,7 @@ export interface courtListType {
     appearanceReasonCode: string;
     issue: civilIssueType[];
     filedBy: civilFiledByType[];
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -267,7 +267,7 @@ export interface courtListType {
     hearingRestrictiontype: string;
     judgeName: string;
     hearingRestrictionDate: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -282,7 +282,7 @@ export interface courtListType {
     appearanceReasonCd: string;
     estDurationHours: string;
     estDurationMins: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -334,7 +334,7 @@ export interface courtListType {
     arrestWarrant: arrestWarrantType[];
     unscheduledDocument: civilUnscheduledDocumentType[];
     orderToVary: civilOrderToVaryType[];
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -344,7 +344,7 @@ export interface courtListType {
       orderTypeDsc: string;
       cfcorderIssueDate: string;
       cfcconditionText: string;
-      additionalProperties: additionalProperties;
+      additionalProperties: AdditionalProperties;
       additionalProp1: {};
       additionalProp2: {};
       additionalProp3: {}
@@ -358,7 +358,7 @@ export interface courtListType {
     relationship: string;
     provenBy: string;
     noticeTo: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -371,7 +371,7 @@ export interface courtListType {
     docmIssueDate: string;
     docmImageId: string;
     docmStatus: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -384,7 +384,7 @@ export interface courtListType {
     docmIssueDate: string;
     docmImageId: string;
     docmStatus: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -399,7 +399,7 @@ export interface courtListType {
     banStatuteId: string;
     banCommentText: string;
     banAcprId: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -425,7 +425,7 @@ export interface courtListType {
     issuingOfficerSurnameName: string;
     findingCode: string;
     findingDate: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -439,7 +439,7 @@ export interface courtListType {
     phoneNumber: string;
     instruction: string;
     otherRoleName: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -451,7 +451,7 @@ export interface courtListType {
     given2Name: string;
     given3Name: string;
     orgName: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -462,7 +462,7 @@ export interface courtListType {
     statuteActCd: string;
     statuteSectionCd: string;
     statuteSectionDsc: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -484,7 +484,7 @@ export interface courtListType {
     mdocAmendedYN: string;
     mdocAmendedText: string;
     issue: criminalIssueType[];
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -500,7 +500,7 @@ export interface courtListType {
 
   export interface criminalTrialRemarkType {
     commentTxt: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -561,7 +561,7 @@ export interface courtListType {
     arrestWarrant: arrestWarrantType[];
     protectionOrder: protectionOrderType[];
     cfcorder: criminalCfcorderType[];
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
