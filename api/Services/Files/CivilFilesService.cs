@@ -475,7 +475,6 @@ namespace Scv.Api.Services.Files
             documents = documents.WhereToList(doc => !_filterOutDocumentTypes.Contains(doc.DocumentTypeCd));
             foreach (var document in documents)
             {
-                document.CommentTxt = 
                 document.Category = _lookupService.GetDocumentCategory(document.DocumentTypeCd);
                 document.DocumentTypeDescription = await _lookupService.GetDocumentDescriptionAsync(document.DocumentTypeCd);
 				document.ImageId = document.SealedYN != "N" ? null : document.ImageId;
