@@ -1,11 +1,11 @@
-import {additionalProperties} from '../../common';
+import {AdditionalProperties} from '../../common';
 import { civilFiledByType } from '@/types/courtlist/jsonTypes';
 
 export interface partyCounselType {
     counselId: string;
     fullNm: string;
     phoneNumberTxt: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -22,7 +22,7 @@ export interface partyType {
     leftRightCd: string;
     selfRepresentedYN: string;
     counsel: partyCounselType[];
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -37,7 +37,7 @@ export interface civilDocumentIssueType {
     concludedYn: string;
     issueResultCd: string;
     issueResultDsc: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -46,7 +46,7 @@ export interface civilDocumentIssueType {
 export interface civilDocumentSupportType {
     actCd: string;
     actDsc: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -58,7 +58,7 @@ export interface civilDocumentAppearanceType {
     courtAgencyIdentifier: string;
     courtRoom: string;
     appearanceReason: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -87,7 +87,7 @@ export interface civilDocumentType {
     DateGranted: string;
     documentSupport: civilDocumentSupportType[];
     appearance: civilDocumentAppearanceType[];
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}        
@@ -104,7 +104,7 @@ export interface civilReferenceDocumentJsonType {
     DescriptionText: string;
     EnterDtm: string;
     ReferenceDocumentTypeDsc: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -127,7 +127,7 @@ export interface civilHearingRestrictionType {
     physicalFileId: string;
     adjInitialsTxt: string;
     hearingRestrictionCcn: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -158,7 +158,7 @@ export interface civilApprDetailType {
     supplementalEquipmentTxt: string;
     securityRestrictionTxt: string;
     outOfTownJudgeTxt: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -170,7 +170,7 @@ export interface civilAppearancesType {
     futureRecCount: string;
     historyRecCount: string;
     apprDetail: civilApprDetailType[];
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}

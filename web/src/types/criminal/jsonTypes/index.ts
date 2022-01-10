@@ -1,4 +1,4 @@
-import {additionalProperties} from '../../common';
+import {AdditionalProperties} from '../../common';
 
 export interface countSentenceType {
     judgesRecommendation: string;
@@ -17,7 +17,7 @@ export interface countSentenceType {
     sentDetailTxt: string;
     sentYcjaAdultYouthCd: string;
     sentCustodySecureYn: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -35,7 +35,7 @@ export interface countType {
     finding: string;
     sectionTxt: string;
     sectionDscTxt: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -55,7 +55,7 @@ export interface documentType {
     docmDispositionDate: string;
     imageId: string;
     documentPageCount: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -64,7 +64,7 @@ export interface documentType {
 export interface chargeType {    
     sectionTxt: string;
     sectionDscTxt: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}        
@@ -81,7 +81,7 @@ export interface banType {
     banCommentText: string;
     banOrderedDate: string;
     banSeqNo: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}        
@@ -101,7 +101,7 @@ export interface witnessType {
     confidentialYN: string;
     pinCodeTxt: string;
     agencyId: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -109,7 +109,7 @@ export interface witnessType {
 
 export interface criminalTrialRemarkType {    
     commentTxt: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -139,7 +139,7 @@ export interface criminalParticipantType {
     counselEnteredDt: string;
     designatedCounselYN: string;
     charge: chargeType[];
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -157,7 +157,7 @@ export interface criminalHearingRestrictionType {
     adjInitialsTxt: string;
     justinNo: string;
     hearingRestrictionCcn: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -198,7 +198,7 @@ export interface criminalApprDetailType {
     supplementalEquipmentTxt: string;
     securityRestrictionTxt: string;
     outOfTownJudgeTxt: string;
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}
@@ -210,7 +210,7 @@ export interface criminalAppearancesType {
     futureRecCount: string;
     historyRecCount: string;
     apprDetail: criminalApprDetailType [];
-    additionalProperties: additionalProperties;
+    additionalProperties: AdditionalProperties;
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {}

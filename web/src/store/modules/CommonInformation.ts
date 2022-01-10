@@ -1,5 +1,5 @@
 import { VuexModule, Module, Mutation, Action } from 'vuex-module-decorators';
-import {courtRoomsJsonInfoType, iconStyleType} from '@/types/common';
+import {CourtRoomsJsonInfoType, IconStyleType} from '@/types/common';
 
 enum appearanceStatus {UNCF='Unconfirmed', CNCL='Canceled', SCHD='Scheduled' }
 
@@ -8,13 +8,23 @@ enum appearanceStatus {UNCF='Unconfirmed', CNCL='Canceled', SCHD='Scheduled' }
 })
 class CommonInformation extends VuexModule {  
 
+  public userInfo = {};
   public displayName = ''
   public time = ''
   public duration = ''
   public statusStyle = ''
-  public iconStyles: iconStyleType[] = [];
-  public courtRoomsAndLocations: courtRoomsJsonInfoType[] = [];
+  public iconStyles: IconStyleType[] = [];
+  public courtRoomsAndLocations: CourtRoomsJsonInfoType[] = [];
   public enableArchive = false;
+
+  @Mutation
+  public setUserInfo(userInfo): void {
+    this.userInfo = userInfo;
+  }
+  @Action
+  public UpdateUserInfo(newUserInfo): void {
+    this.context.commit('setUserInfo', newUserInfo)
+  }
 
   @Mutation
   public setCourtRoomsAndLocations(courtRoomsAndLocations): void {   
@@ -119,7 +129,7 @@ class CommonInformation extends VuexModule {
 
   @Action
   public UpdateIconStyle(newIconsInfo) {
-    const iconStyles: iconStyleType[] = [];
+    const iconStyles: IconStyleType[] = [];
     for (const iconInfo of newIconsInfo) {
       if(iconInfo["info"] == "UNCF") {
         iconStyles.push({"icon":'circle-half', "desc":appearanceStatus.UNCF});

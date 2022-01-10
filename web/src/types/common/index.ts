@@ -1,33 +1,33 @@
 import { csrRequestsInfoType } from "../civil";
 import { ropRequestsInfoType } from "../criminal";
 
-export interface inputNamesType {
+export interface InputNamesType {
     lastName: string;
     givenName: string;
 }
 
-export interface durationType {
+export interface DurationType {
     hr: string;
     min: string;
 }
 
-export interface iconStyleType {
+export interface IconStyleType {
     icon: string;
     desc: string;
 }
 
-export interface iconInfoType {
+export interface IconInfoType {
     info: string;
     desc: string;
 }
 
-export interface additionalProperties {
+export interface AdditionalProperties {
     additionalProp1: {};
     additionalProp2: {};
     additionalProp3: {};
 }
 
-export interface adjudicatorRestrictionsInfoType {
+export interface AdjudicatorRestrictionsInfoType {
     adjRestriction: string;
     adjudicator: string;
     fullName: string;
@@ -35,31 +35,36 @@ export interface adjudicatorRestrictionsInfoType {
     appliesTo: string;
 }
 
-export interface documentRequestsInfoType {
+export interface DocumentRequestsInfoType {
     isCriminal: boolean;
     pdfFileName: string;
     base64UrlEncodedDocumentId: string;
     fileId: string;
 }
 
-export interface archiveInfoType {
+export interface ArchiveInfoType {
     zipName: string;
     vcCivilFileId?: string;
     csrRequests: csrRequestsInfoType[];
-    documentRequests: documentRequestsInfoType[];
+    documentRequests: DocumentRequestsInfoType[];
     ropRequests: ropRequestsInfoType[];
 }
 
-export interface courtRoomsJsonInfoType {
+export interface CourtRoomsJsonInfoType {
     name: string;
     code: string;
     locationId: string;
     active: boolean;
-    courtRooms: courtRoomsInfo[];   
+    courtRooms: CourtRoomsInfo[];   
 }
 
-export interface courtRoomsInfo {
+export interface CourtRoomsInfo {
     room: string;
     locationId: string;
     type: string;
+}
+
+export interface UserInfo {
+    userType: string;
+    isSupremeUser: string;
 }

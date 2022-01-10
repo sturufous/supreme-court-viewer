@@ -125,7 +125,7 @@ namespace Scv.Api.Controllers
                     return Forbid();
             } 
 
-            var civilAppearanceDetail = await _civilFilesService.DetailedAppearanceAsync(fileId, appearanceId);
+            var civilAppearanceDetail = await _civilFilesService.DetailedAppearanceAsync(fileId, appearanceId, User.IsVcUser());
             if (civilAppearanceDetail == null)
                 throw new NotFoundException("Couldn't find appearance detail with the provided file id and appearance id.");
 

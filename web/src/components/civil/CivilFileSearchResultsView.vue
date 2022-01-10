@@ -90,7 +90,7 @@
                 <template  v-slot:cell(nextAppearance)="data">
                     <span  
                         :style="data.field.cellStyle">
-                        {{ data.value | beautify-date }}
+                        {{ data.value | beautify_date }}
                     </span>
                 </template>
             </b-table>
@@ -112,7 +112,7 @@ import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import * as _ from 'underscore';
 import {civilFileInformationType, fileSearchCivilInfoType} from '@/types/civil';
-import {inputNamesType} from '@/types/common';
+import {InputNamesType} from '@/types/common';
 import "@store/modules/CommonInformation";
 const commonState = namespace("CommonInformation");
 import "@store/modules/CivilFileInformation";
@@ -138,7 +138,7 @@ export default class CivilFileSearchResultsView extends Vue {
     public displayName!: string; 
 
     @commonState.Action
-    public UpdateDisplayName!: (newInputNames: inputNamesType) => void
+    public UpdateDisplayName!: (newInputNames: InputNamesType) => void
 
     civilList: fileSearchCivilInfoType[] = [];    
     isMounted = false;

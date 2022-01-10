@@ -1,13 +1,14 @@
-// import Axios from "axios";
+import Vue from 'vue'
 
 export const SessionManager = {
-    // TODO: once there's an api parameter, we need to use it to set enableArchive
     getSettings: async function(store) {
         try {
-            //var response = await Axios.get('');            
-            const enableArchive = false //response.data.enableArchive;
-            store.commit("CommonInformation/setEnableArchive",enableArchive);
-            
+            if (!store.state.userInfo) {
+                const response = await Vue.http.get('/api/auth/info');
+                debugger;
+                store.commit("CommonInformation/setEnableArchive", response.body.enableArchive);
+                store.commit("CommonInformation/setUserInfo", response.body);
+            }
             return true;
         }
         catch (error) {

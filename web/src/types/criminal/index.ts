@@ -1,4 +1,4 @@
-import {adjudicatorRestrictionsInfoType} from '../common';
+import {AdjudicatorRestrictionsInfoType} from '../common';
 import {criminalFileDetailsType, documentType, countType} from '../criminal/jsonTypes';
 
 export interface participantListInfoType {
@@ -37,7 +37,7 @@ export interface statusFieldsType {
 
 export interface criminalFileInformationType {
     participantList: participantListInfoType[];
-    adjudicatorRestrictionsInfo: adjudicatorRestrictionsInfoType[];
+    adjudicatorRestrictionsInfo: AdjudicatorRestrictionsInfoType[];
     bans: bansInfoType[];
     courtLevel: string;
     courtClass: string;

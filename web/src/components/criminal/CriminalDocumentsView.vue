@@ -77,7 +77,7 @@
                     </template> 
 
                     <template v-slot:[`cell(${fields[0][1].key})`]="data" >
-                         {{ data.value | beautify-date}}
+                         {{ data.value | beautify_date}}
                     </template> 
 
                     <template v-slot:[`cell(${fields[fieldsTab][documentPlace[fieldsTab]].key})`]="data" >                       
@@ -95,7 +95,7 @@
                     </template>
 
                     <template v-slot:cell(statusDate)=data >
-                        {{data.value|beautify-date}}
+                        {{data.value|beautify_date}}
                     </template>
 
                 </b-table>
@@ -119,8 +119,7 @@ import { namespace } from 'vuex-class';
 import * as _ from 'underscore';
 import '@store/modules/CriminalFileInformation';
 import "@store/modules/CommonInformation";
-import {participantROPInfoType, participantListInfoType, participantDocumentsInfoType, criminalFileInformationType, ropRequestsInfoType} from '@/types/criminal';
-import {inputNamesType} from '@/types/common'
+import { participantROPInfoType, participantListInfoType, participantDocumentsInfoType, criminalFileInformationType, ropRequestsInfoType } from '@/types/criminal';
 import base64url from 'base64url';
 
 import shared from '../shared';
@@ -128,7 +127,7 @@ const criminalState = namespace("CriminalFileInformation");
 const commonState = namespace("CommonInformation");
 
 import CustomOverlay from "../CustomOverlay.vue"
-import { archiveInfoType, documentRequestsInfoType } from '@/types/common';
+import { InputNamesType, ArchiveInfoType, DocumentRequestsInfoType } from '@/types/common';
 import { CourtDocumentType, DocumentData } from '@/types/shared';
 
 
@@ -160,7 +159,7 @@ export default class CriminalDocumentsView extends Vue {
     public UpdateCriminalFile!: (newCriminalFileInformation: criminalFileInformationType) => void   
 
     @commonState.Action
-    public UpdateDisplayName!: (newInputNames: inputNamesType) => void
+    public UpdateDisplayName!: (newInputNames: InputNamesType) => void
 
     participantFiles: participantListInfoType[] = [];
     participantList: participantListInfoType[] = [];
@@ -182,7 +181,7 @@ export default class CriminalDocumentsView extends Vue {
 
     fieldsTab = fieldTab.Categories;
     documentPlace = [2,1,2]
-    selectedDocuments = {} as archiveInfoType; 
+    selectedDocuments = {} as ArchiveInfoType; 
     downloadCompleted = true;
     allDocumentsChecked = false; 
 
@@ -262,12 +261,12 @@ export default class CriminalDocumentsView extends Vue {
         for(const doc of this.participantFiles[this.activeCriminalParticipantIndex].documents){
             if (doc.isChecked && doc.isEnabled) {
                 const id = doc.imageId;                
-                const documentRequest = {} as documentRequestsInfoType;
+                const documentRequest = {} as DocumentRequestsInfoType;
                 documentRequest.isCriminal = true;
                 const documentData: DocumentData = { 
                     courtClass: this.criminalFileInformation.detailsData.courtClassCd, 
                     courtLevel: this.criminalFileInformation.detailsData.courtLevelCd, 
-                    dateFiled: Vue.filter('beautify-date')(doc.date),
+                    dateFiled: Vue.filter('beautify_date')(doc.date),
                     documentDescription: doc.documentType,
                     documentId: id,
                     fileId: this.criminalFileInformation.fileNumber,
@@ -507,7 +506,7 @@ export default class CriminalDocumentsView extends Vue {
         const documentData: DocumentData = { 
             courtClass: this.criminalFileInformation.detailsData.courtClassCd, 
             courtLevel: this.criminalFileInformation.detailsData.courtLevelCd, 
-            dateFiled: Vue.filter('beautify-date')(eventData.item.date),
+            dateFiled: Vue.filter('beautify_date')(eventData.item.date),
             documentId: eventData.item?.imageId, 
             documentDescription: eventData.item?.documentType,
             fileId: this.criminalFileInformation.fileNumber, 

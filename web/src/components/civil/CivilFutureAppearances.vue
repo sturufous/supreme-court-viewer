@@ -115,7 +115,7 @@ import CivilAppearanceDetails from '@components/civil/CivilAppearanceDetails.vue
 import "@store/modules/CommonInformation";
 import "@store/modules/CivilFileInformation";
 import {civilFileInformationType, civilAppearanceInfoType, civilAppearancesListType} from '@/types/civil';
-import {inputNamesType, durationType } from '@/types/common';
+import {InputNamesType, DurationType } from '@/types/common';
 import { civilApprDetailType } from "@/types/civil/jsonTypes";
 const civilState = namespace("CivilFileInformation");
 const commonState = namespace("CommonInformation");
@@ -154,10 +154,10 @@ export default class CivilFutureAppearances extends Vue {
     public UpdateCivilAppearanceInfo!: (newCivilAppearanceInfo: civilAppearanceInfoType) => void        
 
     @commonState.Action
-    public UpdateDisplayName!: (newInputNames: inputNamesType) => void    
+    public UpdateDisplayName!: (newInputNames: InputNamesType) => void    
 
     @commonState.Action
-    public UpdateDuration!: (duration: durationType) => void    
+    public UpdateDuration!: (duration: DurationType) => void    
 
     @commonState.Action
     public UpdateTime!: (time: string) => void
@@ -212,7 +212,7 @@ export default class CivilFutureAppearances extends Vue {
             appInfo.index = appIndex;
             appInfo.date = jApp.appearanceDt.split(' ')[0]
             if(new Date(appInfo.date) < currentDate) continue;            
-            appInfo.formattedDate = Vue.filter('beautify-date')(appInfo.date);
+            appInfo.formattedDate = Vue.filter('beautify_date')(appInfo.date);
             appInfo.documentType = jApp.documentTypeDsc?jApp.documentTypeDsc:'';
             appInfo.result = jApp.appearanceResultCd;
             appInfo.resultDescription = jApp.appearanceResultDsc? jApp.appearanceResultDsc: '';
