@@ -178,7 +178,11 @@ export default class Home extends Vue {
           this.errorCode = err.status;
           this.errorText = err.statusText;
           if (this.errorCode != 401) {
-            this.openErrorModal = true;
+            this.$bvToast.toast(`Error - ${this.errorCode} - ${this.errorText}`, {
+              title: "An error has occured.",
+              variant: "danger",
+              autoHideDelay: 10000,
+            });
           }
           console.log(this.errorCode);
         }
@@ -224,7 +228,6 @@ export default class Home extends Vue {
 </script>
 
 <style scoped>
-
 input,
 select {
   width: 300px;

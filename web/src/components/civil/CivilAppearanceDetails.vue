@@ -475,8 +475,12 @@ export default class CivilAppearanceDetails extends Vue {
       .then(
         (Response) => Response.json(),
         (err) => {
+            this.$bvToast.toast(`Error - ${err.url} - ${err.status} - ${err.statusText}`, {
+                title: "An error has occured.",
+                variant: "danger",
+                autoHideDelay: 10000,
+            });
           console.log(err);
-          window.alert("bad data!");
         }
       )
       .then((data) => {
