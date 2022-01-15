@@ -41,6 +41,7 @@ read -r -d '' _FORWARDED_HEADERS << EOF
             proxy_set_header X-Forwarded-Server \$proxy_host;
             proxy_set_header X-Forwarded-Port   \$proxy_port;
             proxy_set_header X-Forwarded-Proto  \$proxy_scheme;
+            proxy_set_header X-Base-Href        ${WEB_BASE_HREF};
             proxy_pass_request_headers on;
             proxy_pass_header Authorization;
             proxy_pass_header Accept;
@@ -213,5 +214,6 @@ echo "---> Using self-signed SSH keys ..."
           -subj "/C=CA/ST=BC/L=BC/O=BCGOV/OU=Testing"
   fi
 fi
+
 echo "---> Starting nginx ..."
 /usr/sbin/nginx -g "daemon off;"

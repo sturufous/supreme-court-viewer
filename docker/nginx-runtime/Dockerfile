@@ -20,7 +20,7 @@ COPY nginx.conf.template /tmp/
 # =================================================================================
 # Fix up permissions
 # ref: https://torstenwalter.de/openshift/nginx/2017/08/04/nginx-on-openshift.html
-# - S2I sripts must be executable
+# - S2I scripts must be executable
 # - Make sure nginx can read and write it's working directories.
 # - The container dynamically configures nginx on startup
 # - The application artifacts live in /tmp
@@ -31,6 +31,7 @@ RUN chmod g+rw /var/cache/nginx \
                /var/log/nginx \
                /etc/nginx/nginx.conf \
                /tmp
+
 # =================================================================================
 
 # Work-around for issues with S2I builds on Windows
