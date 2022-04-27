@@ -38,19 +38,31 @@ namespace Scv.Api.Helpers.Extensions
         }
 
         public static bool IsServiceAccountUser(this ClaimsPrincipal claimsPrincipal)
-            => claimsPrincipal.HasClaim(c => c.Type == CustomClaimTypes.PreferredUsername) && 
+            => claimsPrincipal.HasClaim(c => c.Type == CustomClaimTypes.PreferredUsername) &&
                claimsPrincipal.FindFirstValue(CustomClaimTypes.PreferredUsername).Equals("service-account-scv");
 
         public static bool IsIdirUser(this ClaimsPrincipal claimsPrincipal)
-        => claimsPrincipal.HasClaim(c => c.Type == CustomClaimTypes.PreferredUsername) && 
+        => claimsPrincipal.HasClaim(c => c.Type == CustomClaimTypes.PreferredUsername) &&
            claimsPrincipal.FindFirstValue(CustomClaimTypes.PreferredUsername).EndsWith("@idir");
 
         public static bool IsVcUser(this ClaimsPrincipal claimsPrincipal)
-            => claimsPrincipal.HasClaim(c => c.Type == CustomClaimTypes.PreferredUsername) && 
+            => claimsPrincipal.HasClaim(c => c.Type == CustomClaimTypes.PreferredUsername) &&
                claimsPrincipal.FindFirstValue(CustomClaimTypes.PreferredUsername).EndsWith("@vc");
 
         public static bool IsSupremeUser(this ClaimsPrincipal claimsPrincipal)
-        => claimsPrincipal.HasClaim(c => c.Type == CustomClaimTypes.IsSupremeUser) && 
+        => claimsPrincipal.HasClaim(c => c.Type == CustomClaimTypes.IsSupremeUser) &&
            claimsPrincipal.FindFirstValue(CustomClaimTypes.IsSupremeUser).Equals("true", StringComparison.OrdinalIgnoreCase);
+
+        public static string Role(this ClaimsPrincipal claimsPrincipal)
+        {
+            var identity = (ClaimsIdentity)claimsPrincipal.Identity;
+            return identity.Claims.FirstOrDefault(c => c.Type == CustomClaimTypes.Role)?.Value;
+        }
+
+        public static string SubRole(this ClaimsPrincipal claimsPrincipal)
+        {
+            var identity = (ClaimsIdentity)claimsPrincipal.Identity;
+            return identity.Claims.FirstOrDefault(c => c.Type == CustomClaimTypes.SubRole)?.Value;
+        }
     }
 }

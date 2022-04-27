@@ -28,23 +28,26 @@ namespace Scv.Api.Services
         }
         #endregion
 
-        public async Task<GetUserLoginResponseType> GetUserInfo(UserInfoRequest userInfoRequest)
+        public async Task<GetParticipantInfoResponse> GetUserInfo(UserInfoRequest userInfoRequest)
         {
             try 
             {
-                var response = await UserServiceClient.UserGetuserloginAsync(userInfoRequest.DomainName,
-                    userInfoRequest.DomainUserGuid,
-                    userInfoRequest.DomainUserId,
-                    userInfoRequest.DeviceName,
-                    userInfoRequest.IpAddress,
-                    userInfoRequest.TemporaryAccessGuid);
+                var response = await UserServiceClient.UserGetParticipantInfoAsync(userInfoRequest.DomainUserGuid);
 
+                if (response.RoleCd != null)
+                {
+                    response.AgenId = string.IsNullOrEmpty(response.AgenId) ? SupremeAgencyId : response.AgenId;
+                    Logger.LogDebug($"SMGOV_USERGUID: {userInfoRequest.DomainUserGuid}, UserAgencyCd: {response.AgenId}, UserPartId: {response.PartId}");
+                    return response;
+                }
+                /*
                 if (response.ResponseCd != "1")
                 {
                     response.UserDefaultAgencyCd = string.IsNullOrEmpty(response.UserDefaultAgencyCd) ? SupremeAgencyId: response.UserDefaultAgencyCd;
                     Logger.LogDebug($"SMGOV_USERGUID: {userInfoRequest.DomainUserGuid}, UserAgencyCd: {response.UserDefaultAgencyCd}, UserPartId: {response.UserPartId}");
                     return response;
                 }
+                */
                 Logger.LogInformation("Returned responseCd = 1 (failed) from getUserLogin");
                 return null;
             }
