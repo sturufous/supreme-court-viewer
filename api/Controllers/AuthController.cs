@@ -124,6 +124,8 @@ namespace Scv.Api.Controllers
             return Ok(new
             {
                 UserType = userType,
+                Role = HttpContext.User.Role(),
+                SubRole = HttpContext.User.SubRole(),
                 IsSupremeUser = HttpContext.User.IsSupremeUser(),
                 EnableArchive = false,
                 DateTime.UtcNow

@@ -53,16 +53,13 @@ namespace Scv.Api.Helpers.Extensions
         => claimsPrincipal.HasClaim(c => c.Type == CustomClaimTypes.IsSupremeUser) &&
            claimsPrincipal.FindFirstValue(CustomClaimTypes.IsSupremeUser).Equals("true", StringComparison.OrdinalIgnoreCase);
 
-        public static string Role(this ClaimsPrincipal claimsPrincipal)
-        {
-            var identity = (ClaimsIdentity)claimsPrincipal.Identity;
-            return identity.Claims.FirstOrDefault(c => c.Type == CustomClaimTypes.Role)?.Value;
-        }
+        public static string Role(this ClaimsPrincipal claimsPrincipal) =>
+            claimsPrincipal.FindFirstValue(CustomClaimTypes.Role);
 
-        public static string SubRole(this ClaimsPrincipal claimsPrincipal)
-        {
-            var identity = (ClaimsIdentity)claimsPrincipal.Identity;
-            return identity.Claims.FirstOrDefault(c => c.Type == CustomClaimTypes.SubRole)?.Value;
-        }
+        public static string SubRole(this ClaimsPrincipal claimsPrincipal) =>
+            claimsPrincipal.FindFirstValue(CustomClaimTypes.SubRole);
+
+        public static string ErrorMsg(this ClaimsPrincipal claimsPrincipal) =>
+            claimsPrincipal.FindFirstValue(CustomClaimTypes.ErrorMsg);
     }
 }
