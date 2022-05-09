@@ -237,11 +237,11 @@ namespace JCCommon.Clients.UserService
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.10.0 (NJsonSchema v10.6.10.0 (Newtonsoft.Json v12.0.0.0))")]
     public partial class GetParticipantInfoResponse
     {
-        [Newtonsoft.Json.JsonProperty("partId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string PartId { get; set; }
+        [Newtonsoft.Json.JsonProperty("partID", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string PartID { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("agenId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string AgenId { get; set; }
+        [Newtonsoft.Json.JsonProperty("agenID", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string AgenID { get; set; }
 
         [Newtonsoft.Json.JsonProperty("roleCd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string RoleCd { get; set; }

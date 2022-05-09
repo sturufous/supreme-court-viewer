@@ -34,21 +34,13 @@ namespace Scv.Api.Services
             {
                 var response = await UserServiceClient.UserGetParticipantInfoAsync(userInfoRequest.DomainUserGuid);
 
-                if (response.RoleCd != null)
+                if (response.ErrorMsg == null)
                 {
-                    response.AgenId = string.IsNullOrEmpty(response.AgenId) ? SupremeAgencyId : response.AgenId;
-                    Logger.LogDebug($"SMGOV_USERGUID: {userInfoRequest.DomainUserGuid}, UserAgencyCd: {response.AgenId}, UserPartId: {response.PartId}");
+                    response.AgenID = string.IsNullOrEmpty(response.AgenID) ? SupremeAgencyId : response.AgenID;
+                    Logger.LogDebug($"SMGOV_USERGUID: {userInfoRequest.DomainUserGuid}, UserAgencyCd: {response.AgenID}, UserPartId: {response.PartID}");
                     return response;
                 }
-                /*
-                if (response.ResponseCd != "1")
-                {
-                    response.UserDefaultAgencyCd = string.IsNullOrEmpty(response.UserDefaultAgencyCd) ? SupremeAgencyId: response.UserDefaultAgencyCd;
-                    Logger.LogDebug($"SMGOV_USERGUID: {userInfoRequest.DomainUserGuid}, UserAgencyCd: {response.UserDefaultAgencyCd}, UserPartId: {response.UserPartId}");
-                    return response;
-                }
-                */
-                Logger.LogInformation("Returned responseCd = 1 (failed) from getUserLogin");
+                Logger.LogInformation("Return failed from getParticipantInfo");
                 return null;
             }
             catch (Exception e)

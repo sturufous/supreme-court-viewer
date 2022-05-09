@@ -12,7 +12,6 @@ namespace Scv.Api.Helpers
         public const string CivilFileAccess = nameof(CustomClaimTypes) + nameof(CivilFileAccess);
         public const string Role = nameof(CustomClaimTypes) + nameof(Role);
         public const string SubRole = nameof(CustomClaimTypes) + nameof(SubRole);
-        public const string ErrorMsg = nameof(CustomClaimTypes) + nameof(ErrorMsg);
         public const string Groups = "groups";
         public const string PreferredUsername = "preferred_username";
 

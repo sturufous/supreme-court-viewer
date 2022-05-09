@@ -35,9 +35,9 @@
       getParticipantInfoResponse: 
         type: "object"
         properties: 
-          partId: 
+          partID: 
             type: "string"
-          agenId: 
+          agenID: 
             type: "string"
           roleCd: 
             type: "string"

@@ -52,7 +52,7 @@ namespace Scv.Api.Infrastructure.Authentication
             var isSupremeUser = Context.User.IsSupremeUser();
             var role = Context.User.Role();
             var subRole = Context.User.SubRole();
-            var errorMsg = Context.User.ErrorMsg();
+
             if (!authenticatedBySiteMinderPreviously)
             {
                 var request = new UserInfoRequest
@@ -64,15 +64,15 @@ namespace Scv.Api.Infrastructure.Authentication
                     TemporaryAccessGuid = ""
                 };
                 var jcUserInfo = await JCUserService.GetUserInfo(request);
+
                 if (jcUserInfo == null)
                     return AuthenticateResult.Fail("Couldn't authenticate through JC-Interface.");
 
                 applicationCode = "SCV";
-                participantId = jcUserInfo.PartId;
-                agencyCode = jcUserInfo.AgenId;
+                participantId = jcUserInfo.PartID;
+                agencyCode = jcUserInfo.AgenID;
                 role = jcUserInfo.RoleCd;
                 subRole = jcUserInfo.SubRoleCd;
-                errorMsg = jcUserInfo.ErrorMsg;
                 isSupremeUser = true;
             }
 
@@ -82,9 +82,9 @@ namespace Scv.Api.Infrastructure.Authentication
                 new Claim(CustomClaimTypes.JcAgencyCode, agencyCode),
                 new Claim(CustomClaimTypes.Role, role),
                 new Claim(CustomClaimTypes.SubRole, subRole),
-                new Claim(CustomClaimTypes.ErrorMsg, errorMsg),
                 new Claim(CustomClaimTypes.IsSupremeUser, isSupremeUser.ToString()),
             };
+
             var identity = new ClaimsIdentity(claims, Scheme.Name);
             var principal = new ClaimsPrincipal(identity);
 
