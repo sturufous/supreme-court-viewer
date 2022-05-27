@@ -170,6 +170,20 @@
           </b-badge>
         </template>
 
+        <template v-slot:cell(providedDocuments)="data">
+          <b-button
+            :style="data.field.cellStyle"
+            size="sm"
+            :variant="'outline-primary border-white text-' + data.item.listClass"
+            class="mr-2"
+            @click="OpenCivilFilePageprovidedDocuments(data)"
+          >
+            <b-icon-file-earmark-text
+              :variant="data.item.listClass"
+            ></b-icon-file-earmark-text>
+          </b-button>
+        </template>
+
         <template v-slot:cell(fileMarkers)="data">
           <b-badge
             v-for="(field, index) in data.value"
@@ -289,7 +303,7 @@ enum HearingType {
 @Component({
   components: {
     CivilAppearanceDetails,
-    CriminalAppearanceDetails,
+    CriminalAppearanceDetails
   },
 })
 export default class CourtListLayout extends Vue {
@@ -383,6 +397,12 @@ export default class CourtListLayout extends Vue {
     {
       key: "counsel",
       label: "Counsel",
+      tdClass: "border-top",
+      cellStyle: "margin-top: 3px; font-size: 16px; font-weight:normal;",
+    },
+    {
+      key: "providedDocuments",
+      label: "Provided Documents",
       tdClass: "border-top",
       cellStyle: "margin-top: 3px; font-size: 16px; font-weight:normal;",
     },
@@ -761,7 +781,23 @@ export default class CourtListLayout extends Vue {
     this.UpdateCivilFile(fileInformation);
     const routeData = this.$router.resolve({
       name: "CivilCaseDetails",
-      params: { fileNumber: fileInformation.fileNumber },
+      params: {
+        fileNumber: fileInformation.fileNumber
+      },
+    });
+    window.open(routeData.href, "_blank");
+  }
+
+  public OpenCivilFilePageprovidedDocuments(data) {
+    const fileInformation = {} as civilFileInformationType;
+    fileInformation.fileNumber = data.item.fileId;
+    this.UpdateCivilFile(fileInformation);
+    const routeData = this.$router.resolve({
+      name: "CivilCaseDetails",
+      params: {
+        fileNumber: fileInformation.fileNumber,
+        section: "Provided Documents"
+      },
     });
     window.open(routeData.href, "_blank");
   }
