@@ -172,15 +172,28 @@
 
         <template v-slot:cell(providedDocuments)="data">
           <b-button
+            v-if="countReferenceDocs(data) == 1"
             :style="data.field.cellStyle"
             size="sm"
             :variant="'outline-primary border-white text-' + data.item.listClass"
             class="mr-2"
-            @click="OpenCivilFilePageprovidedDocuments(data)"
+            @click="downloadProvidedDocument(data)"
           >
             <b-icon-file-earmark-text
               :variant="data.item.listClass"
             ></b-icon-file-earmark-text>
+          </b-button>
+          <b-button
+            v-else-if="countReferenceDocs(data) > 1"
+            :style="data.field.cellStyle"
+            size="sm"
+            :variant="'outline-primary border-white text-' + data.item.listClass"
+            class="mr-2"
+            @click="OpenCivilFilePageProvidedDocuments(data)"
+          >
+            <b-icon-files
+              :variant="data.item.listClass"
+            ></b-icon-files>
           </b-button>
         </template>
 
@@ -292,6 +305,8 @@ const civilState = namespace("CivilFileInformation");
 import "@store/modules/CriminalFileInformation";
 import { criminalCourtListType } from "@/types/courtlist/jsonTypes";
 const criminalState = namespace("CriminalFileInformation");
+import shared from "../shared";
+import { CourtDocumentType, DocumentData } from "@/types/shared";
 
 enum HearingType {
   "A" = "+",
@@ -361,6 +376,7 @@ export default class CourtListLayout extends Vue {
   isDataReady = false;
   showNotes = false;
   notes = { remarks: [], text: "", trialNotes: "", fileComment: "", commentToJudge: "", sheriffComment: "" };
+  referenceDocs: any[] = [];
 
   initialFields = [
     {
@@ -437,14 +453,13 @@ export default class CourtListLayout extends Vue {
     this.getCourtList();
   }
 
-  public getCourtList(): void {
+  public async getCourtList() {
     const data = this.courtListInformation.detailsData;
     this.civilCourtListJson = data.civilCourtList;
     this.courtRoom = data.courtRoomCode;
-    this.ExtractCivilListInfo();
+    await this.ExtractCivilListInfo();
     this.criminalCourtListJson = data.criminalCourtList;
     this.ExtractCriminalListInfo();
-    console.log(this.courtList);
     this.fields = JSON.parse(JSON.stringify(this.initialFields));
     if (this.criminalCourtListJson.length == 0) {
       this.fields.splice(4, 1);
@@ -599,7 +614,7 @@ export default class CourtListLayout extends Vue {
     else return { name: nameOfAccused, trunc: false };
   }
 
-  public ExtractCivilListInfo(): void {
+  public async ExtractCivilListInfo() {
     const familyListClass = ["F", "E"];
     const civilListClass = ["I", "B", "V", "D", "H", "P", "S"];
     /* 
@@ -676,6 +691,7 @@ export default class CourtListLayout extends Vue {
       if (civilListInfo.counselDesc) civilListInfo.counselDesc += civilListInfo.counsel;
 
       civilListInfo.fileId = jcivilList.physicalFile.physicalFileID;
+      this.referenceDocs.push(await this.UpdateReferenceDocs(civilListInfo.fileId));
       civilListInfo.appearanceId = jcivilList.appearanceId;
 
       civilListInfo.fileMarkers = [];
@@ -788,14 +804,61 @@ export default class CourtListLayout extends Vue {
     window.open(routeData.href, "_blank");
   }
 
-  public OpenCivilFilePageprovidedDocuments(data) {
-    const fileInformation = {} as civilFileInformationType;
-    fileInformation.fileNumber = data.item.fileId;
-    this.UpdateCivilFile(fileInformation);
+  public countReferenceDocs(data) {
+    if (data?.item?.fileId) {
+      const target = this.referenceDocs.find(doc => doc["fileId"] === data.item.fileId);
+      return target["doc"].length;
+    }
+    return 0;
+  }
+
+  public downloadProvidedDocument(data) {
+    const target = this.referenceDocs.find(rd => rd.fileId === data.item.fileId);
+    shared.openDocumentsPdf(CourtDocumentType.ProvidedCivil, target.doc[0]);
+  }
+
+  public UpdateReferenceDocs(fileId) {
+    return new Promise(resolve => {
+      this.$http
+        .get(`api/files/civil/${fileId}`)
+        .then(
+          (Response) => Response.json()
+        )
+        .then((data) => {
+          const detailsData = data;
+          const documents = data.referenceDocument;
+          const documentsData: DocumentData[] = [];
+          
+          for (const docIndex in documents) {
+            const doc = documents[docIndex];
+
+            const documentData: DocumentData = {
+              appearanceDate: Vue.filter("beautify_date")(doc.AppearanceDate),
+              courtClass: detailsData.courtClassCd,
+              courtLevel: detailsData.courtLevelCd,
+              documentId: doc.ObjectGuid,
+              documentDescription: doc.ReferenceDocumentTypeDsc,
+              fileId: fileId,
+              fileNumberText: detailsData.fileNumberTxt,
+              partyName: doc.ReferenceDocumentInterest.map(pn => pn.partyName),
+              location: detailsData.homeLocationAgencyName,
+            };
+
+            documentsData.push(documentData);
+          }
+          resolve({
+            fileId: fileId,
+            doc: documentsData
+          });
+        })
+    })
+  }
+
+  public OpenCivilFilePageProvidedDocuments(data) {
     const routeData = this.$router.resolve({
       name: "CivilCaseDetails",
       params: {
-        fileNumber: fileInformation.fileNumber,
+        fileNumber: data.item.fileId,
         section: "Provided Documents"
       },
     });
