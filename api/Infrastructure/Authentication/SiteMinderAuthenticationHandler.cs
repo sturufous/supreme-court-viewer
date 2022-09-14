@@ -41,15 +41,17 @@ namespace Scv.Api.Infrastructure.Authentication
 
             if (siteMinderUserGuidHeader == null || siteMinderUserTypeHeader == null)
                 return AuthenticateResult.NoResult();
-            
+
             if (siteMinderUserTypeHeader != ValidSiteMinderUserType)
                 return AuthenticateResult.Fail("Invalid SiteMinder UserType Header.");
 
             var authenticatedBySiteMinderPreviously = Context.User.Identity.AuthenticationType == SiteMinder;
             var applicationCode = Context.User.ApplicationCode();
-            var participantId = Context.User.ParticipantId(); 
+            var participantId = Context.User.ParticipantId();
             var agencyCode = Context.User.AgencyCode();
             var isSupremeUser = Context.User.IsSupremeUser();
+            var role = Context.User.Role();
+            var subRole = Context.User.SubRole();
 
             if (!authenticatedBySiteMinderPreviously)
             {
@@ -67,8 +69,10 @@ namespace Scv.Api.Infrastructure.Authentication
                     return AuthenticateResult.Fail("Couldn't authenticate through JC-Interface.");
 
                 applicationCode = "SCV";
-                participantId = jcUserInfo.UserPartId;
-                agencyCode = jcUserInfo.UserDefaultAgencyCd;
+                participantId = jcUserInfo.PartID;
+                agencyCode = jcUserInfo.AgenID;
+                role = jcUserInfo.RoleCd;
+                subRole = jcUserInfo.SubRoleCd;
                 isSupremeUser = true;
             }
 
@@ -76,7 +80,9 @@ namespace Scv.Api.Infrastructure.Authentication
                 new Claim(CustomClaimTypes.ApplicationCode, applicationCode),
                 new Claim(CustomClaimTypes.JcParticipantId, participantId),
                 new Claim(CustomClaimTypes.JcAgencyCode, agencyCode),
-                new Claim(CustomClaimTypes.IsSupremeUser, isSupremeUser.ToString())
+                new Claim(CustomClaimTypes.Role, role),
+                new Claim(CustomClaimTypes.SubRole, subRole),
+                new Claim(CustomClaimTypes.IsSupremeUser, isSupremeUser.ToString()),
             };
 
             var identity = new ClaimsIdentity(claims, Scheme.Name);

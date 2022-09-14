@@ -4,7 +4,32 @@
     title: "JC-Interface - User Service"
     version: "0.0.2"
   servers: []
-  paths: 
+  paths:
+    /user/getParticipantInfo: 
+      get: 
+        responses: 
+          200: 
+            description: ""
+            content: 
+              application/json: 
+                schema: 
+                  $ref: "#/components/schemas/getParticipantInfoResponse"
+          404: 
+            description: ""
+            content: 
+              application/json: 
+                schema: 
+                  example: 
+                    message: "No items matching the given criteria were found."
+        description: "Gets the participant id for a specific domain, user guid and userid. \n"
+        operationId: "GET_user-getParticipantInfo"
+        parameters: 
+          - 
+            name: "guid"
+            in: "header"
+            description: "The guid of the user"
+            schema: 
+              type: "string"
     /user/getUserLogin: 
       get: 
         responses: 
@@ -62,7 +87,20 @@
             schema: 
               type: "string"
   components: 
-    schemas: 
+    schemas:
+      getParticipantInfoResponse: 
+        type: "object"
+        properties: 
+          partID: 
+            type: "string"
+          agenID: 
+            type: "string"
+          roleCd: 
+            type: "string"
+          subRoleCd: 
+            type: "string"
+          errorMsg: 
+            type: "string"
       loginHistory: 
         type: "object"
         properties: 
