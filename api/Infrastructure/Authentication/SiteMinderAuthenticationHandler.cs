@@ -53,7 +53,7 @@ namespace Scv.Api.Infrastructure.Authentication
             var role = Context.User.Role();
             var subRole = Context.User.SubRole();
 
-            if (!authenticatedBySiteMinderPreviously)
+            if (!authenticatedBySiteMinderPreviously || role == null || subRole == null)
             {
                 var request = new UserInfoRequest
                 {
@@ -71,9 +71,9 @@ namespace Scv.Api.Infrastructure.Authentication
                 applicationCode = "SCV";
                 participantId = jcUserInfo.PartID;
                 agencyCode = jcUserInfo.AgenID;
+                isSupremeUser = true;
                 role = jcUserInfo.RoleCd;
                 subRole = jcUserInfo.SubRoleCd;
-                isSupremeUser = true;
             }
 
             var claims = new[] {
