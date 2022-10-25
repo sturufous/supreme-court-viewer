@@ -36,14 +36,24 @@ namespace Scv.Api.Infrastructure.Authentication
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
+            Logger.LogInformation("Authenticating with SiteMinder");
             string siteMinderUserGuidHeader = Request.Headers["SMGOV_USERGUID"];
             string siteMinderUserTypeHeader = Request.Headers["SMGOV_USERTYPE"];
+            Logger.LogInformation("USERGUID: {0}", siteMinderUserGuidHeader);
+            Logger.LogInformation("USERTYPE: {0}", siteMinderUserTypeHeader);
+
 
             if (siteMinderUserGuidHeader == null || siteMinderUserTypeHeader == null)
+            {
+                Logger.LogInformation("One of the headers was null");
                 return AuthenticateResult.NoResult();
+            }
 
             if (siteMinderUserTypeHeader != ValidSiteMinderUserType)
+            {
+                Logger.LogInformation("USERTYPE does not match ValidSiteMinderUserType: {0} vs {1}", siteMinderUserTypeHeader, ValidSiteMinderUserType);
                 return AuthenticateResult.Fail("Invalid SiteMinder UserType Header.");
+            }
 
             var authenticatedBySiteMinderPreviously = Context.User.Identity.AuthenticationType == SiteMinder;
             var applicationCode = Context.User.ApplicationCode();
@@ -53,6 +63,7 @@ namespace Scv.Api.Infrastructure.Authentication
 
             if (!authenticatedBySiteMinderPreviously)
             {
+                Logger.LogInformation("Not Authenticated through siteminder previously, checking against JCI");
                 var request = new UserInfoRequest
                 {
                     DeviceName = Environment.MachineName,
@@ -64,7 +75,10 @@ namespace Scv.Api.Infrastructure.Authentication
                 var jcUserInfo = await JCUserService.GetUserInfo(request);
 
                 if (jcUserInfo == null)
+                {
+                    Logger.LogInformation("JCUserService Response == null");
                     return AuthenticateResult.Fail("Couldn't authenticate through JC-Interface.");
+                }
 
                 applicationCode = "SCV";
                 participantId = jcUserInfo.UserPartId;
@@ -83,9 +97,13 @@ namespace Scv.Api.Infrastructure.Authentication
             var principal = new ClaimsPrincipal(identity);
 
             if (!authenticatedBySiteMinderPreviously)
+            {
+                Logger.LogInformation("Sign in with principal if not authenticated previously");
                 await Context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-
+            }
+                
             var ticket = new AuthenticationTicket(principal, Scheme.Name);
+            Logger.LogInformation("Successfully logged in");
             return AuthenticateResult.Success(ticket);
         }
     }
