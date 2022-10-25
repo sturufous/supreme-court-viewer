@@ -61,7 +61,15 @@ namespace Scv.Api.Infrastructure.Authentication
             var agencyCode = Context.User.AgencyCode();
             var isSupremeUser = Context.User.IsSupremeUser();
 
-            if (!authenticatedBySiteMinderPreviously)
+            Logger.LogInformation("authenticatedBySiteMinderPreviously: {0}", authenticatedBySiteMinderPreviously);
+            Logger.LogInformation("applicationCode: {0}", applicationCode);
+            Logger.LogInformation("participantId : {0}", participantId);
+            Logger.LogInformation("agencyCode : {0}", agencyCode);
+            Logger.LogInformation("isSupremeUser : {0}", isSupremeUser);
+            Logger.LogInformation("role : {0}", role);
+            Logger.LogInformation("subRole : {0}", subRole);
+
+            if (!authenticatedBySiteMinderPreviously || role == null || subRole == null)
             {
                 Logger.LogInformation("Not Authenticated through siteminder previously, checking against JCI");
                 var request = new UserInfoRequest
