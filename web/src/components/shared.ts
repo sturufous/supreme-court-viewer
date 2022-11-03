@@ -72,7 +72,8 @@ export default {
 
       const duration = (end.getTime() - start.getTime()) / 1000;
       const endMsg = `Request Tracking - API response received - CorrelationId: ${correlationId} End time: ${endStr} Duration: ${duration}s`;
-
+      
+      // eslint-disable-next-line
       windowObjectReference.onload = (event) => {
         if (windowObjectReference.document.readyState === "complete") {
           //console.log(endMsg);
