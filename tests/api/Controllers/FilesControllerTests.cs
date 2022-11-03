@@ -92,7 +92,7 @@ namespace tests.api.Controllers
 
             var civilFileContent = await _controller.GetCivilFileDetailByFileId("3822");
             var documentId = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes("GeWzGIDmGMUu.#CGMKv9.i`E|ahP'P^^z>qK*[sfUw=M\":Zxf)f#'AI(92O2adE'VGA9_7.368246000.074711.2459184..#C4"));
-            var document = await _controller.GetDocument(documentId, "hello.txt", false, "3822");
+            var document = await _controller.GetDocument(documentId, "hello.txt", false, "3822", "abc123");
         }
 
         [Fact(Skip="TEST")]
@@ -111,7 +111,7 @@ namespace tests.api.Controllers
             Assert.Equal(2, referenceDocuments.Count);
             var firstReferenceDocument = referenceDocuments.First();
 
-            var document = await _controller.GetDocument(WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(firstReferenceDocument.ObjectGuid)), "hello.txt", false, "4987");
+            var document = await _controller.GetDocument(WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(firstReferenceDocument.ObjectGuid)), "hello.txt", false, "4987", "abc123");
         }
 
         [Fact]
@@ -128,7 +128,7 @@ namespace tests.api.Controllers
             Assert.Equal(4, referenceDocuments.Count);
             var firstReferenceDocument = referenceDocuments.First();
 
-            var document = await _controller.GetDocument(WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(firstReferenceDocument.ObjectGuid)), "hello.txt", false, "3822");
+            var document = await _controller.GetDocument(WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(firstReferenceDocument.ObjectGuid)), "hello.txt", false, "3822", "abc123");
         }
 
         [Fact]
@@ -524,7 +524,7 @@ namespace tests.api.Controllers
         {
             //var civilFile = await _controller.GetCivilFileDetailByFileId("3197");
 
-            var actionResult = await _controller.GetDocument(WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes("6874")), "test.pdf", false, "3197");
+            var actionResult = await _controller.GetDocument(WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes("6874")), "test.pdf", false, "3197", "abc123");
 
             var fileContentResult = actionResult as FileContentResult;
             Assert.NotNull(fileContentResult);
@@ -534,7 +534,7 @@ namespace tests.api.Controllers
         [Fact]
         public async void Document_Criminal()
         {
-            var actionResult = await _controller.GetDocument(WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes("6196.0734")), "test.pdf", true, "3192");
+            var actionResult = await _controller.GetDocument(WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes("6196.0734")), "test.pdf", true, "3192", "abc123");
 
             var fileContentResult = actionResult as FileContentResult;
             Assert.NotNull(fileContentResult);
