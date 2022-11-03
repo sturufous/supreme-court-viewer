@@ -165,7 +165,6 @@ import CustomOverlay from "../CustomOverlay.vue";
 import { ArchiveInfoType, DocumentRequestsInfoType } from "@/types/common";
 import shared from "../shared";
 import { CourtDocumentType, DocumentData } from "@/types/shared";
-import { v4 as uuidv4 } from 'uuid';
 
 enum fieldTab {
   Categories = 0,
@@ -506,8 +505,7 @@ export default class CivilDocumentsView extends Vue {
       fileNumberText: this.civilFileInformation.detailsData.fileNumberTxt,
       courtClass: this.civilFileInformation.detailsData.courtClassCd,
       courtLevel: this.civilFileInformation.detailsData.courtLevelCd,
-      location: this.civilFileInformation.detailsData.homeLocationAgencyName,
-      correlationId: uuidv4()
+      location: this.civilFileInformation.detailsData.homeLocationAgencyName
     };
     shared.openDocumentsPdf(documentType, documentData);
     this.loadingPdf = false;

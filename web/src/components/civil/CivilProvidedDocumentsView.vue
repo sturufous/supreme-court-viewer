@@ -163,7 +163,6 @@ const commonState = namespace("CommonInformation");
 import CustomOverlay from "../CustomOverlay.vue";
 import shared from "../shared";
 import { ArchiveInfoType, DocumentRequestsInfoType } from "@/types/common";
-import { v4 as uuidv4 } from 'uuid';
 enum fieldTab {
   Categories = 0,
 }
@@ -382,8 +381,7 @@ export default class CivilProvidedDocumentsView extends Vue {
       fileId: this.civilFileInformation.fileNumber,
       fileNumberText: this.civilFileInformation.detailsData.fileNumberTxt,
       partyName: eventData.item.partyName,
-      location: this.civilFileInformation.detailsData.homeLocationAgencyName,
-      correlationId: uuidv4()
+      location: this.civilFileInformation.detailsData.homeLocationAgencyName
     };
     shared.openDocumentsPdf(CourtDocumentType.ProvidedCivil, documentData);
     this.loadingPdf = false;
