@@ -1,6 +1,7 @@
 import { CourtDocumentType, DocumentData } from "@/types/shared";
 import { splunkLog } from "@/utils/utils";
 import base64url from "base64url";
+import { v4 as uuidv4 } from 'uuid';
 
 export default {
   openDocumentsPdf(documentType: CourtDocumentType, documentData: DocumentData): void {
@@ -9,6 +10,7 @@ export default {
     const documentId = documentData.documentId
       ? base64url(documentData.documentId)
       : documentData.documentId;
+    const correlationId = uuidv4();
         
     switch (documentType) {
       case CourtDocumentType.CSR:
@@ -23,8 +25,8 @@ export default {
         break;
       default:
         this.openRequestedTab(
-          `${process.env.BASE_URL}api/files/document/${documentId}/${encodeURIComponent(fileName)}?isCriminal=${isCriminal}&fileId=${documentData.fileId}&CorrelationId=${documentData.correlationId}`,
-          documentData.correlationId
+          `${process.env.BASE_URL}api/files/document/${documentId}/${encodeURIComponent(fileName)}?isCriminal=${isCriminal}&fileId=${documentData.fileId}&CorrelationId=${correlationId}`,
+          correlationId
         );
         break;
     }
