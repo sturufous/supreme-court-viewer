@@ -36,23 +36,44 @@ namespace Scv.Api.Infrastructure.Authentication
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
+            Logger.LogInformation("Authenticating with SiteMinder");
             string siteMinderUserGuidHeader = Request.Headers["SMGOV_USERGUID"];
             string siteMinderUserTypeHeader = Request.Headers["SMGOV_USERTYPE"];
+            Logger.LogInformation("USERGUID: {0}", siteMinderUserGuidHeader);
+            Logger.LogInformation("USERTYPE: {0}", siteMinderUserTypeHeader);
+
 
             if (siteMinderUserGuidHeader == null || siteMinderUserTypeHeader == null)
+            {
+                Logger.LogInformation("One of the headers was null");
                 return AuthenticateResult.NoResult();
+            }
 
             if (siteMinderUserTypeHeader != ValidSiteMinderUserType)
+            {
+                Logger.LogInformation("USERTYPE does not match ValidSiteMinderUserType: {0} vs {1}", siteMinderUserTypeHeader, ValidSiteMinderUserType);
                 return AuthenticateResult.Fail("Invalid SiteMinder UserType Header.");
+            }
 
             var authenticatedBySiteMinderPreviously = Context.User.Identity.AuthenticationType == SiteMinder;
             var applicationCode = Context.User.ApplicationCode();
             var participantId = Context.User.ParticipantId();
             var agencyCode = Context.User.AgencyCode();
             var isSupremeUser = Context.User.IsSupremeUser();
+            var role = Context.User.Role();
+            var subRole = Context.User.SubRole();
 
-            if (!authenticatedBySiteMinderPreviously)
+            Logger.LogInformation("authenticatedBySiteMinderPreviously: {0}", authenticatedBySiteMinderPreviously);
+            Logger.LogInformation("applicationCode: {0}", applicationCode);
+            Logger.LogInformation("participantId : {0}", participantId);
+            Logger.LogInformation("agencyCode : {0}", agencyCode);
+            Logger.LogInformation("isSupremeUser : {0}", isSupremeUser);
+            Logger.LogInformation("role : {0}", role);
+            Logger.LogInformation("subRole : {0}", subRole);
+
+            if (!authenticatedBySiteMinderPreviously || role == null || subRole == null)
             {
+                Logger.LogInformation("Not Authenticated through siteminder previously, checking against JCI");
                 var request = new UserInfoRequest
                 {
                     DeviceName = Environment.MachineName,
@@ -64,11 +85,16 @@ namespace Scv.Api.Infrastructure.Authentication
                 var jcUserInfo = await JCUserService.GetUserInfo(request);
 
                 if (jcUserInfo == null)
+                {
+                    Logger.LogInformation("JCUserService Response == null");
                     return AuthenticateResult.Fail("Couldn't authenticate through JC-Interface.");
+                }
 
                 applicationCode = "SCV";
-                participantId = jcUserInfo.UserPartId;
-                agencyCode = jcUserInfo.UserDefaultAgencyCd;
+                participantId = jcUserInfo.PartID;
+                agencyCode = jcUserInfo.AgenID;
+                role = jcUserInfo.RoleCd;
+                subRole = jcUserInfo.SubRoleCd;
                 isSupremeUser = true;
             }
 
@@ -76,6 +102,8 @@ namespace Scv.Api.Infrastructure.Authentication
                 new Claim(CustomClaimTypes.ApplicationCode, applicationCode),
                 new Claim(CustomClaimTypes.JcParticipantId, participantId),
                 new Claim(CustomClaimTypes.JcAgencyCode, agencyCode),
+                new Claim(CustomClaimTypes.Role, role),
+                new Claim(CustomClaimTypes.SubRole, subRole),
                 new Claim(CustomClaimTypes.IsSupremeUser, isSupremeUser.ToString()),
             };
 
@@ -83,9 +111,13 @@ namespace Scv.Api.Infrastructure.Authentication
             var principal = new ClaimsPrincipal(identity);
 
             if (!authenticatedBySiteMinderPreviously)
+            {
+                Logger.LogInformation("Sign in with principal if not authenticated previously");
                 await Context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-
+            }
+                
             var ticket = new AuthenticationTicket(principal, Scheme.Name);
+            Logger.LogInformation("Successfully logged in");
             return AuthenticateResult.Success(ticket);
         }
     }

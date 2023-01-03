@@ -125,6 +125,9 @@ namespace Scv.Api.Controllers
             {
                 UserType = userType,
                 EnableArchive = false,
+                Role = HttpContext.User.Role(),
+                SubRole = HttpContext.User.SubRole(),
+                IsSupremeUser = HttpContext.User.IsSupremeUser(),
                 DateTime.UtcNow
             });
         }
