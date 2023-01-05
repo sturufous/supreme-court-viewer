@@ -42,7 +42,6 @@ namespace Scv.Api.Infrastructure.Authentication
             Logger.LogInformation("USERGUID: {0}", siteMinderUserGuidHeader);
             Logger.LogInformation("USERTYPE: {0}", siteMinderUserTypeHeader);
 
-
             if (siteMinderUserGuidHeader == null || siteMinderUserTypeHeader == null)
             {
                 Logger.LogInformation("One of the headers was null");
@@ -63,6 +62,8 @@ namespace Scv.Api.Infrastructure.Authentication
             var role = Context.User.Role();
             var subRole = Context.User.SubRole();
 
+            Logger.LogInformation("AuthenticationType: {0}", Context.User.Identity.AuthenticationType);
+            Logger.LogInformation("SiteMinder: {0}", SiteMinder);
             Logger.LogInformation("authenticatedBySiteMinderPreviously: {0}", authenticatedBySiteMinderPreviously);
             Logger.LogInformation("applicationCode: {0}", applicationCode);
             Logger.LogInformation("participantId : {0}", participantId);
