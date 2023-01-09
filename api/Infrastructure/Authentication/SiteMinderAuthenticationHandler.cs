@@ -39,8 +39,8 @@ namespace Scv.Api.Infrastructure.Authentication
             Logger.LogInformation("Authenticating with SiteMinder");
             string siteMinderUserGuidHeader = Request.Headers["SMGOV_USERGUID"];
             string siteMinderUserTypeHeader = Request.Headers["SMGOV_USERTYPE"];
-            Logger.LogInformation("USERGUID: {0}", siteMinderUserGuidHeader);
-            Logger.LogInformation("USERTYPE: {0}", siteMinderUserTypeHeader);
+            Logger.LogInformation("SMGOV_USERGUID: {0}", siteMinderUserGuidHeader);
+            Logger.LogInformation("SMGOV_USERTYPE: {0}", siteMinderUserTypeHeader);
 
             if (siteMinderUserGuidHeader == null || siteMinderUserTypeHeader == null)
             {
@@ -54,6 +54,12 @@ namespace Scv.Api.Infrastructure.Authentication
                 return AuthenticateResult.Fail("Invalid SiteMinder UserType Header.");
             }
 
+            // set authtype when we get guid, find out where this context is being set for identity
+            Logger.LogInformation("Context.User.Identity all:");
+            Logger.LogInformation("\tContext.User.Identity.AuthenticationType: {0}", Context.User.Identity.AuthenticationType);
+            Logger.LogInformation("\tContext.User.Identity.IsAuthenticated: {0}", Context.User.Identity.IsAuthenticated);
+            Logger.LogInformation("\tContext.User.Identity.Name: {0}", Context.User.Identity.Name);
+
             var authenticatedBySiteMinderPreviously = Context.User.Identity.AuthenticationType == SiteMinder;
             var applicationCode = Context.User.ApplicationCode();
             var participantId = Context.User.ParticipantId();
@@ -62,7 +68,6 @@ namespace Scv.Api.Infrastructure.Authentication
             var role = Context.User.Role();
             var subRole = Context.User.SubRole();
 
-            Logger.LogInformation("AuthenticationType: {0}", Context.User.Identity.AuthenticationType);
             Logger.LogInformation("SiteMinder: {0}", SiteMinder);
             Logger.LogInformation("authenticatedBySiteMinderPreviously: {0}", authenticatedBySiteMinderPreviously);
             Logger.LogInformation("applicationCode: {0}", applicationCode);
@@ -118,6 +123,7 @@ namespace Scv.Api.Infrastructure.Authentication
             }
                 
             var ticket = new AuthenticationTicket(principal, Scheme.Name);
+            Logger.LogInformation("Scheme.Name: {0}", Scheme.Name);
             Logger.LogInformation("Successfully logged in");
             return AuthenticateResult.Success(ticket);
         }
