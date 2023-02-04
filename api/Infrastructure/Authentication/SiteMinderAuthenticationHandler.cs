@@ -39,26 +39,34 @@ namespace Scv.Api.Infrastructure.Authentication
             Logger.LogInformation("Authenticating with SiteMinder");
             string siteMinderUserGuidHeader = Request.Headers["SMGOV_USERGUID"];
             string siteMinderUserTypeHeader = Request.Headers["SMGOV_USERTYPE"];
-            Logger.LogInformation("SMGOV_USERGUID: {0}", siteMinderUserGuidHeader);
-            Logger.LogInformation("SMGOV_USERTYPE: {0}", siteMinderUserTypeHeader);
+            Logger.LogDebug("SMGOV_USERGUID: {0}", siteMinderUserGuidHeader);
+            Logger.LogDebug("SMGOV_USERTYPE: {0}", siteMinderUserTypeHeader);
 
             if (siteMinderUserGuidHeader == null || siteMinderUserTypeHeader == null)
             {
-                Logger.LogInformation("One of the headers was null");
+                Logger.LogDebug($"One of the SiteMinder headers was null: siteMinderUserGuidHeader: {siteMinderUserGuidHeader}, siteMinderUserTypeHeader: {siteMinderUserTypeHeader}");
                 return AuthenticateResult.NoResult();
+            }
+            else
+            {
+                Logger.LogDebug("Siteminder headers accounted for");
             }
 
             if (siteMinderUserTypeHeader != ValidSiteMinderUserType)
             {
-                Logger.LogInformation("USERTYPE does not match ValidSiteMinderUserType: {0} vs {1}", siteMinderUserTypeHeader, ValidSiteMinderUserType);
+                Logger.LogDebug("USERTYPE does not match ValidSiteMinderUserType: {0} vs {1}", siteMinderUserTypeHeader, ValidSiteMinderUserType);
                 return AuthenticateResult.Fail("Invalid SiteMinder UserType Header.");
+            }
+            else 
+            {
+                Logger.LogDebug("SiteMinder user type is valid");
             }
 
             // set authtype when we get guid, find out where this context is being set for identity
-            Logger.LogInformation("Context.User.Identity all:");
-            Logger.LogInformation("\tContext.User.Identity.AuthenticationType: {0}", Context.User.Identity.AuthenticationType);
-            Logger.LogInformation("\tContext.User.Identity.IsAuthenticated: {0}", Context.User.Identity.IsAuthenticated);
-            Logger.LogInformation("\tContext.User.Identity.Name: {0}", Context.User.Identity.Name);
+            Logger.LogDebug("Context.User.Identity all:");
+            Logger.LogDebug("\tContext.User.Identity.AuthenticationType: {0}", Context.User.Identity.AuthenticationType);
+            Logger.LogDebug("\tContext.User.Identity.IsAuthenticated: {0}", Context.User.Identity.IsAuthenticated);
+            Logger.LogDebug("\tContext.User.Identity.Name: {0}", Context.User.Identity.Name);
 
             var authenticatedBySiteMinderPreviously = Context.User.Identity.AuthenticationType == SiteMinder;
             var applicationCode = Context.User.ApplicationCode();
@@ -68,18 +76,18 @@ namespace Scv.Api.Infrastructure.Authentication
             var role = Context.User.Role();
             var subRole = Context.User.SubRole();
 
-            Logger.LogInformation("SiteMinder: {0}", SiteMinder);
-            Logger.LogInformation("authenticatedBySiteMinderPreviously: {0}", authenticatedBySiteMinderPreviously);
-            Logger.LogInformation("applicationCode: {0}", applicationCode);
-            Logger.LogInformation("participantId : {0}", participantId);
-            Logger.LogInformation("agencyCode : {0}", agencyCode);
-            Logger.LogInformation("isSupremeUser : {0}", isSupremeUser);
-            Logger.LogInformation("role : {0}", role);
-            Logger.LogInformation("subRole : {0}", subRole);
+            Logger.LogDebug("SiteMinder: {0}", SiteMinder);
+            Logger.LogDebug("authenticatedBySiteMinderPreviously: {0}", authenticatedBySiteMinderPreviously);
+            Logger.LogDebug("applicationCode: {0}", applicationCode);
+            Logger.LogDebug("participantId : {0}", participantId);
+            Logger.LogDebug("agencyCode : {0}", agencyCode);
+            Logger.LogDebug("isSupremeUser : {0}", isSupremeUser);
+            Logger.LogDebug("role : {0}", role);
+            Logger.LogDebug("subRole : {0}", subRole);
 
             if (!authenticatedBySiteMinderPreviously || role == null || subRole == null)
             {
-                Logger.LogInformation("Not Authenticated through siteminder previously, checking against JCI");
+                Logger.LogDebug("Not Authenticated through siteminder previously, checking against JCI");
                 var request = new UserInfoRequest
                 {
                     DeviceName = Environment.MachineName,
@@ -95,6 +103,10 @@ namespace Scv.Api.Infrastructure.Authentication
                     Logger.LogInformation("JCUserService Response == null");
                     return AuthenticateResult.Fail("Couldn't authenticate through JC-Interface.");
                 }
+                else
+                {
+                    Logger.LogDebug("JCUserServce Response is valid");
+                }
 
                 applicationCode = "SCV";
                 participantId = jcUserInfo.PartID;
@@ -102,6 +114,10 @@ namespace Scv.Api.Infrastructure.Authentication
                 role = jcUserInfo.RoleCd;
                 subRole = jcUserInfo.SubRoleCd;
                 isSupremeUser = true;
+            }
+            else
+            {
+                Logger.LogDebug("Authenticated by SiteMinder previously, all attributes are available");
             }
 
             var claims = new[] {
@@ -118,8 +134,12 @@ namespace Scv.Api.Infrastructure.Authentication
 
             if (!authenticatedBySiteMinderPreviously)
             {
-                Logger.LogInformation("Sign in with principal if not authenticated previously");
+                Logger.LogDebug("Sign in with principal if not authenticated previously");
                 await Context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+            }
+            else
+            {
+                Logger.LogDebug("Authenticated by SiteMinder previously");
             }
                 
             var ticket = new AuthenticationTicket(principal, Scheme.Name);

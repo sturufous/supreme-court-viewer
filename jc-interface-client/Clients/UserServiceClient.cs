@@ -97,7 +97,7 @@ namespace JCCommon.Clients.UserService
                             var objectResponse_ = await ReadObjectResponseAsync<GetParticipantInfoResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                                throw new ApiException($"Response was null with status: {status_} and message: {response_.ReasonPhrase},", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
                         }
