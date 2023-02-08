@@ -40,8 +40,11 @@ namespace Scv.Api.Services
                     Logger.LogDebug($"SMGOV_USERGUID: {userInfoRequest.DomainUserGuid}, UserAgencyCd: {response.AgenID}, UserPartId: {response.PartID}");
                     return response;
                 }
-                Logger.LogInformation("Return failed from getParticipantInfo");
-                return null;
+                else
+                {
+                    Logger.LogError($"Return failed from getParticipantInfo with error: {response.ErrorMsg}");
+                    return null;
+                }
             }
             catch (Exception e)
             {
