@@ -75,6 +75,29 @@
                 </b-badge>
             </template>
 
+            <template v-if="fromA2a" v-slot:cell(summary)="data">
+                <span :class="data.field.cellClass" :style="data.field.cellStyle"> 
+                    <b-button
+                        variant="outline-primary text-info"
+                        style="transform:translate(0,5px);border:0px;"
+                        class="mt-0"
+                        v-b-tooltip.hover.right
+                        title="Download"
+                        @click="documentClick(
+                            {
+                                appearanceId: data.item.appearanceId,
+                                appearanceDate: data.item.date,
+                                documentDescription: 'CourtSummary',
+                            },
+                            data.item.appearanceId
+                      )"
+                        size="sm"
+                    >
+                        <b-icon icon="file-earmark-arrow-down" font-scale="2"></b-icon>
+                    </b-button>
+                </span>
+            </template>
+
             <template v-slot:cell(result)="data" >
                 <span
                         v-if="data.value"
@@ -116,10 +139,13 @@ import CivilAppearanceDetails from '@components/civil/CivilAppearanceDetails.vue
 import "@store/modules/CommonInformation";
 import "@store/modules/CivilFileInformation";
 import {civilFileInformationType, civilAppearanceInfoType, civilAppearancesListType} from '@/types/civil';
-import {InputNamesType, DurationType } from '@/types/common'
+import { CourtRoomsJsonInfoType, InputNamesType, DurationType } from '@/types/common'
 import { civilApprDetailType } from "@/types/civil/jsonTypes";
+import { CourtDocumentType, DocumentData } from "@/types/shared";
+import shared from "../shared";
 const civilState = namespace("CivilFileInformation");
 const commonState = namespace("CommonInformation");
+
 
 enum appearanceStatus {UNCF='Unconfirmed', CNCL='Canceled', SCHD='Scheduled' }
 
@@ -151,6 +177,9 @@ export default class CivilPastAppearances extends Vue {
     @civilState.State
     public civilFileInformation!: civilFileInformationType;
 
+    @commonState.State
+    public courtRoomsAndLocations!: CourtRoomsJsonInfoType[];
+
     @civilState.Action
     public UpdateCivilAppearanceInfo!: (newCivilAppearanceInfo: civilAppearanceInfoType) => void    
 
@@ -173,6 +202,7 @@ export default class CivilPastAppearances extends Vue {
     pastAppearancesJson: civilApprDetailType[] = [];    
     sortBy = 'date';
     sortDesc = true;    
+    fromA2a = false;
 
     fields =  
     [
@@ -190,17 +220,16 @@ export default class CivilPastAppearances extends Vue {
     
     mounted() {
         this.getPastAppearances();
+        this.isFromA2a();
     }
 
-    public getPastAppearances(): void {      
-    
+    public getPastAppearances(): void {
         const data = this.civilFileInformation.detailsData;
         this.pastAppearancesJson = data.appearances.apprDetail;              
         this.ExtractPastAppearancesInfo();
         if(this.pastAppearancesList.length) {                    
             this.isDataReady = true;
         }
-    
         this.isMounted = true;           
     }
   
@@ -256,8 +285,8 @@ export default class CivilPastAppearances extends Vue {
     {
         if(!data.detailsShowing)
         {
-            this.civilAppearanceInfo.fileNo = this.civilFileInformation.fileNumber; 
-            
+            this.civilAppearanceInfo.fileNo = this.civilFileInformation.fileNumber;
+
             this.civilAppearanceInfo.date = data.item.formattedDate;
             this.civilAppearanceInfo.appearanceId = data.item.appearanceId;
             this.civilAppearanceInfo.supplementalEquipmentTxt = data.item.supplementalEquipment;
@@ -286,6 +315,72 @@ export default class CivilPastAppearances extends Vue {
         {
             return _.sortBy(this.pastAppearancesList,"date").reverse().slice(0, 3);           
         }     
+    }
+
+    public documentClick(document, appearanceId) {
+        this.$http
+            .get(
+                "api/files/civil/" +
+                this.civilFileInformation.fileNumber +
+                "/appearance-detail/" +
+                appearanceId
+            )
+            .then(
+                (Response) => Response.json(),
+                (err) => {
+                    this.$bvToast.toast(`Error - ${err.url} - ${err.status} - ${err.statusText}`, {
+                        title: "An error has occured.",
+                        variant: "danger",
+                        autoHideDelay: 10000,
+                    });
+                console.log(err);
+                }
+            )
+            .then((data) => {
+                if (data) {
+                    const documentType = document.item == null ? CourtDocumentType.CSR : CourtDocumentType.Civil;
+                    const location = this.courtRoomsAndLocations.filter((location) => {
+                        return location.locationId == data?.agencyId;
+                    })[0]?.name;
+                    const documentData: DocumentData = {
+                        appearanceId: document.appearanceId,
+                        appearanceDate: data?.appearanceDt.substring(0, 10),
+                        courtLevel: data?.courtLevelCd,
+                        dateFiled: document.item ? Vue.filter("beautify_date")(document.item.dateFiled) : "",
+                        documentId: document.item ? document.item.id : "",
+                        documentDescription: document.item ? document.item.documentType : document.documentDescription,
+                        fileId: this.civilAppearanceInfo.fileNo,
+                        fileNumberText: data.fileNumberTxt,
+                        location: location ? location : "",
+                    };
+                    console.log(documentData);
+                    shared.openDocumentsPdf(documentType, documentData);
+                } else {
+                    window.alert("bad data!");
+                }
+            });
+    }
+
+    public isFromA2a() {
+        if (this.$route.query?.fromA2A && this.fromA2a == false) {
+            this.fromA2a = true;
+            const newFields: any[] = [];
+            this.fields.forEach( (field) => {
+                if (field.key == "result") {
+                    newFields.push({
+                        key:'summary',
+                        label:'Summary',
+                        sortable:false,
+                        tdClass: 'border-top',
+                        headerStyle:'text',
+                        cellClass:'text',
+                        cellStyle: 'font-weight: normal;font-size: 14px; padding-top:12px;text-align:left;'
+                    });
+                }
+                newFields.push(field);
+            });
+            this.fields = newFields;
+        }
     }
 }
 </script>
