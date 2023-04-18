@@ -82,7 +82,7 @@
                         style="transform:translate(0,5px);border:0px;"
                         class="mt-0"
                         v-b-tooltip.hover.right
-                        title="Download"
+                        title="Download Summary Sheet"
                         @click="documentClick(
                             {
                                 appearanceId: data.item.appearanceId,
@@ -369,7 +369,7 @@ export default class CivilPastAppearances extends Vue {
                 if (field.key == "result") {
                     newFields.push({
                         key:'summary',
-                        label:'Summary',
+                        label:'Court Summary',
                         sortable:false,
                         tdClass: 'border-top',
                         headerStyle:'text',
