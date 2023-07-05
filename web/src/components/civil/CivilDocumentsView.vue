@@ -305,7 +305,13 @@ export default class CivilDocumentsView extends Vue {
         tdClass: "border-top",
         thClass: "",
       },
-      { key: "seq", label: "Seq.", sortable: true, headerStyle: "text-primary", cellStyle: "font-size: 14px;" },
+      {
+        key: "seq",
+        label: "Seq.",
+        sortable: true,
+        headerStyle: "text-primary",
+        cellStyle: "font-size: 14px;"
+      },
       {
         key: "documentType",
         label: "Document Type",
@@ -726,9 +732,12 @@ export default class CivilDocumentsView extends Vue {
     if (this.activetab == "COURT SUMMARY") {
       this.sortDesc = true;
       return "appearanceDate";
-    } else {
+    } else if (this.activetab == "ORDERS") {
       this.sortDesc = false;
       return "seq";
+    } else {
+      this.sortDesc = true;
+      return "dateFiled"
     }
   }
 
