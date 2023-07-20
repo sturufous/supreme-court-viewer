@@ -349,7 +349,7 @@ export default class CivilPastAppearances extends Vue {
                         dateFiled: document.item ? Vue.filter("beautify_date")(document.item.dateFiled) : "",
                         documentId: document.item ? document.item.id : "",
                         documentDescription: document.item ? document.item.documentType : document.documentDescription,
-                        fileId: this.civilAppearanceInfo.fileNo,
+                        fileId: this.civilFileInformation.fileNumber,
                         fileNumberText: data.fileNumberTxt,
                         location: location ? location : "",
                     };
