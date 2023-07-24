@@ -500,7 +500,11 @@ export default class CivilCaseDetails extends Vue {
         }
         docInfo.documentId = jDoc.civilDocumentId;
         docInfo.pdfAvail = jDoc.imageId ? true : false;
-        docInfo.dateFiled = jDoc.filedDt ? jDoc.filedDt.split(" ")[0] : "";
+        if (docInfo.documentType.toUpperCase() == "ORDER") {
+          docInfo.dateFiled = jDoc.DateGranted ? jDoc.DateGranted.split(" ")[0] : "";
+        } else {
+          docInfo.dateFiled = jDoc.filedDt ? jDoc.filedDt.split(" ")[0] : "";
+        }
         docInfo.issues = [];
         if (jDoc.issue && jDoc.issue.length > 0) {
           for (const issue of jDoc.issue) {
