@@ -17,7 +17,7 @@ services:
 
   api:
     image: scv-api
-    environment: 
+    environment:
       - ASPNETCORE_URLS=${ASPNETCORE_URLS}
       - FileServicesClient__Username=${FileServicesClientUsername}
       - FileServicesClient__Password=${FileServicesClientPassword}
@@ -47,6 +47,9 @@ services:
       - UserServicesClient__Url=${UserServicesClientUrl}
       - Keycloak__PresReqConfId=${KeycloakPresReqConfId}
       - Keycloak__VcIdpHint=${KeycloakVcIdpHint}
+      - SplunkCollectorUrl=${SplunkCollectorUrl}
+      - SplunkCollectorId=${SplunkCollectorId}
+      - SplunkToken=${SplunkToken}
     ports:
       - 5000:5000
     volumes:
