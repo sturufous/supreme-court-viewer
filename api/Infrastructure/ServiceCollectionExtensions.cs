@@ -30,7 +30,7 @@ namespace Scv.Api.Infrastructure
             options?.Invoke(config);
 
             services.AddSingleton(config);
-            services.AddScoped<IMapper, ServiceMapper>();
+            services.AddScoped<IMapper>(sp => new Mapper(sp.GetRequiredService<TypeAdapterConfig>()));
 
             return services;
         }

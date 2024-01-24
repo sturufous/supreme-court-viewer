@@ -60,6 +60,7 @@ namespace tests.api.Controllers
             _fileServicesClient = fileServicesClient;
             var lookupService = new LookupService(lookupServices.Configuration, lookupServiceClient, new CachingService());
             var locationService = new LocationService(locationServices.Configuration, locationServiceClient, new CachingService());
+            var contextAccessor = new TestHttpContextAccessor();
 
             _agencyIdentifierId = fileServices.Configuration.GetNonEmptyValue("Request:AgencyIdentifierId");
             _partId = fileServices.Configuration.GetNonEmptyValue("Request:PartId");
@@ -76,7 +77,7 @@ namespace tests.api.Controllers
 
             //TODO fake this.
             var vcCivilFileAccessHandler = new VcCivilFileAccessHandler(new ScvDbContext());
-            _controller = new FilesController(fileServices.Configuration, fileServices.LogFactory.CreateLogger<FilesController>(), _service, vcCivilFileAccessHandler);
+            _controller = new FilesController(fileServices.Configuration, fileServices.LogFactory.CreateLogger<FilesController>(), _service, vcCivilFileAccessHandler, contextAccessor);
             _controller.ControllerContext = HttpResponseTest.SetupMockControllerContext(fileServices.Configuration);
         }
 

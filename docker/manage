@@ -75,7 +75,7 @@ build-api() {
     -e "CORS_DOMAIN=http://localhost:8080" \
     -e "DOTNET_STARTUP_PROJECT=./api/api.csproj" \
     '..' \
-    'registry.centos.org/dotnet/dotnet-31-centos7' \
+    'registry.access.redhat.com/ubi8/dotnet-80:8.0' \
     'scv-api'
   echo -e "===================================================================================================="
 }
