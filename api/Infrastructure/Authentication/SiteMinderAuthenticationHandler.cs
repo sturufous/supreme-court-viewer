@@ -26,8 +26,7 @@ namespace Scv.Api.Infrastructure.Authentication
         public SiteMinderAuthenticationHandler(IOptionsMonitor<AuthenticationSchemeOptions> options,
             ILoggerFactory logger,
             UrlEncoder encoder,
-            ISystemClock clock,
-            IConfiguration configuration, JCUserService jcUserService) : base(options, logger, encoder, clock)
+            IConfiguration configuration, JCUserService jcUserService) : base(options, logger, encoder)
         {
             JCUserService = jcUserService;
             ValidSiteMinderUserType = configuration.GetNonEmptyValue("Auth:AllowSiteMinderUserType");

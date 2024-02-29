@@ -90,7 +90,7 @@ namespace Scv.Api.Infrastructure.Middleware
                 }
                 var audit = new Audit
                 {
-                    Created = DateTimeOffset.Now,
+                    Created = DateTimeOffset.UtcNow,
                     Path = $"{request.Method} {request.GetEncodedPathAndQuery()}",
                     Action = $"{(request.RouteValues.ContainsKey("action") ? request.RouteValues["action"] : "")}",
                     JsonBody = jsonBody,

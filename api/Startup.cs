@@ -26,7 +26,12 @@ using Scv.Api.Services.EF;
 using Scv.Db.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
+using Microsoft.AspNetCore.Mvc.NewtonsoftJson;
 using ColeSoft.Extensions.Logging.Splunk;
+using Npgsql.EntityFrameworkCore.PostgreSQL;
+using Swashbuckle.AspNetCore;
+using Swashbuckle.AspNetCore.Annotations;
+using LazyCache;
 
 namespace Scv.Api
 {
@@ -46,9 +51,9 @@ namespace Scv.Api
         {
             services.AddLogging(options =>
             {
-                options.AddConsole(c =>
+                options.Services.Configure<SimpleConsoleFormatterOptions>(c =>
                 {
-                    c.DisableColors = true;
+                    c.ColorBehavior = LoggerColorBehavior.Enabled;
                     c.TimestampFormat = "[yyyy-MM-dd HH:mm:ss.fff] ";
                 });
 
@@ -66,7 +71,7 @@ namespace Scv.Api
                     {
                         npg.MigrationsAssembly("db");
                         npg.EnableRetryOnFailure(5, TimeSpan.FromSeconds(1), null);
-                   }).UseSnakeCaseNamingConvention();
+                    }).UseSnakeCaseNamingConvention();
 
                     if (CurrentEnvironment.IsDevelopment())
                         options.EnableSensitiveDataLogging();

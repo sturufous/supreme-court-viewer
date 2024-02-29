@@ -11,7 +11,7 @@ namespace Scv.Api.Infrastructure.Encryption
 
         public AesGcmService(byte[] key)
         {
-            _aes = new AesGcm(key);
+            _aes = new AesGcm(key, AesGcm.TagByteSizes.MaxSize);
         }
 
         public string Encrypt(string plain)

@@ -1,5 +1,6 @@
 ﻿using JCCommon.Clients.FileServices;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Scv.Api.Constants;
@@ -39,12 +40,13 @@ namespace Scv.Api.Controllers
         private readonly CivilFilesService _civilFilesService;
         private readonly CriminalFilesService _criminalFilesService;
         private readonly VcCivilFileAccessHandler _vcCivilFileAccessHandler;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         #endregion Variables
 
         #region Constructor
 
-        public FilesController(IConfiguration configuration, ILogger<FilesController> logger, FilesService filesService, VcCivilFileAccessHandler vcCivilFileAccessHandler)
+        public FilesController(IConfiguration configuration, ILogger<FilesController> logger, FilesService filesService, VcCivilFileAccessHandler vcCivilFileAccessHandler, IHttpContextAccessor httpContextAccessor)
         {
             _configuration = configuration;
             _logger = logger;
@@ -52,6 +54,7 @@ namespace Scv.Api.Controllers
             _civilFilesService = filesService.Civil;
             _criminalFilesService = filesService.Criminal;
             _vcCivilFileAccessHandler = vcCivilFileAccessHandler;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         #endregion Constructor
@@ -407,14 +410,18 @@ namespace Scv.Api.Controllers
 
         private FileContentResult BuildZipFileResponse(byte[] content, string name)
         {
-            Response.Headers.Add("X-Content-Type-Options", "nosniff");
+            IHeaderDictionary headers = _httpContextAccessor.HttpContext.Response.Headers;
+
+            headers.Append("X-Content-Type-Options", "nosniff");
             name = name.EndsWith(".zip") ? name : $"{name}.zip";
             return File(content, "application/octet-stream", name);
         }
 
         private FileContentResult BuildPdfFileResponse(string content)
         {
-            Response.Headers.Add("X-Content-Type-Options", "nosniff");
+            IHeaderDictionary headers = _httpContextAccessor.HttpContext.Response.Headers;
+
+            headers.Append("X-Content-Type-Options", "nosniff");
             return File(Convert.FromBase64String(content), "application/pdf");
         }
 
