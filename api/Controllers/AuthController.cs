@@ -88,8 +88,8 @@ namespace Scv.Api.Controllers
                 UserName = request.UserName,
                 AgencyId = agencyId,
                 PartId = partId,
-                Requested = DateTimeOffset.Now,
-                Expires = DateTimeOffset.Now.AddMinutes(expiryMinutes)
+                Requested = DateTimeOffset.UtcNow,
+                Expires = DateTimeOffset.UtcNow.AddMinutes(expiryMinutes)
             });
             await Db.SaveChangesAsync();
 

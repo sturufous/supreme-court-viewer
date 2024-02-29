@@ -33,7 +33,10 @@ namespace Scv.Api.Infrastructure.Authorization
                 return Task.CompletedTask;
             }
 
-            if (user.IsVcUser() && context.Resource is Endpoint endpoint)
+            var httpContext = context.Resource as DefaultHttpContext;
+            var endpoint = httpContext?.GetEndpoint();
+
+            if (user.IsVcUser() && endpoint != null)
             {
                 var actionDescriptor = endpoint.Metadata.GetMetadata<ControllerActionDescriptor>();
                 var isFilesController = actionDescriptor.ControllerTypeInfo.Name == nameof(FilesController);

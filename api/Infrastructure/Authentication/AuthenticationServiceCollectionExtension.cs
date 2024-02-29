@@ -144,7 +144,7 @@ namespace Scv.Api.Infrastructure.Authentication
                         {
                             var db = context.HttpContext.RequestServices.GetRequiredService<ScvDbContext>();
                             var userId = context.Principal.UserId();
-                            var now = DateTimeOffset.Now;
+                            var now = DateTimeOffset.UtcNow;
                             var fileAccess = await db.RequestFileAccess
                                 .Where(r => r.UserId == userId && r.Expires > now)
                                 .OrderByDescending(x => x.Id)
