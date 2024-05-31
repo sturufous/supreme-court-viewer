@@ -1,7 +1,7 @@
 <template>
   <b-card bg-variant="white" class="home">
     <b-card>
-      <b-card-title class="my-0 ml-4 h1 text-primary"> Supreme Court Viewer </b-card-title>
+      <b-card-title class="my-0 ml-4 h1 text-primary"> Supreme Court Viewer Test</b-card-title>
     </b-card>
     <b-row cols="2" body-class="py-0">
       <b-col md="6" cols="6">

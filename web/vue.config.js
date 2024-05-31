@@ -8,6 +8,7 @@ module.exports = {
 	publicPath:  process.env.NODE_ENV == 'production' ? '/S2I_INJECT_PUBLIC_PATH/' : '/',
 	//chainWebpack: config => config.optimization.minimize(false), Disable minification.
 	configureWebpack: {
+		devtool: 'source-map',
 		devServer: {
 			historyApiFallback: true,
 			host: 'localhost',
@@ -17,14 +18,15 @@ module.exports = {
 				//This is for WEB_BASE_HREF = '/' specifically. 
 				//If having problems connecting, try adding: netsh http add iplisten 127.0.0.1
 				'^/api': {
-					target: "https://localhost:44369",
+					target: "http://localhost:5000",
 					headers: {
 						Connection: 'keep-alive',
 						'X-Forwarded-Host': 'localhost',
 						'X-Forwarded-Port': '1339',
 						'X-Base-Href': '/'
 					},
-					changeOrigin: true
+					changeOrigin: true,
+					secure: false
 				}
 			}
 		},
