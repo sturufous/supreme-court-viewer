@@ -12,16 +12,51 @@
       </b-overlay>
     </b-card>
 
+    <b-card class="mb-3">
+      <b-button variant="primary" @click="testMethod">Download selection</b-button>
+    </b-card>
+
     <b-card bg-variant="white" v-if="isDataReady" no-body class="mx-3" style="overflow:auto">
       <b-table :items="SortedCourtList" :fields="fields" borderless small responsive="sm">
         <template v-slot:head()="data">
-          <b> {{ data.label }}</b>
+          <template v-if="data.field.key === 'select'">
+            <b-form-checkbox @change="selectAllRows"></b-form-checkbox>
+          </template>
+          <template v-else>
+            <b-badge :style="data.field.cellStyle" variant="white">
+              <b> {{ data.label }}</b>
+            </b-badge>
+          </template>
         </template>
 
         <template v-slot:cell()="data">
-          <b-badge :style="data.field.cellStyle" variant="white">
-            {{ data.value }}
-          </b-badge>
+          <template v-if="data.field.key === 'select'">
+            <b-form-checkbox v-model="data.item.selected"></b-form-checkbox>
+          </template>
+          <template v-else>
+            <b-badge :style="data.field.cellStyle" variant="white">
+              {{ data.value }}
+            </b-badge>
+          </template>
+        </template>
+
+        <template v-slot:cell(download)="data">
+          <div
+            class="text-center"
+          >
+            <b-button
+              v-if="countReferenceDocs(data) == 1"
+              :style="data.field.cellStyle"
+              size="sm"
+              :variant="'outline-primary border-white text-' + data.item.listClass"
+              class="mr-2"
+              @click="downloadProvidedDocument(data)"
+            >
+              <b-icon-cloud
+                :variant="data.item.listClass"
+              ></b-icon-cloud>
+            </b-button>
+          </div>
         </template>
 
         <template v-slot:cell(fileNumber)="data">
@@ -369,11 +404,24 @@ export default class CourtListLayout extends Vue {
   notes = { remarks: [], text: "", trialNotes: "", fileComment: "", commentToJudge: "", sheriffComment: "" };
   physicalIds: string[] = [];
   referenceDocs: any[] = [];
+  allSelected = false;
 
   initialFields = [
     {
+      key: "select",
+      label: "",
+      tdClass: "border-top",
+      cellStyle: "font-weight: normal; font-size: 16px; padding-top:8px",
+    },
+    {
       key: "seq",
       label: "Seq.",
+      tdClass: "border-top",
+      cellStyle: "font-weight: normal; font-size: 16px; padding-top:8px",
+    },
+    {
+      key: "download",
+      label: "Download",
       tdClass: "border-top",
       cellStyle: "font-weight: normal; font-size: 16px; padding-top:8px",
     },
@@ -383,18 +431,18 @@ export default class CourtListLayout extends Vue {
       tdClass: "border-top",
       cellStyle: "margin-top: 3px; font-size: 16px; font-weight:normal;",
     },
+    { key: "dummy", label: "Dummy", tdClass: "border-top", cellStyle: "font-size:16px" }, // This table never renders the fifth column
     { key: "fileNumber", label: "File Number", tdClass: "border-top", cellStyle: "font-size:16px" },
     { key: "parties", label: "Parties", tdClass: "border-top", cellStyle: "font-size:16px; font-weight: bold;" },
     { key: "accused", label: "Accused", tdClass: "border-top", cellStyle: "font-size:16px; font-weight: bold;" },
-
-    { key: "time", label: "Time", tdClass: "border-top", cellStyle: "margin-top: 3px;" },
+    { key: "time", label: "Time", tdClass: "border-top", cellStyle: "font-size:16px; margin-top: 3px;" },
     {
       key: "est",
       label: "Est.",
       tdClass: "border-top",
       cellStyle: "font-weight: normal; font-size: 16px; padding-top:8px",
     },
-    { key: "reason", label: "Reason", tdClass: "border-top", cellStyle: "margin-top: 6px; font-size: 14px;" },
+    { key: "reason", label: "Reason", tdClass: "border-top", cellStyle: "margin-top: 6px; font-size: 16px;" },
     {
       key: "room",
       label: "Room",
@@ -411,13 +459,13 @@ export default class CourtListLayout extends Vue {
       key: "fileMarkers",
       label: "File Markers",
       tdClass: "border-top",
-      cellStyle: "margin-top: 6px; font-weight: normal; font-size: 14px;",
+      cellStyle: "margin-top: 6px; font-weight: normal; font-size: 16px;",
     },
     {
       key: "hearingRestrictions",
       label: "Hearing Restrictions",
       tdClass: "border-top",
-      cellStyle: "margin-top: 6px; font-weight: normal; font-size: 14px;",
+      cellStyle: "margin-top: 6px; font-weight: normal; font-size: 16px;",
     },
     {
       key: "crown",
@@ -431,7 +479,7 @@ export default class CourtListLayout extends Vue {
       tdClass: "border-top",
       cellStyle: "font-weight: normal; font-size: 16px; padding-top:9px",
     },
-    { key: "notes", label: "Notes", tdClass: "border-top", cellStyle: "font-size:12px; border:0px;" },
+    { key: "notes", label: "Notes", tdClass: "border-top", cellStyle: "font-size:16px; border:0px;" },
   ];
 
   mounted() {
@@ -459,11 +507,45 @@ export default class CourtListLayout extends Vue {
     this.isMounted = true;
   }
 
+  public testMethod(): void {
+    debugger;
+    const options = {
+        responseType: "blob",
+        headers: {
+          "Content-Type": "application/json",
+        },
+    };
+    const selected = this.courtList.filter(item => item.selected);
+    this.$http.get("api/files/test", selected, options).then(
+        (response) => {
+          const blob = response.data;
+        },
+        (err) => {
+          this.$bvToast.toast(`Error - ${err.url} - ${err.status} - ${err.statusText}`, {
+            title: "An error has occured.",
+            variant: "danger",
+            autoHideDelay: 10000,
+          });
+          console.log(err);
+        }
+      );
+  }
+
+  public selectAllRows() {
+    this.allSelected = !this.allSelected;
+    this.SortedCourtList.forEach(item => {
+      item.selected = this.allSelected;
+    })
+  }
+
   public ExtractCriminalListInfo(): void {
+    //debugger;
     for (const criminalListIndex in this.criminalCourtListJson) {
       const criminalListInfo = {} as courtListInfoType;
       const jcriminalList = this.criminalCourtListJson[criminalListIndex];
 
+      criminalListInfo.selected = false;
+      criminalListInfo.download = false;
       criminalListInfo.index = criminalListIndex;
 
       criminalListInfo.seq = jcriminalList.appearanceSequenceNumber
@@ -628,6 +710,8 @@ export default class CourtListLayout extends Vue {
       }
 
       civilListInfo.seq = jcivilList.courtListPrintSortNumber ? parseInt(jcivilList.courtListPrintSortNumber) : 0;
+      civilListInfo.selected = false;
+      civilListInfo.download = false;
 
       civilListInfo.fileNumber = jcivilList.physicalFile.fileNumber;
       civilListInfo.tag = civilListInfo.fileNumber + "-" + civilListInfo.seq;
@@ -786,6 +870,7 @@ export default class CourtListLayout extends Vue {
   }
 
   public downloadProvidedDocument(data) {
+    //debugger;
     const target = this.referenceDocs.find(rd => rd.fileId === data.item.fileId);
     shared.openDocumentsPdf(CourtDocumentType.ProvidedCivil, target.doc[0]);
   }
@@ -862,6 +947,7 @@ export default class CourtListLayout extends Vue {
 
   get SortedCourtList() {
     // TODO: sort by appearance time
+    const test = _.sortBy(this.courtList, "time");
     return _.sortBy(this.courtList, "time");
   }
 }

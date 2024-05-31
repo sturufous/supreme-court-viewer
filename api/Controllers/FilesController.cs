@@ -23,6 +23,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Scv.Api.Helpers;
 using Scv.Api.Infrastructure.Authorization;
 using Scv.Api.Models.archive;
+using System.Net.Http;
 
 namespace Scv.Api.Controllers
 {
@@ -41,6 +42,7 @@ namespace Scv.Api.Controllers
         private readonly CriminalFilesService _criminalFilesService;
         private readonly VcCivilFileAccessHandler _vcCivilFileAccessHandler;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private static readonly HttpClient client = new HttpClient();
 
         #endregion Variables
 
@@ -79,6 +81,21 @@ namespace Scv.Api.Controllers
                 throw new NotFoundException("Couldn't find civil file with this location and file number.");
 
             return Ok(civilFiles);
+        }
+
+        [HttpGet]
+        [Route("test")]
+        public async Task<ActionResult<String>> GetTestData(string location, string fileNumber)
+        {
+            var courtLevel = User.IsSupremeUser() ? CourtLevelCd.S : CourtLevelCd.P;
+            string url = "https://docdownloader-api-dc2d23-dev.apps.emerald.devops.gov.bc.ca/actuator/health"; // Replace with your endpoint URL
+            HttpResponseMessage response = await client.GetAsync(url);
+
+            response.EnsureSuccessStatusCode(); // Throw an exception if the HTTP response is not successful
+
+            string responseBody = await response.Content.ReadAsStringAsync(); // Read the response body as a string
+
+            return Ok(responseBody);
         }
 
         /// <summary>

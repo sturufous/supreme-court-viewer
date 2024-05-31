@@ -23,8 +23,10 @@ export interface locationInfoType {
 }
 
 export interface civilListInfoType {
+    selected: boolean;
     index: string;
     seq: number;
+    download: boolean;
     fileNumber: string;
     tag: string;
     icons: IconStyleType[];
@@ -70,6 +72,7 @@ export interface civilNotesInfoType {
 export interface criminalListInfoType {
     index: string;
     seq: number;
+    download: boolean,
     fileNumber: string;
     tag: string;
     icons: IconStyleType[];
@@ -114,8 +117,10 @@ export interface trialRemarkInfoType {
 }
 
 export interface courtListInfoType {
+    selected: boolean;
     index: string;
     seq: number;
+    download: boolean;
     fileNumber: string;
     tag: string;
     icons: IconStyleType[];
