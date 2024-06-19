@@ -1,5 +1,9 @@
 <template>
   <b-card bg-variant="white" no-body>
+    <b-card class="mb-3">
+      <b-button variant="primary" @click="testMethod">Download selection</b-button>
+    </b-card>
+
     <b-card bg-variant="light" v-if="!isMounted && !isDataReady">
       <b-overlay :show="true">
         <b-card style="min-height: 100px;" />
@@ -12,15 +16,11 @@
       </b-overlay>
     </b-card>
 
-    <b-card class="mb-3">
-      <b-button variant="primary" @click="testMethod">Download selection</b-button>
-    </b-card>
-
     <b-card bg-variant="white" v-if="isDataReady" no-body class="mx-3" style="overflow:auto">
       <b-table :items="SortedCourtList" :fields="fields" borderless small responsive="sm">
         <template v-slot:head()="data">
           <template v-if="data.field.key === 'select'">
-            <b-form-checkbox @change="selectAllRows"></b-form-checkbox>
+            <b-form-checkbox v-model="allSelected" @change="selectAllRows"></b-form-checkbox>
           </template>
           <template v-else>
             <b-badge :style="data.field.cellStyle" variant="white">
@@ -45,12 +45,11 @@
             class="text-center"
           >
             <b-button
-              v-if="countReferenceDocs(data) == 1"
               :style="data.field.cellStyle"
               size="sm"
               :variant="'outline-primary border-white text-' + data.item.listClass"
               class="mr-2"
-              @click="downloadProvidedDocument(data)"
+              @click="preDownloadCloudClick(data)"
             >
               <b-icon-cloud
                 :variant="data.item.listClass"
@@ -266,6 +265,17 @@
       </b-table>
     </b-card>
 
+    <b-modal id="progress-modal" :title="progressModalTitle" @shown="startPolling" @hidden="stopPolling">
+      <div v-for="(progress, index) in progressValues" :key="index" class="mb-2">
+        <span class="progress-label">{{ progress.percentTransfered }}%</span>
+        <span class="progress-label file-name">{{ progress.fileName }}</span>
+        <b-progress :value="progress.percentTransfered" variant="success"></b-progress>
+      </div>
+      <template #modal-footer>
+        <b-button @click="hideProgress">Close</b-button>
+      </template>
+    </b-modal>
+
     <b-modal v-if="isMounted" v-model="showNotes" id="bv-modal-notes" hide-footer>
       <template v-slot:modal-title>
         <h2 class="mb-0">Notes</h2>
@@ -312,7 +322,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Prop } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import CivilAppearanceDetails from "@components/civil/CivilAppearanceDetails.vue";
 import * as _ from "underscore";
@@ -333,6 +343,8 @@ import { criminalCourtListType } from "@/types/courtlist/jsonTypes";
 const criminalState = namespace("CriminalFileInformation");
 import shared from "../shared";
 import { CourtDocumentType, DocumentData } from "@/types/shared";
+import { UserInfo } from "@/types/common";
+import CourtListInformation from "@/store/modules/CourtListInformation";
 
 enum HearingType {
   "A" = "+",
@@ -393,6 +405,17 @@ export default class CourtListLayout extends Vue {
   @commonState.Action
   public UpdateTime!: (time: string) => void;
 
+  @commonState.State
+  public userInfo!: UserInfo;
+
+  // Props
+  /* @Prop({ required: true }) selectedCourtLocation!: string;
+
+  // Computed property
+  get localCourtLocation(): string {
+    return this.selectedCourtLocation;
+  } */
+
   civilCourtListJson: civilCourtListType[] = [];
   criminalCourtListJson: criminalCourtListType[] = [];
   courtList: courtListInfoType[] = [];
@@ -405,6 +428,10 @@ export default class CourtListLayout extends Vue {
   physicalIds: string[] = [];
   referenceDocs: any[] = [];
   allSelected = false;
+  progress = 50;
+  progressModalTitle = "Downloading to OneDrive...";
+  progressValues: any[] = [];
+  pollingInterval: ReturnType<typeof setTimeout> | null = null;
 
   initialFields = [
     {
@@ -508,7 +535,6 @@ export default class CourtListLayout extends Vue {
   }
 
   public testMethod(): void {
-    debugger;
     const options = {
         responseType: "blob",
         headers: {
@@ -516,19 +542,51 @@ export default class CourtListLayout extends Vue {
         },
     };
     const selected = this.courtList.filter(item => item.selected);
-    this.$http.get("api/files/test", selected, options).then(
-        (response) => {
-          const blob = response.data;
-        },
-        (err) => {
-          this.$bvToast.toast(`Error - ${err.url} - ${err.status} - ${err.statusText}`, {
-            title: "An error has occured.",
-            variant: "danger",
-            autoHideDelay: 10000,
-          });
-          console.log(err);
-        }
-      );
+    selected.forEach(listItem => {
+
+      const email = encodeURIComponent("stuart.morse@quartech.com");
+      const user = this.userInfo;
+      //const courtLocation = this.localCourtLocation;
+      const index = listItem.index;
+
+      this.referenceDocs[index].doc.forEach(refDoc => {
+        const objGuid = encodeURIComponent(btoa(refDoc.documentId));
+        const filePath = encodeURIComponent(`${refDoc.location}/${refDoc.fileNumberText}/${listItem.room}`);
+        const url = `api/files/test?email=${email}&objGuid=${objGuid}&filePath=${filePath}`;
+        console.log("Url = " + url);
+
+        this.$http.get(url).then(
+          (response) => {
+            const blob = response.data;
+            const transferId = blob.transferId;
+            const url = `api/files/test2?transferId=${transferId}`;
+
+            this.$http.get(url).then(
+              (response) => {
+                const blob = response.data;
+                this.progressValues.push(blob);
+                this.$bvModal.show('progress-modal');
+              },
+              (err) => {
+                this.$bvToast.toast(`Error - ${err.url} - ${err.status} - ${err.statusText}`, {
+                  title: "An error has occured.",
+                  variant: "danger",
+                  autoHideDelay: 10000,
+                });
+                console.log(err);
+              });
+          },
+          (err) => {
+            this.$bvToast.toast(`Error - ${err.url} - ${err.status} - ${err.statusText}`, {
+              title: "An error has occured.",
+              variant: "danger",
+              autoHideDelay: 10000,
+            });
+            console.log(err);
+          }
+        ) 
+      })
+    })
   }
 
   public selectAllRows() {
@@ -950,11 +1008,95 @@ export default class CourtListLayout extends Vue {
     const test = _.sortBy(this.courtList, "time");
     return _.sortBy(this.courtList, "time");
   }
+
+  public hideProgress() {
+    this.$bvModal.hide('progress-modal');
+  }
+
+  // Method to start polling for progress values
+  startPolling() {
+    this.pollingInterval = setInterval(() => {
+      this.progressValues.every((transfer, index) => {
+        if (this.downloadIsComplete()) {
+          this.$bvModal.hide('progress-modal');
+          this.stopPolling();
+          return false;
+        } else {
+          const url = `api/files/test2?transferId=${transfer.transferId}`;
+
+          if (transfer.percentTransfered < 100) {
+            this.$http.get(url).then(
+              (response) => {
+                  const blob = response.data;
+                  this.progressValues[index].percentTransfered = blob.percentTransfered;
+                  this.progressValues[index].fileName = blob.fileName;
+              },
+              (err) => {
+                this.$bvToast.toast(`Error - ${err.url} - ${err.status} - ${err.statusText}`, {
+                  title: "An error has occured.",
+                  variant: "danger",
+                  autoHideDelay: 10000,
+                });
+                console.log(err);
+              });
+            }
+            return true;
+          }
+      });
+    }, 1000);
+  }
+
+  // Method to stop polling when modal is hidden or closed or all downloads are at 100%
+  stopPolling() {
+    if (this.pollingInterval) {
+      clearInterval(this.pollingInterval);
+      this.pollingInterval = null;
+      this.courtList.forEach(item => {
+        item.selected = false;
+      });
+      this.allSelected = false;
+
+      if (this.downloadIsComplete()) {
+        this.$bvToast.toast("All files have been transferred to OneDrive.", {
+          title: "Download Complete",
+          variant: "success",
+          autoHideDelay: 10000,
+        });
+      } else {
+        this.$bvToast.toast("The progress dialog was closed before all downloads completed.", {
+          title: "Potential incomplete download",
+          variant: "danger",
+          autoHideDelay: 10000,
+        });
+        this.progressValues = [];
+      }
+    }
+  }
+
+  downloadIsComplete() {
+    let complete = true;
+    this.progressValues.forEach(progress => {
+      if (progress.percentTransfered != 100) {
+        complete = false;
+      }
+    });
+    
+    return complete;
+  }
+
+  preDownloadCloudClick(data) {
+    this.courtList[data.index].selected = true;
+    this.testMethod();
+  }
 }
 </script>
 
 <style scoped>
 .card {
   border: white;
+}
+.file-name {
+  float: right;
+  display: inline-block;
 }
 </style>
