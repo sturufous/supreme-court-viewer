@@ -1,7 +1,7 @@
 <template>
   <b-card bg-variant="white" no-body>
     <b-card class="mb-3">
-      <b-button variant="primary" @click="testMethod">Download selection</b-button>
+      <b-button variant="primary" @click="downloadDocuments">Download selection</b-button>
     </b-card>
 
     <b-card bg-variant="light" v-if="!isMounted && !isDataReady">
@@ -534,7 +534,7 @@ export default class CourtListLayout extends Vue {
     this.isMounted = true;
   }
 
-  public testMethod(): void {
+  public downloadDocuments(): void {
     const options = {
         responseType: "blob",
         headers: {
@@ -552,14 +552,14 @@ export default class CourtListLayout extends Vue {
       this.referenceDocs[index].doc.forEach(refDoc => {
         const objGuid = encodeURIComponent(btoa(refDoc.documentId));
         const filePath = encodeURIComponent(`${refDoc.location}/${refDoc.fileNumberText}/${listItem.room}`);
-        const url = `api/files/test?email=${email}&objGuid=${objGuid}&filePath=${filePath}`;
+        const url = `api/files/upload?email=${email}&objGuid=${objGuid}&filePath=${filePath}`;
         console.log("Url = " + url);
 
         this.$http.get(url).then(
           (response) => {
             const blob = response.data;
             const transferId = blob.transferId;
-            const url = `api/files/test2?transferId=${transferId}`;
+            const url = `api/files/status?transferId=${transferId}`;
 
             this.$http.get(url).then(
               (response) => {
@@ -1022,7 +1022,7 @@ export default class CourtListLayout extends Vue {
           this.stopPolling();
           return false;
         } else {
-          const url = `api/files/test2?transferId=${transfer.transferId}`;
+          const url = `api/files/status?transferId=${transfer.transferId}`;
 
           if (transfer.percentTransfered < 100) {
             this.$http.get(url).then(
@@ -1046,8 +1046,7 @@ export default class CourtListLayout extends Vue {
     }, 1000);
   }
 
-  // Method to stop polling when modal is hidden or closed or all downloads are at 100%
-  stopPolling() {
+  public stopPolling() {
     if (this.pollingInterval) {
       clearInterval(this.pollingInterval);
       this.pollingInterval = null;
@@ -1071,7 +1070,7 @@ export default class CourtListLayout extends Vue {
         this.progressValues = [];
       }
     }
-  }
+  } 
 
   downloadIsComplete() {
     let complete = true;
@@ -1086,7 +1085,7 @@ export default class CourtListLayout extends Vue {
 
   preDownloadCloudClick(data) {
     this.courtList[data.index].selected = true;
-    this.testMethod();
+    this.downloadDocuments();
   }
 }
 </script>

@@ -8,13 +8,12 @@
           </h3>
           <custom-overlay :show="!downloadCompleted" style="padding: 0 1rem; margin-left:auto; margin-right:2rem;">
             <b-button
-              v-if="enableArchive"
               @click="downloadDocuments()"
               size="sm"
               variant="success"
               style="padding: 0 1rem; margin-left:auto; margin-right:2rem;"
             >
-              Download Selected
+              Download Selection
             </b-button>
           </custom-overlay>
         </b-row>
@@ -100,14 +99,14 @@
               </b-button>
             </template>
 
-            <template v-if="enableArchive" v-slot:head(select)>
-              <b-form-checkbox class="m-0" v-model="allDocumentsChecked" @change="checkAllDocuments" size="sm" />
+            <template v-slot:head(select)>
+              <b-form-checkbox class="m-0 checkbox" v-model="allDocumentsChecked" @change="checkAllDocuments" size="sm" />
             </template>
 
-            <template v-if="enableArchive" v-slot:cell(select)="data">
+            <template v-slot:cell(select)="data">
               <b-form-checkbox
                 size="sm"
-                class="m-0"
+                class="m-0 checkbox"
                 :disabled="!data.item.isEnabled"
                 v-model="data.item.isChecked"
                 @change="toggleSelectedDocuments"
@@ -147,6 +146,17 @@
         </template>
       </b-overlay>
     </b-card>
+
+    <b-modal id="progress-modal" :title="progressModalTitle" @shown="startPolling" @hidden="stopPolling">
+      <div v-for="(progress, index) in progressValues" :key="index" class="mb-2">
+        <span class="progress-label">{{ progress.percentTransfered }}%</span>
+        <span class="progress-label file-name">{{ progress.fileName }}</span>
+        <b-progress :value="progress.percentTransfered" variant="success"></b-progress>
+      </div>
+      <template #modal-footer>
+        <b-button @click="hideProgress">Close</b-button>
+      </template>
+    </b-modal>
   </div>
 </template>
 
@@ -200,6 +210,9 @@ export default class CivilProvidedDocumentsView extends Vue {
   selectedDocuments = {} as ArchiveInfoType;
   downloadCompleted = true;
   allDocumentsChecked = false;
+  progressModalTitle = "Downloading to OneDrive...";
+  progressValues: any[] = [];
+  pollingInterval: ReturnType<typeof setTimeout> | null = null;
 
   initialFields = [
     {
@@ -270,70 +283,8 @@ export default class CivilProvidedDocumentsView extends Vue {
     this.selectedDocuments = { zipName: "", csrRequests: [], documentRequests: [], ropRequests: [] };
   }
 
-  public downloadDocuments() {
-    const fileName = shared
-      .generateFileName(CourtDocumentType.CivilZip, {
-        location: this.civilFileInformation.detailsData.homeLocationAgencyName,
-        courtLevel: this.civilFileInformation.detailsData.courtLevelCd,
-        fileNumberText: this.civilFileInformation.detailsData.fileNumberTxt,
-      })
-      .replace("documents", "provided-documents");
-
-    this.selectedDocuments = { zipName: fileName, csrRequests: [], documentRequests: [], ropRequests: [] };
-    for (const doc of this.documents) {
-      if (doc.isChecked && doc.isEnabled) {
-        const id = doc.objectGuid;
-        const documentRequest = {} as DocumentRequestsInfoType;
-        documentRequest.isCriminal = false;
-        const documentData: DocumentData = {
-          appearanceDate: Vue.filter("beautify_date")(doc.appearanceDate),
-          courtLevel: this.civilFileInformation.detailsData.courtLevelCd,
-          documentDescription: doc.descriptionText,
-          documentId: id,
-          fileNumberText: this.civilFileInformation.detailsData.fileNumberTxt,
-          location: this.civilFileInformation.detailsData.homeLocationAgencyName,
-          partyName: doc.partyName.toString(),
-        };
-        documentRequest.pdfFileName = shared.generateFileName(CourtDocumentType.ProvidedCivil, documentData);
-        documentRequest.base64UrlEncodedDocumentId = base64url(id);
-        documentRequest.fileId = this.civilFileInformation.fileNumber;
-        this.selectedDocuments.documentRequests.push(documentRequest);
-      }
-    }
-
-    if (this.selectedDocuments.documentRequests.length > 0) {
-      const options = {
-        responseType: "blob",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      };
-      this.downloadCompleted = false;
-      this.$http.post("api/files/archive", this.selectedDocuments, options).then(
-        (response) => {
-          const blob = response.data;
-          const link = document.createElement("a");
-          link.href = URL.createObjectURL(blob);
-          document.body.appendChild(link);
-          link.download = this.selectedDocuments.zipName;
-          link.click();
-          setTimeout(() => URL.revokeObjectURL(link.href), 1000);
-          this.downloadCompleted = true;
-        },
-        (err) => {
-          this.$bvToast.toast(`Error - ${err.url} - ${err.status} - ${err.statusText}`, {
-            title: "An error has occured.",
-            variant: "danger",
-            autoHideDelay: 10000,
-          });
-          console.log(err);
-          this.downloadCompleted = true;
-        }
-      );
-    }
-  }
-
   public checkAllDocuments(checked) {
+    debugger;
     if (this.activetab != "ALL") {
       for (const docInx in this.documents) {
         if (
@@ -408,11 +359,139 @@ export default class CivilProvidedDocumentsView extends Vue {
   get NumberOfDocuments() {
     return this.documents.length;
   }
+
+  public downloadDocuments(): void {
+    debugger;
+    const options = {
+        responseType: "blob",
+        headers: {
+          "Content-Type": "application/json",
+        },
+    };
+    this.documents.forEach((listItem, index) => {
+      if (listItem.isChecked) {
+        const email = encodeURIComponent("stuart.morse@quartech.com");
+        const objGuid = encodeURIComponent(btoa(listItem.objectGuid));
+        const filePath = "victoria/" + listItem.appearanceId + "/533"; //encodeURIComponent(`${listItem.location}/${listItem.fileNumberText}/${listItem.room}`);
+        const url = `api/files/upload?email=${email}&objGuid=${objGuid}&filePath=${filePath}`;
+        console.log("Url = " + url);
+
+        this.$http.get(url).then(
+          (response) => {
+            const blob = response.data;
+            const transferId = blob.transferId;
+            const url = `api/files/status?transferId=${transferId}`;
+
+            this.$http.get(url).then(
+              (response) => {
+                const blob = response.data;
+                this.progressValues.push(blob);
+                this.$bvModal.show('progress-modal');
+              },
+              (err) => {
+                this.$bvToast.toast(`Error - ${err.url} - ${err.status} - ${err.statusText}`, {
+                  title: "An error has occured.",
+                  variant: "danger",
+                  autoHideDelay: 10000,
+                });
+                console.log(err);
+              });
+          },
+          (err) => {
+            this.$bvToast.toast(`Error - ${err.url} - ${err.status} - ${err.statusText}`, {
+              title: "An error has occured.",
+              variant: "danger",
+              autoHideDelay: 10000,
+            });
+            console.log(err);
+          }
+        ) 
+      }
+    })
+  }
+
+   // Method to start polling for progress values
+   startPolling() {
+    this.pollingInterval = setInterval(() => {
+      this.progressValues.every((transfer, index) => {
+        if (this.downloadIsComplete()) {
+          this.$bvModal.hide('progress-modal');
+          this.stopPolling();
+          return false;
+        } else {
+          const url = `api/files/status?transferId=${transfer.transferId}`;
+
+          if (transfer.percentTransfered < 100) {
+            this.$http.get(url).then(
+              (response) => {
+                  const blob = response.data;
+                  this.progressValues[index].percentTransfered = blob.percentTransfered;
+                  this.progressValues[index].fileName = blob.fileName;
+              },
+              (err) => {
+                this.$bvToast.toast(`Error - ${err.url} - ${err.status} - ${err.statusText}`, {
+                  title: "An error has occured.",
+                  variant: "danger",
+                  autoHideDelay: 10000,
+                });
+                console.log(err);
+              });
+            }
+            return true;
+          }
+      });
+    }, 1000);
+  }
+  
+  public stopPolling() {
+    if (this.pollingInterval) {
+      clearInterval(this.pollingInterval);
+      this.pollingInterval = null;
+      /* this.documents.forEach(item => {
+        item.select = false;
+      });
+      this.allSelected = false; */
+
+      if (this.downloadIsComplete()) {
+        this.$bvToast.toast("All files have been transferred to OneDrive.", {
+          title: "Download Complete",
+          variant: "success",
+          autoHideDelay: 10000,
+        });
+      } else {
+        this.$bvToast.toast("The progress dialog was closed before all downloads completed.", {
+          title: "Potential incomplete download",
+          variant: "danger",
+          autoHideDelay: 10000,
+        });
+        this.progressValues = [];
+      }
+    }
+  } 
+
+  downloadIsComplete() {
+    let complete = true;
+    this.progressValues.forEach(progress => {
+      if (progress.percentTransfered != 100) {
+        complete = false;
+      }
+    });
+    
+    return complete;
+  }
+
+  public hideProgress() {
+    this.$bvModal.hide('progress-modal');
+  }
 }
 </script>
 
 <style scoped>
 .card {
   border: white;
+}
+.checkbox {
+  padding-top: 4px;
+  padding-left: 30px;
 }
 </style>
