@@ -87,7 +87,7 @@ namespace Scv.Api.Controllers
         }
 
         [HttpGet]
-        [Route("test")]
+        [Route("upload")]
         public async Task<ActionResult<String>> GetTestData(string email, string objGuid, string filePath)
         {
             var courtLevel = User.IsSupremeUser() ? CourtLevelCd.S : CourtLevelCd.P;
@@ -117,7 +117,7 @@ namespace Scv.Api.Controllers
         }
 
         [HttpGet]
-        [Route("test2")]
+        [Route("status")]
         public async Task<ActionResult<String>> GetTestData2(string transferId)
         {
             var courtLevel = User.IsSupremeUser() ? CourtLevelCd.S : CourtLevelCd.P;
