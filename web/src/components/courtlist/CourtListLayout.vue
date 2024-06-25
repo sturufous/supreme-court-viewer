@@ -268,7 +268,6 @@
     <b-modal id="progress-modal" :title="progressModalTitle" @shown="startPolling">
       <div v-for="(progress, index) in progressValues" :key="index" class="mb-2">
         <span class="progress-label">{{ progress.percentTransfered }}%</span>
-        <span class="progress-label file-name">{{ progress.fileName }}</span>
         <b-progress :value="progress.percentTransfered" variant="success"></b-progress>
       </div>
       <template #modal-footer>
@@ -977,11 +976,15 @@ export default class CourtListLayout extends Vue {
   }
 
   public OpenCivilFilePage(data, section = "") {
+    debugger;
     let params;
     if (section) {
       params = {
         fileNumber: data.item.fileId,
-        section: section
+        fileNumberText: this.referenceDocs[data.index].doc[0].fileNumberText,
+        section: section,
+        location: this.referenceDocs[data.index].doc[0].location,
+        room: this.courtList[data.index].room
       };
     } else {
       params = { fileNumber: data.item.fileId };
@@ -1008,12 +1011,6 @@ export default class CourtListLayout extends Vue {
     this.$bvModal.hide('progress-modal');
     this.cleanUp();
 
-    this.$bvToast.toast("The download request was cancelled.", {
-      title: "Download Cancelled",
-      variant: "success",
-      autoHideDelay: 10000,
-    });
-
     const options = {
       responseType: "blob",
       headers: {
@@ -1024,10 +1021,13 @@ export default class CourtListLayout extends Vue {
     this.cancelPreDownloadInfo.transferIds = this.progressValues.map(transfer => transfer.transferId);
 
     this.$http.post(url, this.cancelPreDownloadInfo, options).then(
-      (response) => {
-        const blob = response.data;
-        this.progressValues.push(blob);
-        this.$bvModal.show('progress-modal');
+      () => {
+        this.$bvToast.toast("The download request was cancelled.", {
+          title: "Download Cancelled",
+          variant: "success",
+          autoHideDelay: 10000,
+        });
+        this.progressValues = [];
       },
       (err) => {
         this.$bvToast.toast(`Error - ${err.url} - ${err.status} - ${err.statusText}`, {
@@ -1038,8 +1038,6 @@ export default class CourtListLayout extends Vue {
         console.log(err);
       }
     );
-
-    this.progressValues = [];
   }
 
   // Method to start polling for progress values
@@ -1076,7 +1074,6 @@ export default class CourtListLayout extends Vue {
   }
 
   public stopPolling() {
-    debugger;
     this.cleanUp();
 
     this.$bvToast.toast("All files have been transferred to OneDrive.", {
@@ -1120,9 +1117,5 @@ export default class CourtListLayout extends Vue {
 <style scoped>
 .card {
   border: white;
-}
-.file-name {
-  float: right;
-  display: inline-block;
 }
 </style>
