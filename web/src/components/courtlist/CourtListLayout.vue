@@ -265,14 +265,14 @@
       </b-table>
     </b-card>
 
-    <b-modal id="progress-modal" :title="progressModalTitle" @shown="startPolling" @hidden="stopPolling">
+    <b-modal id="progress-modal" :title="progressModalTitle" @shown="startPolling">
       <div v-for="(progress, index) in progressValues" :key="index" class="mb-2">
         <span class="progress-label">{{ progress.percentTransfered }}%</span>
         <span class="progress-label file-name">{{ progress.fileName }}</span>
         <b-progress :value="progress.percentTransfered" variant="success"></b-progress>
       </div>
       <template #modal-footer>
-        <b-button @click="hideProgress">Close</b-button>
+        <b-button @click="cancelDownload">Cancel</b-button>
       </template>
     </b-modal>
 
@@ -322,7 +322,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
+import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import CivilAppearanceDetails from "@components/civil/CivilAppearanceDetails.vue";
 import * as _ from "underscore";
@@ -344,7 +344,9 @@ const criminalState = namespace("CriminalFileInformation");
 import shared from "../shared";
 import { CourtDocumentType, DocumentData } from "@/types/shared";
 import { UserInfo } from "@/types/common";
-import CourtListInformation from "@/store/modules/CourtListInformation";
+import {
+  CancelPreDownloadInfoType,
+} from "@/types/common";
 
 enum HearingType {
   "A" = "+",
@@ -407,6 +409,10 @@ export default class CourtListLayout extends Vue {
 
   @commonState.State
   public userInfo!: UserInfo;
+
+  public cancelPreDownloadInfo: CancelPreDownloadInfoType = {
+        transferIds: [] // Initialize with an empty array or any default values
+  };
 
   // Props
   /* @Prop({ required: true }) selectedCourtLocation!: string;
@@ -535,25 +541,14 @@ export default class CourtListLayout extends Vue {
   }
 
   public downloadDocuments(): void {
-    const options = {
-        responseType: "blob",
-        headers: {
-          "Content-Type": "application/json",
-        },
-    };
     const selected = this.courtList.filter(item => item.selected);
     selected.forEach(listItem => {
-
-      const email = encodeURIComponent("stuart.morse@quartech.com");
-      const user = this.userInfo;
-      //const courtLocation = this.localCourtLocation;
       const index = listItem.index;
 
       this.referenceDocs[index].doc.forEach(refDoc => {
         const objGuid = encodeURIComponent(btoa(refDoc.documentId));
         const filePath = encodeURIComponent(`${refDoc.location}/${refDoc.fileNumberText}/${listItem.room}`);
-        const url = `api/files/upload?email=${email}&objGuid=${objGuid}&filePath=${filePath}`;
-        console.log("Url = " + url);
+        const url = `api/files/upload?objGuid=${objGuid}&filePath=${filePath}`;
 
         this.$http.get(url).then(
           (response) => {
@@ -1005,12 +1000,46 @@ export default class CourtListLayout extends Vue {
 
   get SortedCourtList() {
     // TODO: sort by appearance time
-    const test = _.sortBy(this.courtList, "time");
     return _.sortBy(this.courtList, "time");
   }
 
-  public hideProgress() {
+  public cancelDownload() {
+    debugger;
     this.$bvModal.hide('progress-modal');
+    this.cleanUp();
+
+    this.$bvToast.toast("The download request was cancelled.", {
+      title: "Download Cancelled",
+      variant: "success",
+      autoHideDelay: 10000,
+    });
+
+    const options = {
+      responseType: "blob",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    const url = "api/files/terminate";
+    this.cancelPreDownloadInfo.transferIds = this.progressValues.map(transfer => transfer.transferId);
+
+    this.$http.post(url, this.cancelPreDownloadInfo, options).then(
+      (response) => {
+        const blob = response.data;
+        this.progressValues.push(blob);
+        this.$bvModal.show('progress-modal');
+      },
+      (err) => {
+        this.$bvToast.toast(`Error - ${err.url} - ${err.status} - ${err.statusText}`, {
+          title: "An error has occured.",
+          variant: "danger",
+          autoHideDelay: 10000,
+        });
+        console.log(err);
+      }
+    );
+
+    this.progressValues = [];
   }
 
   // Method to start polling for progress values
@@ -1047,32 +1076,30 @@ export default class CourtListLayout extends Vue {
   }
 
   public stopPolling() {
+    debugger;
+    this.cleanUp();
+
+    this.$bvToast.toast("All files have been transferred to OneDrive.", {
+      title: "Download Complete",
+      variant: "success",
+      autoHideDelay: 10000,
+    });
+      
+    this.progressValues = [];
+  } 
+
+  public cleanUp() {
     if (this.pollingInterval) {
       clearInterval(this.pollingInterval);
       this.pollingInterval = null;
-      this.courtList.forEach(item => {
-        item.selected = false;
-      });
-      this.allSelected = false;
-
-      if (this.downloadIsComplete()) {
-        this.$bvToast.toast("All files have been transferred to OneDrive.", {
-          title: "Download Complete",
-          variant: "success",
-          autoHideDelay: 10000,
-        });
-      } else {
-        this.$bvToast.toast("The progress dialog was closed before all downloads completed.", {
-          title: "Potential incomplete download",
-          variant: "danger",
-          autoHideDelay: 10000,
-        });
-        this.progressValues = [];
-      }
     }
-  } 
+    this.courtList.forEach(item => {
+      item.selected = false;
+    });
+    this.allSelected = false;
+  }
 
-  downloadIsComplete() {
+  public downloadIsComplete() {
     let complete = true;
     this.progressValues.forEach(progress => {
       if (progress.percentTransfered != 100) {

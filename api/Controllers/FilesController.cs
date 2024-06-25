@@ -60,6 +60,17 @@ namespace Scv.Api.Controllers
             _criminalFilesService = filesService.Criminal;
             _vcCivilFileAccessHandler = vcCivilFileAccessHandler;
             _httpContextAccessor = httpContextAccessor;
+            
+            initializePreDownloadClient();
+        }
+
+        private void initializePreDownloadClient() {
+            var userId = _configuration.GetNonEmptyValue("PreDownloadId");
+            var password = _configuration.GetNonEmptyValue("PreDownloadPassword");
+            var byteArray = Encoding.ASCII.GetBytes($"{userId}:{password}");
+            var base64String = Convert.ToBase64String(byteArray);
+
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", base64String);
         }
 
         #endregion Constructor
@@ -84,57 +95,6 @@ namespace Scv.Api.Controllers
                 throw new NotFoundException("Couldn't find civil file with this location and file number.");
 
             return Ok(civilFiles);
-        }
-
-        [HttpGet]
-        [Route("upload")]
-        public async Task<ActionResult<String>> GetTestData(string email, string objGuid, string filePath)
-        {
-            var courtLevel = User.IsSupremeUser() ? CourtLevelCd.S : CourtLevelCd.P;
-
-            var byteArray = Encoding.ASCII.GetBytes("docuser_dev:m1ck3y2");
-            var base64String = Convert.ToBase64String(byteArray);
-
-                        // Add the Authorization header
-            client.DefaultRequestHeaders.Authorization = 
-            new AuthenticationHeaderValue("Basic", base64String);
-            PreDownloadRequest dlRequest = new PreDownloadRequest
-            {
-                objGuid = objGuid,
-                email = email,
-                filePath = filePath
-            };
-
-            string json = JsonConvert.SerializeObject(dlRequest);
-            HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
-
-            string url = "https://docdownloader-api-dc2d23-dev.apps.emerald.devops.gov.bc.ca/document/upload"; 
-            HttpResponseMessage response = await client.PostAsync(url, content);
-            response.EnsureSuccessStatusCode(); // Throw an exception if the HTTP response is not successful
-            string responseBody = await response.Content.ReadAsStringAsync(); // Read the response body as a string
-
-            return Ok(responseBody);
-        }
-
-        [HttpGet]
-        [Route("status")]
-        public async Task<ActionResult<String>> GetTestData2(string transferId)
-        {
-            var courtLevel = User.IsSupremeUser() ? CourtLevelCd.S : CourtLevelCd.P;
-
-            var byteArray = Encoding.ASCII.GetBytes("docuser_dev:m1ck3y2");
-            var base64String = Convert.ToBase64String(byteArray);
-
-                        // Add the Authorization header
-            client.DefaultRequestHeaders.Authorization = 
-            new AuthenticationHeaderValue("Basic", base64String);
-
-            string url = "https://docdownloader-api-dc2d23-dev.apps.emerald.devops.gov.bc.ca/document/status/" + transferId; 
-            HttpResponseMessage response = await client.GetAsync(url);
-            response.EnsureSuccessStatusCode(); // Throw an exception if the HTTP response is not successful
-            string responseBody = await response.Content.ReadAsStringAsync(); // Read the response body as a string
-
-            return Ok(responseBody);
         }
 
         /// <summary>
@@ -439,6 +399,53 @@ namespace Scv.Api.Controllers
                 { Content = d.B64Content, FileName = ropRequests[rops.IndexOf(d)].PdfFileName }));
 
             return await BuildArchiveWithPdfFiles(pdfDocuments, archiveRequest.ZipName);
+        }
+
+        [HttpGet]
+        [Route("upload")]
+        public async Task<ActionResult<String>> InitiatePreDownloadRequest(string objGuid, string filePath)
+        {
+            PreDownloadRequest dlRequest = new PreDownloadRequest
+            {
+                objGuid = objGuid,
+                email = User.Email(),
+                filePath = filePath
+            };
+
+            var url = _configuration.GetNonEmptyValue("PreDownloadUrl") + "/document/upload";
+            string json = JsonConvert.SerializeObject(dlRequest);
+            HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await client.PostAsync(url, content);
+            response.EnsureSuccessStatusCode(); // Throw an exception if the HTTP response is not successful
+            string responseBody = await response.Content.ReadAsStringAsync(); // Read the response body as a string
+
+            return Ok(responseBody);
+        }
+
+        [HttpGet]
+        [Route("status")]
+        public async Task<ActionResult<String>> GetPreDownloadRequestStatus(string transferId)
+        {
+            var url = _configuration.GetNonEmptyValue("PreDownloadUrl") + "/document/status/" + transferId;
+            HttpResponseMessage response = await client.GetAsync(url);
+            response.EnsureSuccessStatusCode(); // Throw an exception if the HTTP response is not successful
+            string responseBody = await response.Content.ReadAsStringAsync(); // Read the response body as a string
+
+            return Ok(responseBody);
+        }
+
+        [HttpPost]
+        [Route("terminate")]
+        public async Task<ActionResult<String>> TerminatePreDownloadRequest(CancelPreDownloadRequest transfers)
+        {
+            var url = _configuration.GetNonEmptyValue("PreDownloadUrl") + "/document/terminate/";
+            string json = JsonConvert.SerializeObject(transfers);
+            HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await client.PostAsync(url, content);
+            response.EnsureSuccessStatusCode(); // Throw an exception if the HTTP response is not successful
+            string responseBody = await response.Content.ReadAsStringAsync(); // Read the response body as a string
+
+            return Ok(responseBody);
         }
 
         #endregion Documents 

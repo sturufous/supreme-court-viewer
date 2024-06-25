@@ -42,6 +42,10 @@ export interface DocumentRequestsInfoType {
     fileId: string;
 }
 
+export interface CancelPreDownloadInfoType {
+    transferIds: string[];
+}
+
 export interface ArchiveInfoType {
     zipName: string;
     vcCivilFileId?: string;
