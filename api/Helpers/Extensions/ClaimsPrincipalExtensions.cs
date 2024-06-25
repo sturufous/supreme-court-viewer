@@ -56,6 +56,8 @@ namespace Scv.Api.Helpers.Extensions
         public static string Role(this ClaimsPrincipal claimsPrincipal) =>
            claimsPrincipal.FindFirstValue(CustomClaimTypes.Role);
 
+        public static string Email(this ClaimsPrincipal claimsPrincipal) =>
+           claimsPrincipal.FindFirstValue(CustomClaimTypes.Email);
         public static string SubRole(this ClaimsPrincipal claimsPrincipal) =>
             claimsPrincipal.FindFirstValue(CustomClaimTypes.SubRole);
 

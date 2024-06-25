@@ -50,6 +50,10 @@ services:
       - SplunkCollectorUrl=${SplunkCollectorUrl}
       - SplunkCollectorId=${SplunkCollectorId}
       - SplunkToken=${SplunkToken}
+      - PreDownloadUrl=${PreDownloadUrl}
+      - PreDownloadId=${PreDownloadId}
+      - PreDownloadPassword=${PreDownloadPassword}
+
     ports:
       - 5000:5000
     volumes:

@@ -11,6 +11,7 @@ namespace Scv.Api.Helpers
         public const string IsSupremeUser = nameof(CustomClaimTypes) + nameof(IsSupremeUser);
         public const string CivilFileAccess = nameof(CustomClaimTypes) + nameof(CivilFileAccess);
         public const string Role = nameof(CustomClaimTypes) + nameof(Role);
+        public const string Email = ClaimTypes.Email;
         public const string SubRole = nameof(CustomClaimTypes) + nameof(SubRole);
         public const string Groups = "groups";
         public const string PreferredUsername = "preferred_username";
@@ -21,7 +22,8 @@ namespace Scv.Api.Helpers
             "idir_userid",
             "name",
             "preferred_username",
-            "groups"
+            "groups",
+            ClaimTypes.Email
         };
     }
 }

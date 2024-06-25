@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.Configuration;
 using Scv.Api.Helpers;
 using Scv.Api.Helpers.Extensions;
@@ -131,6 +132,7 @@ namespace Scv.Api.Controllers
                 UserType = userType,
                 EnableArchive = false,
                 Role = HttpContext.User.Role(),
+                Email = HttpContext.User.Email(),
                 SubRole = HttpContext.User.SubRole(),
                 IsSupremeUser = HttpContext.User.IsSupremeUser(),
                 DateTime.UtcNow

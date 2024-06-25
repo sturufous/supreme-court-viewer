@@ -163,7 +163,6 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
-import base64url from "base64url";
 import "@store/modules/CivilFileInformation";
 import "@store/modules/CommonInformation";
 import { civilFileInformationType, referenceDocumentsInfoType } from "@/types/civil";
@@ -172,7 +171,7 @@ const civilState = namespace("CivilFileInformation");
 const commonState = namespace("CommonInformation");
 import CustomOverlay from "../CustomOverlay.vue";
 import shared from "../shared";
-import { ArchiveInfoType, DocumentRequestsInfoType } from "@/types/common";
+import { ArchiveInfoType } from "@/types/common";
 enum fieldTab {
   Categories = 0,
 }
@@ -361,19 +360,11 @@ export default class CivilProvidedDocumentsView extends Vue {
   }
 
   public downloadDocuments(): void {
-    debugger;
-    const options = {
-        responseType: "blob",
-        headers: {
-          "Content-Type": "application/json",
-        },
-    };
-    this.documents.forEach((listItem, index) => {
+    this.documents.forEach(listItem => {
       if (listItem.isChecked) {
-        const email = encodeURIComponent("stuart.morse@quartech.com");
         const objGuid = encodeURIComponent(btoa(listItem.objectGuid));
         const filePath = "victoria/" + listItem.appearanceId + "/533"; //encodeURIComponent(`${listItem.location}/${listItem.fileNumberText}/${listItem.room}`);
-        const url = `api/files/upload?email=${email}&objGuid=${objGuid}&filePath=${filePath}`;
+        const url = `api/files/upload?objGuid=${objGuid}&filePath=${filePath}`;
         console.log("Url = " + url);
 
         this.$http.get(url).then(
