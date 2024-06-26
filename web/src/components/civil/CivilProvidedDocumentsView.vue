@@ -6,16 +6,14 @@
           <h3 class="ml-5 my-1 p-0 font-weight-normal" v-if="!showSections['Provided Documents']">
             Provided Documents ({{ NumberOfDocuments }})
           </h3>
-          <custom-overlay :show="!downloadCompleted" style="padding: 0 1rem; margin-left:auto; margin-right:2rem;">
-            <b-button
-              @click="downloadDocuments()"
-              size="sm"
-              variant="success"
-              style="padding: 0 1rem; margin-left:auto; margin-right:2rem;"
-            >
-              Download Selection
-            </b-button>
-          </custom-overlay>
+          <b-button
+            @click="downloadDocuments()"
+            size="sm"
+            variant="success"
+            style="padding: 0 1rem; margin-left:2rem; margin-right:2rem;"
+          >
+            Download Selection
+          </b-button>
         </b-row>
         <hr class="mx-3 bg-light" style="height: 5px;" />
       </div>
@@ -147,14 +145,13 @@
       </b-overlay>
     </b-card>
 
-    <b-modal id="progress-modal" :title="progressModalTitle" @shown="startPolling" @hidden="stopPolling">
+    <b-modal id="progress-modal" :title="progressModalTitle" @shown="startPolling">
       <div v-for="(progress, index) in progressValues" :key="index" class="mb-2">
         <span class="progress-label">{{ progress.percentTransfered }}%</span>
-        <span class="progress-label file-name">{{ progress.fileName }}</span>
         <b-progress :value="progress.percentTransfered" variant="success"></b-progress>
       </div>
       <template #modal-footer>
-        <b-button @click="hideProgress">Close</b-button>
+        <b-button @click="cancelDownload">Cancel</b-button>
       </template>
     </b-modal>
   </div>
@@ -172,6 +169,9 @@ const commonState = namespace("CommonInformation");
 import CustomOverlay from "../CustomOverlay.vue";
 import shared from "../shared";
 import { ArchiveInfoType } from "@/types/common";
+import {
+  CancelPreDownloadInfoType,
+} from "@/types/common";
 enum fieldTab {
   Categories = 0,
 }
@@ -196,6 +196,10 @@ export default class CivilProvidedDocumentsView extends Vue {
 
   @civilState.Action
   public UpdateCivilFile!: (newCivilFileInformation: civilFileInformationType) => void;
+
+  public cancelPreDownloadInfo: CancelPreDownloadInfoType = {
+        transferIds: [] // Initialize with an empty array or any default values
+  };
 
   documents: referenceDocumentsInfoType[] = [];
   loadingPdf = false;
@@ -401,6 +405,39 @@ export default class CivilProvidedDocumentsView extends Vue {
     })
   }
 
+  public cancelDownload() {
+    this.$bvModal.hide('progress-modal');
+    this.cleanUp();
+
+    const options = {
+      responseType: "blob",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    const url = "api/files/terminate";
+    this.cancelPreDownloadInfo.transferIds = this.progressValues.map(transfer => transfer.transferId);
+
+    this.$http.post(url, this.cancelPreDownloadInfo, options).then(
+      () => {
+        this.$bvToast.toast("The download request was cancelled.", {
+          title: "Download Cancelled",
+          variant: "success",
+          autoHideDelay: 10000,
+        });
+        this.progressValues = [];
+      },
+      (err) => {
+        this.$bvToast.toast(`Error - ${err.url} - ${err.status} - ${err.statusText}`, {
+          title: "An error has occured.",
+          variant: "danger",
+          autoHideDelay: 10000,
+        });
+        console.log(err);
+      }
+    );
+  }
+
    // Method to start polling for progress values
    startPolling() {
     this.pollingInterval = setInterval(() => {
@@ -435,30 +472,28 @@ export default class CivilProvidedDocumentsView extends Vue {
   }
   
   public stopPolling() {
+    debugger;
+    this.cleanUp();
+
+    this.$bvToast.toast("All files have been transferred to OneDrive.", {
+      title: "Download Complete",
+      variant: "success",
+      autoHideDelay: 10000,
+    });
+      
+    this.progressValues = [];
+  } 
+
+  public cleanUp() {
     if (this.pollingInterval) {
       clearInterval(this.pollingInterval);
       this.pollingInterval = null;
-      /* this.documents.forEach(item => {
-        item.select = false;
-      });
-      this.allSelected = false; */
-
-      if (this.downloadIsComplete()) {
-        this.$bvToast.toast("All files have been transferred to OneDrive.", {
-          title: "Download Complete",
-          variant: "success",
-          autoHideDelay: 10000,
-        });
-      } else {
-        this.$bvToast.toast("The progress dialog was closed before all downloads completed.", {
-          title: "Potential incomplete download",
-          variant: "danger",
-          autoHideDelay: 10000,
-        });
-        this.progressValues = [];
-      }
     }
-  } 
+    this.documents.forEach(item => {
+      item.isChecked = false;
+    });
+    this.allDocumentsChecked = false;
+  }
 
   downloadIsComplete() {
     let complete = true;

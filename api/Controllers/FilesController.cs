@@ -438,7 +438,7 @@ namespace Scv.Api.Controllers
         [Route("terminate")]
         public async Task<ActionResult<String>> TerminatePreDownloadRequest(CancelPreDownloadRequest transfers)
         {
-            var url = _configuration.GetNonEmptyValue("PreDownloadUrl") + "/document/terminate/";
+            var url = _configuration.GetNonEmptyValue("PreDownloadUrl") + "/document/terminate";
             string json = JsonConvert.SerializeObject(transfers);
             HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
             HttpResponseMessage response = await client.PostAsync(url, content);
