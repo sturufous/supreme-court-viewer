@@ -111,6 +111,24 @@
               />
             </template>
 
+            <template v-slot:cell(download)="data">
+              <div
+                class="text-center"
+              >
+                <b-button
+                  :style="data.field.cellStyle"
+                  size="sm"
+                  :variant="'outline-primary border-white text-' + data.item.listClass"
+                  class="mr-2"
+                  @click="preDownloadCloudClick(data)"
+                >
+                  <b-icon-cloud
+                    :variant="data.item.listClass"
+                  ></b-icon-cloud>
+                </b-button>
+              </div>
+            </template>
+
             <template v-slot:cell(descriptionText)="data">
               <div :style="data.field.cellStyle" v-b-tooltip.hover :title="data.value.length > 45 ? data.value : ''">
                 {{ data.value | truncate(45) }}
@@ -227,6 +245,13 @@ export default class CivilProvidedDocumentsView extends Vue {
       tdClass: "border-top",
       thClass: "",
     },
+    {
+      key: "download",
+      label: "Download",
+      tdClass: "border-top",
+      cellStyle: "font-weight: normal; font-size: 16px; border: 0px",
+    },
+    { key: "dummy", label: "Dummy", tdClass: "border-top", cellStyle: "font-size:16px" }, // This table never renders the second column
     {
       key: "partyName",
       label: "Party Name",
@@ -366,8 +391,9 @@ export default class CivilProvidedDocumentsView extends Vue {
   public downloadDocuments(): void {
     this.documents.forEach(listItem => {
       if (listItem.isChecked) {
+        debugger;
         const objGuid = encodeURIComponent(btoa(listItem.objectGuid));
-        const filePath = "victoria/" + listItem.appearanceId + "/533"; //encodeURIComponent(`${listItem.location}/${listItem.fileNumberText}/${listItem.room}`);
+        const filePath = encodeURIComponent(`${this.$route.params.location}/${this.$route.params.fileNumberText}/${this.$route.params.room}`);
         const url = `api/files/upload?objGuid=${objGuid}&filePath=${filePath}`;
         console.log("Url = " + url);
 
@@ -508,6 +534,12 @@ export default class CivilProvidedDocumentsView extends Vue {
 
   public hideProgress() {
     this.$bvModal.hide('progress-modal');
+  }
+
+  preDownloadCloudClick(data) {
+    debugger;
+    this.documents[data.index].isChecked = true;
+    this.downloadDocuments();
   }
 }
 </script>

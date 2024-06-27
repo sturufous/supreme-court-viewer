@@ -976,11 +976,15 @@ export default class CourtListLayout extends Vue {
   }
 
   public OpenCivilFilePage(data, section = "") {
+    debugger;
     let params;
     if (section) {
       params = {
         fileNumber: data.item.fileId,
-        section: section
+        fileNumberText: this.referenceDocs[data.index].doc[0].fileNumberText,
+        section: section,
+        location: this.referenceDocs[data.index].doc[0].location,
+        room: this.courtList[data.index].room
       };
     } else {
       params = { fileNumber: data.item.fileId };

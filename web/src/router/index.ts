@@ -37,7 +37,7 @@ const routes: Array<RouteConfig> = [
     ]
   },
   {
-    path: '/civil-file/:fileNumber/:section?',
+    path: '/civil-file/:fileNumber/:fileNumberText/:section/:location/:room?',
     name: 'CivilCaseDetails',
     component: CivilCaseDetails,
     beforeEnter: authGuard, 
