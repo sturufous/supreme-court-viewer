@@ -9,8 +9,8 @@
           <b-button
             @click="downloadDocuments()"
             size="sm"
-            variant="success"
-            style="padding: 0 1rem; margin-left:2rem; margin-right:2rem;"
+            variant="primary"
+            style="padding: 0 1rem; margin-left:2rem; margin-right:2rem; height: 35px"
           >
             Download Selection
           </b-button>
