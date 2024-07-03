@@ -403,13 +403,14 @@ namespace Scv.Api.Controllers
 
         [HttpGet]
         [Route("upload")]
-        public async Task<ActionResult<String>> InitiatePreDownloadRequest(string objGuid, string filePath)
+        public async Task<ActionResult<String>> InitiatePreDownloadRequest(string objGuid, string filePath, string fileName)
         {
             PreDownloadRequest dlRequest = new PreDownloadRequest
             {
                 objGuid = objGuid,
                 email = User.Email(),
-                filePath = filePath
+                filePath = filePath,
+                fileName = fileName
             };
 
             var url = _configuration.GetNonEmptyValue("PreDownloadUrl") + "/document/upload";

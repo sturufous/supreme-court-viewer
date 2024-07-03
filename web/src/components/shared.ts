@@ -81,5 +81,128 @@ export default {
         }
       };
     }
+  },
+
+  submitUploadRequest(url, parent) {
+    parent.$http.get(url).then(
+      (response) => {
+        const blob = response.data;
+        const transferId = blob.transferId;
+        const url = `api/files/status?transferId=${transferId}`;
+
+        parent.$http.get(url).then(
+          (response) => {
+            const blob = response.data;
+            parent.progressValues.push(blob);
+            parent.$bvModal.show('progress-modal');
+          },
+          (err) => {
+            parent.$bvToast.toast(`Error - ${err.url} - ${err.status} - ${err.statusText}`, {
+              title: "An error has occured.",
+              variant: "danger",
+              autoHideDelay: 10000,
+            });
+            console.log(err);
+          });
+      },
+      (err) => {
+        parent.$bvToast.toast(`Error - ${err.url} - ${err.status} - ${err.statusText}`, {
+          title: "An error has occured.",
+          variant: "danger",
+          autoHideDelay: 10000,
+        });
+        console.log(err);
+      }
+    ) 
+  },
+
+  // Method to start polling for progress values
+  startPolling(parent) {
+    parent.pollingInterval = setInterval(() => {
+      parent.progressValues.every((transfer, index) => {
+        if (this.downloadIsComplete(parent)) {
+          parent.$bvModal.hide('progress-modal');
+          parent.stopPolling();
+          return false;
+        } else {
+          const url = `api/files/status?transferId=${transfer.transferId}`;
+
+          if (transfer.percentTransfered < 100) {
+            parent.$http.get(url).then(
+              (response) => {
+                  const blob = response.data;
+                  parent.progressValues[index].percentTransfered = blob.percentTransfered;
+                  parent.progressValues[index].fileName = blob.fileName;
+              },
+              (err) => {
+                parent.$bvToast.toast(`Error - ${err.url} - ${err.status} - ${err.statusText}`, {
+                  title: "An error has occured.",
+                  variant: "danger",
+                  autoHideDelay: 10000,
+                });
+                console.log(err);
+              });
+            }
+            return true;
+          }
+      });
+    }, 1000);
+  },
+
+  cancelDownload(parent) {
+    parent.$bvModal.hide('progress-modal');
+    parent.cleanUp();
+
+    const options = {
+      responseType: "blob",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    const url = "api/files/terminate";
+    parent.cancelPreDownloadInfo.transferIds = parent.progressValues.map(transfer => transfer.transferId);
+
+    parent.$http.post(url, parent.cancelPreDownloadInfo, options).then(
+      () => {
+        parent.$bvToast.toast("The download request was cancelled.", {
+          title: "Download Cancelled",
+          variant: "success",
+          autoHideDelay: 10000,
+        });
+        parent.progressValues = [];
+      },
+      (err) => {
+        parent.$bvToast.toast(`Error - ${err.url} - ${err.status} - ${err.statusText}`, {
+          title: "An error has occured.",
+          variant: "danger",
+          autoHideDelay: 10000,
+        });
+        console.log(err);
+      }
+    );
+  },
+
+  stopPolling(parent) {
+    parent.cleanUp(parent);
+
+    parent.$bvToast.toast("All files have been transferred to OneDrive.", {
+      title: "Download Complete",
+      variant: "success",
+      autoHideDelay: 10000,
+    });
+      
+    parent.progressValues = [];
+
+  },
+
+   downloadIsComplete(parent) {
+    let complete = true;
+    parent.progressValues.forEach(progress => {
+      if (progress.percentTransfered != 100) {
+        complete = false;
+      }
+    });
+    
+    return complete;
   }
 };

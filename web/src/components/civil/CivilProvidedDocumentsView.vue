@@ -7,7 +7,7 @@
             Provided Documents ({{ NumberOfDocuments }})
           </h3>
           <b-button
-            @click="downloadDocuments()"
+            @click="preDownloadDocuments()"
             size="sm"
             variant="primary"
             style="padding: 0 1rem; margin-left:2rem; margin-right:2rem; height: 35px"
@@ -163,9 +163,10 @@
       </b-overlay>
     </b-card>
 
-    <b-modal id="progress-modal" :title="progressModalTitle" @shown="startPolling">
+    <b-modal id="progress-modal" :title="progressModalTitle" @shown="startPolling" size="lg">
       <div v-for="(progress, index) in progressValues" :key="index" class="mb-2">
         <span class="progress-label">{{ progress.percentTransfered }}%</span>
+        <span class="progress-filename">{{ progress.fileName }}</span>
         <b-progress :value="progress.percentTransfered" variant="success"></b-progress>
       </div>
       <template #modal-footer>
@@ -312,7 +313,6 @@ export default class CivilProvidedDocumentsView extends Vue {
   }
 
   public checkAllDocuments(checked) {
-    debugger;
     if (this.activetab != "ALL") {
       for (const docInx in this.documents) {
         if (
@@ -388,126 +388,31 @@ export default class CivilProvidedDocumentsView extends Vue {
     return this.documents.length;
   }
 
-  public downloadDocuments(): void {
+  public preDownloadDocuments(): void {
     this.documents.forEach(listItem => {
       if (listItem.isChecked) {
         debugger;
         const objGuid = encodeURIComponent(btoa(listItem.objectGuid));
         const filePath = encodeURIComponent(`${this.$route.params.location}/${this.$route.params.fileNumberText}/${this.$route.params.room}`);
-        const url = `api/files/upload?objGuid=${objGuid}&filePath=${filePath}`;
-        console.log("Url = " + url);
+        const fileName = encodeURIComponent(`${this.$route.params.fileNumberText}-${listItem.referenceDocumentTypeDsc}-${listItem.appearanceDate.substring(0, 10)}-${listItem.partyName[0]}.pdf`);
+        const url = `api/files/upload?objGuid=${objGuid}&filePath=${filePath}&fileName=${fileName}`;
 
-        this.$http.get(url).then(
-          (response) => {
-            const blob = response.data;
-            const transferId = blob.transferId;
-            const url = `api/files/status?transferId=${transferId}`;
-
-            this.$http.get(url).then(
-              (response) => {
-                const blob = response.data;
-                this.progressValues.push(blob);
-                this.$bvModal.show('progress-modal');
-              },
-              (err) => {
-                this.$bvToast.toast(`Error - ${err.url} - ${err.status} - ${err.statusText}`, {
-                  title: "An error has occured.",
-                  variant: "danger",
-                  autoHideDelay: 10000,
-                });
-                console.log(err);
-              });
-          },
-          (err) => {
-            this.$bvToast.toast(`Error - ${err.url} - ${err.status} - ${err.statusText}`, {
-              title: "An error has occured.",
-              variant: "danger",
-              autoHideDelay: 10000,
-            });
-            console.log(err);
-          }
-        ) 
+        shared.submitUploadRequest(url, this);
       }
     })
   }
 
   public cancelDownload() {
-    this.$bvModal.hide('progress-modal');
-    this.cleanUp();
-
-    const options = {
-      responseType: "blob",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    };
-    const url = "api/files/terminate";
-    this.cancelPreDownloadInfo.transferIds = this.progressValues.map(transfer => transfer.transferId);
-
-    this.$http.post(url, this.cancelPreDownloadInfo, options).then(
-      () => {
-        this.$bvToast.toast("The download request was cancelled.", {
-          title: "Download Cancelled",
-          variant: "success",
-          autoHideDelay: 10000,
-        });
-        this.progressValues = [];
-      },
-      (err) => {
-        this.$bvToast.toast(`Error - ${err.url} - ${err.status} - ${err.statusText}`, {
-          title: "An error has occured.",
-          variant: "danger",
-          autoHideDelay: 10000,
-        });
-        console.log(err);
-      }
-    );
+    shared.cancelDownload(this);
   }
 
-   // Method to start polling for progress values
-   startPolling() {
-    this.pollingInterval = setInterval(() => {
-      this.progressValues.every((transfer, index) => {
-        if (this.downloadIsComplete()) {
-          this.$bvModal.hide('progress-modal');
-          this.stopPolling();
-          return false;
-        } else {
-          const url = `api/files/status?transferId=${transfer.transferId}`;
-
-          if (transfer.percentTransfered < 100) {
-            this.$http.get(url).then(
-              (response) => {
-                  const blob = response.data;
-                  this.progressValues[index].percentTransfered = blob.percentTransfered;
-                  this.progressValues[index].fileName = blob.fileName;
-              },
-              (err) => {
-                this.$bvToast.toast(`Error - ${err.url} - ${err.status} - ${err.statusText}`, {
-                  title: "An error has occured.",
-                  variant: "danger",
-                  autoHideDelay: 10000,
-                });
-                console.log(err);
-              });
-            }
-            return true;
-          }
-      });
-    }, 1000);
+  // Method to start polling for progress values
+  startPolling() {
+    shared.startPolling(this);
   }
   
   public stopPolling() {
-    debugger;
-    this.cleanUp();
-
-    this.$bvToast.toast("All files have been transferred to OneDrive.", {
-      title: "Download Complete",
-      variant: "success",
-      autoHideDelay: 10000,
-    });
-      
-    this.progressValues = [];
+    shared.stopPolling(this);
   } 
 
   public cleanUp() {
@@ -521,25 +426,9 @@ export default class CivilProvidedDocumentsView extends Vue {
     this.allDocumentsChecked = false;
   }
 
-  downloadIsComplete() {
-    let complete = true;
-    this.progressValues.forEach(progress => {
-      if (progress.percentTransfered != 100) {
-        complete = false;
-      }
-    });
-    
-    return complete;
-  }
-
-  public hideProgress() {
-    this.$bvModal.hide('progress-modal');
-  }
-
   preDownloadCloudClick(data) {
-    debugger;
     this.documents[data.index].isChecked = true;
-    this.downloadDocuments();
+    this.preDownloadDocuments();
   }
 }
 </script>
@@ -551,5 +440,10 @@ export default class CivilProvidedDocumentsView extends Vue {
 .checkbox {
   padding-top: 4px;
   padding-left: 30px;
+}
+.progress-filename {
+  float: right;
+  font-size: smaller;
+  vertical-align: middle;
 }
 </style>

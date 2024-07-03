@@ -1,7 +1,7 @@
 <template>
   <b-card bg-variant="white" no-body>
     <b-card class="mb-3">
-      <b-button variant="primary" @click="downloadDocuments">Download selection</b-button>
+      <b-button variant="primary" @click="preDownloadDocuments">Download selection</b-button>
     </b-card>
 
     <b-card bg-variant="light" v-if="!isMounted && !isDataReady">
@@ -265,9 +265,10 @@
       </b-table>
     </b-card>
 
-    <b-modal id="progress-modal" :title="progressModalTitle" @shown="startPolling">
+    <b-modal id="progress-modal" :title="progressModalTitle" @shown="startPolling()" size="lg">
       <div v-for="(progress, index) in progressValues" :key="index" class="mb-2">
         <span class="progress-label">{{ progress.percentTransfered }}%</span>
+        <span class="progress-filename">{{ progress.fileName }}</span>
         <b-progress :value="progress.percentTransfered" variant="success"></b-progress>
       </div>
       <template #modal-footer>
@@ -433,7 +434,7 @@ export default class CourtListLayout extends Vue {
   physicalIds: string[] = [];
   referenceDocs: any[] = [];
   allSelected = false;
-  progress = 50;
+  progress = 0;
   progressModalTitle = "Downloading to OneDrive...";
   progressValues: any[] = [];
   pollingInterval: ReturnType<typeof setTimeout> | null = null;
@@ -539,50 +540,6 @@ export default class CourtListLayout extends Vue {
     this.isMounted = true;
   }
 
-  public downloadDocuments(): void {
-    const selected = this.courtList.filter(item => item.selected);
-    selected.forEach(listItem => {
-      const index = listItem.index;
-
-      this.referenceDocs[index].doc.forEach(refDoc => {
-        const objGuid = encodeURIComponent(btoa(refDoc.documentId));
-        const filePath = encodeURIComponent(`${refDoc.location}/${refDoc.fileNumberText}/${listItem.room}`);
-        const url = `api/files/upload?objGuid=${objGuid}&filePath=${filePath}`;
-
-        this.$http.get(url).then(
-          (response) => {
-            const blob = response.data;
-            const transferId = blob.transferId;
-            const url = `api/files/status?transferId=${transferId}`;
-
-            this.$http.get(url).then(
-              (response) => {
-                const blob = response.data;
-                this.progressValues.push(blob);
-                this.$bvModal.show('progress-modal');
-              },
-              (err) => {
-                this.$bvToast.toast(`Error - ${err.url} - ${err.status} - ${err.statusText}`, {
-                  title: "An error has occured.",
-                  variant: "danger",
-                  autoHideDelay: 10000,
-                });
-                console.log(err);
-              });
-          },
-          (err) => {
-            this.$bvToast.toast(`Error - ${err.url} - ${err.status} - ${err.statusText}`, {
-              title: "An error has occured.",
-              variant: "danger",
-              autoHideDelay: 10000,
-            });
-            console.log(err);
-          }
-        ) 
-      })
-    })
-  }
-
   public selectAllRows() {
     this.allSelected = !this.allSelected;
     this.SortedCourtList.forEach(item => {
@@ -591,7 +548,6 @@ export default class CourtListLayout extends Vue {
   }
 
   public ExtractCriminalListInfo(): void {
-    //debugger;
     for (const criminalListIndex in this.criminalCourtListJson) {
       const criminalListInfo = {} as courtListInfoType;
       const jcriminalList = this.criminalCourtListJson[criminalListIndex];
@@ -922,7 +878,6 @@ export default class CourtListLayout extends Vue {
   }
 
   public downloadProvidedDocument(data) {
-    //debugger;
     const target = this.referenceDocs.find(rd => rd.fileId === data.item.fileId);
     shared.openDocumentsPdf(CourtDocumentType.ProvidedCivil, target.doc[0]);
   }
@@ -976,7 +931,6 @@ export default class CourtListLayout extends Vue {
   }
 
   public OpenCivilFilePage(data, section = "") {
-    debugger;
     let params;
     if (section) {
       params = {
@@ -1006,83 +960,32 @@ export default class CourtListLayout extends Vue {
     return _.sortBy(this.courtList, "time");
   }
 
-  public cancelDownload() {
-    debugger;
-    this.$bvModal.hide('progress-modal');
-    this.cleanUp();
+  public preDownloadDocuments(): void {
+    const selected = this.courtList.filter(item => item.selected);
+    selected.forEach(listItem => {
+      const index = listItem.index;
 
-    const options = {
-      responseType: "blob",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    };
-    const url = "api/files/terminate";
-    this.cancelPreDownloadInfo.transferIds = this.progressValues.map(transfer => transfer.transferId);
+      this.referenceDocs[index].doc.forEach(refDoc => {
+        const objGuid = encodeURIComponent(btoa(refDoc.documentId));
+        const filePath = encodeURIComponent(`${refDoc.location}/${refDoc.fileNumberText}/${listItem.room}`);
+        const fileName = encodeURIComponent(`${refDoc.fileNumberText}-${refDoc.documentDescription}-${refDoc.appearanceDate}-${this.courtList[index].parties}.pdf`);
+        const url = `api/files/upload?objGuid=${objGuid}&filePath=${filePath}&fileName=${fileName}`;
 
-    this.$http.post(url, this.cancelPreDownloadInfo, options).then(
-      () => {
-        this.$bvToast.toast("The download request was cancelled.", {
-          title: "Download Cancelled",
-          variant: "success",
-          autoHideDelay: 10000,
-        });
-        this.progressValues = [];
-      },
-      (err) => {
-        this.$bvToast.toast(`Error - ${err.url} - ${err.status} - ${err.statusText}`, {
-          title: "An error has occured.",
-          variant: "danger",
-          autoHideDelay: 10000,
-        });
-        console.log(err);
-      }
-    );
+        shared.submitUploadRequest(url, this);
+      })
+    })
   }
 
-  // Method to start polling for progress values
-  startPolling() {
-    this.pollingInterval = setInterval(() => {
-      this.progressValues.every((transfer, index) => {
-        if (this.downloadIsComplete()) {
-          this.$bvModal.hide('progress-modal');
-          this.stopPolling();
-          return false;
-        } else {
-          const url = `api/files/status?transferId=${transfer.transferId}`;
+  public cancelDownload() {
+    shared.cancelDownload(this);
+  }
 
-          if (transfer.percentTransfered < 100) {
-            this.$http.get(url).then(
-              (response) => {
-                  const blob = response.data;
-                  this.progressValues[index].percentTransfered = blob.percentTransfered;
-                  this.progressValues[index].fileName = blob.fileName;
-              },
-              (err) => {
-                this.$bvToast.toast(`Error - ${err.url} - ${err.status} - ${err.statusText}`, {
-                  title: "An error has occured.",
-                  variant: "danger",
-                  autoHideDelay: 10000,
-                });
-                console.log(err);
-              });
-            }
-            return true;
-          }
-      });
-    }, 1000);
+  startPolling() {
+    shared.startPolling(this)
   }
 
   public stopPolling() {
-    this.cleanUp();
-
-    this.$bvToast.toast("All files have been transferred to OneDrive.", {
-      title: "Download Complete",
-      variant: "success",
-      autoHideDelay: 10000,
-    });
-      
-    this.progressValues = [];
+    shared.stopPolling(this);
   } 
 
   public cleanUp() {
@@ -1096,20 +999,9 @@ export default class CourtListLayout extends Vue {
     this.allSelected = false;
   }
 
-  public downloadIsComplete() {
-    let complete = true;
-    this.progressValues.forEach(progress => {
-      if (progress.percentTransfered != 100) {
-        complete = false;
-      }
-    });
-    
-    return complete;
-  }
-
   preDownloadCloudClick(data) {
     this.courtList[data.index].selected = true;
-    this.downloadDocuments();
+    this.preDownloadDocuments();
   }
 }
 </script>
@@ -1117,5 +1009,10 @@ export default class CourtListLayout extends Vue {
 <style scoped>
 .card {
   border: white;
+}
+.progress-filename {
+  float: right;
+  font-size: smaller;
+  vertical-align: middle;
 }
 </style>

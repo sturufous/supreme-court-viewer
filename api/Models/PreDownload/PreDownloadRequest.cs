@@ -10,5 +10,6 @@ namespace Scv.Api.Models.PreDownload
         public string objGuid { get; set; }
         public string email { get; set; }
         public string filePath { get; set; }
+        public string fileName { get; set; }
     }
 }
