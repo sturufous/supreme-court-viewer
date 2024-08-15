@@ -93,6 +93,7 @@ export default {
         parent.$http.get(url).then(
           (response) => {
             const blob = response.data;
+            blob.variant = "success";
             parent.progressValues.push(blob);
             parent.$bvModal.show('progress-modal');
           },
@@ -131,7 +132,20 @@ export default {
             parent.$http.get(url).then(
               (response) => {
                   const blob = response.data;
-                  parent.progressValues[index].percentTransfered = blob.percentTransfered;
+                  if (blob.error == true && parent.progressValues[index].error === false) {
+                    parent.$bvToast.toast(`Error - ${blob.fileName} - ${blob.lastErrorMessage}`, {
+                      title: "An error has occured.",
+                      variant: "danger",
+                      autoHideDelay: 10000,
+                    });
+                    parent.progressValues[index].error = true;
+                    parent.progressValues[index].percentTransfered = 100;
+                    parent.progressValues[index].variant = "danger";
+                  } else if (blob.error === false) {
+                    parent.progressValues[index].error = false;
+                    parent.progressValues[index].percentTransfered = blob.percentTransfered;
+                    parent.progressValues[index].variant = "success";
+                  }
                   parent.progressValues[index].fileName = blob.fileName;
               },
               (err) => {
@@ -198,7 +212,7 @@ export default {
    downloadIsComplete(parent) {
     let complete = true;
     parent.progressValues.forEach(progress => {
-      if (progress.percentTransfered != 100) {
+      if (progress.percentTransfered != 100 || progress.error === true) {
         complete = false;
       }
     });

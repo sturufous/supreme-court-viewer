@@ -265,11 +265,11 @@
       </b-table>
     </b-card>
 
-    <b-modal id="progress-modal" :title="progressModalTitle" @shown="startPolling()" size="lg">
+    <b-modal id="progress-modal" :title="progressModalTitle" @shown="startPolling()" size="lg" no-close-on-backdrop>
       <div v-for="(progress, index) in progressValues" :key="index" class="mb-2">
         <span class="progress-label">{{ progress.percentTransfered }}%</span>
         <span class="progress-filename">{{ progress.fileName }}</span>
-        <b-progress :value="progress.percentTransfered" variant="success"></b-progress>
+        <b-progress :value="progress.percentTransfered" :variant="progress.variant"></b-progress>
       </div>
       <template #modal-footer>
         <b-button @click="cancelDownload">Cancel</b-button>
@@ -966,6 +966,7 @@ export default class CourtListLayout extends Vue {
       const index = listItem.index;
 
       this.referenceDocs[index].doc.forEach(refDoc => {
+        debugger;
         const objGuid = encodeURIComponent(btoa(refDoc.documentId));
         const filePath = encodeURIComponent(`${refDoc.location}/${refDoc.fileNumberText}/${listItem.room}`);
         const fileName = encodeURIComponent(`${refDoc.fileNumberText}-${refDoc.documentDescription}-${refDoc.appearanceDate}-${this.courtList[index].parties}.pdf`);

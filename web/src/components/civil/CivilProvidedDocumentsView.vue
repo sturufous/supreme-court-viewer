@@ -163,11 +163,11 @@
       </b-overlay>
     </b-card>
 
-    <b-modal id="progress-modal" :title="progressModalTitle" @shown="startPolling" size="lg">
+    <b-modal id="progress-modal" :title="progressModalTitle" @shown="startPolling" size="lg" no-close-on-backdrop>
       <div v-for="(progress, index) in progressValues" :key="index" class="mb-2">
         <span class="progress-label">{{ progress.percentTransfered }}%</span>
         <span class="progress-filename">{{ progress.fileName }}</span>
-        <b-progress :value="progress.percentTransfered" variant="success"></b-progress>
+        <b-progress :value="progress.percentTransfered" :variant="progress.variant"></b-progress>
       </div>
       <template #modal-footer>
         <b-button @click="cancelDownload">Cancel</b-button>
