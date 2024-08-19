@@ -8,10 +8,10 @@ To get full usage information on the script, run:
 ```
 ./manage -h
 ```
-  
+
 ## Building the Images
 
-The first thing you'll need to do is build the Docker images. 
+The first thing you'll need to do is build the Docker images.
 
 To build the images, run:
 ```
@@ -27,6 +27,8 @@ To start the project, run:
 
 This will start the project interactively; with all of the logs being written to the command line.  Press `Ctrl-C` to shut down the services from the same shell window.
 
+Any environment variables containing settings, configuration, or secrets can be placed in a `.env` file in the `docker` folder and they will automatically be picked up and loaded by the `./manage` script when you start the application.
+
 ## Stopping the Project
 
 To stop the project, run:
@@ -40,6 +42,6 @@ Since the services are started interactively, you will have to issue this comman
 
 ## Using the Application
 
-- The main UI is exposed at; http://localhost:8080/
-- The API is available at; http://localhost:8080/api
-  - The API is also exposed directly at; http://localhost:5000/api
+- By default, the main developer UI is exposed at; https://localhost:8080/scjscv/
+- The Swagger API and documentation is available at; https://localhost:8080/scjscv/api/
+  - Which is also exposed directly at; http://localhost:5000/api/
