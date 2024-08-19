@@ -131,6 +131,7 @@ export default {
           if (transfer.percentTransfered < 100) {
             parent.$http.get(url).then(
               (response) => {
+                  debugger;
                   const blob = response.data;
                   if (blob.error == true && parent.progressValues[index].error === false) {
                     parent.$bvToast.toast(`Error - ${blob.fileName} - ${blob.lastErrorMessage}`, {
@@ -138,13 +139,9 @@ export default {
                       variant: "danger",
                       autoHideDelay: 10000,
                     });
-                    parent.progressValues[index].error = true;
-                    parent.progressValues[index].percentTransfered = 100;
-                    parent.progressValues[index].variant = "danger";
+                    this.setProgressValues(parent.progressValues[index], true, 100, "danger");
                   } else if (blob.error === false) {
-                    parent.progressValues[index].error = false;
-                    parent.progressValues[index].percentTransfered = blob.percentTransfered;
-                    parent.progressValues[index].variant = "success";
+                    this.setProgressValues(parent.progressValues[index], false, blob.percentTransfered, "success");
                   }
                   parent.progressValues[index].fileName = blob.fileName;
               },
@@ -161,6 +158,12 @@ export default {
           }
       });
     }, 1000);
+  },
+
+  setProgressValues(progress, error, percentTransfered, variant) {
+    progress.error = error;
+    progress.percentTransfered = percentTransfered;
+    progress.variant = variant;
   },
 
   cancelDownload(parent) {
