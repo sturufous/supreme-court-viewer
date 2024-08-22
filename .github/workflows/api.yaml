@@ -13,6 +13,8 @@ jobs:
 
       - name: Checkout Repo
         uses: actions/checkout@v4
+        with:
+          ref: SCV-415   # Specifies the branch to checkout
 
       - name: Login to Artifactory
         uses: docker/login-action@v1
