@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 env:
   IMAGE_NAME: api
-  WORKING_DIRECTORY: ./
+  WORKING_DIRECTORY: ../
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -32,7 +32,7 @@ jobs:
 
       - name: Docker Build Image
         run: |          
-          docker build --tag ${{ env.IMAGE_NAME }} -f api/Dockerfile . 
+          docker build --tag ${{ env.IMAGE_NAME }} -f docker/Dockerfile.api . 
           docker tag ${{ env.IMAGE_NAME }} artifacts.developer.gov.bc.ca/sb3c-images/${{ env.IMAGE_NAME }}:dev-${{ steps.short_sha.outputs.SHORT_SHA }}
           docker push artifacts.developer.gov.bc.ca/sb3c-images/${{ env.IMAGE_NAME }}:dev-${{ steps.short_sha.outputs.SHORT_SHA }}
 
