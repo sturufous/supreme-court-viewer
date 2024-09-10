@@ -32,9 +32,7 @@ jobs:
       - name: Docker Build Image
         run: |          
           docker build --tag web-runtime -f docker/nginx-runtime/Dockerfile ./docker/nginx-runtime/
-          cd web
           docker build --tag web-artifacts -f docker/Dockerfile.node . --build-arg WEB_BASE_HREF=${{ secrets.WEB_BASE_HREF }}
-          cd ..
           docker build --tag ${{ env.IMAGE_NAME }} -f docker/vue-on-nginx/Dockerfile ./docker/vue-on-nginx/
           docker tag ${{ env.IMAGE_NAME }} artifacts.developer.gov.bc.ca/sb3c-images/${{ env.IMAGE_NAME }}:dev-${{ steps.short_sha.outputs.SHORT_SHA }}
           docker push artifacts.developer.gov.bc.ca/sb3c-images/${{ env.IMAGE_NAME }}:dev-${{ steps.short_sha.outputs.SHORT_SHA }}
