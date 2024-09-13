@@ -313,6 +313,7 @@ export default class CivilProvidedDocumentsView extends Vue {
   }
 
   public checkAllDocuments(checked) {
+  debugger;
     if (this.activetab != "ALL") {
       for (const docInx in this.documents) {
         if (

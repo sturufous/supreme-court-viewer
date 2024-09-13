@@ -30,7 +30,7 @@
         </template>
 
         <template v-slot:cell()="data">
-          <template v-if="data.field.key === 'select'">
+          <template v-if="data.field.key === 'select' && countReferenceDocs(data) > 0">
             <b-form-checkbox v-model="data.item.selected"></b-form-checkbox>
           </template>
           <template v-else>
@@ -51,9 +51,10 @@
               class="mr-2"
               @click="preDownloadCloudClick(data)"
             >
-              <b-icon-cloud
-                :variant="data.item.listClass"
-              ></b-icon-cloud>
+            <b-icon-cloud
+              v-if="countReferenceDocs(data) > 0"
+              :variant="data.item.listClass"
+            ></b-icon-cloud>
             </b-button>
           </div>
         </template>
@@ -966,7 +967,6 @@ export default class CourtListLayout extends Vue {
       const index = listItem.index;
 
       this.referenceDocs[index].doc.forEach(refDoc => {
-        debugger;
         const objGuid = encodeURIComponent(btoa(refDoc.documentId));
         const filePath = encodeURIComponent(`${refDoc.location}/${refDoc.fileNumberText}/${listItem.room}`);
         const fileName = encodeURIComponent(`${refDoc.fileNumberText}-${refDoc.documentDescription}-${refDoc.appearanceDate}-${this.courtList[index].parties}.pdf`);
