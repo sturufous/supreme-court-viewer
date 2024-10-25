@@ -405,10 +405,13 @@ namespace Scv.Api.Controllers
         [Route("upload")]
         public async Task<ActionResult<String>> InitiatePreDownloadRequest(string objGuid, string filePath, string fileName)
         {
+            if (User.IsVcUser() || User.IsIdirUser()) // Only allow judiciary to download files
+                return Forbid();
+
             PreDownloadRequest dlRequest = new PreDownloadRequest
             {
                 objGuid = objGuid,
-                email = User.Email(),
+                email = "stuart.morse@bccourts.ca", //User.Email(),
                 filePath = filePath,
                 fileName = fileName
             };
@@ -427,6 +430,9 @@ namespace Scv.Api.Controllers
         [Route("status")]
         public async Task<ActionResult<String>> GetPreDownloadRequestStatus(string transferId)
         {
+            if (User.IsVcUser() || User.IsIdirUser()) // Only allow judiciary to check file status
+                return Forbid();
+
             var url = _configuration.GetNonEmptyValue("PreDownloadUrl") + "/document/status/" + transferId;
             HttpResponseMessage response = await client.GetAsync(url);
             response.EnsureSuccessStatusCode(); // Throw an exception if the HTTP response is not successful
@@ -439,6 +445,9 @@ namespace Scv.Api.Controllers
         [Route("terminate")]
         public async Task<ActionResult<String>> TerminatePreDownloadRequest(CancelPreDownloadRequest transfers)
         {
+            if (User.IsVcUser() || User.IsIdirUser()) // Only allow judiciary to terminate downloads
+                return Forbid(); 
+                
             var url = _configuration.GetNonEmptyValue("PreDownloadUrl") + "/document/terminate";
             string json = JsonConvert.SerializeObject(transfers);
             HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
