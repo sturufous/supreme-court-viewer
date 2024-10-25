@@ -1,6 +1,6 @@
 <template>
   <b-card bg-variant="white" no-body>
-    <b-card class="mb-3">
+    <b-card class="mb-3" v-if="isJudiciaryUser()">
       <b-button variant="primary" @click="preDownloadDocuments">Download selection</b-button>
     </b-card>
 
@@ -17,7 +17,7 @@
     </b-card>
 
     <b-card bg-variant="white" v-if="isDataReady" no-body class="mx-3" style="overflow:auto">
-      <b-table :items="SortedCourtList" :fields="fields" borderless small responsive="sm">
+      <b-table :items="SortedCourtList" :fields="filteredFields()" borderless small responsive="sm">
         <template v-slot:head()="data">
           <template v-if="data.field.key === 'select'">
             <b-form-checkbox v-model="allSelected" @change="selectAllRows"></b-form-checkbox>
@@ -41,8 +41,8 @@
         </template>
 
         <template v-slot:cell(download)="data">
-          <div
-            class="text-center"
+          <div  
+              class="text-center"
           >
             <b-button
               :style="data.field.cellStyle"
@@ -876,6 +876,14 @@ export default class CourtListLayout extends Vue {
       return target["doc"].length;
     }
     return 0;
+  }
+
+  public isJudiciaryUser() {
+    return shared.isJudiciaryUser(this);
+  }
+
+  filteredFields() {
+    return shared.filteredFields(this);
   }
 
   public downloadProvidedDocument(data) {

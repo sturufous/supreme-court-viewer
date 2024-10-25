@@ -6,7 +6,7 @@
           <h3 class="ml-5 my-1 p-0 font-weight-normal" v-if="!showSections['Provided Documents']">
             Provided Documents ({{ NumberOfDocuments }})
           </h3>
-          <b-button
+          <b-button v-if="isJudiciaryUser()"
             @click="preDownloadDocuments()"
             size="sm"
             variant="primary"
@@ -61,7 +61,7 @@
         >
           <b-table
             :items="FilteredDocuments"
-            :fields="fields"
+            :fields="filteredFields()"
             sort-by="appearanceDate"
             :sort-desc.sync="sortDesc"
             :no-sort-reset="true"
@@ -70,10 +70,11 @@
             striped
             responsive="sm"
           >
-            <template v-for="(field, index) in fields" v-slot:[`head(${field.key})`]="data">
-              <b v-bind:key="index" :class="field.headerStyle"> {{ data.label }}</b>
-            </template>
-
+          <template v-for="(field, index) in fields" v-slot:[`head(${field.key})`]="data">
+            <div :key="index" :class="['header-wrapper', field.headerStyle]">
+              <b>{{ data.label }}</b>
+            </div>
+          </template>
             <template v-slot:cell(appearanceDate)="data">
               <span :style="data.field.cellStyle">
                 {{ data.value | beautify_date }}
@@ -188,6 +189,7 @@ const commonState = namespace("CommonInformation");
 import CustomOverlay from "../CustomOverlay.vue";
 import shared from "../shared";
 import { ArchiveInfoType } from "@/types/common";
+import { UserInfo } from "@/types/common";
 import {
   CancelPreDownloadInfoType,
 } from "@/types/common";
@@ -215,6 +217,9 @@ export default class CivilProvidedDocumentsView extends Vue {
 
   @civilState.Action
   public UpdateCivilFile!: (newCivilFileInformation: civilFileInformationType) => void;
+
+  @commonState.State
+  public userInfo!: UserInfo;
 
   public cancelPreDownloadInfo: CancelPreDownloadInfoType = {
         transferIds: [] // Initialize with an empty array or any default values
@@ -257,8 +262,8 @@ export default class CivilProvidedDocumentsView extends Vue {
       key: "partyName",
       label: "Party Name",
       sortable: true,
-      headerStyle: "text-primary",
-      cellStyle: "font-size: 16px;",
+      headerStyle: "text-primary pad-left",
+      cellStyle: "font-size: 16px; padding-left: 10px;"
     },
     {
       key: "nonPartyName",
@@ -279,7 +284,7 @@ export default class CivilProvidedDocumentsView extends Vue {
       label: "Appearance Date",
       sortable: true,
       headerStyle: "text",
-      cellStyle: "font-size: 16px;",
+      cellStyle: "font-size: 16px",
     },
     // {key:'enterDtm',                 label:'Created Date',    sortable:true,  headerStyle:'text',          cellStyle:'font-size: 16px;'},
     {
@@ -408,7 +413,7 @@ export default class CivilProvidedDocumentsView extends Vue {
   }
 
   // Method to start polling for progress values
-  startPolling() {
+  public startPolling() {
     shared.startPolling(this);
   }
   
@@ -431,6 +436,14 @@ export default class CivilProvidedDocumentsView extends Vue {
     this.documents[data.index].isChecked = true;
     this.preDownloadDocuments();
   }
+
+  public isJudiciaryUser() {
+    return shared.isJudiciaryUser(this);
+  }
+
+  filteredFields() {
+    return shared.filteredFields(this);
+  }
 }
 </script>
 
@@ -446,5 +459,13 @@ export default class CivilProvidedDocumentsView extends Vue {
   float: right;
   font-size: smaller;
   vertical-align: middle;
+}
+.pad-left {
+  padding-left: 10px;
+}
+.header-wrapper {
+  padding-left: 10px;
+  display: flex;
+  align-items: center;
 }
 </style>

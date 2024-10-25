@@ -221,5 +221,16 @@ export default {
     });
     
     return complete;
+  },
+
+  filteredFields(parent) {
+    if (this.isJudiciaryUser(parent)) {
+      return parent.fields; // show all fields
+    }
+    return parent.fields.filter(field => field.key !== 'download' && field.key !== 'select');
+  },
+
+  isJudiciaryUser(parent) {
+    return parent.userInfo.userType === "idird";
   }
 };
