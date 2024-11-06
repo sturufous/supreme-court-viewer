@@ -24,8 +24,11 @@ using Scv.Api.Infrastructure.Encryption;
 using Scv.Api.Infrastructure.Middleware;
 using Scv.Api.Services.EF;
 using Scv.Db.Models;
+using Scv.Api.Controllers;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
+using System.Text;
+using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Mvc.NewtonsoftJson;
 using ColeSoft.Extensions.Logging.Splunk;
 using Npgsql.EntityFrameworkCore.PostgreSQL;
@@ -77,6 +80,8 @@ namespace Scv.Api
                         options.EnableSensitiveDataLogging();
                 }
             );
+
+            services.AddHttpClient<FilesController>();
             
             services.AddMapster();
 

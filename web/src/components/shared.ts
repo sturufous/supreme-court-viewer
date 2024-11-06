@@ -131,7 +131,6 @@ export default {
           if (transfer.percentTransfered < 100) {
             parent.$http.get(url).then(
               (response) => {
-                  debugger;
                   const blob = response.data;
                   if (blob.error == true && parent.progressValues[index].error === false) {
                     parent.$bvToast.toast(`Error - ${blob.fileName} - ${blob.lastErrorMessage}`, {
@@ -231,6 +230,6 @@ export default {
   },
 
   isJudiciaryUser(parent) {
-    return parent.userInfo.userType === "idird";
+    return parent.userInfo.userType === "idir";
   }
 };

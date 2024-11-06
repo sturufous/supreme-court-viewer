@@ -318,7 +318,6 @@ export default class CivilProvidedDocumentsView extends Vue {
   }
 
   public checkAllDocuments(checked) {
-  debugger;
     if (this.activetab != "ALL") {
       for (const docInx in this.documents) {
         if (
@@ -397,11 +396,11 @@ export default class CivilProvidedDocumentsView extends Vue {
   public preDownloadDocuments(): void {
     this.documents.forEach(listItem => {
       if (listItem.isChecked) {
-        debugger;
         const objGuid = encodeURIComponent(btoa(listItem.objectGuid));
         const filePath = encodeURIComponent(`${this.$route.params.location}/${this.$route.params.fileNumberText}/${this.$route.params.room}`);
         const fileName = encodeURIComponent(`${this.$route.params.fileNumberText}-${listItem.referenceDocumentTypeDsc}-${listItem.appearanceDate.substring(0, 10)}-${listItem.partyName[0]}.pdf`);
-        const url = `api/files/upload?objGuid=${objGuid}&filePath=${filePath}&fileName=${fileName}`;
+        const fileNameFiltered = fileName.replace(/\//g, "-").replace(/\\/g, "-");
+        const url = `api/files/upload?objGuid=${objGuid}&filePathIn=${filePath}&fileNameIn=${fileNameFiltered}`;
 
         shared.submitUploadRequest(url, this);
       }

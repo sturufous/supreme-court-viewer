@@ -466,10 +466,10 @@ export default class CourtListLayout extends Vue {
       cellStyle: "margin-top: 3px; font-size: 16px; font-weight:normal;",
     },
     { key: "dummy", label: "Dummy", tdClass: "border-top", cellStyle: "font-size:16px" }, // This table never renders the fifth column
-    { key: "fileNumber", label: "File Number", tdClass: "border-top", cellStyle: "font-size:16px" },
+    { key: "fileNumber", label: "File Number", tdClass: "border-top", cellStyle: "white-space: nowrap; font-size: 16px" },
     { key: "parties", label: "Parties", tdClass: "border-top", cellStyle: "font-size:16px; font-weight: bold;" },
     { key: "accused", label: "Accused", tdClass: "border-top", cellStyle: "font-size:16px; font-weight: bold;" },
-    { key: "time", label: "Time", tdClass: "border-top", cellStyle: "font-size:16px; margin-top: 3px;" },
+    { key: "time", label: "Time", tdClass: "border-top", cellStyle: "font-size:16px; white-space: nowrap; margin-top: 3px;" },
     {
       key: "est",
       label: "Est.",
@@ -976,9 +976,11 @@ export default class CourtListLayout extends Vue {
 
       this.referenceDocs[index].doc.forEach(refDoc => {
         const objGuid = encodeURIComponent(btoa(refDoc.documentId));
-        const filePath = encodeURIComponent(`${refDoc.location}/${refDoc.fileNumberText}/${listItem.room}`);
-        const fileName = encodeURIComponent(`${refDoc.fileNumberText}-${refDoc.documentDescription}-${refDoc.appearanceDate}-${this.courtList[index].parties}.pdf`);
-        const url = `api/files/upload?objGuid=${objGuid}&filePath=${filePath}&fileName=${fileName}`;
+        const filePathIn = encodeURIComponent(`${refDoc.location}/${refDoc.fileNumberText}/${listItem.room}`);
+        const parties = this.courtList[index].parties;
+        const partiesFiltered = parties.replace(/\//g, "-").replace(/\\/g, "-");
+        const filenameIn = encodeURIComponent(`${refDoc.fileNumberText}-${refDoc.documentDescription}-${refDoc.appearanceDate}-${partiesFiltered}.pdf`);
+        const url = `api/files/upload?objGuid=${objGuid}&filePathIn=${filePathIn}&fileNameIn=${filenameIn}`;
 
         shared.submitUploadRequest(url, this);
       })

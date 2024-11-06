@@ -26,6 +26,7 @@ using Scv.Api.Infrastructure.Authorization;
 using Scv.Api.Models.archive;
 using Scv.Db.Models;
 using Scv.Api.Models.Search;
+using System.Net.Http;
 
 namespace tests.api.Controllers
 {
@@ -77,7 +78,8 @@ namespace tests.api.Controllers
 
             //TODO fake this.
             var vcCivilFileAccessHandler = new VcCivilFileAccessHandler(new ScvDbContext());
-            _controller = new FilesController(fileServices.Configuration, fileServices.LogFactory.CreateLogger<FilesController>(), _service, vcCivilFileAccessHandler, contextAccessor);
+            var mockHttpClient = new HttpClient(new HttpMessageHandlerMock());
+            _controller = new FilesController(fileServices.Configuration, fileServices.LogFactory.CreateLogger<FilesController>(), _service, vcCivilFileAccessHandler, contextAccessor, mockHttpClient);
             _controller.ControllerContext = HttpResponseTest.SetupMockControllerContext(fileServices.Configuration);
         }
 

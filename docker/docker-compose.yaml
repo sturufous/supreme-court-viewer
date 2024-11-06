@@ -50,7 +50,7 @@ services:
       - SplunkCollectorUrl=${SplunkCollectorUrl}
       - SplunkCollectorId=${SplunkCollectorId}
       - SplunkToken=${SplunkToken}
-      - PreDownloadUrl=${PreDownloadUrl}
+      - PreDownloadHost=${PreDownloadHost}
       - PreDownloadId=${PreDownloadId}
       - PreDownloadPassword=${PreDownloadPassword}
 

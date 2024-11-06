@@ -14,6 +14,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
 using Microsoft.AspNetCore.Authorization;
 using Scv.Api.Helpers.Extensions;
 using Scv.Api.Services.Files;
@@ -45,13 +46,13 @@ namespace Scv.Api.Controllers
         private readonly CriminalFilesService _criminalFilesService;
         private readonly VcCivilFileAccessHandler _vcCivilFileAccessHandler;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private static readonly HttpClient client = new HttpClient();
+        private readonly HttpClient _httpClient;
 
         #endregion Variables
 
         #region Constructor
 
-        public FilesController(IConfiguration configuration, ILogger<FilesController> logger, FilesService filesService, VcCivilFileAccessHandler vcCivilFileAccessHandler, IHttpContextAccessor httpContextAccessor)
+        public FilesController(IConfiguration configuration, ILogger<FilesController> logger, FilesService filesService, VcCivilFileAccessHandler vcCivilFileAccessHandler, IHttpContextAccessor httpContextAccessor, HttpClient httpClient)
         {
             _configuration = configuration;
             _logger = logger;
@@ -60,7 +61,8 @@ namespace Scv.Api.Controllers
             _criminalFilesService = filesService.Criminal;
             _vcCivilFileAccessHandler = vcCivilFileAccessHandler;
             _httpContextAccessor = httpContextAccessor;
-            
+            _httpClient = httpClient;
+
             initializePreDownloadClient();
         }
 
@@ -70,7 +72,7 @@ namespace Scv.Api.Controllers
             var byteArray = Encoding.ASCII.GetBytes($"{userId}:{password}");
             var base64String = Convert.ToBase64String(byteArray);
 
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", base64String);
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", base64String);
         }
 
         #endregion Constructor
@@ -403,23 +405,23 @@ namespace Scv.Api.Controllers
 
         [HttpGet]
         [Route("upload")]
-        public async Task<ActionResult<String>> InitiatePreDownloadRequest(string objGuid, string filePath, string fileName)
+        public async Task<ActionResult<String>> InitiatePreDownloadRequest(string objGuid, string filePathIn, string fileNameIn)
         {
-            if (User.IsVcUser() || User.IsIdirUser()) // Only allow judiciary to download files
-                return Forbid();
+            // if (User.IsVcUser() || User.IsIdirUser()) // Only allow judiciary to download files
+            //     return Forbid();
 
             PreDownloadRequest dlRequest = new PreDownloadRequest
             {
                 objGuid = objGuid,
                 email = "stuart.morse@bccourts.ca", //User.Email(),
-                filePath = filePath,
-                fileName = fileName
+                filePath = filePathIn.Replace(" ", "_"),
+                fileName = fileNameIn.Replace(" ", "_")
             };
 
-            var url = _configuration.GetNonEmptyValue("PreDownloadUrl") + "/document/upload";
+            var url = XForwardedForHelper.BuildUrlString(_configuration.GetNonEmptyValue("PreDownloadHost"), null, "document/upload");
             string json = JsonConvert.SerializeObject(dlRequest);
             HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await client.PostAsync(url, content);
+            HttpResponseMessage response = await _httpClient.PostAsync(url, content);
             response.EnsureSuccessStatusCode(); // Throw an exception if the HTTP response is not successful
             string responseBody = await response.Content.ReadAsStringAsync(); // Read the response body as a string
 
@@ -430,11 +432,11 @@ namespace Scv.Api.Controllers
         [Route("status")]
         public async Task<ActionResult<String>> GetPreDownloadRequestStatus(string transferId)
         {
-            if (User.IsVcUser() || User.IsIdirUser()) // Only allow judiciary to check file status
-                return Forbid();
+            // if (User.IsVcUser() || User.IsIdirUser()) // Only allow judiciary to check file status
+            //     return Forbid();
 
-            var url = _configuration.GetNonEmptyValue("PreDownloadUrl") + "/document/status/" + transferId;
-            HttpResponseMessage response = await client.GetAsync(url);
+            var url = XForwardedForHelper.BuildUrlString(_configuration.GetNonEmptyValue("PreDownloadHost"), null, "document/status/" + transferId);
+            HttpResponseMessage response = await _httpClient.GetAsync(url);
             response.EnsureSuccessStatusCode(); // Throw an exception if the HTTP response is not successful
             string responseBody = await response.Content.ReadAsStringAsync(); // Read the response body as a string
 
@@ -445,13 +447,13 @@ namespace Scv.Api.Controllers
         [Route("terminate")]
         public async Task<ActionResult<String>> TerminatePreDownloadRequest(CancelPreDownloadRequest transfers)
         {
-            if (User.IsVcUser() || User.IsIdirUser()) // Only allow judiciary to terminate downloads
-                return Forbid(); 
+            // if (User.IsVcUser() || User.IsIdirUser()) // Only allow judiciary to terminate downloads
+            //     return Forbid(); 
                 
-            var url = _configuration.GetNonEmptyValue("PreDownloadUrl") + "/document/terminate";
+            var url = XForwardedForHelper.BuildUrlString(_configuration.GetNonEmptyValue("PreDownloadHost"), null, "document/terminate");
             string json = JsonConvert.SerializeObject(transfers);
             HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await client.PostAsync(url, content);
+            HttpResponseMessage response = await _httpClient.PostAsync(url, content);
             response.EnsureSuccessStatusCode(); // Throw an exception if the HTTP response is not successful
             string responseBody = await response.Content.ReadAsStringAsync(); // Read the response body as a string
 
